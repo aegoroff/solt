@@ -14,8 +14,6 @@ package solution
 %token COMMA
 %token DOT
 %token EQ
-%token BRACE_OPEN
-%token BRACE_CLOSE
 %token PAREN_OPEN
 %token PAREN_CLOSE
 %token COMMENT
@@ -25,8 +23,6 @@ package solution
 %token <str> IDENTIFIER
 %token <str> STRING
 %token <str> BARE_STRING
-%token <str> START_TAG
-%token <str> CLOSE_TAG
 
 %type <str> project_type_id project_name project_type project_path project_id project_section_name project_section_type
 %type <str> project_section_start project_section_key project_section_value
