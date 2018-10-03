@@ -47,11 +47,10 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
     const format = "  %v\t%v\n"
     tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-    fmt.Fprintf(tw, format, "Package", "Versions")
-    fmt.Fprintf(tw, format, "-------", "--------")
-
     for sol, m := range mismatches {
         fmt.Printf("\n %s\n", sol)
+        fmt.Fprintf(tw, format, "Package", "Versions")
+        fmt.Fprintf(tw, format, "-------", "--------")
         for _, item := range m {
             fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
         }
