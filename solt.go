@@ -18,13 +18,16 @@ type options struct {
 
     goptions.Verbs
 
+    // Finds files that not included into any project
     LostFiles struct {
         Filter string `goptions:"-f, --filter, description='Files filter. By default .cs files'"`
     } `goptions:"lostfiles"`
 
+    // Finds projects that not included into any solution within sources folder
     LostProjects struct {
     } `goptions:"lostprojects"`
 
+    // Shows nuget packages used within any folder that contains packages.confing file
     Nuget struct {
         Exclude string `goptions:"-e, --exclude, description='Do not include specified package version into output'"`
     } `goptions:"nuget"`
