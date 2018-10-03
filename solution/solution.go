@@ -43,6 +43,7 @@ func (l *lexer) Lex(lval *yySymType) int {
 }
 
 func (l *lexer) Error(e string) {
+    // TODO: fix this spike
     if !l.atEOF {
         log.Print(e)
     } else if yyDebug >= 1 {
