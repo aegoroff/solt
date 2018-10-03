@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "solt/solution"
     "strings"
     "text/tabwriter"
 )
@@ -61,7 +62,7 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
 func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInfo) map[string][]*folderInfo {
     var solutionProjects = make(map[string][]*folderInfo)
     for _, sol := range solutions {
-        projects, _, _ := parseSolution(sol)
+        projects, _, _ := solution.Parse(sol)
         var solutionProjectIds = make(map[string]interface{})
         for _, sp := range projects {
             solutionProjectIds[sp.Id] = nil
@@ -86,7 +87,7 @@ func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInf
 
 func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][]*mismatch {
     var mismatches = make(map[string][]*mismatch)
-    for solution, projects := range solutionProjects {
+    for sol, projects := range solutionProjects {
         var packagesMap = make(map[string][]string)
         for _, prj := range projects {
             if prj.packages == nil {
@@ -116,10 +117,10 @@ func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][
                 versions: vers,
             }
 
-            if v, ok := mismatches[solution]; !ok {
-                mismatches[solution] = []*mismatch{&m}
+            if v, ok := mismatches[sol]; !ok {
+                mismatches[sol] = []*mismatch{&m}
             } else {
-                mismatches[solution] = append(v, &m)
+                mismatches[sol] = append(v, &m)
             }
         }
     }

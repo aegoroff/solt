@@ -1,7 +1,9 @@
 package solution
 
 import (
+    "bufio"
     "log"
+    "os"
     "strings"
 )
 
@@ -51,7 +53,40 @@ func (l *lexer) Error(e string) {
     }
 }
 
-func Parse(str string) ([]*Project, []*Section) {
+// Parses visual studio solution file specified by path
+func Parse(solutionPath string) ([]*Project, []*Section, error) {
+
+    f, err := os.Open(solutionPath)
+    if err != nil {
+        return nil, nil, err
+    }
+    defer f.Close()
+
+    br := bufio.NewReader(f)
+    r, _, err := br.ReadRune()
+    if err != nil {
+        return nil, nil, err
+    }
+    if r != '\uFEFF' {
+        br.UnreadRune() // Not a BOM -- put the rune back
+    }
+
+    bs := bufio.NewScanner(br)
+    bs.Split(bufio.ScanRunes)
+    sb := strings.Builder{}
+
+    for bs.Scan() {
+        sb.WriteString(bs.Text())
+    }
+
+    str := sb.String()
+
+    projects, globalSections := parse(str)
+
+    return projects, globalSections, nil
+}
+
+func parse(str string) ([]*Project, []*Section) {
     //yyDebug = 3
     projects = []*Project{}
     globalSections = []*Section{}
