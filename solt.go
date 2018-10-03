@@ -32,6 +32,10 @@ type options struct {
     Nuget struct {
         Mismatch bool `goptions:"-m, --mismatch, description='Find packages to consolidate i.e. packages with different versions in the same solution'"`
     } `goptions:"nuget"`
+
+    // Shows solutions information
+    Info struct {
+    } `goptions:"info"`
 }
 
 type Command func(options) error
@@ -40,6 +44,7 @@ var commands = map[goptions.Verbs]Command{
     "lostfiles":    lostfilescmd,
     "lostprojects": lostprojectscmd,
     "nuget":        nugetcmd,
+    "info":         infocmd,
 }
 
 type walkEntry struct {
