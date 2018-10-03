@@ -57,7 +57,7 @@ func readProjectDir(path string, action func(we *walkEntry)) map[string]*folderI
         }
 
         ext := strings.ToLower(filepath.Ext(we.Name))
-        if ext == CSharpProjectExt {
+        if ext == CSharpProjectExt || ext == CppProjectExt {
 
             // Create project model from msbuild project file
             full := filepath.Join(we.Parent, we.Name)

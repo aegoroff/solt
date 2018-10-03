@@ -7,6 +7,7 @@ import (
 )
 
 const CSharpProjectExt = ".csproj"
+const CppProjectExt = ".vcxproj"
 const CSharpCodeFileExt = ".cs"
 const SolutionFileExt = ".sln"
 const PackagesConfingFile = "packages.config"
