@@ -14,29 +14,28 @@ const PackagesConfingFile = "packages.config"
 type options struct {
     Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
     Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
-    Path      string        `goptions:"-p, --path, obligatory, description='Path to the project'"`
+    Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
 
     goptions.Verbs
 
-    Lost struct {
+    LostFiles struct {
         Filter string `goptions:"-f, --filter, description='Files filter. By default .cs files'"`
-    } `goptions:"lost"`
+    } `goptions:"lostfiles"`
 
-    Info struct {
-        Exclude string `goptions:"-e, --exclude, description='Do not include this version into output'"`
-    } `goptions:"info"`
+    LostProjects struct {
+    } `goptions:"lostprojects"`
 
-    Analyze struct {
-        Solution string `goptions:"-s, --solution, description='solution file to analyze'"`
-    } `goptions:"analyze"`
+    Nuget struct {
+        Exclude string `goptions:"-e, --exclude, description='Do not include specified package version into output'"`
+    } `goptions:"nuget"`
 }
 
 type Command func(options) error
 
 var commands = map[goptions.Verbs]Command{
-    "lost":   lostcmd,
-    "info":   infocmd,
-    "analyze":   analyzecmd,
+    "lostfiles":    lostfilescmd,
+    "lostprojects": lostprojectscmd,
+    "nuget":        infocmd,
 }
 
 type walkEntry struct {

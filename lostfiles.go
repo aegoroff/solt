@@ -11,13 +11,13 @@ var excludeSubFolders = []string{
     "bin",
 }
 
-func lostcmd(opt options) error {
+func lostfilescmd(opt options) error {
     var includedFiles = make(map[string]interface{})
     var filteredFiles []string
 
     filter := CSharpCodeFileExt
-    if len(opt.Lost.Filter) > 0 {
-        filter = opt.Lost.Filter
+    if len(opt.LostFiles.Filter) > 0 {
+        filter = opt.LostFiles.Filter
     }
 
     var excludeFolders []string
