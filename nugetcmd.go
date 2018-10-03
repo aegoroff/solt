@@ -136,13 +136,21 @@ func contains(s []string, e string) bool {
 }
 
 func showPackagesInfoByFolders(foldersMap map[string]*folderInfo) {
+    const format = "  %v\t%v\n"
+    tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+
     for k, v := range foldersMap {
         if v.packages == nil {
             continue
         }
-        fmt.Printf("%s\n", k)
+        fmt.Printf(" %s\n", k)
+        fmt.Fprintf(tw, format, "Package", "Version")
+        fmt.Fprintf(tw, format, "-------", "--------")
+
         for _, p := range v.packages.Packages {
-            fmt.Printf("\t%s %s\n", p.Id, p.Version)
+            fmt.Fprintf(tw, format, p.Id, p.Version)
         }
+        tw.Flush()
+        fmt.Println()
     }
 }
