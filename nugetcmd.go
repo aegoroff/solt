@@ -42,7 +42,7 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
         return
     }
 
-    fmt.Println(" Found different nuget package's versions in the same solution:")
+    fmt.Println(" Different nuget package's versions in the same solution found:")
 
     const format = "  %v\t%v\n"
     tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
