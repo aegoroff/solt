@@ -61,7 +61,7 @@ func main() {
     err := goptions.Parse(&opt)
 
     if opt.Version {
-        fmt.Printf("solt v%s\n", VERSION)
+        fmt.Printf("solt v%s\n", Version)
         return
     }
 
