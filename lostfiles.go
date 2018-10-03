@@ -19,6 +19,7 @@ func lostfilescmd(opt options) error {
     }
 
     var foundFiles []string
+    var packagesFolders = make(map[string]interface{})
     foldersMap := readProjectDir(opt.Path, func(we *walkEntry) {
         // Add file to filtered files slice
         ext := strings.ToLower(filepath.Ext(we.Name))
@@ -26,9 +27,20 @@ func lostfilescmd(opt options) error {
             fp := filepath.Join(we.Parent, we.Name)
             foundFiles = append(foundFiles, fp)
         }
+
+        if ext == SolutionFileExt {
+            ppath := filepath.Join(we.Parent, "packages")
+            if _, ok := packagesFolders[ppath]; !ok {
+                packagesFolders[ppath] = nil
+            }
+        }
     })
 
     includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(foldersMap)
+
+    for k := range packagesFolders {
+        excludedFolders = append(excludedFolders, k)
+    }
 
     findLostFiles(excludedFolders, foundFiles, includedFiles)
 
