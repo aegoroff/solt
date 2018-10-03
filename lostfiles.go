@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "github.com/anknown/ahocorasick"
     "path/filepath"
     "strings"
 )
@@ -29,23 +28,28 @@ func lostfilescmd(opt options) error {
         }
     })
 
-    includedFiles, excludeFoldersMachine := createFilesAndFoldersMap(foldersMap)
+    includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(foldersMap)
 
+    findLostFiles(excludedFolders, foundFiles, includedFiles)
+
+    return nil
+}
+
+func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) {
+    excludedFoldersMachine := createAhoCorasickMachine(excludedFolders)
     for _, file := range foundFiles {
         if _, ok := includedFiles[file]; !ok {
 
-            if Match(excludeFoldersMachine, file) {
+            if Match(excludedFoldersMachine, file) {
                 continue
             }
 
             fmt.Println(file)
         }
     }
-
-    return nil
 }
 
-func createFilesAndFoldersMap(foldersMap map[string]*folderInfo) (map[string]interface{}, *goahocorasick.Machine) {
+func createIncludedFilesAndExcludedFolders(foldersMap map[string]*folderInfo) (map[string]interface{}, []string) {
     var excludeFolders []string
     var includedFiles = make(map[string]interface{})
     for k, v := range foldersMap {
@@ -53,7 +57,7 @@ func createFilesAndFoldersMap(foldersMap map[string]*folderInfo) (map[string]int
             continue
         }
 
-        // Add project base + exlude subfolder into exclude folders list
+        // Add project base + exclude subfolder into exclude folders list
         for _, s := range subfolderToExclude {
             sub := filepath.Join(k, s)
             excludeFolders = append(excludeFolders, sub)
@@ -79,6 +83,5 @@ func createFilesAndFoldersMap(foldersMap map[string]*folderInfo) (map[string]int
             }
         }
     }
-    excludeFoldersMachine := createAhoCorasickMachine(excludeFolders)
-    return includedFiles, excludeFoldersMachine
+    return includedFiles, excludeFolders
 }
