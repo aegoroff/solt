@@ -16,6 +16,7 @@ type options struct {
     Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
     Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
     Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
+    Version   bool          `goptions:"--version, description='Print version'"`
 
     goptions.Verbs
 
@@ -57,9 +58,14 @@ type walkEntry struct {
 func main() {
     opt := options{}
 
-    goptions.ParseAndFail(&opt)
+    err := goptions.Parse(&opt)
 
-    if len(opt.Verbs) == 0 {
+    if opt.Version {
+        fmt.Printf("solt v%s\n", VERSION)
+        return
+    }
+
+    if len(opt.Verbs) == 0 || opt.Help || err != nil {
         goptions.PrintHelp()
         return
     }
