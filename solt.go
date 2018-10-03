@@ -35,7 +35,7 @@ type Command func(options) error
 var commands = map[goptions.Verbs]Command{
     "lostfiles":    lostfilescmd,
     "lostprojects": lostprojectscmd,
-    "nuget":        infocmd,
+    "nuget":        nugetcmd,
 }
 
 type walkEntry struct {

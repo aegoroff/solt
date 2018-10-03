@@ -4,7 +4,7 @@ import (
     "fmt"
 )
 
-func infocmd(opt options) error {
+func nugetcmd(opt options) error {
 
     foldersMap := readProjectDir(opt.Path, func(we *walkEntry) {})
 
