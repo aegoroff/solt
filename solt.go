@@ -29,7 +29,7 @@ type options struct {
 
     // Shows nuget packages used within any folder that contains packages.confing file
     Nuget struct {
-        Exclude string `goptions:"-e, --exclude, description='Do not include specified package version into output'"`
+        Mismatch bool `goptions:"-m, --mismatch, description='Find packages to consolidate i.e. packages with different versions through solution projects'"`
     } `goptions:"nuget"`
 }
 
