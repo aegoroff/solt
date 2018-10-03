@@ -29,7 +29,7 @@ type options struct {
 
     // Shows nuget packages used within any folder that contains packages.confing file
     Nuget struct {
-        Mismatch bool `goptions:"-m, --mismatch, description='Find packages to consolidate i.e. packages with different versions through solution projects'"`
+        Mismatch bool `goptions:"-m, --mismatch, description='Find packages to consolidate i.e. packages with different versions in the same solution'"`
     } `goptions:"nuget"`
 }
 

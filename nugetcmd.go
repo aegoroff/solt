@@ -33,6 +33,32 @@ func nugetcmd(opt options) error {
 
 func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
 
+    solutionProjects := getProjectsOfSolutions(solutions, foldersMap)
+
+    mismatches := calculateMismatches(solutionProjects)
+
+    if len(mismatches) == 0 {
+        return
+    }
+
+    fmt.Println(" Found different nuget package's versions in the same solution:")
+
+    const format = "  %v\t%v\n"
+    tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+
+    fmt.Fprintf(tw, format, "Package", "Versions")
+    fmt.Fprintf(tw, format, "-------", "--------")
+
+    for sol, m := range mismatches {
+        fmt.Printf("\n %s\n", sol)
+        for _, item := range m {
+            fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+        }
+        tw.Flush()
+    }
+}
+
+func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInfo) map[string][]*folderInfo {
     var solutionProjects = make(map[string][]*folderInfo)
     for _, sol := range solutions {
         projects, _, _ := parseSolution(sol)
@@ -55,7 +81,10 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
             }
         }
     }
+    return solutionProjects
+}
 
+func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][]*mismatch {
     var mismatches = make(map[string][]*mismatch)
     for solution, projects := range solutionProjects {
         var packagesMap = make(map[string][]string)
@@ -94,26 +123,7 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
             }
         }
     }
-
-    if len(mismatches) == 0 {
-        return
-    }
-
-    fmt.Println("Found different nuget package's versions in the same solution:")
-
-    const format = "  %v\t%v\n"
-    tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
-
-    fmt.Fprintf(tw, format, "Package", "Versions")
-    fmt.Fprintf(tw, format, "-------", "--------")
-
-    for sol, m := range mismatches {
-        fmt.Printf("\n %s\n", sol)
-        for _, item := range m {
-            fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
-        }
-        tw.Flush()
-    }
+    return mismatches
 }
 
 func contains(s []string, e string) bool {
