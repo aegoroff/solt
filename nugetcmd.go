@@ -16,7 +16,7 @@ type mismatch struct {
 
 func nugetcmd(opt options) error {
     var solutions []string
-    foldersMap := readProjectDir(opt.Path, func(we *walkEntry) {
+    folders := readProjectDir(opt.Path, func(we *walkEntry) {
         ext := strings.ToLower(filepath.Ext(we.Name))
         if ext == SolutionFileExt {
             solutions = append(solutions, filepath.Join(we.Parent, we.Name))
@@ -24,17 +24,17 @@ func nugetcmd(opt options) error {
     })
 
     if opt.Nuget.Mismatch {
-        showMismatches(solutions, foldersMap)
+        showMismatches(solutions, folders)
     } else {
-        showPackagesInfoByFolders(foldersMap)
+        showPackagesInfoByFolders(folders)
     }
 
     return nil
 }
 
-func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
+func showMismatches(solutions []string, folders []*folderInfo) {
 
-    solutionProjects := getProjectsOfSolutions(solutions, foldersMap)
+    solutionProjects := getProjectsOfSolutions(solutions, folders)
 
     mismatches := calculateMismatches(solutionProjects)
 
@@ -58,7 +58,7 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
     }
 }
 
-func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInfo) map[string][]*folderInfo {
+func getProjectsOfSolutions(solutions []string, folders []*folderInfo) map[string][]*folderInfo {
     var solutionProjects = make(map[string][]*folderInfo)
     for _, sol := range solutions {
         sln, _ := solution.Parse(sol)
@@ -67,7 +67,7 @@ func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInf
             solutionProjectIds[sp.Id] = nil
         }
 
-        for _, finfo := range foldersMap {
+        for _, finfo := range folders {
             if finfo.project == nil {
                 continue
             }
@@ -135,15 +135,17 @@ func contains(s []string, e string) bool {
     return false
 }
 
-func showPackagesInfoByFolders(foldersMap map[string]*folderInfo) {
+func showPackagesInfoByFolders(folders []*folderInfo) {
     const format = "  %v\t%v\n"
     tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-    for k, v := range foldersMap {
+    for _, v := range folders {
         if v.packages == nil {
             continue
         }
-        fmt.Printf(" %s\n", k)
+
+        parent := filepath.Dir(*v.projectPath)
+        fmt.Printf(" %s\n", parent)
         fmt.Fprintf(tw, format, "Package", "Version")
         fmt.Fprintf(tw, format, "-------", "--------")
 

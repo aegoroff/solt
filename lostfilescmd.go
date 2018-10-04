@@ -61,37 +61,26 @@ func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles 
     }
 }
 
-func createIncludedFilesAndExcludedFolders(foldersMap map[string]*folderInfo) (map[string]interface{}, []string) {
+func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string) {
     var excludeFolders []string
     var includedFiles = make(map[string]interface{})
-    for parent, info := range foldersMap {
+    for _, info := range folders {
         if info.project == nil {
             continue
         }
 
         // Add project base + exclude subfolder into exclude folders list
+        parent := filepath.Dir(*info.projectPath)
         for _, s := range subfolderToExclude {
             sub := filepath.Join(parent, s)
             excludeFolders = append(excludeFolders, sub)
         }
 
         // Add compiles, contents and nones into included files map
-        addFilesFrom(info.project.Compiles, parent, includedFiles)
-        addFilesFrom(info.project.Contents, parent, includedFiles)
-        addFilesFrom(info.project.Nones, parent, includedFiles)
-        addFilesFrom(info.project.CLCompiles, parent, includedFiles)
-        addFilesFrom(info.project.CLInclude, parent, includedFiles)
+        filesIncluded := getFilesIncludedIntoProject(info)
+        for _, f := range filesIncluded {
+            includedFiles[f] = nil
+        }
     }
     return includedFiles, excludeFolders
-}
-
-func addFilesFrom(src []Include, parent string, includedFiles map[string]interface{}) {
-    if src == nil {
-        return
-    }
-
-    for _, c := range src {
-        fp := filepath.Join(parent, c.Path)
-        includedFiles[fp] = nil
-    }
 }

@@ -13,7 +13,33 @@ type folderInfo struct {
     projectPath *string
 }
 
-func readProjectDir(path string, action func(we *walkEntry)) map[string]*folderInfo {
+func getFilesIncludedIntoProject(info *folderInfo) []string {
+    dir := filepath.Dir(*info.projectPath)
+    var result []string
+    result = append(result, getFiles(info.project.Contents, dir)...)
+    result = append(result, getFiles(info.project.Nones, dir)...)
+    result = append(result, getFiles(info.project.CLCompiles, dir)...)
+    result = append(result, getFiles(info.project.CLInclude, dir)...)
+    result = append(result, getFiles(info.project.Compiles, dir)...)
+    return result
+}
+
+func getFiles(includes []Include, dir string) []string {
+    if includes == nil {
+        return []string{}
+    }
+
+    var result []string
+
+    for _, c := range includes {
+        fp := filepath.Join(dir, c.Path)
+        result = append(result, fp)
+    }
+
+    return result
+}
+
+func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
     ch := make(chan *walkEntry, 1024)
 
     go func(ch chan<- *walkEntry) {
@@ -49,7 +75,7 @@ func readProjectDir(path string, action func(we *walkEntry)) map[string]*folderI
 
             info, ok := foldersMap[we.Parent]
             if !ok {
-                fi := folderInfo{packages: &pack}
+                fi := folderInfo{packages: &pack, projectPath: &full}
                 foldersMap[we.Parent] = &fi
             } else {
                 info.packages = &pack
@@ -83,5 +109,11 @@ func readProjectDir(path string, action func(we *walkEntry)) map[string]*folderI
         action(we)
     }
 
-    return foldersMap
+    var result []*folderInfo
+
+    for _, v := range foldersMap {
+        result = append(result, v)
+    }
+
+    return result
 }

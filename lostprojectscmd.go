@@ -95,28 +95,3 @@ func lostprojectscmd(opt options) error {
     return nil
 }
 
-func getFilesIncludedIntoProject(info *folderInfo) []string {
-    dir := filepath.Dir(*info.projectPath)
-    var result []string
-    result = append(result, getFiles(info.project.Contents, dir)...)
-    result = append(result, getFiles(info.project.Nones, dir)...)
-    result = append(result, getFiles(info.project.CLCompiles, dir)...)
-    result = append(result, getFiles(info.project.CLInclude, dir)...)
-    result = append(result, getFiles(info.project.Compiles, dir)...)
-    return result
-}
-
-func getFiles(includes []Include, dir string) []string {
-    if includes == nil {
-        return []string{}
-    }
-
-    var result []string
-
-    for _, c := range includes {
-        fp := filepath.Join(dir, c.Path)
-        result = append(result, fp)
-    }
-
-    return result
-}
