@@ -83,7 +83,7 @@ func lostprojectscmd(opt options) error {
     }
 
     if len(projectsOutsideSolutionWithFilesInside) > 0 {
-        fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within solution.\n")
+        fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
     }
 
     sort.Strings(projectsOutsideSolutionWithFilesInside)
