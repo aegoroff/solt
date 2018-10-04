@@ -17,12 +17,16 @@ func lostprojectscmd(opt options) error {
         }
     })
 
-    var projectsInSolution = make(map[string]*solution.Project)
+    var projectsInSolution = make(map[string]interface{})
     for _, sol := range solutions {
-        sol, _ := solution.Parse(sol)
-        for _, p := range sol.Projects {
-            if _, ok := projectsInSolution[p.Id]; !ok {
-                projectsInSolution[p.Id] = p
+        sln, _ := solution.Parse(sol)
+        parent := filepath.Dir(sol)
+
+        for _, p := range sln.Projects {
+            pp := filepath.Join(parent, p.Path)
+
+            if _, ok := projectsInSolution[pp]; !ok {
+                projectsInSolution[pp] = nil
             }
         }
     }
@@ -31,7 +35,7 @@ func lostprojectscmd(opt options) error {
         if p.project == nil {
             continue
         }
-        _, ok := projectsInSolution[p.project.Id]
+        _, ok := projectsInSolution[*p.projectPath]
         if !ok {
             fmt.Println(*p.projectPath)
         }
