@@ -28,7 +28,7 @@ package solution
 %token <str> NUMBER
 
 %type <str> project_type_id project_name project_type project_path project_id project_section_name project_section_type
-%type <str> project_section_start project_section_key project_section_value comment word lvalue rvalue
+%type <str> project_section_start project_section_key project_section_value comment lvalue rvalue
 
 %%
 
@@ -61,9 +61,9 @@ first_line: word words ;
 words: word
         | words word ;
 
-word : IDENTIFIER { $$ = $1; }
+word : IDENTIFIER { onWord($1) }
      | COMMA
-     | NUMBER { $$ = $1; }
+     | NUMBER { onWord($1) }
      ;
 
 version

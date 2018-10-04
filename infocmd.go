@@ -31,6 +31,7 @@ func infocmd(opt options) error {
         tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
 
+        fmt.Fprintf(tw, format, "Header", sln.Header)
         fmt.Fprintf(tw, format, "Product", sln.Comment)
         fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
         fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)

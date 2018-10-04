@@ -2,6 +2,7 @@ package solution
 
 import (
     "bufio"
+    "fmt"
     "log"
     "os"
     "strings"
@@ -13,6 +14,7 @@ type Solution struct {
     VisualStudioVersion        string
     MinimumVisualStudioVersion string
     Comment                    string
+    Header                     string
 }
 
 type Project struct {
@@ -42,6 +44,7 @@ var (
     visualStudioVersion        string
     minimumVisualStudioVersion string
     comment                    string
+    words                      []string
 )
 
 var ProjectsGuids = map[string]string{
@@ -166,6 +169,7 @@ func Parse(solutionPath string) (*Solution, error) {
         MinimumVisualStudioVersion: minimumVisualStudioVersion,
         VisualStudioVersion:        visualStudioVersion,
         Comment:                    comment,
+        Header:                     strings.Join(words, " "),
     }
 
     return &sol, nil
@@ -178,6 +182,7 @@ func parse(str string) {
     minimumVisualStudioVersion = ""
     visualStudioVersion = ""
     comment = ""
+    words = []string{}
     yyErrorVerbose = true
     lx := newLexer(str)
     yyParse(lx)
@@ -210,6 +215,14 @@ func onVersion(key, value string) {
 
 func onComment(value string) {
     comment = value
+}
+
+func onWord(value string) {
+    if value == "File" {
+        words = append(words, fmt.Sprintf("%s,", value))
+    } else {
+        words = append(words, value)
+    }
 }
 
 const projectSection = "ProjectSection"

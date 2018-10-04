@@ -20,7 +20,7 @@ func lostfilescmd(opt options) error {
 
     var foundFiles []string
     var packagesFolders = make(map[string]interface{})
-    foldersMap := readProjectDir(opt.Path, func(we *walkEntry) {
+    folders := readProjectDir(opt.Path, func(we *walkEntry) {
         // Add file to filtered files slice
         ext := strings.ToLower(filepath.Ext(we.Name))
         if ext == filter {
@@ -36,7 +36,7 @@ func lostfilescmd(opt options) error {
         }
     })
 
-    includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(foldersMap)
+    includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(folders)
 
     for k := range packagesFolders {
         excludedFolders = append(excludedFolders, k)
