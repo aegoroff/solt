@@ -4,6 +4,7 @@ import (
     "fmt"
     "path/filepath"
     "solt/solution"
+    "sort"
     "strings"
 )
 
@@ -79,6 +80,8 @@ func lostprojectscmd(opt options) error {
     if len(projectsOutsideSolutionWithFilesInside) > 0 {
         fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within solution.\n")
     }
+
+    sort.Strings(projectsOutsideSolutionWithFilesInside)
 
     for _, p := range projectsOutsideSolutionWithFilesInside {
         fmt.Printf(" %s\n", p)
