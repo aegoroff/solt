@@ -65,8 +65,13 @@ func lostprojectscmd(opt options) error {
         var includedIntoOther = false
         for _, f := range filesIncluded {
             if _, ok := filesInsideSolution[f]; ok {
-                includedIntoOther = true
-                break
+
+                dir := filepath.Dir(*info.projectPath)
+
+                if strings.Contains(f, dir) {
+                    includedIntoOther = true
+                    break
+                }
             }
         }
 
@@ -92,7 +97,7 @@ func lostprojectscmd(opt options) error {
 
 func getFilesIncludedIntoProject(info *folderInfo) []string {
     dir := filepath.Dir(*info.projectPath)
-    var  result []string
+    var result []string
     result = append(result, getFiles(info.project.Contents, dir)...)
     result = append(result, getFiles(info.project.Nones, dir)...)
     result = append(result, getFiles(info.project.CLCompiles, dir)...)
