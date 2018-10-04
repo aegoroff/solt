@@ -61,9 +61,9 @@ func showMismatches(solutions []string, foldersMap map[string]*folderInfo) {
 func getProjectsOfSolutions(solutions []string, foldersMap map[string]*folderInfo) map[string][]*folderInfo {
     var solutionProjects = make(map[string][]*folderInfo)
     for _, sol := range solutions {
-        projects, _, _ := solution.Parse(sol)
+        sln, _ := solution.Parse(sol)
         var solutionProjectIds = make(map[string]interface{})
-        for _, sp := range projects {
+        for _, sp := range sln.Projects {
             solutionProjectIds[sp.Id] = nil
         }
 

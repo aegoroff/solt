@@ -7,6 +7,14 @@ import (
     "strings"
 )
 
+type Solution struct {
+    Projects                   []*Project
+    GlobalSections             []*Section
+    VisualStudioVersion        string
+    MinimumVisualStudioVersion string
+    Comment                    string
+}
+
 type Project struct {
     Type     string
     TypeId   string
@@ -26,6 +34,15 @@ type SectionItem struct {
     Key   string
     Value string
 }
+
+const visualStudioVersionKey = "VisualStudioVersion"
+const minimumVisualStudioVersionKey = "MinimumVisualStudioVersion"
+
+var (
+    visualStudioVersion        string
+    minimumVisualStudioVersion string
+    comment                    string
+)
 
 var ProjectsGuids = map[string]string{
     "{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}": "Azure Project",
@@ -114,18 +131,18 @@ func (l *lexer) Error(e string) {
 }
 
 // Parses visual studio solution file specified by path
-func Parse(solutionPath string) ([]*Project, []*Section, error) {
+func Parse(solutionPath string) (*Solution, error) {
 
     f, err := os.Open(solutionPath)
     if err != nil {
-        return nil, nil, err
+        return nil, err
     }
     defer f.Close()
 
     br := bufio.NewReader(f)
     r, _, err := br.ReadRune()
     if err != nil {
-        return nil, nil, err
+        return nil, err
     }
     if r != '\uFEFF' {
         br.UnreadRune() // Not a BOM -- put the rune back
@@ -141,19 +158,29 @@ func Parse(solutionPath string) ([]*Project, []*Section, error) {
 
     str := sb.String()
 
-    projects, globalSections := parse(str)
+    parse(str)
 
-    return projects, globalSections, nil
+    sol := Solution{
+        GlobalSections:             globalSections,
+        Projects:                   projects,
+        MinimumVisualStudioVersion: minimumVisualStudioVersion,
+        VisualStudioVersion:        visualStudioVersion,
+        Comment:                    comment,
+    }
+
+    return &sol, nil
 }
 
-func parse(str string) ([]*Project, []*Section) {
+func parse(str string) {
     //yyDebug = 3
     projects = []*Project{}
     globalSections = []*Section{}
+    minimumVisualStudioVersion = ""
+    visualStudioVersion = ""
+    comment = ""
     yyErrorVerbose = true
     lx := newLexer(str)
     yyParse(lx)
-    return projects, globalSections
 }
 
 func onProject(projectType, name, path, id string) {
@@ -168,6 +195,21 @@ func onProject(projectType, name, path, id string) {
     }
 
     projects = append(projects, &p)
+}
+
+func onVersion(key, value string) {
+    switch key {
+    case minimumVisualStudioVersionKey:
+        minimumVisualStudioVersion = value
+        break
+    case visualStudioVersionKey:
+        visualStudioVersion = value
+        break
+    }
+}
+
+func onComment(value string) {
+    comment = value
 }
 
 const projectSection = "ProjectSection"

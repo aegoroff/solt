@@ -1,4 +1,4 @@
-//go:generate goyacc -o grammar.go -p solution grammar.y
+//go:generate goyacc -o grammar.go grammar.y
 %{
 package solution
 %}
@@ -23,9 +23,12 @@ package solution
 %token <str> IDENTIFIER
 %token <str> STRING
 %token <str> BARE_STRING
+%token <str> COMMENT
+%token <str> COMMA
+%token <str> NUMBER
 
 %type <str> project_type_id project_name project_type project_path project_id project_section_name project_section_type
-%type <str> project_section_start project_section_key project_section_value
+%type <str> project_section_start project_section_key project_section_value comment word lvalue rvalue
 
 %%
 
@@ -51,20 +54,20 @@ header_line
         | comment
         ;
 
-comment : COMMENT ;
+comment : COMMENT { $$ = $1; onComment($1) };
 
 first_line: word words ;
 
 words: word
         | words word ;
 
-word : IDENTIFIER
+word : IDENTIFIER { $$ = $1; }
      | COMMA
-     | NUMBER
+     | NUMBER { $$ = $1; }
      ;
 
 version
-    : lvalue EQ rvalue
+    : lvalue EQ rvalue { onVersion($1, $3) }
     ;
 
 lvalue : IDENTIFIER ;

@@ -19,8 +19,8 @@ func lostprojectscmd(opt options) error {
 
     var projectsInSolution = make(map[string]*solution.Project)
     for _, sol := range solutions {
-        projects, _, _ := solution.Parse(sol)
-        for _, p := range projects {
+        sol, _ := solution.Parse(sol)
+        for _, p := range sol.Projects {
             if _, ok := projectsInSolution[p.Id]; !ok {
                 projectsInSolution[p.Id] = p
             }
