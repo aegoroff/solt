@@ -47,14 +47,9 @@ func lostfilescmd(opt options) error {
 }
 
 func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) {
-    excludedFoldersMachine := createAhoCorasickMachine(excludedFolders)
+    exmach := createAhoCorasickMachine(excludedFolders)
     for _, file := range foundFiles {
-        if _, ok := includedFiles[file]; !ok {
-
-            if Match(excludedFoldersMachine, file) {
-                continue
-            }
-
+        if _, ok := includedFiles[file]; !ok && !Match(exmach, file) {
             fmt.Println(file)
         }
     }

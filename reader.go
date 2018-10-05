@@ -92,7 +92,7 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
             err := unmarshalXml(full, &project)
 
             if err != nil {
-                log.Print(err)
+                log.Printf("%s: %v\n", full, err)
                 continue
             }
 
