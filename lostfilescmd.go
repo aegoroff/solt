@@ -8,7 +8,6 @@ import (
 
 var subfolderToExclude = []string{
     "obj",
-    "bin",
 }
 
 func lostfilescmd(opt options) error {
@@ -74,6 +73,13 @@ func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]in
         for _, s := range subfolderToExclude {
             sub := filepath.Join(parent, s)
             excludeFolders = append(excludeFolders, sub)
+        }
+
+        if info.project.OutputPaths != nil {
+            for _, s := range info.project.OutputPaths {
+                sub := filepath.Join(parent, s)
+                excludeFolders = append(excludeFolders, sub)
+            }
         }
 
         // Add compiles, contents and nones into included files map

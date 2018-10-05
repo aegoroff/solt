@@ -12,6 +12,7 @@ type Project struct {
     Nones             []Include          `xml:"ItemGroup>None"`
     References        []Reference        `xml:"ItemGroup>Reference"`
     ProjectReferences []ProjectReference `xml:"ItemGroup>ProjectReference"`
+    OutputPaths       []string           `xml:"PropertyGroup>OutputPath"`
 }
 
 type Include struct {
