@@ -61,7 +61,7 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
             break
         }
 
-        if we.Name == PackagesConfingFile {
+        if we.Name == PackagesConfigFile {
             // Create package model from packages.config
             full := filepath.Join(we.Parent, we.Name)
 

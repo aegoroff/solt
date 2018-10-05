@@ -10,7 +10,7 @@ const CSharpProjectExt = ".csproj"
 const CppProjectExt = ".vcxproj"
 const CSharpCodeFileExt = ".cs"
 const SolutionFileExt = ".sln"
-const PackagesConfingFile = "packages.config"
+const PackagesConfigFile = "packages.config"
 
 type options struct {
     Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
