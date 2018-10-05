@@ -59,11 +59,11 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
     }(readch)
 
     var result []*folderInfo
-    projectFolders := make(map[string]interface{})
 
     aggregatech := make(chan *folder, 1024)
 
     go func(ch <-chan *folder) {
+        projectFolders := make(map[string]interface{})
         for {
             f, ok := <-ch
             if !ok {
