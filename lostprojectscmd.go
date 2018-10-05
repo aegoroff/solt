@@ -11,7 +11,7 @@ import (
 func lostprojectscmd(opt options) error {
 
     var solutions []string
-    foldersMap := readProjectDir(opt.Path, func(we *walkEntry) {
+    folders := readProjectDir(opt.Path, func(we *walkEntry) {
         ext := strings.ToLower(filepath.Ext(we.Name))
         if ext == SolutionFileExt {
             sp := filepath.Join(we.Parent, we.Name)
@@ -41,7 +41,7 @@ func lostprojectscmd(opt options) error {
 
     var projectsOutsideSolution []*folderInfo
     var filesInsideSolution = make(map[string]interface{})
-    for _, info := range foldersMap {
+    for _, info := range folders {
         if info.project == nil {
             continue
         }
