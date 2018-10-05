@@ -39,8 +39,13 @@ func getFiles(includes []Include, dir string) []string {
     return result
 }
 
+type folderInfoPair struct {
+    info   *folderInfo
+    parent string
+}
+
 func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
-    ch := make(chan *walkEntry, 1024)
+    readch := make(chan *walkEntry, 1024)
 
     go func(ch chan<- *walkEntry) {
         walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
@@ -51,44 +56,69 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
             ch <- &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
         })
         close(ch)
-    }(ch)
+    }(readch)
 
-    foldersMap := make(map[string]*folderInfo)
+    var result []*folderInfo
+    parents := make(map[string]interface{})
+
+    aggregatech := make(chan *folderInfoPair, 1024)
+
+    go func(ch <-chan *folderInfoPair) {
+        for {
+            fi, ok := <-ch
+            if !ok {
+                break
+            }
+
+            if _, ok := parents[fi.parent]; !ok {
+                parents[fi.parent] = nil
+                result = append(result, fi.info)
+            } else {
+                current := result[len(result)-1]
+
+                if current.project == nil {
+                    // Project read after packages.config
+                    current.project = fi.info.project
+                    current.projectPath = fi.info.projectPath
+                } else if current.packages == nil {
+                    // Project read before packages.config
+                    current.packages = fi.info.packages
+                }
+            }
+        }
+    }(aggregatech)
 
     for {
-        we, ok := <-ch
+        we, ok := <-readch
         if !ok {
+            close(aggregatech)
             break
         }
 
         if we.Name == PackagesConfigFile {
             // Create package model from packages.config
             full := filepath.Join(we.Parent, we.Name)
-
             pack := Packages{}
-
             err := unmarshalXml(full, &pack)
 
             if err != nil {
-                log.Print(err)
+                log.Printf("%s: %v\n", full, err)
+                continue
             }
 
-            info, ok := foldersMap[we.Parent]
-            if !ok {
-                fi := folderInfo{packages: &pack, projectPath: &full}
-                foldersMap[we.Parent] = &fi
-            } else {
-                info.packages = &pack
+            pi := folderInfoPair{
+                info:   &folderInfo{packages: &pack, projectPath: &full},
+                parent: we.Parent,
             }
+
+            aggregatech <- &pi
         }
 
         ext := strings.ToLower(filepath.Ext(we.Name))
         if ext == CSharpProjectExt || ext == CppProjectExt {
-
             // Create project model from msbuild project file
             full := filepath.Join(we.Parent, we.Name)
             project := Project{}
-
             err := unmarshalXml(full, &project)
 
             if err != nil {
@@ -96,23 +126,15 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
                 continue
             }
 
-            info, ok := foldersMap[we.Parent]
-            if !ok {
-                fi := folderInfo{project: &project, projectPath: &full}
-                foldersMap[we.Parent] = &fi
-            } else {
-                info.project = &project
-                info.projectPath = &full
+            pi := folderInfoPair{
+                info:   &folderInfo{project: &project, projectPath: &full},
+                parent: we.Parent,
             }
+
+            aggregatech <- &pi
         }
 
         action(we)
-    }
-
-    var result []*folderInfo
-
-    for _, v := range foldersMap {
-        result = append(result, v)
     }
 
     return result
