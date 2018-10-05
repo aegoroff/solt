@@ -14,7 +14,6 @@ const PackagesConfingFile = "packages.config"
 
 type options struct {
     Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
-    Verbosity bool          `goptions:"-v, --verbose, description='Be verbose'"`
     Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
     Version   bool          `goptions:"--version, description='Print version'"`
 
