@@ -13,6 +13,11 @@ type folderInfo struct {
     projectPath *string
 }
 
+type folder struct {
+    info *folderInfo
+    path string
+}
+
 func getFilesIncludedIntoProject(info *folderInfo) []string {
     dir := filepath.Dir(*info.projectPath)
     var result []string
@@ -39,11 +44,6 @@ func getFiles(includes []Include, dir string) []string {
     return result
 }
 
-type folderInfoPair struct {
-    info   *folderInfo
-    parent string
-}
-
 func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
     readch := make(chan *walkEntry, 1024)
 
@@ -59,30 +59,30 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
     }(readch)
 
     var result []*folderInfo
-    parents := make(map[string]interface{})
+    projectFolders := make(map[string]interface{})
 
-    aggregatech := make(chan *folderInfoPair, 1024)
+    aggregatech := make(chan *folder, 1024)
 
-    go func(ch <-chan *folderInfoPair) {
+    go func(ch <-chan *folder) {
         for {
-            fi, ok := <-ch
+            f, ok := <-ch
             if !ok {
                 break
             }
 
-            if _, ok := parents[fi.parent]; !ok {
-                parents[fi.parent] = nil
-                result = append(result, fi.info)
+            if _, ok := projectFolders[f.path]; !ok {
+                projectFolders[f.path] = nil
+                result = append(result, f.info)
             } else {
                 current := result[len(result)-1]
 
                 if current.project == nil {
                     // Project read after packages.config
-                    current.project = fi.info.project
-                    current.projectPath = fi.info.projectPath
+                    current.project = f.info.project
+                    current.projectPath = f.info.projectPath
                 } else if current.packages == nil {
                     // Project read before packages.config
-                    current.packages = fi.info.packages
+                    current.packages = f.info.packages
                 }
             }
         }
@@ -96,46 +96,53 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
         }
 
         if we.Name == PackagesConfigFile {
-            // Create package model from packages.config
-            full := filepath.Join(we.Parent, we.Name)
-            pack := Packages{}
-            err := unmarshalXml(full, &pack)
-
-            if err != nil {
-                log.Printf("%s: %v\n", full, err)
-                continue
+            if f, ok := onPackagesConfig(we); ok {
+                aggregatech <- f
             }
-
-            pi := folderInfoPair{
-                info:   &folderInfo{packages: &pack, projectPath: &full},
-                parent: we.Parent,
-            }
-
-            aggregatech <- &pi
         }
 
         ext := strings.ToLower(filepath.Ext(we.Name))
         if ext == CSharpProjectExt || ext == CppProjectExt {
-            // Create project model from msbuild project file
-            full := filepath.Join(we.Parent, we.Name)
-            project := Project{}
-            err := unmarshalXml(full, &project)
-
-            if err != nil {
-                log.Printf("%s: %v\n", full, err)
-                continue
+            if f, ok := onMsbuildProject(we); ok {
+                aggregatech <- f
             }
-
-            pi := folderInfoPair{
-                info:   &folderInfo{project: &project, projectPath: &full},
-                parent: we.Parent,
-            }
-
-            aggregatech <- &pi
         }
 
         action(we)
     }
 
     return result
+}
+
+func onPackagesConfig(we *walkEntry) (*folder, bool) {
+    // Create packages model from packages.config
+    full := filepath.Join(we.Parent, we.Name)
+    pack := Packages{}
+    err := unmarshalXml(full, &pack)
+    if err != nil {
+        log.Printf("%s: %v\n", full, err)
+        return nil, false
+    }
+    pi := folder{
+        info: &folderInfo{packages: &pack, projectPath: &full},
+        path: we.Parent,
+    }
+    return &pi, true
+}
+
+func onMsbuildProject(we *walkEntry) (*folder, bool) {
+    // Create project model from project file
+    full := filepath.Join(we.Parent, we.Name)
+    project := Project{}
+    err := unmarshalXml(full, &project)
+    if err != nil {
+        log.Printf("%s: %v\n", full, err)
+        return nil, false
+    }
+    pi := folder{
+        info: &folderInfo{project: &project, projectPath: &full},
+        path: we.Parent,
+    }
+
+    return &pi, true
 }
