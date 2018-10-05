@@ -13,7 +13,6 @@ const SolutionFileExt = ".sln"
 const PackagesConfingFile = "packages.config"
 
 type options struct {
-    Help      goptions.Help `goptions:"-h, --help, description='Show this help'"`
     Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
     Version   bool          `goptions:"--version, description='Print version'"`
 
@@ -64,7 +63,7 @@ func main() {
         return
     }
 
-    if len(opt.Verbs) == 0 || opt.Help || err != nil {
+    if len(opt.Verbs) == 0 || err != nil {
         goptions.PrintHelp()
         return
     }
