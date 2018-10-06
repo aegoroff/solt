@@ -16,12 +16,23 @@ skip_tags: true
 environment:
   GOPATH: c:\gopath
 
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - go version
+  - go env
+  - go get -u "github.com/anknown/ahocorasick"
+  - go get -u "github.com/dustin/go-humanize"
+  - go get -u "github.com/voxelbrain/goptions"
+
 stack: go 1.11
 
 image: Visual Studio 2017
 
-build: off
+build_script:
+  - go build -ldflags "-X main.Version=0.1.{build}" solt
 
 test_script:
-- go test ./...
+  - go test ./...
 
