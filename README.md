@@ -1,6 +1,8 @@
 solt
 ====
 
+[![Build status](https://ci.appveyor.com/api/projects/status/tgx6ai9erbgfq2ij?svg=true)](https://ci.appveyor.com/project/aegoroff/solt)
+
 **SOL**ution **T**ool is a small commandline app written in Go that allows you to easily analyze
 sources and Microsoft Visual Studion solutions and projects.
 The tool can find files that aren't included into any project and projects that
