@@ -116,33 +116,45 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
 
 func onPackagesConfig(we *walkEntry) (*folder, bool) {
     // Create packages model from packages.config
-    full := filepath.Join(we.Parent, we.Name)
     pack := Packages{}
-    err := unmarshalXml(full, &pack)
-    if err != nil {
-        log.Printf("%s: %v\n", full, err)
+
+    f, ok := onXmlFile(we, &pack)
+    if !ok {
         return nil, false
     }
-    pi := folder{
-        info: &folderInfo{packages: &pack, projectPath: &full},
-        path: we.Parent,
-    }
-    return &pi, true
+
+    f.info.packages = &pack
+
+    return f, true
 }
 
 func onMsbuildProject(we *walkEntry) (*folder, bool) {
     // Create project model from project file
-    full := filepath.Join(we.Parent, we.Name)
     project := Project{}
-    err := unmarshalXml(full, &project)
+
+    f, ok := onXmlFile(we, &project)
+    if !ok {
+        return nil, false
+    }
+
+    f.info.project = &project
+
+    return f, true
+}
+
+func onXmlFile(we *walkEntry, result interface{}) (*folder, bool) {
+    full := filepath.Join(we.Parent, we.Name)
+
+    err := unmarshalXml(full, result)
     if err != nil {
         log.Printf("%s: %v\n", full, err)
         return nil, false
     }
-    pi := folder{
-        info: &folderInfo{project: &project, projectPath: &full},
+
+    f := folder{
+        info: &folderInfo{projectPath: &full},
         path: we.Parent,
     }
 
-    return &pi, true
+    return &f, true
 }
