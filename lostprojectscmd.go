@@ -13,7 +13,7 @@ func lostprojectscmd(opt options) error {
     var solutions []string
     folders := readProjectDir(opt.Path, func(we *walkEntry) {
         ext := strings.ToLower(filepath.Ext(we.Name))
-        if ext == SolutionFileExt {
+        if ext == solutionFileExt {
             sp := filepath.Join(we.Parent, we.Name)
             solutions = append(solutions, sp)
         }

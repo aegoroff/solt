@@ -1,6 +1,6 @@
 package solution
 
-// Visual Studio solution definition
+// Solution is Visual Studio solution definition
 type Solution struct {
     Projects                   []*Project
     GlobalSections             []*Section
@@ -27,13 +27,13 @@ type Section struct {
     Items []*SectionItem
 }
 
-// Section element definition
+// SectionItem is Section element definition
 type SectionItem struct {
     Key   string
     Value string
 }
 
-// All possible project GUIDs
+// ProjectsGuids are all possible project GUIDs
 var ProjectsGuids = map[string]string{
     "{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}": "Azure Project",
     "{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}": "ASP.NET 5",

@@ -6,11 +6,11 @@ import (
     "os"
 )
 
-const CSharpProjectExt = ".csproj"
-const CppProjectExt = ".vcxproj"
-const CSharpCodeFileExt = ".cs"
-const SolutionFileExt = ".sln"
-const PackagesConfigFile = "packages.config"
+const csharpProjectExt = ".csproj"
+const cppProjectExt = ".vcxproj"
+const csharpCodeFileExt = ".cs"
+const solutionFileExt = ".sln"
+const packagesConfigFile = "packages.config"
 
 type options struct {
     Path      string        `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
@@ -37,9 +37,9 @@ type options struct {
     } `goptions:"info"`
 }
 
-type Command func(options) error
+type command func(options) error
 
-var commands = map[goptions.Verbs]Command{
+var commands = map[goptions.Verbs]command{
     "lostfiles":    lostfilescmd,
     "lostprojects": lostprojectscmd,
     "nuget":        nugetcmd,

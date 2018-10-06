@@ -37,7 +37,7 @@ func (l *lexer) Error(e string) {
     log.Print(e)
 }
 
-// Parses visual studio solution file specified by path
+// Parse parses visual studio solution file specified by path
 func Parse(solutionPath string) (*Solution, error) {
 
     f, err := os.Open(solutionPath)

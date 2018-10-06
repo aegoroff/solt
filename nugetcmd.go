@@ -18,7 +18,7 @@ func nugetcmd(opt options) error {
     var solutions []string
     folders := readProjectDir(opt.Path, func(we *walkEntry) {
         ext := strings.ToLower(filepath.Ext(we.Name))
-        if ext == SolutionFileExt {
+        if ext == solutionFileExt {
             solutions = append(solutions, filepath.Join(we.Parent, we.Name))
         }
     })

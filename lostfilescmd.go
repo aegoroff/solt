@@ -12,7 +12,7 @@ var subfolderToExclude = []string{
 
 func lostfilescmd(opt options) error {
 
-    filter := CSharpCodeFileExt
+    filter := csharpCodeFileExt
     if len(opt.LostFiles.Filter) > 0 {
         filter = opt.LostFiles.Filter
     }
@@ -27,7 +27,7 @@ func lostfilescmd(opt options) error {
             foundFiles = append(foundFiles, fp)
         }
 
-        if ext == SolutionFileExt {
+        if ext == solutionFileExt {
             ppath := filepath.Join(we.Parent, "packages")
             if _, ok := packagesFolders[ppath]; !ok {
                 packagesFolders[ppath] = nil

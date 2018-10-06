@@ -95,14 +95,14 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
             break
         }
 
-        if we.Name == PackagesConfigFile {
+        if we.Name == packagesConfigFile {
             if f, ok := onPackagesConfig(we); ok {
                 aggregatech <- f
             }
         }
 
         ext := strings.ToLower(filepath.Ext(we.Name))
-        if ext == CSharpProjectExt || ext == CppProjectExt {
+        if ext == csharpProjectExt || ext == cppProjectExt {
             if f, ok := onMsbuildProject(we); ok {
                 aggregatech <- f
             }
