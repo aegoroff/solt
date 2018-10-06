@@ -32,8 +32,12 @@ stack: go 1.11
 image: Visual Studio 2017
 
 build_script:
-  - go build -ldflags "-X main.Version=0.1.{build}" solt
+  - go build -ldflags "-X main.Version=0.1.{build}" -o buildOutput\solt solt
 
 test_script:
   - go test ./...
+
+artifacts:
+  - path: buildOutput/solt
+    name: binary
 
