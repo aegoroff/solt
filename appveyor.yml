@@ -35,7 +35,7 @@ build_script:
   - go build -ldflags "-X main.Version=%APPVEYOR_BUILD_VERSION%" solt
 
 test_script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic solt
+  - go test -coverprofile=coverage.txt -covermode=atomic solt
 
 after_test:
   - ps: |
