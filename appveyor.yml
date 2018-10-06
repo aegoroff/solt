@@ -1,7 +1,7 @@
 ﻿# version format
 version: 0.1.{build}
 
-clone_folder: c:\gopath\src\github.com\aegoroff\solt
+clone_folder: c:\gopath\src\solt
 
 # branches to build
 branches:
