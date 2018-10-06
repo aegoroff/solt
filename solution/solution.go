@@ -24,24 +24,17 @@ var (
 func (l *lexer) Lex(lval *yySymType) int {
     v := l.nextItem()
     if v.tok == itemEOF {
-        lval.tok = 0
-    } else {
-        lval.tok = v.tok
+        return 0
     }
+    lval.tok = v.tok
     lval.str = v.str
     lval.line = v.line
     lval.yys = v.yys
-    //fmt.Printf("%s:%q\n",lval.tok, lval.str)
     return int(lval.tok)
 }
 
 func (l *lexer) Error(e string) {
-    // TODO: fix this spike
-    if !l.atEOF {
-        log.Print(e)
-    } else if yyDebug >= 1 {
-        log.Print(e)
-    }
+    log.Print(e)
 }
 
 // Parses visual studio solution file specified by path
@@ -78,7 +71,6 @@ func Parse(solutionPath string) (*Solution, error) {
 }
 
 func parse(str string) *Solution {
-    //yyDebug = 3
     projects = []*Project{}
     globalSections = []*Section{}
     minimumVisualStudioVersion = ""
@@ -131,7 +123,7 @@ func onComment(value string) {
 func onWord(value string) {
     if value == "File" {
         // HACK
-        words = append(words, value + ",")
+        words = append(words, value+",")
     } else {
         words = append(words, value)
     }

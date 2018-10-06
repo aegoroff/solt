@@ -40,12 +40,12 @@ lines
     ;
 
 line
-    : header_line
+    :
+    | header_line
     | project_start
     | project_end
     | project_section
     | project_section_key_value_pair
-    | CRLF
     ;
 
 header_line
