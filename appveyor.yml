@@ -19,7 +19,7 @@ environment:
 install:
   - echo %PATH%
   - echo %GOPATH%
-  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;C:\msys64\usr\bin;%PATH%
   - go version
   - go env
   - go get -u "github.com/anknown/ahocorasick"
@@ -39,7 +39,6 @@ test_script:
 
 after_test:
   - ps: |
-      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
       bash codecov.sh -f "coverage.txt" -t $env:CODECOV_TOKEN
 
