@@ -35,7 +35,10 @@ build_script:
   - go build -ldflags "-X main.Version=%APPVEYOR_BUILD_VERSION%" solt
 
 test_script:
-  - go test ./...
+  - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 artifacts:
   - path: solt.exe
