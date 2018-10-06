@@ -1,41 +1,41 @@
 package solution
 
 import (
-    "github.com/stretchr/testify/assert"
-    "testing"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func Test_ParseSolution_ParsedSolution(t *testing.T) {
-    // Arrange
-    ass := assert.New(t)
-    var tests = []struct {
-        input                string
-        expectedComment      string
-        expectedHead         string
-        expectedVer          string
-        expectedMinVer       string
-        expectedProjectCount int
-        expectedGsCount      int
-        expectedProjectType  string
-    }{
-        {Vs2013, "# Visual Studio 2013", "Microsoft Visual Studio Solution File, Format Version 12.00", "12.0.31101.0", "10.0.40219.1", 1, 3, "C#"},
-        {Vs2010, "# Visual Studio 2010", "Microsoft Visual Studio Solution File, Format Version 11.00", "", "", 1, 3, "C#"},
-        {Vs2008, "# Visual Studio 2008", "Microsoft Visual Studio Solution File, Format Version 10.00", "", "", 1, 3, "C#"},
-    }
+	// Arrange
+	ass := assert.New(t)
+	var tests = []struct {
+		input                string
+		expectedComment      string
+		expectedHead         string
+		expectedVer          string
+		expectedMinVer       string
+		expectedProjectCount int
+		expectedGsCount      int
+		expectedProjectType  string
+	}{
+		{Vs2013, "# Visual Studio 2013", "Microsoft Visual Studio Solution File, Format Version 12.00", "12.0.31101.0", "10.0.40219.1", 1, 3, "C#"},
+		{Vs2010, "# Visual Studio 2010", "Microsoft Visual Studio Solution File, Format Version 11.00", "", "", 1, 3, "C#"},
+		{Vs2008, "# Visual Studio 2008", "Microsoft Visual Studio Solution File, Format Version 10.00", "", "", 1, 3, "C#"},
+	}
 
-    // Act
-    for _, test := range tests {
-        sol := parse(test.input)
+	// Act
+	for _, test := range tests {
+		sol := parse(test.input)
 
-        // Assert
-        ass.Equal(test.expectedComment, sol.Comment)
-        ass.Equal(test.expectedHead, sol.Header)
-        ass.Equal(test.expectedVer, sol.VisualStudioVersion)
-        ass.Equal(test.expectedMinVer, sol.MinimumVisualStudioVersion)
-        ass.Equal(test.expectedProjectCount, len(sol.Projects))
-        ass.Equal(test.expectedGsCount, len(sol.GlobalSections))
-        ass.Equal(test.expectedProjectType, sol.Projects[0].Type)
-    }
+		// Assert
+		ass.Equal(test.expectedComment, sol.Comment)
+		ass.Equal(test.expectedHead, sol.Header)
+		ass.Equal(test.expectedVer, sol.VisualStudioVersion)
+		ass.Equal(test.expectedMinVer, sol.MinimumVisualStudioVersion)
+		ass.Equal(test.expectedProjectCount, len(sol.Projects))
+		ass.Equal(test.expectedGsCount, len(sol.GlobalSections))
+		ass.Equal(test.expectedProjectType, sol.Projects[0].Type)
+	}
 }
 
 const Vs2013 = `
