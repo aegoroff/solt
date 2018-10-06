@@ -102,10 +102,10 @@ func parse(str string) *Solution {
 
 func onProject(projectType, name, path, id string) {
     p := Project{
-        TypeId: strings.Trim(projectType, " "),
-        Name:   strings.Trim(name, " "),
-        Path:   strings.Trim(path, " "),
-        Id:     strings.Trim(id, " "),
+        TypeId: projectType,
+        Name:   name,
+        Path:   path,
+        Id:     id,
     }
     if v, ok := ProjectsGuids[p.TypeId]; ok {
         p.Type = v

@@ -339,15 +339,15 @@ func lexBareString(lx *lexer) stateFn {
     switch r := lx.next(); {
     case isCrlf(r):
         lx.backup()
-        lx.emit(BARE_STRING)
+        lx.emitTrim(BARE_STRING)
         return lexBareStringEnd
     case r == eq:
         lx.backup()
-        lx.emit(BARE_STRING)
+        lx.emitTrim(BARE_STRING)
         return lexBareStringEnd
     case r == '\r':
         lx.backup()
-        lx.emit(BARE_STRING)
+        lx.emitTrim(BARE_STRING)
         return lexBareStringEnd
     default:
         return lexBareString
@@ -412,7 +412,7 @@ func lexString(lx *lexer) stateFn {
         //    return lexStringEscape
     case r == stringEnd:
         lx.backup()
-        lx.emit(STRING)
+        lx.emitTrim(STRING)
         lx.next()
         lx.ignore()
         return lx.pop()
@@ -538,7 +538,7 @@ func lexCommentStart(lx *lexer) stateFn {
 func lexComment(lx *lexer) stateFn {
     r := lx.peek()
     if isNL(r) || r == eof {
-        lx.emit(COMMENT)
+        lx.emitTrim(COMMENT)
         return lx.pop()
     }
     lx.next()
