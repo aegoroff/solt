@@ -1,0 +1,27 @@
+﻿# version format
+version: 0.1.{build}
+
+clone_folder: c:\gopath\src\github.com\$username\$project
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+# environment variables
+environment:
+  GOPATH: c:\gopath
+
+stack: go 1.11
+
+image: Visual Studio 2017
+
+build: off
+
+test_script:
+- go test ./...
+
