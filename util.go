@@ -30,6 +30,7 @@ func unmarshalXml(path string, result interface{}) error {
         log.Print(err)
         return err
     }
+    defer f.Close()
     s := bufio.NewScanner(f)
     var data []byte
     for s.Scan() {
