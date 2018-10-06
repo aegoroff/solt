@@ -10,17 +10,17 @@ import (
 
 const visualStudioVersionKey = "VisualStudioVersion"
 const minimumVisualStudioVersionKey = "MinimumVisualStudioVersion"
+const projectSection = "ProjectSection"
 
 var (
     visualStudioVersion        string
     minimumVisualStudioVersion string
     comment                    string
     words                      []string
+    projects                   []*Project
+    globalSections             []*Section
+    currentSectionType         string
 )
-
-var projects []*Project
-var globalSections []*Section
-var currentSectionType string
 
 func (l *lexer) Lex(lval *yySymType) int {
     v := l.nextItem()
@@ -73,21 +73,12 @@ func Parse(solutionPath string) (*Solution, error) {
 
     str := sb.String()
 
-    parse(str)
+    sol := parse(str)
 
-    sol := Solution{
-        GlobalSections:             globalSections,
-        Projects:                   projects,
-        MinimumVisualStudioVersion: minimumVisualStudioVersion,
-        VisualStudioVersion:        visualStudioVersion,
-        Comment:                    comment,
-        Header:                     strings.Join(words, " "),
-    }
-
-    return &sol, nil
+    return sol, nil
 }
 
-func parse(str string) {
+func parse(str string) *Solution {
     //yyDebug = 3
     projects = []*Project{}
     globalSections = []*Section{}
@@ -98,6 +89,15 @@ func parse(str string) {
     yyErrorVerbose = true
     lx := newLexer(str)
     yyParse(lx)
+
+    return &Solution{
+        GlobalSections:             globalSections,
+        Projects:                   projects,
+        MinimumVisualStudioVersion: minimumVisualStudioVersion,
+        VisualStudioVersion:        visualStudioVersion,
+        Comment:                    comment,
+        Header:                     strings.Join(words, " "),
+    }
 }
 
 func onProject(projectType, name, path, id string) {
@@ -136,8 +136,6 @@ func onWord(value string) {
         words = append(words, value)
     }
 }
-
-const projectSection = "ProjectSection"
 
 func onSection(sectionType, name, stage string) {
     s := Section{Name: name, Stage: stage}
