@@ -1,5 +1,6 @@
 package solution
 
+// Visual Studio solution definition
 type Solution struct {
     Projects                   []*Project
     GlobalSections             []*Section
@@ -9,6 +10,7 @@ type Solution struct {
     Header                     string
 }
 
+// Project element
 type Project struct {
     Type     string
     TypeId   string
@@ -18,17 +20,20 @@ type Project struct {
     Sections []*Section
 }
 
+// Section element. It maybe global or project section
 type Section struct {
     Name  string
     Stage string
     Items []*SectionItem
 }
 
+// Section element definition
 type SectionItem struct {
     Key   string
     Value string
 }
 
+// All possible project GUIDs
 var ProjectsGuids = map[string]string{
     "{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}": "Azure Project",
     "{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}": "ASP.NET 5",

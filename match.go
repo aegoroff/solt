@@ -5,6 +5,7 @@ import (
     "github.com/anknown/ahocorasick"
 )
 
+// Matches string several patterns that defined by goahocorasick.Machine
 func Match(m *goahocorasick.Machine, s string) bool {
     terms := m.MultiPatternSearch([]rune(s), true)
     return len(terms) > 0

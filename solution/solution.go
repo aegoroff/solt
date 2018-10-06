@@ -2,7 +2,6 @@ package solution
 
 import (
     "bufio"
-    "fmt"
     "log"
     "os"
     "strings"
@@ -131,7 +130,8 @@ func onComment(value string) {
 
 func onWord(value string) {
     if value == "File" {
-        words = append(words, fmt.Sprintf("%s,", value))
+        // HACK
+        words = append(words, value + ",")
     } else {
         words = append(words, value)
     }
