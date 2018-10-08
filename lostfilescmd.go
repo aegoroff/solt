@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -41,18 +42,30 @@ func lostfilescmd(opt options) error {
 		excludedFolders = append(excludedFolders, k)
 	}
 
-	findLostFiles(excludedFolders, foundFiles, includedFiles)
+	lostFiles := findLostFiles(excludedFolders, foundFiles, includedFiles)
+
+	outputLostFiles(lostFiles)
 
 	return nil
 }
 
-func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) {
+func outputLostFiles(lostFiles []string) {
+	sort.Strings(lostFiles)
+	for _, f := range lostFiles {
+		fmt.Println(f)
+	}
+}
+
+func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) []string {
 	exmach := createAhoCorasickMachine(excludedFolders)
+	var result []string
 	for _, file := range foundFiles {
 		if _, ok := includedFiles[strings.ToUpper(file)]; !ok && !Match(exmach, file) {
-			fmt.Println(file)
+			result = append(result, file)
 		}
 	}
+
+	return result
 }
 
 func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string) {
