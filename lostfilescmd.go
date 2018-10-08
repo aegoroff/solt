@@ -49,7 +49,7 @@ func lostfilescmd(opt options) error {
 func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) {
 	exmach := createAhoCorasickMachine(excludedFolders)
 	for _, file := range foundFiles {
-		if _, ok := includedFiles[file]; !ok && !Match(exmach, file) {
+		if _, ok := includedFiles[strings.ToUpper(file)]; !ok && !Match(exmach, file) {
 			fmt.Println(file)
 		}
 	}
@@ -80,7 +80,7 @@ func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]in
 		// Add compiles, contents and nones into included files map
 		filesIncluded := getFilesIncludedIntoProject(info)
 		for _, f := range filesIncluded {
-			includedFiles[f] = nil
+			includedFiles[strings.ToUpper(f)] = nil
 		}
 	}
 	return includedFiles, excludeFolders
