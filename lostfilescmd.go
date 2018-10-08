@@ -34,20 +34,19 @@ func lostfilescmd(opt options) error {
 		}
 	})
 
-	includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(folders)
-
-	for k := range packagesFolders {
-		excludedFolders = append(excludedFolders, k)
-	}
-
-	lostFiles := findLostFiles(excludedFolders, foundFiles, includedFiles)
+	lostFiles := findLostFiles(folders, packagesFolders, foundFiles)
 
 	sortAndOutput(lostFiles)
 
 	return nil
 }
 
-func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) []string {
+func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) []string {
+	includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(folders)
+	for k := range packagesFolders {
+		excludedFolders = append(excludedFolders, k)
+	}
+
 	exmach := createAhoCorasickMachine(excludedFolders)
 	var result []string
 	for _, file := range foundFiles {
