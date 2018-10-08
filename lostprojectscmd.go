@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"solt/solution"
-	"sort"
 	"strings"
 )
 
@@ -58,6 +57,7 @@ func lostprojectscmd(opt options) error {
 		}
 	}
 
+	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
 	for _, info := range projectsOutsideSolution {
 		filesIncluded := getFilesIncludedIntoProject(info)
@@ -76,21 +76,19 @@ func lostprojectscmd(opt options) error {
 		}
 
 		if !includedIntoOther {
-			fmt.Printf(" %s\n", *info.projectPath)
+			projectsOutside = append(projectsOutside, *info.projectPath)
 		} else {
 			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, *info.projectPath)
 		}
 	}
 
+	sortAndOutput(projectsOutside)
+
 	if len(projectsOutsideSolutionWithFilesInside) > 0 {
 		fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
 	}
 
-	sort.Strings(projectsOutsideSolutionWithFilesInside)
-
-	for _, p := range projectsOutsideSolutionWithFilesInside {
-		fmt.Printf(" %s\n", p)
-	}
+	sortAndOutput(projectsOutsideSolutionWithFilesInside)
 
 	return nil
 }

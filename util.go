@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 )
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
@@ -22,6 +23,13 @@ func printMemUsage() {
 	fmt.Printf("\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
 	fmt.Printf("\tSys = %s", humanize.IBytes(m.Sys))
 	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func sortAndOutput(items []string) {
+	sort.Strings(items)
+	for _, item := range items {
+		fmt.Printf(" %s\n", item)
+	}
 }
 
 func unmarshalXml(path string, result interface{}) error {

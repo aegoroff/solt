@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
@@ -44,16 +42,9 @@ func lostfilescmd(opt options) error {
 
 	lostFiles := findLostFiles(excludedFolders, foundFiles, includedFiles)
 
-	outputLostFiles(lostFiles)
+	sortAndOutput(lostFiles)
 
 	return nil
-}
-
-func outputLostFiles(lostFiles []string) {
-	sort.Strings(lostFiles)
-	for _, f := range lostFiles {
-		fmt.Println(f)
-	}
 }
 
 func findLostFiles(excludedFolders []string, foundFiles []string, includedFiles map[string]interface{}) []string {
