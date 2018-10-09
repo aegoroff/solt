@@ -44,12 +44,15 @@ func lostfilescmd(opt options) error {
 		fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
 	}
 
-	sortAndOutput(unexistFiles)
+	for k, v := range unexistFiles {
+		fmt.Printf("\nProject: %s\n", k)
+		sortAndOutput(v)
+	}
 
 	return nil
 }
 
-func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) ([]string, []string) {
+func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
 	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(folders)
 	for k := range packagesFolders {
 		excludedFolders = append(excludedFolders, k)
@@ -66,17 +69,19 @@ func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string, []string) {
+func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string, map[string][]string) {
 	var excludeFolders []string
-	var unexistFiles []string
+	unexistFiles := make(map[string][]string)
 	var includedFiles = make(map[string]interface{})
 	for _, info := range folders {
 		if info.project == nil {
 			continue
 		}
 
+		project := *info.projectPath
+
 		// Add project base + exclude subfolder into exclude folders list
-		parent := filepath.Dir(*info.projectPath)
+		parent := filepath.Dir(project)
 		for _, s := range subfolderToExclude {
 			sub := filepath.Join(parent, s)
 			excludeFolders = append(excludeFolders, sub)
@@ -94,7 +99,12 @@ func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]in
 		for _, f := range filesIncluded {
 			includedFiles[strings.ToUpper(f)] = nil
 			if _, err := os.Stat(f); os.IsNotExist(err) {
-				unexistFiles = append(unexistFiles, f)
+				if found, ok := unexistFiles[project]; ok {
+					found = append(found, f)
+					unexistFiles[project] = found
+				} else {
+					unexistFiles[project] = []string{f}
+				}
 			}
 		}
 	}

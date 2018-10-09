@@ -54,6 +54,6 @@ func Test_FindLostFiles(t *testing.T) {
 
 		// Assert
 		ass.Equal(test.result, result)
-		ass.Equal(4, len(unexists))
+		ass.Equal(2, len(unexists))
 	}
 }
