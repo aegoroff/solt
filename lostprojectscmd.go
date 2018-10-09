@@ -18,26 +18,24 @@ func lostprojectscmd(opt options) error {
 		}
 	})
 
-	var projectsInSolution = make(map[string]interface{})
-	for _, solpath := range solutions {
-		sln, _ := solution.Parse(solpath)
+	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
 
-		parent := filepath.Dir(solpath)
+	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
 
-		for _, p := range sln.Projects {
-			// Skip solution folders
-			if p.TypeId == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}" {
-				continue
-			}
+	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
-			pp := filepath.Join(parent, p.Path)
+	sortAndOutput(projectsOutside)
 
-			if _, ok := projectsInSolution[pp]; !ok {
-				projectsInSolution[pp] = nil
-			}
-		}
+	if len(projectsOutsideSolutionWithFilesInside) > 0 {
+		fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
 	}
 
+	sortAndOutput(projectsOutsideSolutionWithFilesInside)
+
+	return nil
+}
+
+func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]interface{}) ([]*folderInfo, map[string]interface{}) {
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
 	for _, info := range folders {
@@ -45,7 +43,7 @@ func lostprojectscmd(opt options) error {
 			continue
 		}
 		project := *info.projectPath
-		_, ok := projectsInSolution[project]
+		_, ok := allProjectsWithinSolutions[project]
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, info)
 		} else {
@@ -56,7 +54,10 @@ func lostprojectscmd(opt options) error {
 			}
 		}
 	}
+	return projectsOutsideSolution, filesInsideSolution
+}
 
+func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution map[string]interface{}) ([]string, []string) {
 	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
 	for _, info := range projectsOutsideSolution {
@@ -81,14 +82,28 @@ func lostprojectscmd(opt options) error {
 			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, *info.projectPath)
 		}
 	}
+	return projectsOutside, projectsOutsideSolutionWithFilesInside
+}
 
-	sortAndOutput(projectsOutside)
+func getAllSolutionsProjects(solutions []string) map[string]interface{} {
+	var projectsInSolution = make(map[string]interface{})
+	for _, solpath := range solutions {
+		sln, _ := solution.Parse(solpath)
 
-	if len(projectsOutsideSolutionWithFilesInside) > 0 {
-		fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
+		parent := filepath.Dir(solpath)
+
+		for _, p := range sln.Projects {
+			// Skip solution folders
+			if p.TypeId == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}" {
+				continue
+			}
+
+			pp := filepath.Join(parent, p.Path)
+
+			if _, ok := projectsInSolution[pp]; !ok {
+				projectsInSolution[pp] = nil
+			}
+		}
 	}
-
-	sortAndOutput(projectsOutsideSolutionWithFilesInside)
-
-	return nil
+	return projectsInSolution
 }
