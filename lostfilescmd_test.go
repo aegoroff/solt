@@ -9,6 +9,7 @@ func Test_FindLostFiles(t *testing.T) {
 	// Arrange
 	f1 := `c:\prj\f1\p1.csproj`
 	f2 := `c:\prj\f2\p2.csproj`
+	f3 := `c:\prj\f2\p3.csproj`
 
 	p1 := Project{
 		OutputPaths: []string{`bin\Debug`, `bin\Release`},
@@ -28,8 +29,11 @@ func Test_FindLostFiles(t *testing.T) {
 		projectPath: &f2,
 		project:     &p2,
 	}
+	fi3 := folderInfo{
+		projectPath: &f3,
+	}
 
-	folders := []*folderInfo{&fi1, &fi2}
+	folders := []*folderInfo{&fi1, &fi2, &fi3}
 
 	ass := assert.New(t)
 	var tests = []struct {
@@ -41,6 +45,7 @@ func Test_FindLostFiles(t *testing.T) {
 		{[]string{`c:\prj\f1\cOde1.cs`, `c:\prj\f1\Code2.cs`, `c:\prj\f2\coDe1.cs`, `c:\prj\f2\Code2.cs`}, []string(nil)},
 		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\prj\f1\bin\Debug\code3.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`, `c:\prj\f2\code3.cs`}, []string{`c:\prj\f2\code3.cs`}},
 		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\prj\f1\bin\Release\code3.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`, `c:\prj\f2\code3.cs`}, []string{`c:\prj\f2\code3.cs`}},
+		{[]string{`c:\prj\f1\cOde1.cs`, `c:\prj\f1\Code2.cs`, `c:\prj\f2\coDe1.cs`, `c:\prj\f2\Code2.cs`, `c:\prj\f3\Code1.cs`}, []string{`c:\prj\f3\Code1.cs`}},
 	}
 
 	for _, test := range tests {
