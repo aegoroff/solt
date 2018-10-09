@@ -7,16 +7,16 @@ import (
 
 func Test_FindLostFiles(t *testing.T) {
 	// Arrange
-	f1 := "c:\\prj\\f1\\p1.csproj"
-	f2 := "c:\\prj\\f2\\p2.csproj"
+	f1 := `c:\prj\f1\p1.csproj`
+	f2 := `c:\prj\f2\p2.csproj`
 
 	p1 := Project{
-		OutputPaths: []string{"bin\\Debug", "bin\\Release"},
+		OutputPaths: []string{`bin\Debug`, `bin\Release`},
 		Compiles:    []Include{{Path: "code1.cs"}, {Path: "code2.cs"}},
 	}
 
 	p2 := Project{
-		OutputPaths: []string{"bin\\Debug", "bin\\Release"},
+		OutputPaths: []string{`bin\Debug`, `bin\Release`},
 		Compiles:    []Include{{Path: "code1.cs"}, {Path: "code2.cs"}},
 	}
 
@@ -36,13 +36,16 @@ func Test_FindLostFiles(t *testing.T) {
 		foundfiles []string
 		result     []string
 	}{
-		{[]string{"c:\\prj\\f1\\code1.cs", "c:\\prj\\f1\\code2.cs", "c:\\prj\\f1\\code3.cs", "c:\\prj\\f2\\code1.cs", "c:\\prj\\f2\\code2.cs", "c:\\prj\\f2\\code3.cs"}, []string{"c:\\prj\\f1\\code3.cs", "c:\\prj\\f2\\code3.cs"}},
-		{[]string{"c:\\prj\\f1\\code1.cs", "c:\\prj\\f1\\code2.cs", "c:\\prj\\f1\\bin\\Debug\\code3.cs", "c:\\prj\\f2\\code1.cs", "c:\\prj\\f2\\code2.cs", "c:\\prj\\f2\\code3.cs"}, []string{"c:\\prj\\f2\\code3.cs"}},
+		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\\prj\f1\code3.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`, `c:\prj\f2\code3.cs`}, []string{`c:\\prj\f1\code3.cs`, `c:\prj\f2\code3.cs`}},
+		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`}, []string(nil)},
+		{[]string{`c:\prj\f1\cOde1.cs`, `c:\prj\f1\Code2.cs`, `c:\prj\f2\coDe1.cs`, `c:\prj\f2\Code2.cs`}, []string(nil)},
+		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\prj\f1\bin\Debug\code3.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`, `c:\prj\f2\code3.cs`}, []string{`c:\prj\f2\code3.cs`}},
+		{[]string{`c:\prj\f1\code1.cs`, `c:\prj\f1\code2.cs`, `c:\prj\f1\bin\Release\code3.cs`, `c:\prj\f2\code1.cs`, `c:\prj\f2\code2.cs`, `c:\prj\f2\code3.cs`}, []string{`c:\prj\f2\code3.cs`}},
 	}
 
 	for _, test := range tests {
 		// Act
-		result := findLostFiles(folders, map[string]interface{}{}, test.foundfiles)
+		result := findLostFiles(folders, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
 
 		// Assert
 		ass.Equal(test.result, result)
