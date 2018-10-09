@@ -50,9 +50,10 @@ func Test_FindLostFiles(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		result := findLostFiles(folders, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
+		result, unexists := findLostFiles(folders, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
 
 		// Assert
 		ass.Equal(test.result, result)
+		ass.Equal(4, len(unexists))
 	}
 }

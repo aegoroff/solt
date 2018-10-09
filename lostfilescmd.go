@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -34,15 +36,21 @@ func lostfilescmd(opt options) error {
 		}
 	})
 
-	lostFiles := findLostFiles(folders, packagesFolders, foundFiles)
+	lostFiles, unexistFiles := findLostFiles(folders, packagesFolders, foundFiles)
 
 	sortAndOutput(lostFiles)
+
+	if len(unexistFiles) > 0 {
+		fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
+	}
+
+	sortAndOutput(unexistFiles)
 
 	return nil
 }
 
-func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) []string {
-	includedFiles, excludedFolders := createIncludedFilesAndExcludedFolders(folders)
+func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) ([]string, []string) {
+	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(folders)
 	for k := range packagesFolders {
 		excludedFolders = append(excludedFolders, k)
 	}
@@ -55,11 +63,12 @@ func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}
 		}
 	}
 
-	return result
+	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string) {
+func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string, []string) {
 	var excludeFolders []string
+	var unexistFiles []string
 	var includedFiles = make(map[string]interface{})
 	for _, info := range folders {
 		if info.project == nil {
@@ -84,7 +93,10 @@ func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]in
 		filesIncluded := getFilesIncludedIntoProject(info)
 		for _, f := range filesIncluded {
 			includedFiles[strings.ToUpper(f)] = nil
+			if _, err := os.Stat(f); os.IsNotExist(err) {
+				unexistFiles = append(unexistFiles, f)
+			}
 		}
 	}
-	return includedFiles, excludeFolders
+	return includedFiles, excludeFolders, unexistFiles
 }
