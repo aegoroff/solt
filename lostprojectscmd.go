@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+type projectSolution struct {
+	project  string
+	solution string
+}
+
 func lostprojectscmd(opt options) error {
 
 	var solutions []string
@@ -20,29 +25,55 @@ func lostprojectscmd(opt options) error {
 
 	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
 
-	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
+	projectsOutsideSolution, filesInsideSolution, allFoundProjects := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
 
 	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
-	sortAndOutput(projectsOutside)
+	sortAndOutputToStdout(projectsOutside)
 
 	if len(projectsOutsideSolutionWithFilesInside) > 0 {
 		fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
 	}
 
-	sortAndOutput(projectsOutsideSolutionWithFilesInside)
+	sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
+
+	var unexistProjects = make(map[string][]string)
+	for sol, prj := range allProjectsWithinSolutions {
+		if _, ok := allFoundProjects[sol]; !ok {
+
+			if found, ok := unexistProjects[prj.solution]; ok {
+				found = append(found, prj.project)
+				unexistProjects[prj.solution] = found
+			} else {
+				unexistProjects[prj.solution] = []string{prj.project}
+			}
+		}
+	}
+
+	if len(unexistProjects) > 0 {
+		fmt.Printf("\nThese projects included into a solution but not found in the file system.\n")
+	}
+
+	outputSortedMapToStdout(unexistProjects, "Solution")
 
 	return nil
 }
 
-func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]interface{}) ([]*folderInfo, map[string]interface{}) {
+func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}, map[string]interface{}) {
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
+	var allFoundProjects = make(map[string]interface{})
 	for _, info := range folders {
 		if info.project == nil {
 			continue
 		}
+
 		id := strings.ToUpper(info.project.Id)
+
+		if _, ok := allFoundProjects[id]; !ok {
+			allFoundProjects[id] = nil
+		}
+
 		_, ok := allProjectsWithinSolutions[id]
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, info)
@@ -54,7 +85,7 @@ func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjects
 			}
 		}
 	}
-	return projectsOutsideSolution, filesInsideSolution
+	return projectsOutsideSolution, filesInsideSolution, allFoundProjects
 }
 
 func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution map[string]interface{}) ([]string, []string) {
@@ -86,8 +117,8 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
 }
 
-func getAllSolutionsProjects(solutions []string) map[string]interface{} {
-	var projectsInSolution = make(map[string]interface{})
+func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
+	var projectsInSolution = make(map[string]*projectSolution)
 	for _, solpath := range solutions {
 		sln, _ := solution.Parse(solpath)
 
@@ -100,7 +131,15 @@ func getAllSolutionsProjects(solutions []string) map[string]interface{} {
 			id := strings.ToUpper(p.Id)
 
 			if _, ok := projectsInSolution[id]; !ok {
-				projectsInSolution[id] = nil
+				parent := filepath.Dir(solpath)
+				pp := filepath.Join(parent, p.Path)
+
+				ps := projectSolution{
+					project:  pp,
+					solution: solpath,
+				}
+
+				projectsInSolution[id] = &ps
 			}
 		}
 	}

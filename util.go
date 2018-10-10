@@ -4,31 +4,40 @@ import (
 	"bufio"
 	"encoding/xml"
 	"fmt"
-	"github.com/dustin/go-humanize"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sort"
 )
 
-// printMemUsage outputs the current, total and OS memory being used. As well as the number
-// of garage collection cycles completed.
-func printMemUsage() {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	fmt.Printf("\nAlloc = %s", humanize.IBytes(m.Alloc))
-	fmt.Printf("\tTotalAlloc = %s", humanize.IBytes(m.TotalAlloc))
-	fmt.Printf("\tSys = %s", humanize.IBytes(m.Sys))
-	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+func outputSortedMapToStdout(itemsMap map[string][]string, keyPrefix string) {
+	outputSortedMap(os.Stdout, itemsMap, keyPrefix)
 }
 
-func sortAndOutput(items []string) {
+func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix string) {
+	var keys []string
+	for k := range itemsMap {
+		keys = append(keys, k)
+	}
+
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		fmt.Fprintf(writer, "\n%s: %s\n", keyPrefix, k)
+		sortAndOutput(writer, itemsMap[k])
+	}
+}
+
+func sortAndOutputToStdout(items []string) {
+	sortAndOutput(os.Stdout, items)
+}
+
+func sortAndOutput(writer io.Writer, items []string) {
 	sort.Strings(items)
 	for _, item := range items {
-		fmt.Printf(" %s\n", item)
+		fmt.Fprintf(writer, " %s\n", item)
 	}
 }
 
