@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/rbtree"
+	"gonum.org/v1/gonum/graph/simple"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -16,7 +18,7 @@ type projectSolution struct {
 func lostprojectscmd(opt options) error {
 
 	var solutions []string
-	folders := readProjectDir(opt.Path, func(we *walkEntry) {
+	tree := readProjectDir(opt.Path, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			sp := filepath.Join(we.Parent, we.Name)
@@ -24,9 +26,11 @@ func lostprojectscmd(opt options) error {
 		}
 	})
 
-	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
+	allProjectsWithinSolutions, solutionGraph := getAllSolutionsProjects(solutions)
 
-	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
+	extendSolutionGraph(solutionGraph, tree)
+
+	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(tree, allProjectsWithinSolutions)
 
 	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
@@ -49,6 +53,42 @@ func lostprojectscmd(opt options) error {
 	return nil
 }
 
+func extendSolutionGraph(solutionGraph *simple.UndirectedGraph, tree *rbtree.RbTree) {
+	var fileNodesMap = make(map[string]int64)
+	for _, parentNode := range solutionGraph.Nodes() {
+		path := parentNode.(*node).name
+		tn := createProjectTreeNode(path, nil)
+		found, ok := rbtree.Search(tree.Root, tn)
+		if ok {
+			info := (*found.Key).(projectTreeNode).info
+			if info.project == nil {
+				continue
+			}
+
+			files := getFilesIncludedIntoProject(info)
+
+			for _, f := range files {
+				if nodeId, ok := fileNodesMap[f]; ok {
+					edge := solutionGraph.NewEdge(parentNode, solutionGraph.Node(nodeId))
+					solutionGraph.SetEdge(edge)
+					continue
+				}
+
+				n := solutionGraph.NewNode()
+				fileNode := node{
+					nodeID: n.ID(),
+					name:   f,
+				}
+				fileNodesMap[f] = n.ID()
+				solutionGraph.AddNode(&fileNode)
+
+				edge := solutionGraph.NewEdge(parentNode, &fileNode)
+				solutionGraph.SetEdge(edge)
+			}
+		}
+	}
+}
+
 func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) map[string][]string {
 	var result = make(map[string][]string)
 	for _, prj := range allProjectsWithinSolutions {
@@ -66,12 +106,15 @@ func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) 
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
+func getOutsideProjectsAndFilesInsideSolution(tree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
+
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
-	for _, info := range folders {
+
+	rbtree.WalkInorder(tree.Root, func(n *rbtree.Node) {
+		info := (*n.Key).(projectTreeNode).info
 		if info.project == nil {
-			continue
+			return
 		}
 
 		id := strings.ToUpper(info.project.Id)
@@ -86,7 +129,8 @@ func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjects
 				filesInsideSolution[strings.ToUpper(f)] = nil
 			}
 		}
-	}
+	})
+
 	return projectsOutsideSolution, filesInsideSolution
 }
 
@@ -120,10 +164,20 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
 }
 
-func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
+func getAllSolutionsProjects(solutions []string) (map[string]*projectSolution, *simple.UndirectedGraph) {
+	graph := simple.NewUndirectedGraph()
+
 	var projectsInSolution = make(map[string]*projectSolution)
 	for _, solpath := range solutions {
 		sln, _ := solution.Parse(solpath)
+
+		n := graph.NewNode()
+		solNode := node{
+			nodeID: n.ID(),
+			name:   solpath,
+		}
+
+		graph.AddNode(&solNode)
 
 		for _, p := range sln.Projects {
 			// Skip solution folders
@@ -141,11 +195,21 @@ func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
 			parent := filepath.Dir(solpath)
 			pp := filepath.Join(parent, p.Path)
 
+			n := graph.NewNode()
+			prjNode := node{
+				nodeID: n.ID(),
+				name:   pp,
+			}
+
+			graph.AddNode(&prjNode)
+			edge := graph.NewEdge(&solNode, &prjNode)
+			graph.SetEdge(edge)
+
 			projectsInSolution[id] = &projectSolution{
 				project:  pp,
 				solution: solpath,
 			}
 		}
 	}
-	return projectsInSolution
+	return projectsInSolution, graph
 }

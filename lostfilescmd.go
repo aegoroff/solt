@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +21,7 @@ func lostfilescmd(opt options) error {
 
 	var foundFiles []string
 	var packagesFolders = make(map[string]interface{})
-	folders := readProjectDir(opt.Path, func(we *walkEntry) {
+	tree := readProjectDir(opt.Path, func(we *walkEntry) {
 		// Add file to filtered files slice
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == filter {
@@ -36,7 +37,7 @@ func lostfilescmd(opt options) error {
 		}
 	})
 
-	lostFiles, unexistFiles := findLostFiles(folders, packagesFolders, foundFiles)
+	lostFiles, unexistFiles := findLostFiles(tree, packagesFolders, foundFiles)
 
 	sortAndOutputToStdout(lostFiles)
 
@@ -49,8 +50,8 @@ func lostfilescmd(opt options) error {
 	return nil
 }
 
-func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
-	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(folders)
+func findLostFiles(tree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
+	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(tree)
 	for k := range packagesFolders {
 		excludedFolders = append(excludedFolders, k)
 	}
@@ -66,13 +67,15 @@ func findLostFiles(folders []*folderInfo, packagesFolders map[string]interface{}
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]interface{}, []string, map[string][]string) {
+func createIncludedFilesAndExcludedFolders(tree *rbtree.RbTree) (map[string]interface{}, []string, map[string][]string) {
 	var excludeFolders []string
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(map[string]interface{})
-	for _, info := range folders {
+
+	rbtree.WalkInorder(tree.Root, func(n *rbtree.Node) {
+		info := (*n.Key).(projectTreeNode).info
 		if info.project == nil {
-			continue
+			return
 		}
 
 		project := *info.projectPath
@@ -104,6 +107,7 @@ func createIncludedFilesAndExcludedFolders(folders []*folderInfo) (map[string]in
 				}
 			}
 		}
-	}
+	})
+
 	return includedFiles, excludeFolders, unexistFiles
 }

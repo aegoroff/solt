@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -16,7 +17,7 @@ type mismatch struct {
 
 func nugetcmd(opt options) error {
 	var solutions []string
-	folders := readProjectDir(opt.Path, func(we *walkEntry) {
+	tree := readProjectDir(opt.Path, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			solutions = append(solutions, filepath.Join(we.Parent, we.Name))
@@ -24,15 +25,15 @@ func nugetcmd(opt options) error {
 	})
 
 	if opt.Nuget.Mismatch {
-		showMismatches(solutions, folders)
+		showMismatches(solutions, tree)
 	} else {
-		showPackagesInfoByFolders(folders)
+		showPackagesInfoByFolders(tree)
 	}
 
 	return nil
 }
 
-func showMismatches(solutions []string, folders []*folderInfo) {
+func showMismatches(solutions []string, folders *rbtree.RbTree) {
 
 	solutionProjects := getProjectsOfSolutions(solutions, folders)
 
@@ -58,7 +59,7 @@ func showMismatches(solutions []string, folders []*folderInfo) {
 	}
 }
 
-func getProjectsOfSolutions(solutions []string, folders []*folderInfo) map[string][]*folderInfo {
+func getProjectsOfSolutions(solutions []string, folders *rbtree.RbTree) map[string][]*folderInfo {
 	var solutionProjects = make(map[string][]*folderInfo)
 	for _, sol := range solutions {
 		sln, _ := solution.Parse(sol)
@@ -67,9 +68,10 @@ func getProjectsOfSolutions(solutions []string, folders []*folderInfo) map[strin
 			solutionProjectIds[sp.Id] = nil
 		}
 
-		for _, finfo := range folders {
+		rbtree.WalkInorder(folders.Root, func(n *rbtree.Node) {
+			finfo := (*n.Key).(projectTreeNode).info
 			if finfo.project == nil {
-				continue
+				return
 			}
 
 			if _, ok := solutionProjectIds[finfo.project.Id]; ok {
@@ -79,7 +81,7 @@ func getProjectsOfSolutions(solutions []string, folders []*folderInfo) map[strin
 					solutionProjects[sol] = append(v, finfo)
 				}
 			}
-		}
+		})
 	}
 	return solutionProjects
 }
@@ -135,13 +137,14 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func showPackagesInfoByFolders(folders []*folderInfo) {
+func showPackagesInfoByFolders(folders *rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-	for _, v := range folders {
+	rbtree.WalkInorder(folders.Root, func(n *rbtree.Node) {
+		v := (*n.Key).(projectTreeNode).info
 		if v.packages == nil {
-			continue
+			return
 		}
 
 		parent := filepath.Dir(*v.projectPath)
@@ -154,5 +157,5 @@ func showPackagesInfoByFolders(folders []*folderInfo) {
 		}
 		tw.Flush()
 		fmt.Println()
-	}
+	})
 }

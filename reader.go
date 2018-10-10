@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/aegoroff/godatastruct/rbtree"
 	"log"
 	"os"
 	"path/filepath"
@@ -44,7 +45,7 @@ func getFiles(includes []Include, dir string) []string {
 	return result
 }
 
-func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
+func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 	readch := make(chan *walkEntry, 1024)
 
 	go func(ch chan<- *walkEntry) {
@@ -58,31 +59,30 @@ func readProjectDir(path string, action func(we *walkEntry)) []*folderInfo {
 		close(ch)
 	}(readch)
 
-	var result []*folderInfo
+	result := rbtree.NewRbTree()
 
 	aggregatech := make(chan *folder, 1024)
 
 	go func(ch <-chan *folder) {
-		projectFolders := make(map[string]interface{})
 		for {
 			f, ok := <-ch
 			if !ok {
 				break
 			}
+			key := createProjectTreeNode(*f.info.projectPath, f.info)
 
-			if _, ok := projectFolders[f.path]; !ok {
-				projectFolders[f.path] = nil
-				result = append(result, f.info)
+			if current, ok := rbtree.Search(result.Root, key); !ok {
+				n := rbtree.NewNode(*key)
+				rbtree.Insert(result, n)
 			} else {
-				current := result[len(result)-1]
-
-				if current.project == nil {
+				info := (*current.Key).(projectTreeNode).info
+				if info.project == nil {
 					// Project read after packages.config
-					current.project = f.info.project
-					current.projectPath = f.info.projectPath
-				} else if current.packages == nil {
+					info.project = f.info.project
+					info.projectPath = f.info.projectPath
+				} else if info.packages == nil {
 					// Project read before packages.config
-					current.packages = f.info.packages
+					info.packages = f.info.packages
 				}
 			}
 		}

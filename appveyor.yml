@@ -26,6 +26,8 @@ install:
   - go get -u "github.com/dustin/go-humanize"
   - go get -u "github.com/voxelbrain/goptions"
   - go get -u "github.com/stretchr/testify/assert"
+  - go get -u "github.com/aegoroff/godatastruct/rbtree"
+  - go get -u "github.com/akutz/sortfold"
 
 stack: go 1.11
 
