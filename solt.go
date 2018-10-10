@@ -46,13 +46,6 @@ var commands = map[goptions.Verbs]command{
 	"info":         infocmd,
 }
 
-type walkEntry struct {
-	Size   int64
-	Parent string
-	Name   string
-	IsDir  bool
-}
-
 func main() {
 	opt := options{}
 

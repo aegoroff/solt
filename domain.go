@@ -47,3 +47,10 @@ type ProjectReference struct {
 	ProjectGuid string `xml:"Project"`
 	Name        string `xml:"Name"`
 }
+
+type walkEntry struct {
+	Size   int64
+	Parent string
+	Name   string
+	IsDir  bool
+}
