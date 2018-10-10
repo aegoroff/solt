@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -25,7 +26,7 @@ func lostprojectscmd(opt options) error {
 
 	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
 
-	projectsOutsideSolution, filesInsideSolution, allFoundProjects := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
+	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(folders, allProjectsWithinSolutions)
 
 	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
@@ -38,9 +39,8 @@ func lostprojectscmd(opt options) error {
 	sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
 
 	var unexistProjects = make(map[string][]string)
-	for sol, prj := range allProjectsWithinSolutions {
-		if _, ok := allFoundProjects[sol]; !ok {
-
+	for _, prj := range allProjectsWithinSolutions {
+		if _, err := os.Stat(prj.project); os.IsNotExist(err) {
 			if found, ok := unexistProjects[prj.solution]; ok {
 				found = append(found, prj.project)
 				unexistProjects[prj.solution] = found
@@ -59,20 +59,15 @@ func lostprojectscmd(opt options) error {
 	return nil
 }
 
-func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}, map[string]interface{}) {
+func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
-	var allFoundProjects = make(map[string]interface{})
 	for _, info := range folders {
 		if info.project == nil {
 			continue
 		}
 
 		id := strings.ToUpper(info.project.Id)
-
-		if _, ok := allFoundProjects[id]; !ok {
-			allFoundProjects[id] = nil
-		}
 
 		_, ok := allProjectsWithinSolutions[id]
 		if !ok {
@@ -85,7 +80,7 @@ func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjects
 			}
 		}
 	}
-	return projectsOutsideSolution, filesInsideSolution, allFoundProjects
+	return projectsOutsideSolution, filesInsideSolution
 }
 
 func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution map[string]interface{}) ([]string, []string) {
