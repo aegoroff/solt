@@ -60,15 +60,6 @@ type walkEntry struct {
 	IsDir  bool
 }
 
-type node struct {
-	nodeID int64
-	name   string
-}
-
-func (n node) ID() int64 {
-	return n.nodeID
-}
-
 type projectTreeNode struct {
 	info *folderInfo
 	path string
