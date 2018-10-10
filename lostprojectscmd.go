@@ -97,14 +97,15 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 		var includedIntoOther = false
 		for _, f := range projectFiles {
 			pf := strings.ToUpper(f)
-			if _, ok := filesInsideSolution[pf]; ok {
+			if _, ok := filesInsideSolution[pf]; !ok {
+				continue
+			}
 
-				dir := filepath.Dir(*info.projectPath)
+			dir := filepath.Dir(*info.projectPath)
 
-				if strings.Contains(pf, strings.ToUpper(dir)) {
-					includedIntoOther = true
-					break
-				}
+			if strings.Contains(pf, strings.ToUpper(dir)) {
+				includedIntoOther = true
+				break
 			}
 		}
 
@@ -130,16 +131,17 @@ func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
 
 			id := strings.ToUpper(p.Id)
 
-			if _, ok := projectsInSolution[id]; !ok {
-				parent := filepath.Dir(solpath)
-				pp := filepath.Join(parent, p.Path)
+			// Already added
+			if _, ok := projectsInSolution[id]; ok {
+				continue
+			}
 
-				ps := projectSolution{
-					project:  pp,
-					solution: solpath,
-				}
+			parent := filepath.Dir(solpath)
+			pp := filepath.Join(parent, p.Path)
 
-				projectsInSolution[id] = &ps
+			projectsInSolution[id] = &projectSolution{
+				project:  pp,
+				solution: solpath,
 			}
 		}
 	}
