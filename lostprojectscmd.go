@@ -33,7 +33,7 @@ func lostprojectscmd(opt options) error {
 	sortAndOutputToStdout(projectsOutside)
 
 	if len(projectsOutsideSolutionWithFilesInside) > 0 {
-		fmt.Printf("\nThese projects not included into any solution but their files used in projects that included into another projects within a solution.\n")
+		fmt.Printf("\nThese projects not included into any solution but files in the projects' folders used in another projects within a solution:\n\n")
 	}
 
 	sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
@@ -41,7 +41,7 @@ func lostprojectscmd(opt options) error {
 	unexistProjects := getUnexistProjects(allProjectsWithinSolutions)
 
 	if len(unexistProjects) > 0 {
-		fmt.Printf("\nThese projects included into a solution but not found in the file system.\n")
+		fmt.Printf("\nThese projects included into a solution but not found in the file system:\n")
 	}
 
 	outputSortedMapToStdout(unexistProjects, "Solution")
@@ -52,13 +52,15 @@ func lostprojectscmd(opt options) error {
 func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) map[string][]string {
 	var result = make(map[string][]string)
 	for _, prj := range allProjectsWithinSolutions {
-		if _, err := os.Stat(prj.project); os.IsNotExist(err) {
-			if found, ok := result[prj.solution]; ok {
-				found = append(found, prj.project)
-				result[prj.solution] = found
-			} else {
-				result[prj.solution] = []string{prj.project}
-			}
+		if _, err := os.Stat(prj.project); !os.IsNotExist(err) {
+			continue
+		}
+
+		if found, ok := result[prj.solution]; ok {
+			found = append(found, prj.project)
+			result[prj.solution] = found
+		} else {
+			result[prj.solution] = []string{prj.project}
 		}
 	}
 	return result
