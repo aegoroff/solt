@@ -64,11 +64,12 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 
 		var includedIntoOther = false
 		for _, f := range projectFiles {
-			if _, ok := filesInsideSolution[strings.ToUpper(f)]; ok {
+			pf := strings.ToUpper(f)
+			if _, ok := filesInsideSolution[pf]; ok {
 
 				dir := filepath.Dir(*info.projectPath)
 
-				if strings.Contains(strings.ToUpper(f), strings.ToUpper(dir)) {
+				if strings.Contains(pf, strings.ToUpper(dir)) {
 					includedIntoOther = true
 					break
 				}
