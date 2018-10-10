@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -9,7 +11,7 @@ func Test_FindLostFiles(t *testing.T) {
 	// Arrange
 	f1 := `c:\prj\f1\p1.csproj`
 	f2 := `c:\prj\f2\p2.csproj`
-	f3 := `c:\prj\f2\p3.csproj`
+	f3 := `c:\prj\f3\p3.csproj`
 
 	p1 := Project{
 		OutputPaths: []string{`bin\Debug`, `bin\Release`},
@@ -33,7 +35,16 @@ func Test_FindLostFiles(t *testing.T) {
 		projectPath: &f3,
 	}
 
-	folders := []*folderInfo{&fi1, &fi2, &fi3}
+	infos := []*folderInfo{&fi1, &fi2, &fi3}
+
+	tree := rbtree.NewRbTree()
+
+	for i, fi := range infos {
+		path := fmt.Sprintf(`c:\prj\f%d\`, i+1)
+		key := createProjectTreeNode(path, fi)
+		n := rbtree.NewNode(*key)
+		rbtree.Insert(tree, n)
+	}
 
 	ass := assert.New(t)
 	var tests = []struct {
@@ -50,7 +61,7 @@ func Test_FindLostFiles(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		result, unexists := findLostFiles(folders, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
+		result, unexists := findLostFiles(tree, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
 
 		// Assert
 		ass.Equal(test.result, result)
