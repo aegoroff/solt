@@ -33,9 +33,9 @@ func nugetcmd(opt options) error {
 	return nil
 }
 
-func showMismatches(solutions []string, folders *rbtree.RbTree) {
+func showMismatches(solutions []string, tree *rbtree.RbTree) {
 
-	solutionProjects := getProjectsOfSolutions(solutions, folders)
+	solutionProjects := getProjectsOfSolutions(solutions, tree)
 
 	mismatches := calculateMismatches(solutionProjects)
 

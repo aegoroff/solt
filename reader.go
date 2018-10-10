@@ -69,7 +69,7 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 			if !ok {
 				break
 			}
-			key := createProjectTreeNode(*f.info.projectPath, f.info)
+			key := createProjectTreeNode(f.path, f.info)
 
 			if current, ok := rbtree.Search(result.Root, key); !ok {
 				n := rbtree.NewNode(*key)
