@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -44,9 +45,16 @@ func lostfilescmd(opt options) error {
 		fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
 	}
 
-	for k, v := range unexistFiles {
-		fmt.Printf("\nProject: %s\n", k)
-		sortAndOutput(v)
+	var projects []string
+	for k := range unexistFiles {
+		projects = append(projects, k)
+	}
+
+	sort.Strings(projects)
+
+	for _, p := range projects {
+		fmt.Printf("\nProject: %s\n", p)
+		sortAndOutput(unexistFiles[p])
 	}
 
 	return nil
