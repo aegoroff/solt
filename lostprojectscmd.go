@@ -42,7 +42,8 @@ func getOutsideProjectsAndFilesInsideSolution(folders []*folderInfo, allProjects
 		if info.project == nil {
 			continue
 		}
-		_, ok := allProjectsWithinSolutions[info.project.Id]
+		id := strings.ToUpper(info.project.Id)
+		_, ok := allProjectsWithinSolutions[id]
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, info)
 		} else {
@@ -96,8 +97,10 @@ func getAllSolutionsProjects(solutions []string) map[string]interface{} {
 				continue
 			}
 
-			if _, ok := projectsInSolution[p.Id]; !ok {
-				projectsInSolution[p.Id] = nil
+			id := strings.ToUpper(p.Id)
+
+			if _, ok := projectsInSolution[id]; !ok {
+				projectsInSolution[id] = nil
 			}
 		}
 	}
