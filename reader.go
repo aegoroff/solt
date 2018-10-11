@@ -75,6 +75,7 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 				n := rbtree.NewNode(*key)
 				rbtree.Insert(result, n)
 			} else {
+				// Update folder node that has already been created before
 				info := (*current.Key).(projectTreeNode).info
 				if info.project == nil {
 					// Project read after packages.config
