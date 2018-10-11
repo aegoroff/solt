@@ -21,7 +21,7 @@ func lostfilescmd(opt options) error {
 
 	var foundFiles []string
 	var packagesFolders = make(map[string]interface{})
-	tree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
 		// Add file to filtered files slice
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == filter {
@@ -37,7 +37,7 @@ func lostfilescmd(opt options) error {
 		}
 	})
 
-	lostFiles, unexistFiles := findLostFiles(tree, packagesFolders, foundFiles)
+	lostFiles, unexistFiles := findLostFiles(foldersTree, packagesFolders, foundFiles)
 
 	sortAndOutputToStdout(lostFiles)
 
@@ -50,8 +50,8 @@ func lostfilescmd(opt options) error {
 	return nil
 }
 
-func findLostFiles(tree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
-	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(tree)
+func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
+	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree)
 	for k := range packagesFolders {
 		excludedFolders = append(excludedFolders, k)
 	}
@@ -67,12 +67,12 @@ func findLostFiles(tree *rbtree.RbTree, packagesFolders map[string]interface{}, 
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(tree *rbtree.RbTree) (map[string]interface{}, []string, map[string][]string) {
+func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (map[string]interface{}, []string, map[string][]string) {
 	var excludeFolders []string
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(map[string]interface{})
 
-	rbtree.WalkInorder(tree.Root, func(n *rbtree.Node) {
+	rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
 		info := (*n.Key).(projectTreeNode).info
 		if info.project == nil {
 			return

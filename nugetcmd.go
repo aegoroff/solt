@@ -17,7 +17,7 @@ type mismatch struct {
 
 func nugetcmd(opt options) error {
 	var solutions []string
-	tree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			solutions = append(solutions, filepath.Join(we.Parent, we.Name))
@@ -25,17 +25,17 @@ func nugetcmd(opt options) error {
 	})
 
 	if opt.Nuget.Mismatch {
-		showMismatches(solutions, tree)
+		showMismatches(solutions, foldersTree)
 	} else {
-		showPackagesInfoByFolders(tree)
+		showPackagesInfoByFolders(foldersTree)
 	}
 
 	return nil
 }
 
-func showMismatches(solutions []string, tree *rbtree.RbTree) {
+func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
 
-	solutionProjects := getProjectsOfSolutions(solutions, tree)
+	solutionProjects := getProjectsOfSolutions(solutions, foldersTree)
 
 	mismatches := calculateMismatches(solutionProjects)
 
@@ -59,7 +59,7 @@ func showMismatches(solutions []string, tree *rbtree.RbTree) {
 	}
 }
 
-func getProjectsOfSolutions(solutions []string, folders *rbtree.RbTree) map[string][]*folderInfo {
+func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree) map[string][]*folderInfo {
 	var solutionProjects = make(map[string][]*folderInfo)
 	for _, sol := range solutions {
 		sln, _ := solution.Parse(sol)
@@ -68,7 +68,7 @@ func getProjectsOfSolutions(solutions []string, folders *rbtree.RbTree) map[stri
 			solutionProjectIds[sp.Id] = nil
 		}
 
-		rbtree.WalkInorder(folders.Root, func(n *rbtree.Node) {
+		rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
 			finfo := (*n.Key).(projectTreeNode).info
 			if finfo.project == nil {
 				return
@@ -137,11 +137,11 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func showPackagesInfoByFolders(folders *rbtree.RbTree) {
+func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-	rbtree.WalkInorder(folders.Root, func(n *rbtree.Node) {
+	rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
 		v := (*n.Key).(projectTreeNode).info
 		if v.packages == nil {
 			return

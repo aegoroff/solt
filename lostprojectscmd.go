@@ -17,7 +17,7 @@ type projectSolution struct {
 func lostprojectscmd(opt options) error {
 
 	var solutions []string
-	tree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			sp := filepath.Join(we.Parent, we.Name)
@@ -27,7 +27,7 @@ func lostprojectscmd(opt options) error {
 
 	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
 
-	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(tree, allProjectsWithinSolutions)
+	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
 
 	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
@@ -67,12 +67,12 @@ func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) 
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(tree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
+func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
 
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
 
-	rbtree.WalkInorder(tree.Root, func(n *rbtree.Node) {
+	rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
 		info := (*n.Key).(projectTreeNode).info
 		if info.project == nil {
 			return
