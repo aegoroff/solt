@@ -96,14 +96,14 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 			break
 		}
 
-		if we.Name == packagesConfigFile {
+		if strings.EqualFold(we.Name, packagesConfigFile) {
 			if f, ok := onPackagesConfig(we); ok {
 				aggregatech <- f
 			}
 		}
 
-		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == csharpProjectExt || ext == cppProjectExt {
+		ext := filepath.Ext(we.Name)
+		if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
 			if f, ok := onMsbuildProject(we); ok {
 				aggregatech <- f
 			}
@@ -115,8 +115,8 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 	return result
 }
 
+// Create packages model from packages.config
 func onPackagesConfig(we *walkEntry) (*folder, bool) {
-	// Create packages model from packages.config
 	pack := Packages{}
 
 	f, ok := onXmlFile(we, &pack)
@@ -129,8 +129,8 @@ func onPackagesConfig(we *walkEntry) (*folder, bool) {
 	return f, true
 }
 
+// Create project model from project file
 func onMsbuildProject(we *walkEntry) (*folder, bool) {
-	// Create project model from project file
 	project := Project{}
 
 	f, ok := onXmlFile(we, &project)
