@@ -72,7 +72,7 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (map[stri
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(map[string]interface{})
 
-	rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
+	foldersTree.WalkInorder(func(n *rbtree.Node) {
 		info := (*n.Key).(projectTreeNode).info
 		if info.project == nil {
 			return

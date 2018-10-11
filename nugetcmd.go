@@ -68,7 +68,7 @@ func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree) map[
 			solutionProjectIds[sp.Id] = nil
 		}
 
-		rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
+		foldersTree.WalkInorder(func(n *rbtree.Node) {
 			finfo := (*n.Key).(projectTreeNode).info
 			if finfo.project == nil {
 				return
@@ -141,7 +141,7 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
-	rbtree.WalkInorder(foldersTree.Root, func(n *rbtree.Node) {
+	foldersTree.WalkInorder(func(n *rbtree.Node) {
 		v := (*n.Key).(projectTreeNode).info
 		if v.packages == nil {
 			return
