@@ -72,10 +72,10 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 	var projectsOutsideSolution []*folderInfo
 	var filesInsideSolution = make(map[string]interface{})
 
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		info := (*n.Key).(projectTreeNode).info
+	foldersTree.Ascend(func(c *rbtree.Comparable) bool {
+		info := (*c).(projectTreeNode).info
 		if info.project == nil {
-			return
+			return true
 		}
 
 		id := strings.ToUpper(info.project.Id)
@@ -90,6 +90,8 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 				filesInsideSolution[strings.ToUpper(f)] = nil
 			}
 		}
+
+		return true
 	})
 
 	return projectsOutsideSolution, filesInsideSolution
