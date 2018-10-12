@@ -34,7 +34,7 @@ func lostprojectscmd(opt options) error {
 	sortAndOutputToStdout(projectsOutside)
 
 	if len(projectsOutsideSolutionWithFilesInside) > 0 {
-		fmt.Printf("\nThese projects not included into any solution but files in the projects' folders used in another projects within a solution:\n\n")
+		fmt.Printf("\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 	}
 
 	sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
@@ -42,7 +42,7 @@ func lostprojectscmd(opt options) error {
 	unexistProjects := getUnexistProjects(allProjectsWithinSolutions)
 
 	if len(unexistProjects) > 0 {
-		fmt.Printf("\nThese projects included into a solution but not found in the file system:\n")
+		fmt.Printf("\nThese projects are included into a solution but not found in the file system:\n")
 	}
 
 	outputSortedMapToStdout(unexistProjects, "Solution")
