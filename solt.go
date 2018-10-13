@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/voxelbrain/goptions"
+	"log"
 	"os"
+	"runtime/pprof"
 )
 
 const csharpProjectExt = ".csproj"
@@ -13,8 +15,9 @@ const solutionFileExt = ".sln"
 const packagesConfigFile = "packages.config"
 
 type options struct {
-	Path    string `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
-	Version bool   `goptions:"--version, description='Print version'"`
+	Path       string `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
+	CpuProfile string `goptions:"-c, --cpuprofile, description='CPU profile file'"`
+	Version    bool   `goptions:"--version, description='Print version'"`
 
 	goptions.Verbs
 
@@ -59,6 +62,15 @@ func main() {
 	if len(opt.Verbs) == 0 || err != nil {
 		goptions.PrintHelp()
 		return
+	}
+
+	if opt.CpuProfile != "" {
+		f, err := os.Create(opt.CpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	if cmd, found := commands[opt.Verbs]; found {
