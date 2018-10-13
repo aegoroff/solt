@@ -13,9 +13,8 @@ const solutionFileExt = ".sln"
 const packagesConfigFile = "packages.config"
 
 type options struct {
-	Path       string `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
-	CpuProfile string `goptions:"-c, --cpuprofile, description='CPU profile file'"`
-	Version    bool   `goptions:"--version, description='Print version'"`
+	Path    string `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
+	Version bool   `goptions:"--version, description='Print version'"`
 
 	goptions.Verbs
 
