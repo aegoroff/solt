@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/voxelbrain/goptions"
-	"log"
 	"os"
-	"runtime/pprof"
 )
 
 const csharpProjectExt = ".csproj"
@@ -62,15 +60,6 @@ func main() {
 	if len(opt.Verbs) == 0 || err != nil {
 		goptions.PrintHelp()
 		return
-	}
-
-	if opt.CpuProfile != "" {
-		f, err := os.Create(opt.CpuProfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
 	}
 
 	if cmd, found := commands[opt.Verbs]; found {
