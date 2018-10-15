@@ -73,7 +73,7 @@ func (x projectTreeNode) EqualTo(y interface{}) bool {
 	return strings.EqualFold(x.path, (y.(projectTreeNode)).path)
 }
 
-func createProjectTreeNode(path string, info *folderInfo) *rbtree.Comparable {
+func newProjectTreeNode(path string, info *folderInfo) *rbtree.Comparable {
 	var r rbtree.Comparable
 	r = projectTreeNode{
 		path: path,

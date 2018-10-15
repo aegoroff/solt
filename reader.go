@@ -69,10 +69,10 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 			if !ok {
 				break
 			}
-			key := createProjectTreeNode(f.path, f.info)
+			key := newProjectTreeNode(f.path, f.info)
 
 			if current, ok := result.Search(key); !ok {
-				n := rbtree.NewNode(*key)
+				n := rbtree.NewNode(key)
 				result.Insert(n)
 			} else {
 				// Update folder node that has already been created before

@@ -41,8 +41,8 @@ func Test_FindLostFiles(t *testing.T) {
 
 	for i, fi := range infos {
 		path := fmt.Sprintf(`c:\prj\f%d\`, i+1)
-		key := createProjectTreeNode(path, fi)
-		n := rbtree.NewNode(*key)
+		key := newProjectTreeNode(path, fi)
+		n := rbtree.NewNode(key)
 		tree.Insert(n)
 	}
 
