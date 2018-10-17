@@ -146,7 +146,7 @@ func onMsbuildProject(we *walkEntry) (*folder, bool) {
 func onXmlFile(we *walkEntry, result interface{}) (*folder, bool) {
 	full := filepath.Join(we.Parent, we.Name)
 
-	err := unmarshalXml(full, result)
+	err := unmarshalXmlFrom(full, result)
 	if err != nil {
 		log.Printf("%s: %v\n", full, err)
 		return nil, false

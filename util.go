@@ -41,19 +41,24 @@ func sortAndOutput(writer io.Writer, items []string) {
 	}
 }
 
-func unmarshalXml(path string, result interface{}) error {
+func unmarshalXmlFrom(path string, result interface{}) error {
 	f, err := os.Open(path)
 	if err != nil {
 		log.Print(err)
 		return err
 	}
 	defer f.Close()
-	s := bufio.NewScanner(f)
+
+	return unmarshalXml(f, result)
+}
+
+func unmarshalXml(r io.Reader, result interface{}) error {
+	s := bufio.NewScanner(r)
 	var data []byte
 	for s.Scan() {
 		data = append(data, s.Bytes()...)
 	}
-	err = xml.Unmarshal(data, result)
+	err := xml.Unmarshal(data, result)
 	if err != nil {
 		return err
 	}
