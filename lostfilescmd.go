@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,19 +13,13 @@ var subfolderToExclude = []string{
 	"obj",
 }
 
-func lostfilescmd(opt options) error {
-
-	filter := csharpCodeFileExt
-	if len(opt.LostFiles.Filter) > 0 {
-		filter = opt.LostFiles.Filter
-	}
-
+func lostfilescmd(c *cli.Context) error {
 	var foundFiles []string
 	var packagesFolders = make(map[string]interface{})
-	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 		// Add file to filtered files slice
 		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == filter {
+		if ext == lostFilesFilter {
 			fp := filepath.Join(we.Parent, we.Name)
 			foundFiles = append(foundFiles, fp)
 		}

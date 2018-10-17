@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -15,16 +16,16 @@ type mismatch struct {
 	versions []string
 }
 
-func nugetcmd(opt options) error {
+func nugetcmd(c *cli.Context) error {
 	var solutions []string
-	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			solutions = append(solutions, filepath.Join(we.Parent, we.Name))
 		}
 	})
 
-	if opt.Nuget.Mismatch {
+	if findNugetMismatches {
 		showMismatches(solutions, foldersTree)
 	} else {
 		showPackagesInfoByFolders(foldersTree)

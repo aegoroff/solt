@@ -1,71 +1,94 @@
 package main
 
 import (
-	"fmt"
-	"github.com/voxelbrain/goptions"
+	"github.com/urfave/cli"
+	"log"
 	"os"
 )
 
 const csharpProjectExt = ".csproj"
 const cppProjectExt = ".vcxproj"
-const csharpCodeFileExt = ".cs"
 const solutionFileExt = ".sln"
 const packagesConfigFile = "packages.config"
 
-type options struct {
-	Path    string `goptions:"-p, --path, obligatory, description='Path to the sources folder'"`
-	Version bool   `goptions:"--version, description='Print version'"`
-
-	goptions.Verbs
-
-	// Finds files that not included into any project
-	LostFiles struct {
-		Filter string `goptions:"-f, --filter, description='Files filter. By default .cs files'"`
-	} `goptions:"lostfiles"`
-
-	// Finds projects that not included into any solution within sources folder
-	LostProjects struct {
-	} `goptions:"lostprojects"`
-
-	// Shows nuget packages used within any folder that contains packages.confing file
-	Nuget struct {
-		Mismatch bool `goptions:"-m, --mismatch, description='Find packages to consolidate i.e. packages with different versions in the same solution'"`
-	} `goptions:"nuget"`
-
-	// Shows solutions information
-	Info struct {
-	} `goptions:"info"`
-}
-
-type command func(options) error
-
-var commands = map[goptions.Verbs]command{
-	"lostfiles":    lostfilescmd,
-	"lostprojects": lostprojectscmd,
-	"nuget":        nugetcmd,
-	"info":         infocmd,
-}
+var sourcesPath string
+var lostFilesFilter string
+var findNugetMismatches bool
 
 func main() {
-	opt := options{}
+	app := cli.NewApp()
+	app.Name = "solt"
+	app.Version = Version
+	app.Usage = "SOLution Tool that analyzes Microsoft Visual Studio solutions and projects"
 
-	err := goptions.Parse(&opt)
-
-	if opt.Version {
-		fmt.Printf("solt v%s\n", Version)
-		return
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "path, p",
+			Usage:       "REQUIRED. Path to the sources folder",
+			Destination: &sourcesPath,
+		},
 	}
 
-	if len(opt.Verbs) == 0 || err != nil {
-		goptions.PrintHelp()
-		return
+	app.Commands = []cli.Command{
+		{
+			Name:    "lostfiles",
+			Aliases: []string{"f"},
+			Usage:   "Find lost files in the folder specified",
+			Action: func(c *cli.Context) error {
+				return actionLoader(c, lostfilescmd)
+			},
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "file, f",
+					Value:       ".cs",
+					Usage:       "Lost files filter extension",
+					Destination: &lostFilesFilter,
+				},
+			},
+		},
+		{
+			Name:    "lostprojects",
+			Aliases: []string{"p"},
+			Usage:   "Find projects that not included into any solution",
+			Action: func(c *cli.Context) error {
+				return actionLoader(c, lostprojectscmd)
+			},
+		},
+		{
+			Name:    "nuget",
+			Aliases: []string{"n"},
+			Usage:   "Get nuget packages information within projects or find Nuget mismatches in solution",
+			Action: func(c *cli.Context) error {
+				return actionLoader(c, nugetcmd)
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:        "mismatch, m",
+					Usage:       "Find packages to consolidate i.e. packages with different versions in the same solution",
+					Destination: &findNugetMismatches,
+				},
+			},
+		},
+		{
+			Name:    "info",
+			Aliases: []string{"i"},
+			Usage:   "Get information about found solutions",
+			Action: func(c *cli.Context) error {
+				return actionLoader(c, infocmd)
+			},
+		},
 	}
 
-	if cmd, found := commands[opt.Verbs]; found {
-		err := cmd(opt)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "error:", err)
-			os.Exit(1)
-		}
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
 	}
+}
+
+func actionLoader(c *cli.Context, action func(*cli.Context) error) error {
+	if len(sourcesPath) == 0 {
+		cli.ShowAppHelp(c)
+		return nil
+	}
+	return action(c)
 }

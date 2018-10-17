@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -9,9 +10,9 @@ import (
 	"text/tabwriter"
 )
 
-func infocmd(opt options) error {
+func infocmd(c *cli.Context) error {
 	var solutions []string
-	readProjectDir(opt.Path, func(we *walkEntry) {
+	readProjectDir(sourcesPath, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			solutions = append(solutions, filepath.Join(we.Parent, we.Name))

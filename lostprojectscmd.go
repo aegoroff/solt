@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -14,10 +15,9 @@ type projectSolution struct {
 	solution string
 }
 
-func lostprojectscmd(opt options) error {
-
+func lostprojectscmd(c *cli.Context) error {
 	var solutions []string
-	foldersTree := readProjectDir(opt.Path, func(we *walkEntry) {
+	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == solutionFileExt {
 			sp := filepath.Join(we.Parent, we.Name)
