@@ -32,6 +32,7 @@ func Execute() {
 }
 
 func init() {
+	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
 	rootCmd.MarkPersistentFlagRequired(pathParamName)
 }
