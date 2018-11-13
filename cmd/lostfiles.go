@@ -1,48 +1,59 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 var subfolderToExclude = []string{
 	"obj",
 }
 
-func lostfilescmd(c *cli.Context) error {
-	var foundFiles []string
-	var packagesFolders = make(map[string]interface{})
-	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
-		// Add file to filtered files slice
-		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == lostFilesFilter {
-			fp := filepath.Join(we.Parent, we.Name)
-			foundFiles = append(foundFiles, fp)
-		}
+var lostFilesFilter string
 
-		if ext == solutionFileExt {
-			ppath := filepath.Join(we.Parent, "packages")
-			if _, ok := packagesFolders[ppath]; !ok {
-				packagesFolders[ppath] = nil
+// lostfilesCmd represents the lostfiles command
+var lostfilesCmd = &cobra.Command{
+	Use:   "lostfiles",
+	Short: "Find lost files in the folder specified",
+	Run: func(cmd *cobra.Command, args []string) {
+		var foundFiles []string
+		var packagesFolders = make(map[string]interface{})
+		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+			// Add file to filtered files slice
+			ext := strings.ToLower(filepath.Ext(we.Name))
+			if ext == lostFilesFilter {
+				fp := filepath.Join(we.Parent, we.Name)
+				foundFiles = append(foundFiles, fp)
 			}
+
+			if ext == solutionFileExt {
+				ppath := filepath.Join(we.Parent, "packages")
+				if _, ok := packagesFolders[ppath]; !ok {
+					packagesFolders[ppath] = nil
+				}
+			}
+		})
+
+		lostFiles, unexistFiles := findLostFiles(foldersTree, packagesFolders, foundFiles)
+
+		sortAndOutputToStdout(lostFiles)
+
+		if len(unexistFiles) > 0 {
+			fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
 		}
-	})
 
-	lostFiles, unexistFiles := findLostFiles(foldersTree, packagesFolders, foundFiles)
+		outputSortedMapToStdout(unexistFiles, "Project")
+	},
+}
 
-	sortAndOutputToStdout(lostFiles)
-
-	if len(unexistFiles) > 0 {
-		fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
-	}
-
-	outputSortedMapToStdout(unexistFiles, "Project")
-
-	return nil
+func init() {
+	rootCmd.AddCommand(lostfilesCmd)
+	lostfilesCmd.Flags().StringVarP(&lostFilesFilter, "file", "f", ".cs", "Lost files filter extension")
 }
 
 func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {

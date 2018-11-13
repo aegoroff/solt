@@ -1,14 +1,15 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/spf13/cobra"
 )
 
 type mismatch struct {
@@ -16,22 +17,34 @@ type mismatch struct {
 	versions []string
 }
 
-func nugetcmd(c *cli.Context) error {
-	var solutions []string
-	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
-		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == solutionFileExt {
-			solutions = append(solutions, filepath.Join(we.Parent, we.Name))
+var findNugetMismatches bool
+
+// nugetCmd represents the nuget command
+var nugetCmd = &cobra.Command{
+	Use:   "nuget",
+	Short: "Get nuget packages information within projects or find Nuget mismatches in solution",
+	Run: func(cmd *cobra.Command, args []string) {
+		var solutions []string
+		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+			ext := strings.ToLower(filepath.Ext(we.Name))
+			if ext == solutionFileExt {
+				solutions = append(solutions, filepath.Join(we.Parent, we.Name))
+			}
+		})
+
+		if findNugetMismatches {
+			showMismatches(solutions, foldersTree)
+		} else {
+			showPackagesInfoByFolders(foldersTree)
 		}
-	})
 
-	if findNugetMismatches {
-		showMismatches(solutions, foldersTree)
-	} else {
-		showPackagesInfoByFolders(foldersTree)
-	}
+	},
+}
 
-	return nil
+func init() {
+	rootCmd.AddCommand(nugetCmd)
+
+	nugetCmd.PersistentFlags().BoolVarP(&findNugetMismatches, "mismatch", "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
 }
 
 func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {

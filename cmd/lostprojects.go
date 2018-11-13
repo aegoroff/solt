@@ -1,13 +1,14 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 type projectSolution struct {
@@ -15,39 +16,46 @@ type projectSolution struct {
 	solution string
 }
 
-func lostprojectscmd(c *cli.Context) error {
-	var solutions []string
-	foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
-		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == solutionFileExt {
-			sp := filepath.Join(we.Parent, we.Name)
-			solutions = append(solutions, sp)
+// lostprojectsCmd represents the lostprojects command
+var lostprojectsCmd = &cobra.Command{
+	Use:   "lostprojects",
+	Short: "Find projects that not included into any solution",
+	Run: func(cmd *cobra.Command, args []string) {
+		var solutions []string
+		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+			ext := strings.ToLower(filepath.Ext(we.Name))
+			if ext == solutionFileExt {
+				sp := filepath.Join(we.Parent, we.Name)
+				solutions = append(solutions, sp)
+			}
+		})
+
+		allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
+
+		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
+
+		projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
+
+		sortAndOutputToStdout(projectsOutside)
+
+		if len(projectsOutsideSolutionWithFilesInside) > 0 {
+			fmt.Printf("\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 		}
-	})
 
-	allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
+		sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
 
-	projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
+		unexistProjects := getUnexistProjects(allProjectsWithinSolutions)
 
-	projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
+		if len(unexistProjects) > 0 {
+			fmt.Printf("\nThese projects are included into a solution but not found in the file system:\n")
+		}
 
-	sortAndOutputToStdout(projectsOutside)
+		outputSortedMapToStdout(unexistProjects, "Solution")
+	},
+}
 
-	if len(projectsOutsideSolutionWithFilesInside) > 0 {
-		fmt.Printf("\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
-	}
-
-	sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
-
-	unexistProjects := getUnexistProjects(allProjectsWithinSolutions)
-
-	if len(unexistProjects) > 0 {
-		fmt.Printf("\nThese projects are included into a solution but not found in the file system:\n")
-	}
-
-	outputSortedMapToStdout(unexistProjects, "Solution")
-
-	return nil
+func init() {
+	rootCmd.AddCommand(lostprojectsCmd)
 }
 
 func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) map[string][]string {

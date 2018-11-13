@@ -1,5 +1,5 @@
 ﻿# version format
-version: 0.1.{build}
+version: 0.2.{build}
 
 clone_folder: c:\gopath\src\solt
 
@@ -24,7 +24,7 @@ install:
   - go env
   - go get -u "github.com/anknown/ahocorasick"
   - go get -u "github.com/dustin/go-humanize"
-  - go get -u "github.com/urfave/cli"
+  - go get -u "github.com/spf13/cobra"
   - go get -u "github.com/stretchr/testify/assert"
   - go get -u "github.com/aegoroff/godatastruct/rbtree"
   - go get -u "github.com/akutz/sortfold"
