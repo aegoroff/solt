@@ -20,6 +20,7 @@ var rootCmd = &cobra.Command{
 	Use:   "solt",
 	Short: "SOLution Tool that analyzes Microsoft Visual Studio solutions and projects",
 	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
 	},
 }
 
@@ -34,5 +35,4 @@ func Execute() {
 func init() {
 	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
-	rootCmd.MarkPersistentFlagRequired(pathParamName)
 }

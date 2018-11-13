@@ -35,7 +35,7 @@ stack: go 1.11
 image: Visual Studio 2017
 
 build_script:
-  - go build -ldflags "-X main.Version=%APPVEYOR_BUILD_VERSION%" solt
+  - go build -ldflags "-X solt/cmd.Version=%APPVEYOR_BUILD_VERSION%" solt
 
 test_script:
   - go test -coverprofile=coverage.txt -covermode=atomic solt/...
