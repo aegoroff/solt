@@ -148,33 +148,11 @@ func (lx *lexer) backup() {
 	}
 }
 
-// accept consumes the next rune if it's equal to `valid`.
-func (lx *lexer) accept(valid rune) bool {
-	if lx.next() == valid {
-		return true
-	}
-	lx.backup()
-	return false
-}
-
 // peek returns but does not consume the next rune in the input.
 func (lx *lexer) peek() rune {
 	r := lx.next()
 	lx.backup()
 	return r
-}
-
-// skip ignores all input that matches the given predicate.
-func (lx *lexer) skip(pred func(rune) bool) {
-	for {
-		r := lx.next()
-		if pred(r) {
-			continue
-		}
-		lx.backup()
-		lx.ignore()
-		return
-	}
 }
 
 // errorf stops all lexing by emitting an error and returning `nil`.
@@ -569,12 +547,6 @@ func isCrlf(r rune) bool {
 
 func isDigit(r rune) bool {
 	return r >= '0' && r <= '9'
-}
-
-func isHexadecimal(r rune) bool {
-	return (r >= '0' && r <= '9') ||
-		(r >= 'a' && r <= 'f') ||
-		(r >= 'A' && r <= 'F')
 }
 
 func isIdentifierChar(r rune) bool {

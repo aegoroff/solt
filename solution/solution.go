@@ -112,10 +112,8 @@ func onVersion(key, value string) {
 	switch key {
 	case minimumVisualStudioVersionKey:
 		minimumVisualStudioVersion = value
-		break
 	case visualStudioVersionKey:
 		visualStudioVersion = value
-		break
 	}
 }
 

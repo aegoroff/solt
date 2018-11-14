@@ -59,11 +59,7 @@ func unmarshalXml(r io.Reader, result interface{}) error {
 		data = append(data, s.Bytes()...)
 	}
 	err := xml.Unmarshal(data, result)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func walkDirBreadthFirst(path string, action func(parent string, entry os.FileInfo)) {
