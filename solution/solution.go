@@ -52,7 +52,10 @@ func Parse(solutionPath string) (*Solution, error) {
 		return nil, err
 	}
 	if r != '\uFEFF' {
-		br.UnreadRune() // Not a BOM -- put the rune back
+		err = br.UnreadRune() // Not a BOM -- put the rune back
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	bs := bufio.NewScanner(br)
