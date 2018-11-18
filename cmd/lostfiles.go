@@ -18,8 +18,9 @@ const filterParamName = "file"
 
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
-	Use:   "lostfiles",
-	Short: "Find lost files in the folder specified",
+	Use:     "lostfiles",
+	Aliases: []string{"f"},
+	Short:   "Find lost files in the folder specified",
 	Run: func(cmd *cobra.Command, args []string) {
 		var foundFiles []string
 		var packagesFolders = make(map[string]interface{})

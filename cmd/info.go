@@ -13,8 +13,9 @@ import (
 
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
-	Use:   "info",
-	Short: "Get information about found solutions",
+	Use:     "info",
+	Aliases: []string{"i"},
+	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var solutions []string
 		readProjectDir(sourcesPath, func(we *walkEntry) {

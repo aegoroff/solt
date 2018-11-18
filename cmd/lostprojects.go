@@ -18,8 +18,9 @@ type projectSolution struct {
 
 // lostprojectsCmd represents the lostprojects command
 var lostprojectsCmd = &cobra.Command{
-	Use:   "lostprojects",
-	Short: "Find projects that not included into any solution",
+	Use:     "lostprojects",
+	Aliases: []string{"p"},
+	Short:   "Find projects that not included into any solution",
 	Run: func(cmd *cobra.Command, args []string) {
 		var solutions []string
 		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
