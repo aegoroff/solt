@@ -14,7 +14,7 @@ var subfolderToExclude = []string{
 	"obj",
 }
 
-var lostFilesFilter string
+const filterParamName = "file"
 
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
@@ -23,6 +23,9 @@ var lostfilesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var foundFiles []string
 		var packagesFolders = make(map[string]interface{})
+
+		lostFilesFilter, _ := cmd.Flags().GetString(filterParamName)
+
 		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 			// Add file to filtered files slice
 			ext := strings.ToLower(filepath.Ext(we.Name))
@@ -53,7 +56,7 @@ var lostfilesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(lostfilesCmd)
-	lostfilesCmd.Flags().StringVarP(&lostFilesFilter, "file", "f", ".cs", "Lost files filter extension")
+	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension")
 }
 
 func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {

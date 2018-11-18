@@ -17,7 +17,7 @@ type mismatch struct {
 	versions []string
 }
 
-var findNugetMismatches bool
+const mismatchParamName = "mismatch"
 
 // nugetCmd represents the nuget command
 var nugetCmd = &cobra.Command{
@@ -32,6 +32,8 @@ var nugetCmd = &cobra.Command{
 			}
 		})
 
+		findNugetMismatches, _ := cmd.Flags().GetBool(mismatchParamName)
+
 		if findNugetMismatches {
 			showMismatches(solutions, foldersTree)
 		} else {
@@ -44,7 +46,7 @@ var nugetCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(nugetCmd)
 
-	nugetCmd.PersistentFlags().BoolVarP(&findNugetMismatches, "mismatch", "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
+	nugetCmd.Flags().BoolP(mismatchParamName, "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
 }
 
 func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
