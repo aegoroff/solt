@@ -47,7 +47,7 @@ func unmarshalXmlFrom(path string, result interface{}) error {
 		log.Print(err)
 		return err
 	}
-	defer f.Close()
+	defer closeResource(f)
 
 	return unmarshalXml(f, result)
 }
@@ -88,4 +88,11 @@ func dirents(path string) []os.FileInfo {
 	}
 
 	return entries
+}
+
+func closeResource(c io.Closer) {
+	err := c.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }

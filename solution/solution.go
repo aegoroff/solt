@@ -2,6 +2,7 @@ package solution
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -21,8 +22,8 @@ var (
 	currentSectionType         string
 )
 
-func (l *lexer) Lex(lval *yySymType) int {
-	v := l.nextItem()
+func (lx *lexer) Lex(lval *yySymType) int {
+	v := lx.nextItem()
 	if v.tok == itemEOF {
 		return 0
 	}
@@ -33,7 +34,7 @@ func (l *lexer) Lex(lval *yySymType) int {
 	return int(lval.tok)
 }
 
-func (l *lexer) Error(e string) {
+func (lx *lexer) Error(e string) {
 	log.Print(e)
 }
 
@@ -44,7 +45,7 @@ func Parse(solutionPath string) (*Solution, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer closeResource(f)
 
 	br := bufio.NewReader(f)
 	r, _, err := br.ReadRune()
@@ -71,6 +72,13 @@ func Parse(solutionPath string) (*Solution, error) {
 	sol := parse(str)
 
 	return sol, nil
+}
+
+func closeResource(c io.Closer) {
+	err := c.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func parse(str string) *Solution {

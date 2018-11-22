@@ -19,8 +19,8 @@ var sourcesPath string
 var rootCmd = &cobra.Command{
 	Use:   "solt",
 	Short: "SOLution Tool that analyzes Microsoft Visual Studio solutions and projects",
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
 	},
 }
 
