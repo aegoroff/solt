@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -40,8 +41,7 @@ func (lx *lexer) Error(e string) {
 
 // Parse parses visual studio solution file specified by path
 func Parse(solutionPath string) (*Solution, error) {
-
-	f, err := os.Open(solutionPath)
+	f, err := os.Open(filepath.Clean(solutionPath))
 	if err != nil {
 		return nil, err
 	}

@@ -42,7 +42,7 @@ func sortAndOutput(writer io.Writer, items []string) {
 }
 
 func unmarshalXmlFrom(path string, result interface{}) error {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		log.Print(err)
 		return err
