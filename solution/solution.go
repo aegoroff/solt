@@ -64,7 +64,10 @@ func Parse(solutionPath string) (*Solution, error) {
 	sb := strings.Builder{}
 
 	for bs.Scan() {
-		sb.WriteString(bs.Text())
+		_, err = sb.WriteString(bs.Text())
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	str := sb.String()

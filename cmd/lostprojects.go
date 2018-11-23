@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"log"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -140,7 +141,12 @@ func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
 
 	var projectsInSolution = make(map[string]*projectSolution)
 	for _, solpath := range solutions {
-		sln, _ := solution.Parse(solpath)
+		sln, err := solution.Parse(solpath)
+
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 
 		for _, p := range sln.Projects {
 			// Skip solution folders

@@ -21,11 +21,15 @@ var lostfilesCmd = &cobra.Command{
 	Use:     "lostfiles",
 	Aliases: []string{"f"},
 	Short:   "Find lost files in the folder specified",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		var foundFiles []string
 		var packagesFolders = make(map[string]interface{})
 
-		lostFilesFilter, _ := cmd.Flags().GetString(filterParamName)
+		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
+
+		if err != nil {
+			return err
+		}
 
 		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 			// Add file to filtered files slice
@@ -52,6 +56,7 @@ var lostfilesCmd = &cobra.Command{
 		}
 
 		outputSortedMapToStdout(unexistFiles, "Project")
+		return nil
 	},
 }
 
@@ -66,7 +71,11 @@ func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interf
 		excludedFolders = append(excludedFolders, k)
 	}
 
-	exmach := createAhoCorasickMachine(excludedFolders)
+	exmach, err := createAhoCorasickMachine(excludedFolders)
+	if err != nil {
+		fmt.Println(err)
+		return []string{}, unexistFiles
+	}
 	var result []string
 	for _, file := range foundFiles {
 		if _, ok := includedFiles[strings.ToUpper(file)]; !ok && !Match(exmach, file) {

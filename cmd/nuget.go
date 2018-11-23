@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"log"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -24,7 +25,7 @@ var nugetCmd = &cobra.Command{
 	Use:     "nuget",
 	Aliases: []string{"n"},
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		var solutions []string
 		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
 			ext := strings.ToLower(filepath.Ext(we.Name))
@@ -33,7 +34,11 @@ var nugetCmd = &cobra.Command{
 			}
 		})
 
-		findNugetMismatches, _ := cmd.Flags().GetBool(mismatchParamName)
+		findNugetMismatches, err := cmd.Flags().GetBool(mismatchParamName)
+
+		if err != nil {
+			return err
+		}
 
 		if findNugetMismatches {
 			showMismatches(solutions, foldersTree)
@@ -41,6 +46,7 @@ var nugetCmd = &cobra.Command{
 			showPackagesInfoByFolders(foldersTree)
 		}
 
+		return nil
 	},
 }
 
@@ -79,7 +85,13 @@ func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
 func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree) map[string][]*folderInfo {
 	var solutionProjects = make(map[string][]*folderInfo)
 	for _, sol := range solutions {
-		sln, _ := solution.Parse(sol)
+		sln, err := solution.Parse(sol)
+
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
 		var solutionProjectIds = make(map[string]interface{})
 		for _, sp := range sln.Projects {
 			solutionProjectIds[sp.Id] = nil

@@ -22,7 +22,7 @@ func Test_MatchOneOfPatterns(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		m := createAhoCorasickMachine(test.patterns)
+		m, _ := createAhoCorasickMachine(test.patterns)
 		result := Match(m, test.input)
 
 		// Assert
