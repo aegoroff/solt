@@ -32,6 +32,7 @@ type Project struct {
 	Nones             []Include          `xml:"ItemGroup>None"`
 	References        []Reference        `xml:"ItemGroup>Reference"`
 	ProjectReferences []ProjectReference `xml:"ItemGroup>ProjectReference"`
+	PackageReferences []PackageReference `xml:"ItemGroup>PackageReference"`
 	OutputPaths       []string           `xml:"PropertyGroup>OutputPath"`
 }
 
@@ -51,6 +52,17 @@ type ProjectReference struct {
 	Path        string `xml:"Include,attr"`
 	ProjectGuid string `xml:"Project"`
 	Name        string `xml:"Name"`
+}
+
+// PackageReference is nuget reference definition in MSBuild file
+type PackageReference struct {
+	Id      string `xml:"Include,attr"`
+	Version string `xml:"Version,attr"`
+}
+
+type nugetPackage struct {
+	Id      string
+	Version string
 }
 
 type walkEntry struct {

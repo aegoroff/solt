@@ -120,11 +120,13 @@ func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][
 	for sol, projects := range solutionProjects {
 		var packagesMap = make(map[string][]string)
 		for _, prj := range projects {
-			if prj.packages == nil {
+			if prj.packages == nil && prj.project.PackageReferences == nil {
 				continue
 			}
 
-			for _, pkg := range prj.packages.Packages {
+			nugetPackages := getNugetPackages(prj)
+
+			for _, pkg := range nugetPackages {
 				if v, ok := packagesMap[pkg.Id]; !ok {
 					packagesMap[pkg.Id] = []string{pkg.Version}
 				} else {
@@ -171,20 +173,40 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
 
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		v := (*n.Key).(projectTreeNode).info
-		if v.packages == nil {
+		fi := (*n.Key).(projectTreeNode).info
+		if fi.packages == nil && fi.project.PackageReferences == nil {
 			return
 		}
 
-		parent := filepath.Dir(*v.projectPath)
+		nugetPackages := getNugetPackages(fi)
+
+		parent := filepath.Dir(*fi.projectPath)
 		fmt.Printf(" %s\n", parent)
 		fmt.Fprintf(tw, format, "Package", "Version")
 		fmt.Fprintf(tw, format, "-------", "--------")
 
-		for _, p := range v.packages.Packages {
+		for _, p := range nugetPackages {
 			fmt.Fprintf(tw, format, p.Id, p.Version)
 		}
+
 		tw.Flush()
 		fmt.Println()
 	})
+}
+
+func getNugetPackages(fi *folderInfo) []nugetPackage {
+	var nugetPackages []nugetPackage
+	if fi.packages != nil {
+		for _, p := range fi.packages.Packages {
+			n := nugetPackage{Id: p.Id, Version: p.Version}
+			nugetPackages = append(nugetPackages, n)
+		}
+	}
+	if fi.project.PackageReferences != nil {
+		for _, p := range fi.project.PackageReferences {
+			n := nugetPackage{Id: p.Id, Version: p.Version}
+			nugetPackages = append(nugetPackages, n)
+		}
+	}
+	return nugetPackages
 }
