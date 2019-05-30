@@ -120,7 +120,7 @@ func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][
 	for sol, projects := range solutionProjects {
 		var packagesMap = make(map[string][]string)
 		for _, prj := range projects {
-			if prj.packages == nil && prj.project.PackageReferences == nil {
+			if prj.packages == nil && (prj.project == nil || prj.project.PackageReferences == nil) {
 				continue
 			}
 
@@ -174,7 +174,7 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
 		fi := (*n.Key).(projectTreeNode).info
-		if fi.packages == nil && fi.project.PackageReferences == nil {
+		if fi.packages == nil && (fi.project == nil || fi.project.PackageReferences == nil) {
 			return
 		}
 
@@ -202,7 +202,7 @@ func getNugetPackages(fi *folderInfo) []nugetPackage {
 			nugetPackages = append(nugetPackages, n)
 		}
 	}
-	if fi.project.PackageReferences != nil {
+	if fi.project != nil && fi.project.PackageReferences != nil {
 		for _, p := range fi.project.PackageReferences {
 			n := nugetPackage{Id: p.Id, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
