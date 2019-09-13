@@ -24,6 +24,9 @@ type Package struct {
 // Project is MSBuild project definition
 type Project struct {
 	XMLName           xml.Name           `xml:"Project"`
+	Sdk               string             `xml:"Sdk,attr"`
+	ToolsVersion      string             `xml:"ToolsVersion,attr"`
+	DefaultTargets    string             `xml:"DefaultTargets,attr"`
 	Id                string             `xml:"PropertyGroup>ProjectGuid"`
 	Compiles          []Include          `xml:"ItemGroup>Compile"`
 	CLCompiles        []Include          `xml:"ItemGroup>ClCompile"`

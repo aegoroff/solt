@@ -1,0 +1,424 @@
+
+state 0
+	$accept: .solution $end 
+	line: .    (4)
+
+	COMMA  shift 18
+	COMMENT  shift 16
+	NUMBER  shift 19
+	IDENTIFIER  shift 12
+	BARE_STRING  shift 17
+	.  reduce 4 (src line 42)
+
+	solution  goto 1
+	project_section_key  goto 13
+	comment  goto 11
+	lvalue  goto 15
+	lines  goto 2
+	line  goto 3
+	header_line  goto 4
+	project_start  goto 5
+	project_end  goto 6
+	project_section  goto 7
+	project_section_key_value_pair  goto 8
+	first_line  goto 9
+	version  goto 10
+	word  goto 14
+
+state 1
+	$accept:  solution.$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	solution:  lines.    (1)
+	lines:  lines.CRLF line 
+
+	CRLF  shift 20
+	.  reduce 1 (src line 35)
+
+
+state 3
+	lines:  line.    (2)
+
+	.  reduce 2 (src line 37)
+
+
+state 4
+	line:  header_line.    (5)
+
+	.  reduce 5 (src line 44)
+
+
+state 5
+	line:  project_start.    (6)
+
+	.  reduce 6 (src line 45)
+
+
+state 6
+	line:  project_end.    (7)
+
+	.  reduce 7 (src line 46)
+
+
+state 7
+	line:  project_section.    (8)
+
+	.  reduce 8 (src line 47)
+
+
+state 8
+	line:  project_section_key_value_pair.    (9)
+
+	.  reduce 9 (src line 48)
+
+
+state 9
+	header_line:  first_line.    (10)
+
+	.  reduce 10 (src line 51)
+
+
+state 10
+	header_line:  version.    (11)
+
+	.  reduce 11 (src line 53)
+
+
+state 11
+	header_line:  comment.    (12)
+
+	.  reduce 12 (src line 54)
+
+
+state 12
+	word:  IDENTIFIER.    (17)
+	lvalue:  IDENTIFIER.    (21)
+	project_start:  IDENTIFIER.project_type EQ project_name COMMA project_path COMMA project_id 
+	project_end:  IDENTIFIER.    (30)
+	project_section:  IDENTIFIER.project_section_start EQ project_section_type 
+
+	$end  reduce 30 (src line 91)
+	EQ  reduce 21 (src line 73)
+	PAREN_OPEN  shift 23
+	CRLF  reduce 30 (src line 91)
+	.  reduce 17 (src line 64)
+
+	project_type  goto 21
+	project_section_start  goto 22
+
+state 13
+	project_section_key_value_pair:  project_section_key.EQ project_section_value 
+
+	EQ  shift 24
+	.  error
+
+
+state 14
+	first_line:  word.words 
+
+	COMMA  shift 18
+	NUMBER  shift 19
+	IDENTIFIER  shift 27
+	.  error
+
+	word  goto 26
+	words  goto 25
+
+state 15
+	version:  lvalue.EQ rvalue 
+
+	EQ  shift 28
+	.  error
+
+
+state 16
+	comment:  COMMENT.    (13)
+
+	.  reduce 13 (src line 57)
+
+
+state 17
+	project_section_key:  BARE_STRING.    (36)
+
+	.  reduce 36 (src line 107)
+
+
+state 18
+	word:  COMMA.    (18)
+
+	.  reduce 18 (src line 65)
+
+
+state 19
+	word:  NUMBER.    (19)
+
+	.  reduce 19 (src line 66)
+
+
+state 20
+	lines:  lines CRLF.line 
+	line: .    (4)
+
+	COMMA  shift 18
+	COMMENT  shift 16
+	NUMBER  shift 19
+	IDENTIFIER  shift 12
+	BARE_STRING  shift 17
+	.  reduce 4 (src line 42)
+
+	project_section_key  goto 13
+	comment  goto 11
+	lvalue  goto 15
+	line  goto 29
+	header_line  goto 4
+	project_start  goto 5
+	project_end  goto 6
+	project_section  goto 7
+	project_section_key_value_pair  goto 8
+	first_line  goto 9
+	version  goto 10
+	word  goto 14
+
+state 21
+	project_start:  IDENTIFIER project_type.EQ project_name COMMA project_path COMMA project_id 
+
+	EQ  shift 30
+	.  error
+
+
+state 22
+	project_section:  IDENTIFIER project_section_start.EQ project_section_type 
+
+	EQ  shift 31
+	.  error
+
+
+state 23
+	project_type:  PAREN_OPEN.project_type_id PAREN_CLOSE 
+	project_section_start:  PAREN_OPEN.project_section_name PAREN_CLOSE 
+
+	IDENTIFIER  shift 35
+	STRING  shift 34
+	.  error
+
+	project_type_id  goto 32
+	project_section_name  goto 33
+
+state 24
+	project_section_key_value_pair:  project_section_key EQ.project_section_value 
+
+	BARE_STRING  shift 37
+	.  error
+
+	project_section_value  goto 36
+
+state 25
+	first_line:  word words.    (14)
+	words:  words.word 
+
+	COMMA  shift 18
+	NUMBER  shift 19
+	IDENTIFIER  shift 27
+	.  reduce 14 (src line 59)
+
+	word  goto 38
+
+state 26
+	words:  word.    (15)
+
+	.  reduce 15 (src line 61)
+
+
+state 27
+	word:  IDENTIFIER.    (17)
+
+	.  reduce 17 (src line 64)
+
+
+state 28
+	version:  lvalue EQ.rvalue 
+
+	NUMBER  shift 41
+	IDENTIFIER  shift 40
+	.  error
+
+	rvalue  goto 39
+
+state 29
+	lines:  lines CRLF line.    (3)
+
+	.  reduce 3 (src line 39)
+
+
+state 30
+	project_start:  IDENTIFIER project_type EQ.project_name COMMA project_path COMMA project_id 
+
+	STRING  shift 43
+	.  error
+
+	project_name  goto 42
+
+state 31
+	project_section:  IDENTIFIER project_section_start EQ.project_section_type 
+
+	IDENTIFIER  shift 45
+	.  error
+
+	project_section_type  goto 44
+
+state 32
+	project_type:  PAREN_OPEN project_type_id.PAREN_CLOSE 
+
+	PAREN_CLOSE  shift 46
+	.  error
+
+
+state 33
+	project_section_start:  PAREN_OPEN project_section_name.PAREN_CLOSE 
+
+	PAREN_CLOSE  shift 47
+	.  error
+
+
+state 34
+	project_type_id:  STRING.    (26)
+
+	.  reduce 26 (src line 83)
+
+
+state 35
+	project_section_name:  IDENTIFIER.    (33)
+
+	.  reduce 33 (src line 99)
+
+
+state 36
+	project_section_key_value_pair:  project_section_key EQ project_section_value.    (35)
+
+	.  reduce 35 (src line 103)
+
+
+state 37
+	project_section_value:  BARE_STRING.    (37)
+
+	.  reduce 37 (src line 109)
+
+
+state 38
+	words:  words word.    (16)
+
+	.  reduce 16 (src line 62)
+
+
+state 39
+	version:  lvalue EQ rvalue.    (20)
+
+	.  reduce 20 (src line 69)
+
+
+state 40
+	rvalue:  IDENTIFIER.    (22)
+
+	.  reduce 22 (src line 75)
+
+
+state 41
+	rvalue:  NUMBER.    (23)
+
+	.  reduce 23 (src line 75)
+
+
+state 42
+	project_start:  IDENTIFIER project_type EQ project_name.COMMA project_path COMMA project_id 
+
+	COMMA  shift 48
+	.  error
+
+
+state 43
+	project_name:  STRING.    (27)
+
+	.  reduce 27 (src line 85)
+
+
+state 44
+	project_section:  IDENTIFIER project_section_start EQ project_section_type.    (31)
+
+	.  reduce 31 (src line 93)
+
+
+state 45
+	project_section_type:  IDENTIFIER.    (34)
+
+	.  reduce 34 (src line 101)
+
+
+state 46
+	project_type:  PAREN_OPEN project_type_id PAREN_CLOSE.    (25)
+
+	.  reduce 25 (src line 81)
+
+
+state 47
+	project_section_start:  PAREN_OPEN project_section_name PAREN_CLOSE.    (32)
+
+	.  reduce 32 (src line 97)
+
+
+state 48
+	project_start:  IDENTIFIER project_type EQ project_name COMMA.project_path COMMA project_id 
+
+	STRING  shift 50
+	.  error
+
+	project_path  goto 49
+
+state 49
+	project_start:  IDENTIFIER project_type EQ project_name COMMA project_path.COMMA project_id 
+
+	COMMA  shift 51
+	.  error
+
+
+state 50
+	project_path:  STRING.    (28)
+
+	.  reduce 28 (src line 87)
+
+
+state 51
+	project_start:  IDENTIFIER project_type EQ project_name COMMA project_path COMMA.project_id 
+
+	STRING  shift 53
+	.  error
+
+	project_id  goto 52
+
+state 52
+	project_start:  IDENTIFIER project_type EQ project_name COMMA project_path COMMA project_id.    (24)
+
+	.  reduce 24 (src line 77)
+
+
+state 53
+	project_id:  STRING.    (29)
+
+	.  reduce 29 (src line 89)
+
+
+14 terminals, 26 nonterminals
+38 grammar rules, 54/8000 states
+0 shift/reduce, 0 reduce/reduce conflicts reported
+75 working sets used
+memory: parser 38/120000
+0 extra closures
+35 shift entries, 4 exceptions
+28 goto entries
+11 entries saved by goto default
+Optimizer space used: output 55/120000
+55 table entries, 0 zero
+maximum spread: 14, maximum offset: 25
