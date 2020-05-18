@@ -42,7 +42,7 @@ var lostprojectsCmd = &cobra.Command{
 		sortAndOutput(appWriter, projectsOutside)
 
 		if len(projectsOutsideSolutionWithFilesInside) > 0 {
-			fmt.Fprintf(appWriter,"\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
+			fmt.Fprintf(appWriter, "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 		}
 
 		sortAndOutput(appWriter, projectsOutsideSolutionWithFilesInside)
@@ -50,7 +50,7 @@ var lostprojectsCmd = &cobra.Command{
 		unexistProjects := getUnexistProjects(allProjectsWithinSolutions, appFileSystem)
 
 		if len(unexistProjects) > 0 {
-			fmt.Fprintf(appWriter,"\nThese projects are included into a solution but not found in the file system:\n")
+			fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
 		}
 
 		outputSortedMap(appWriter, unexistProjects, "Solution")
