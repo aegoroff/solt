@@ -19,7 +19,7 @@ const filterParamName = "file"
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
 	Use:     "lostfiles",
-	Aliases: []string{"f"},
+	Aliases: []string{"lf"},
 	Short:   "Find lost files in the folder specified",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var foundFiles []string

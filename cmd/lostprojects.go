@@ -20,7 +20,7 @@ type projectSolution struct {
 // lostprojectsCmd represents the lostprojects command
 var lostprojectsCmd = &cobra.Command{
 	Use:     "lostprojects",
-	Aliases: []string{"p"},
+	Aliases: []string{"lp"},
 	Short:   "Find projects that not included into any solution",
 	Run: func(cmd *cobra.Command, args []string) {
 		var solutions []string

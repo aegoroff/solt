@@ -14,7 +14,7 @@ import (
 // infoCmd represents the info command
 var infoCmd = &cobra.Command{
 	Use:     "info",
-	Aliases: []string{"i"},
+	Aliases: []string{"in"},
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var solutions []string
