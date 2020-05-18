@@ -48,23 +48,23 @@ func getFiles(includes []Include, dir string) []string {
 }
 
 func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtree.RbTree {
-	readch := make(chan *walkEntry, 1024)
+	readch := make(chan *walkEntry, 16)
 
 	result := rbtree.NewRbTree()
 
-	aggregatech := make(chan *folder, 1024)
+	aggregatech := make(chan *folder, 4)
 
 	var wg sync.WaitGroup
 
 	// Aggregating goroutine
-	go func(tree *rbtree.RbTree) {
+	go func() {
 		defer wg.Done()
 		for f := range aggregatech {
 			key := newProjectTreeNode(f.path, f.info)
 
-			if current, ok := tree.Search(key); !ok {
+			if current, ok := result.Search(key); !ok {
 				n := rbtree.NewNode(key)
-				tree.Insert(n)
+				result.Insert(n)
 			} else {
 				// Update folder node that has already been created before
 				info := (*current.Key).(projectTreeNode).info
@@ -78,7 +78,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 				}
 			}
 		}
-	}(result)
+	}()
 
 	// Reading files goroutine
 	go func() {
