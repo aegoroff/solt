@@ -39,15 +39,9 @@ func (lx *lexer) Error(e string) {
 	log.Print(e)
 }
 
-// Parse parses visual studio solution file specified by path
-func Parse(solutionPath string) (*Solution, error) {
-	f, err := os.Open(filepath.Clean(solutionPath))
-	if err != nil {
-		return nil, err
-	}
-	defer closeResource(f)
-
-	br := bufio.NewReader(f)
+// Parse parses visual studio solution file specified by io.Reader
+func Parse(rdr io.Reader) (*Solution, error) {
+	br := bufio.NewReader(rdr)
 	r, _, err := br.ReadRune()
 	if err != nil {
 		return nil, err
@@ -75,6 +69,16 @@ func Parse(solutionPath string) (*Solution, error) {
 	sol := parse(str)
 
 	return sol, nil
+}
+
+// ParseFile parses visual studio solution file specified by path
+func ParseFile(solutionPath string) (*Solution, error) {
+	f, err := os.Open(filepath.Clean(solutionPath))
+	if err != nil {
+		return nil, err
+	}
+	defer closeResource(f)
+	return Parse(f)
 }
 
 func closeResource(c io.Closer) {

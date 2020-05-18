@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"log"
 	"path/filepath"
 	"solt/solution"
@@ -40,7 +41,7 @@ var nugetCmd = &cobra.Command{
 		}
 
 		if findNugetMismatches {
-			showMismatches(solutions, foldersTree)
+			showMismatches(solutions, foldersTree, appFileSystem)
 		} else {
 			showPackagesInfoByFolders(foldersTree)
 		}
@@ -55,9 +56,9 @@ func init() {
 	nugetCmd.Flags().BoolP(mismatchParamName, "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
 }
 
-func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
+func showMismatches(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs) {
 
-	solutionProjects := getProjectsOfSolutions(solutions, foldersTree)
+	solutionProjects := getProjectsOfSolutions(solutions, foldersTree, fs)
 
 	mismatches := calculateMismatches(solutionProjects)
 
@@ -81,12 +82,19 @@ func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
 	}
 }
 
-func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree) map[string][]*folderInfo {
+func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs) map[string][]*folderInfo {
 	var solutionProjects = make(map[string][]*folderInfo)
 	for _, sol := range solutions {
-		sln, err := solution.Parse(sol)
+		f, err := fs.Open(sol)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		sln, err := solution.Parse(f)
 
 		if err != nil {
+			closeResource(f)
 			log.Println(err)
 			continue
 		}
@@ -110,6 +118,7 @@ func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree) map[
 				}
 			}
 		})
+		closeResource(f)
 	}
 	return solutionProjects
 }

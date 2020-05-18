@@ -33,7 +33,7 @@ var lostprojectsCmd = &cobra.Command{
 			}
 		})
 
-		allProjectsWithinSolutions := getAllSolutionsProjects(solutions)
+		allProjectsWithinSolutions := getAllSolutionsProjects(solutions, appFileSystem)
 
 		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
 
@@ -138,13 +138,20 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
 }
 
-func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
+func getAllSolutionsProjects(solutions []string, fs afero.Fs) map[string]*projectSolution {
 
 	var projectsInSolution = make(map[string]*projectSolution)
 	for _, solpath := range solutions {
-		sln, err := solution.Parse(solpath)
+		f, err := fs.Open(solpath)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		sln, err := solution.Parse(f)
 
 		if err != nil {
+			closeResource(f)
 			log.Println(err)
 			continue
 		}
@@ -170,6 +177,7 @@ func getAllSolutionsProjects(solutions []string) map[string]*projectSolution {
 				solution: solpath,
 			}
 		}
+		closeResource(f)
 	}
 	return projectsInSolution
 }

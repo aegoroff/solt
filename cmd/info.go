@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -25,9 +26,16 @@ var infoCmd = &cobra.Command{
 		})
 
 		for _, sol := range solutions {
-			sln, err := solution.Parse(sol)
+			f, err := appFileSystem.Open(sol)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			sln, err := solution.Parse(f)
 
 			if err != nil {
+				closeResource(f)
 				continue
 			}
 
@@ -48,9 +56,7 @@ var infoCmd = &cobra.Command{
 			showProjectsInfo(sln.Projects)
 			showSectionsInfo(sln.GlobalSections)
 
-			if err != nil {
-				return err
-			}
+			closeResource(f)
 		}
 
 		return nil
