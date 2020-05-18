@@ -58,6 +58,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 
 	// Aggregating goroutine
 	go func(tree *rbtree.RbTree) {
+		defer wg.Done()
 		for f := range aggregatech {
 			key := newProjectTreeNode(f.path, f.info)
 
@@ -77,7 +78,6 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 				}
 			}
 		}
-		wg.Done()
 	}(result)
 
 	// Reading files goroutine
