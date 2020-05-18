@@ -51,7 +51,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	result := rbtree.NewRbTree()
 
 	aggregateChannel := make(chan *folder, 4)
-	deferReadChannel := make(chan *walkEntry, 16)
+	slowReadChannel := make(chan *walkEntry, 16)
 
 	var wg sync.WaitGroup
 
@@ -83,7 +83,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	go func() {
 		defer close(aggregateChannel)
 
-		for we := range deferReadChannel {
+		for we := range slowReadChannel {
 			if strings.EqualFold(we.Name, packagesConfigFile) {
 				if folder, ok := onPackagesConfig(we, fs); ok {
 					aggregateChannel <- folder
@@ -107,12 +107,12 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 		}
 
 		we := &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
-		deferReadChannel <- we
+		slowReadChannel <- we
 
 		action(we)
 	})
 
-	close(deferReadChannel)
+	close(slowReadChannel)
 
 	wg.Wait()
 
