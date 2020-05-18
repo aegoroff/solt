@@ -86,7 +86,7 @@ func showMismatches(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs)
 func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs) map[string][]*folderInfo {
 	var solutionProjects = make(map[string][]*folderInfo)
 	for _, sol := range solutions {
-		f, err := fs.Open(sol)
+		f, err := fs.Open(filepath.Clean(sol))
 		if err != nil {
 			log.Println(err)
 			continue

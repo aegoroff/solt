@@ -142,7 +142,7 @@ func getAllSolutionsProjects(solutions []string, fs afero.Fs) map[string]*projec
 
 	var projectsInSolution = make(map[string]*projectSolution)
 	for _, solpath := range solutions {
-		f, err := fs.Open(solpath)
+		f, err := fs.Open(filepath.Clean(solpath))
 		if err != nil {
 			log.Println(err)
 			continue

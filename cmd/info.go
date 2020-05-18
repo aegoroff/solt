@@ -26,7 +26,7 @@ var infoCmd = &cobra.Command{
 		})
 
 		for _, sol := range solutions {
-			f, err := appFileSystem.Open(sol)
+			f, err := appFileSystem.Open(filepath.Clean(sol))
 			if err != nil {
 				log.Println(err)
 				continue
