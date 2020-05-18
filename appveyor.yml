@@ -25,6 +25,7 @@ install:
   - go get -u "github.com/anknown/ahocorasick"
   - go get -u "github.com/dustin/go-humanize"
   - go get -u "github.com/spf13/cobra"
+  - go get -u "github.com/spf13/afero"
   - go get -u "github.com/stretchr/testify/assert"
   - go get -u "github.com/aegoroff/godatastruct/rbtree"
   - go get -u "github.com/akutz/sortfold"
