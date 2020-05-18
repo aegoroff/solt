@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type folderInfo struct {
@@ -53,6 +54,8 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 
 	aggregatech := make(chan *folder, 1024)
 
+	var wg sync.WaitGroup
+
 	// Aggregating procedure
 	go func(tree *rbtree.RbTree) {
 		for f := range aggregatech {
@@ -74,11 +77,13 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 				}
 			}
 		}
+		wg.Done()
 	}(result)
 
 	// Reading files procedure
 	go func() {
 		defer close(aggregatech)
+		wg.Add(1)
 		for we := range readch {
 			if strings.EqualFold(we.Name, packagesConfigFile) {
 				if folder, ok := onPackagesConfig(we, fs); ok {
@@ -107,6 +112,8 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	})
 
 	close(readch)
+
+	wg.Wait()
 
 	return result
 }
