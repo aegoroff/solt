@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"log"
 	"os"
 	"path/filepath"
@@ -45,11 +46,11 @@ func getFiles(includes []Include, dir string) []string {
 	return result
 }
 
-func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
+func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtree.RbTree {
 	readch := make(chan *walkEntry, 1024)
 
 	go func(ch chan<- *walkEntry) {
-		walkDirBreadthFirst(path, func(parent string, entry os.FileInfo) {
+		walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
 			if entry.IsDir() {
 				return
 			}
@@ -97,14 +98,14 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 		}
 
 		if strings.EqualFold(we.Name, packagesConfigFile) {
-			if f, ok := onPackagesConfig(we); ok {
+			if f, ok := onPackagesConfig(we, fs); ok {
 				aggregatech <- f
 			}
 		}
 
 		ext := filepath.Ext(we.Name)
 		if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
-			if f, ok := onMsbuildProject(we); ok {
+			if f, ok := onMsbuildProject(we, fs); ok {
 				aggregatech <- f
 			}
 		}
@@ -116,10 +117,10 @@ func readProjectDir(path string, action func(we *walkEntry)) *rbtree.RbTree {
 }
 
 // Create packages model from packages.config
-func onPackagesConfig(we *walkEntry) (*folder, bool) {
+func onPackagesConfig(we *walkEntry, fs afero.Fs) (*folder, bool) {
 	pack := Packages{}
 
-	f, ok := onXmlFile(we, &pack)
+	f, ok := onXmlFile(we, fs, &pack)
 	if !ok {
 		return nil, false
 	}
@@ -130,10 +131,10 @@ func onPackagesConfig(we *walkEntry) (*folder, bool) {
 }
 
 // Create project model from project file
-func onMsbuildProject(we *walkEntry) (*folder, bool) {
+func onMsbuildProject(we *walkEntry, fs afero.Fs) (*folder, bool) {
 	project := Project{}
 
-	f, ok := onXmlFile(we, &project)
+	f, ok := onXmlFile(we, fs, &project)
 	if !ok {
 		return nil, false
 	}
@@ -143,10 +144,10 @@ func onMsbuildProject(we *walkEntry) (*folder, bool) {
 	return f, true
 }
 
-func onXmlFile(we *walkEntry, result interface{}) (*folder, bool) {
+func onXmlFile(we *walkEntry, fs afero.Fs, result interface{}) (*folder, bool) {
 	full := filepath.Join(we.Parent, we.Name)
 
-	err := unmarshalXmlFrom(full, result)
+	err := unmarshalXmlFrom(full, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", full, err)
 		return nil, false

@@ -1,11 +1,38 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func Test_FindLostFilesCmd(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	memfs.MkdirAll(dir + "a/Properties", 0755)
+	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	appFileSystem = memfs
+
+	buf := bytes.NewBufferString("")
+	appWriter = buf
+
+	// Act
+	rootCmd.SetArgs([]string{"lf", "-p", dir})
+	rootCmd.Execute()
+
+	// Assert
+	actual := buf.String();
+	ass.Equal(``, actual)
+}
 
 func Test_FindLostFiles(t *testing.T) {
 	// Arrange
@@ -61,7 +88,7 @@ func Test_FindLostFiles(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		result, unexists := findLostFiles(tree, map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
+		result, unexists := findLostFiles(tree, afero.NewMemMapFs(), map[string]interface{}{`c:\prj\packages`: nil}, test.foundfiles)
 
 		// Assert
 		ass.Equal(test.result, result)

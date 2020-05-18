@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -18,7 +17,7 @@ var infoCmd = &cobra.Command{
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var solutions []string
-		readProjectDir(sourcesPath, func(we *walkEntry) {
+		readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
 			ext := strings.ToLower(filepath.Ext(we.Name))
 			if ext == solutionFileExt {
 				solutions = append(solutions, filepath.Join(we.Parent, we.Name))
@@ -35,7 +34,7 @@ var infoCmd = &cobra.Command{
 			fmt.Printf(" %s\n", sol)
 
 			const format = "  %v\t%v\n"
-			tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+			tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 			fmt.Fprintf(tw, format, "Header", sln.Header)
 			fmt.Fprintf(tw, format, "Product", sln.Comment)
@@ -70,7 +69,7 @@ func showProjectsInfo(projects []*solution.Project) {
 	}
 
 	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	fmt.Fprintf(tw, format, "Project type", "Count")
 	fmt.Fprintf(tw, format, "------------", "-----")
@@ -104,7 +103,7 @@ func showSectionsInfo(sections []*solution.Section) {
 	}
 
 	const format = "  %v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	fmt.Fprintf(tw, format, "Configuration")
 	fmt.Fprintf(tw, format, "------------")

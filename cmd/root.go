@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/spf13/afero"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -14,6 +16,9 @@ const packagesConfigFile = "packages.config"
 const pathParamName = "path"
 
 var sourcesPath string
+
+var appFileSystem = afero.NewOsFs()
+var appWriter io.Writer
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,6 +38,7 @@ func Execute() {
 }
 
 func init() {
+	appWriter = os.Stdout
 	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
 }

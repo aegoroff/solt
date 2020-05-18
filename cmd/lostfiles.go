@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,7 +32,7 @@ var lostfilesCmd = &cobra.Command{
 			return err
 		}
 
-		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
 			// Add file to filtered files slice
 			ext := strings.ToLower(filepath.Ext(we.Name))
 			if ext == lostFilesFilter {
@@ -45,15 +46,15 @@ var lostfilesCmd = &cobra.Command{
 			}
 		})
 
-		lostFiles, unexistFiles := findLostFiles(foldersTree, packagesFolders, foundFiles)
+		lostFiles, unexistFiles := findLostFiles(foldersTree, appFileSystem, packagesFolders, foundFiles)
 
-		sortAndOutputToStdout(lostFiles)
+		sortAndOutput(appWriter, lostFiles)
 
 		if len(unexistFiles) > 0 {
 			fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
 		}
 
-		outputSortedMapToStdout(unexistFiles, "Project")
+		outputSortedMap(appWriter, unexistFiles, "Project")
 		return nil
 	},
 }
@@ -63,8 +64,8 @@ func init() {
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension")
 }
 
-func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders StringHashSet, foundFiles []string) ([]string, map[string][]string) {
-	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree)
+func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders StringHashSet, foundFiles []string) ([]string, map[string][]string) {
+	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree, fs)
 	excludedFolders = append(excludedFolders, packagesFolders.Items()...)
 
 	exmach, err := createAhoCorasickMachine(excludedFolders)
@@ -82,7 +83,7 @@ func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders StringHashSet, fo
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (StringHashSet, []string, map[string][]string) {
+func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.Fs) (StringHashSet, []string, map[string][]string) {
 	var excludeFolders []string
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(StringHashSet)
@@ -113,7 +114,7 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (StringHa
 		filesIncluded := getFilesIncludedIntoProject(info)
 		for _, f := range filesIncluded {
 			includedFiles.Add(strings.ToUpper(f))
-			if _, err := os.Stat(f); os.IsNotExist(err) {
+			if _, err := fs.Stat(f); os.IsNotExist(err) {
 				if found, ok := unexistFiles[project]; ok {
 					found = append(found, f)
 					unexistFiles[project] = found

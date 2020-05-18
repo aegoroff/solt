@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"log"
-	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -27,7 +26,7 @@ var nugetCmd = &cobra.Command{
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var solutions []string
-		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
 			ext := strings.ToLower(filepath.Ext(we.Name))
 			if ext == solutionFileExt {
 				solutions = append(solutions, filepath.Join(we.Parent, we.Name))
@@ -69,7 +68,7 @@ func showMismatches(solutions []string, foldersTree *rbtree.RbTree) {
 	fmt.Println(" Different nuget package's versions in the same solution found:")
 
 	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	for sol, m := range mismatches {
 		fmt.Printf("\n %s\n", sol)
@@ -170,7 +169,7 @@ func contains(s []string, e string) bool {
 
 func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 4, ' ', 0)
+	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
 		fi := (*n.Key).(projectTreeNode).info

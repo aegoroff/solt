@@ -3,9 +3,6 @@ package cmd
 // StringHashSet defines strings hash set
 type StringHashSet map[string]interface{}
 
-// IntHashSet defines integers hash set
-type IntHashSet map[int]interface{}
-
 // Items gets all set's items
 func (m *StringHashSet) Items() []string {
 	keys := make([]string, 0, len(*m))

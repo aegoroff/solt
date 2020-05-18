@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/afero"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,7 +25,7 @@ var lostprojectsCmd = &cobra.Command{
 	Short:   "Find projects that not included into any solution",
 	Run: func(cmd *cobra.Command, args []string) {
 		var solutions []string
-		foldersTree := readProjectDir(sourcesPath, func(we *walkEntry) {
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
 			ext := strings.ToLower(filepath.Ext(we.Name))
 			if ext == solutionFileExt {
 				sp := filepath.Join(we.Parent, we.Name)
@@ -38,21 +39,21 @@ var lostprojectsCmd = &cobra.Command{
 
 		projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
-		sortAndOutputToStdout(projectsOutside)
+		sortAndOutput(appWriter, projectsOutside)
 
 		if len(projectsOutsideSolutionWithFilesInside) > 0 {
 			fmt.Printf("\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 		}
 
-		sortAndOutputToStdout(projectsOutsideSolutionWithFilesInside)
+		sortAndOutput(appWriter, projectsOutsideSolutionWithFilesInside)
 
-		unexistProjects := getUnexistProjects(allProjectsWithinSolutions)
+		unexistProjects := getUnexistProjects(allProjectsWithinSolutions, appFileSystem)
 
 		if len(unexistProjects) > 0 {
 			fmt.Printf("\nThese projects are included into a solution but not found in the file system:\n")
 		}
 
-		outputSortedMapToStdout(unexistProjects, "Solution")
+		outputSortedMap(appWriter, unexistProjects, "Solution")
 	},
 }
 
@@ -60,10 +61,10 @@ func init() {
 	rootCmd.AddCommand(lostprojectsCmd)
 }
 
-func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) map[string][]string {
+func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
 	for _, prj := range allProjectsWithinSolutions {
-		if _, err := os.Stat(prj.project); !os.IsNotExist(err) {
+		if _, err := fs.Stat(prj.project); !os.IsNotExist(err) {
 			continue
 		}
 

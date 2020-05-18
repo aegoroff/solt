@@ -4,17 +4,13 @@ import (
 	"bufio"
 	"encoding/xml"
 	"fmt"
+	"github.com/spf13/afero"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 )
-
-func outputSortedMapToStdout(itemsMap map[string][]string, keyPrefix string) {
-	outputSortedMap(os.Stdout, itemsMap, keyPrefix)
-}
 
 func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
@@ -30,10 +26,6 @@ func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix s
 	}
 }
 
-func sortAndOutputToStdout(items []string) {
-	sortAndOutput(os.Stdout, items)
-}
-
 func sortAndOutput(writer io.Writer, items []string) {
 	sort.Strings(items)
 	for _, item := range items {
@@ -41,8 +33,8 @@ func sortAndOutput(writer io.Writer, items []string) {
 	}
 }
 
-func unmarshalXmlFrom(path string, result interface{}) error {
-	f, err := os.Open(filepath.Clean(path))
+func unmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
+	f, err := fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Print(err)
 		return err
@@ -62,7 +54,7 @@ func unmarshalXml(r io.Reader, result interface{}) error {
 	return err
 }
 
-func walkDirBreadthFirst(path string, action func(parent string, entry os.FileInfo)) {
+func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
@@ -70,7 +62,7 @@ func walkDirBreadthFirst(path string, action func(parent string, entry os.FileIn
 	for len(queue) > 0 {
 		curr := queue[0]
 
-		for _, entry := range dirents(curr) {
+		for _, entry := range dirents(curr, fs) {
 			action(curr, entry)
 			if entry.IsDir() {
 				queue = append(queue, filepath.Join(curr, entry.Name()))
@@ -81,13 +73,31 @@ func walkDirBreadthFirst(path string, action func(parent string, entry os.FileIn
 	}
 }
 
-func dirents(path string) []os.FileInfo {
-	entries, err := ioutil.ReadDir(path)
+func dirents(path string, fs afero.Fs) []os.FileInfo {
+	entries, err := ReadDir(path, fs)
 	if err != nil {
 		return nil
 	}
 
 	return entries
+}
+
+// ReadDir reads the directory named by dirname and returns
+// a list of directory entries sorted by filename.
+func ReadDir(dirname string, fs afero.Fs) ([]os.FileInfo, error) {
+	f, err := fs.Open(dirname)
+	if err != nil {
+		return nil, err
+	}
+
+	defer closeResource(f)
+
+	list, err := f.Readdir(-1)
+	if err != nil {
+		return nil, err
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].Name() < list[j].Name() })
+	return list, nil
 }
 
 func closeResource(c io.Closer) {
