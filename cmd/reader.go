@@ -97,8 +97,6 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 					aggregatech <- folder
 				}
 			}
-
-			action(we)
 		}
 	}()
 
@@ -108,7 +106,10 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 			return
 		}
 
-		readch <- &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
+		we := &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
+		readch <- we
+
+		action(we)
 	})
 
 	close(readch)
