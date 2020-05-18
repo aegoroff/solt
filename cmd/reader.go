@@ -49,32 +49,18 @@ func getFiles(includes []Include, dir string) []string {
 func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtree.RbTree {
 	readch := make(chan *walkEntry, 1024)
 
-	go func(ch chan<- *walkEntry) {
-		walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
-			if entry.IsDir() {
-				return
-			}
-
-			ch <- &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
-		})
-		close(ch)
-	}(readch)
-
 	result := rbtree.NewRbTree()
 
 	aggregatech := make(chan *folder, 1024)
 
-	go func(ch <-chan *folder) {
-		for {
-			f, ok := <-ch
-			if !ok {
-				break
-			}
+	// Aggregating procedure
+	go func(tree *rbtree.RbTree) {
+		for f := range aggregatech {
 			key := newProjectTreeNode(f.path, f.info)
 
-			if current, ok := result.Search(key); !ok {
+			if current, ok := tree.Search(key); !ok {
 				n := rbtree.NewNode(key)
-				result.Insert(n)
+				tree.Insert(n)
 			} else {
 				// Update folder node that has already been created before
 				info := (*current.Key).(projectTreeNode).info
@@ -88,30 +74,39 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 				}
 			}
 		}
-	}(aggregatech)
+	}(result)
 
-	for {
-		we, ok := <-readch
-		if !ok {
-			close(aggregatech)
-			break
-		}
-
-		if strings.EqualFold(we.Name, packagesConfigFile) {
-			if f, ok := onPackagesConfig(we, fs); ok {
-				aggregatech <- f
+	// Reading files procedure
+	go func() {
+		defer close(aggregatech)
+		for we := range readch {
+			if strings.EqualFold(we.Name, packagesConfigFile) {
+				if folder, ok := onPackagesConfig(we, fs); ok {
+					aggregatech <- folder
+				}
 			}
-		}
 
-		ext := filepath.Ext(we.Name)
-		if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
-			if f, ok := onMsbuildProject(we, fs); ok {
-				aggregatech <- f
+			ext := filepath.Ext(we.Name)
+			if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
+				if folder, ok := onMsbuildProject(we, fs); ok {
+					aggregatech <- folder
+				}
 			}
+
+			action(we)
+		}
+	}()
+
+	// Start reading path
+	walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
+		if entry.IsDir() {
+			return
 		}
 
-		action(we)
-	}
+		readch <- &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
+	})
+
+	close(readch)
 
 	return result
 }

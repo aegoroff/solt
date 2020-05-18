@@ -17,7 +17,7 @@ const pathParamName = "path"
 
 var sourcesPath string
 
-var appFileSystem = afero.NewOsFs()
+var appFileSystem afero.Fs
 var appWriter io.Writer
 
 // rootCmd represents the base command when called without any subcommands
@@ -39,6 +39,7 @@ func Execute() {
 
 func init() {
 	appWriter = os.Stdout
+	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
 }
