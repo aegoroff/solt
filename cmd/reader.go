@@ -48,18 +48,17 @@ func getFiles(includes []Include, dir string) []string {
 }
 
 func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtree.RbTree {
-	readch := make(chan *walkEntry, 16)
-
 	result := rbtree.NewRbTree()
 
-	aggregatech := make(chan *folder, 4)
+	aggregateChannel := make(chan *folder, 4)
+	deferReadChannel := make(chan *walkEntry, 16)
 
 	var wg sync.WaitGroup
 
 	// Aggregating goroutine
 	go func() {
 		defer wg.Done()
-		for f := range aggregatech {
+		for f := range aggregateChannel {
 			key := newProjectTreeNode(f.path, f.info)
 
 			if current, ok := result.Search(key); !ok {
@@ -82,37 +81,38 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 
 	// Reading files goroutine
 	go func() {
-		defer close(aggregatech)
-		wg.Add(1)
-		for we := range readch {
+		defer close(aggregateChannel)
+
+		for we := range deferReadChannel {
 			if strings.EqualFold(we.Name, packagesConfigFile) {
 				if folder, ok := onPackagesConfig(we, fs); ok {
-					aggregatech <- folder
+					aggregateChannel <- folder
 				}
 			}
 
 			ext := filepath.Ext(we.Name)
 			if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
 				if folder, ok := onMsbuildProject(we, fs); ok {
-					aggregatech <- folder
+					aggregateChannel <- folder
 				}
 			}
 		}
 	}()
 
 	// Start reading path
+	wg.Add(1)
 	walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
 		if entry.IsDir() {
 			return
 		}
 
 		we := &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
-		readch <- we
+		deferReadChannel <- we
 
 		action(we)
 	})
 
-	close(readch)
+	close(deferReadChannel)
 
 	wg.Wait()
 
