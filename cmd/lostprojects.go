@@ -77,10 +77,10 @@ func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution) 
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, map[string]interface{}) {
+func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, StringHashSet) {
 
 	var projectsOutsideSolution []*folderInfo
-	var filesInsideSolution = make(map[string]interface{})
+	var filesInsideSolution = make(StringHashSet)
 
 	foldersTree.Ascend(func(c *rbtree.Comparable) bool {
 		info := (*c).(projectTreeNode).info
@@ -97,7 +97,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 			filesIncluded := getFilesIncludedIntoProject(info)
 
 			for _, f := range filesIncluded {
-				filesInsideSolution[strings.ToUpper(f)] = nil
+				filesInsideSolution.Add(strings.ToUpper(f))
 			}
 		}
 
@@ -107,7 +107,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 	return projectsOutsideSolution, filesInsideSolution
 }
 
-func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution map[string]interface{}) ([]string, []string) {
+func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution StringHashSet) ([]string, []string) {
 	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
 	for _, info := range projectsOutsideSolution {
@@ -116,7 +116,7 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 		var includedIntoOther = false
 		for _, f := range projectFiles {
 			pf := strings.ToUpper(f)
-			if _, ok := filesInsideSolution[pf]; !ok {
+			if !filesInsideSolution.Contains(pf) {
 				continue
 			}
 

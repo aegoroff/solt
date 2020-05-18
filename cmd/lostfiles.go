@@ -23,7 +23,7 @@ var lostfilesCmd = &cobra.Command{
 	Short:   "Find lost files in the folder specified",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var foundFiles []string
-		var packagesFolders = make(map[string]interface{})
+		var packagesFolders = make(StringHashSet)
 
 		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
 
@@ -41,9 +41,7 @@ var lostfilesCmd = &cobra.Command{
 
 			if ext == solutionFileExt {
 				ppath := filepath.Join(we.Parent, "packages")
-				if _, ok := packagesFolders[ppath]; !ok {
-					packagesFolders[ppath] = nil
-				}
+				packagesFolders.Add(ppath)
 			}
 		})
 
@@ -65,11 +63,9 @@ func init() {
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension")
 }
 
-func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interface{}, foundFiles []string) ([]string, map[string][]string) {
+func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders StringHashSet, foundFiles []string) ([]string, map[string][]string) {
 	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree)
-	for k := range packagesFolders {
-		excludedFolders = append(excludedFolders, k)
-	}
+	excludedFolders = append(excludedFolders, packagesFolders.Items()...)
 
 	exmach, err := createAhoCorasickMachine(excludedFolders)
 	if err != nil {
@@ -78,7 +74,7 @@ func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interf
 	}
 	var result []string
 	for _, file := range foundFiles {
-		if _, ok := includedFiles[strings.ToUpper(file)]; !ok && !Match(exmach, file) {
+		if !includedFiles.Contains(strings.ToUpper(file)) && !Match(exmach, file) {
 			result = append(result, file)
 		}
 	}
@@ -86,10 +82,10 @@ func findLostFiles(foldersTree *rbtree.RbTree, packagesFolders map[string]interf
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (map[string]interface{}, []string, map[string][]string) {
+func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (StringHashSet, []string, map[string][]string) {
 	var excludeFolders []string
 	unexistFiles := make(map[string][]string)
-	var includedFiles = make(map[string]interface{})
+	var includedFiles = make(StringHashSet)
 
 	foldersTree.Ascend(func(key *rbtree.Comparable) bool {
 		info := (*key).(projectTreeNode).info
@@ -116,7 +112,7 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree) (map[stri
 		// Add compiles, contents and nones into included files map
 		filesIncluded := getFilesIncludedIntoProject(info)
 		for _, f := range filesIncluded {
-			includedFiles[strings.ToUpper(f)] = nil
+			includedFiles.Add(strings.ToUpper(f))
 			if _, err := os.Stat(f); os.IsNotExist(err) {
 				if found, ok := unexistFiles[project]; ok {
 					found = append(found, f)
