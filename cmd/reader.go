@@ -56,7 +56,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 
 	var wg sync.WaitGroup
 
-	// Aggregating procedure
+	// Aggregating goroutine
 	go func(tree *rbtree.RbTree) {
 		for f := range aggregatech {
 			key := newProjectTreeNode(f.path, f.info)
@@ -80,7 +80,7 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 		wg.Done()
 	}(result)
 
-	// Reading files procedure
+	// Reading files goroutine
 	go func() {
 		defer close(aggregatech)
 		wg.Add(1)
