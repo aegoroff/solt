@@ -9,9 +9,11 @@ import (
 	"strings"
 )
 
-const visualStudioVersionKey = "VisualStudioVersion"
-const minimumVisualStudioVersionKey = "MinimumVisualStudioVersion"
-const projectSection = "ProjectSection"
+const (
+	visualStudioVersionKey        = "VisualStudioVersion"
+	minimumVisualStudioVersionKey = "MinimumVisualStudioVersion"
+	projectSection                = "ProjectSection"
+)
 
 var (
 	visualStudioVersion        string

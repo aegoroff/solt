@@ -158,7 +158,7 @@ func getAllSolutionsProjects(solutions []string, fs afero.Fs) map[string]*projec
 
 		for _, p := range sln.Projects {
 			// Skip solution folders
-			if p.TypeId == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}" {
+			if p.TypeId == solution.IdSolutionFolder {
 				continue
 			}
 

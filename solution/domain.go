@@ -1,5 +1,10 @@
 package solution
 
+const (
+	// IdSolutionFolder defines Solution Folder project type guid in Solution file
+	IdSolutionFolder = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}"
+)
+
 // Solution is Visual Studio solution definition
 type Solution struct {
 	Projects                   []*Project
@@ -68,7 +73,7 @@ var ProjectsGuids = map[string]string{
 	"{A1591282-1198-4647-A2B1-27E5FF5F6F3B}": "Silverlight",
 	"{4D628B5B-2FBC-4AA6-8C16-197242AEB884}": "Smart Device (C#)",
 	"{68B1623D-7FB9-47D8-8664-7ECEA3297D4F}": "Smart Device (VB.NET)",
-	"{2150E333-8FDC-42A3-9474-1A3956D46DE8}": "Solution Folder",
+	IdSolutionFolder:                         "Solution Folder",
 	"{3AC096D0-A1C2-E12C-1390-A8335801FDAB}": "Test",
 	"{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A}": "Universal Windows Class Library",
 	"{F184B08F-C81C-45F6-A57F-5ABD9991F28F}": "VB.NET",

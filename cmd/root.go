@@ -8,12 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const solutionFileExt = ".sln"
-const csharpProjectExt = ".csproj"
-const cppProjectExt = ".vcxproj"
-const packagesConfigFile = "packages.config"
+const (
+	solutionFileExt    = ".sln"
+	csharpProjectExt   = ".csproj"
+	cppProjectExt      = ".vcxproj"
+	packagesConfigFile = "packages.config"
 
-const pathParamName = "path"
+	pathParamName = "path"
+)
 
 var sourcesPath string
 
