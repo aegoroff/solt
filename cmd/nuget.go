@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"log"
@@ -99,7 +100,7 @@ func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs a
 			continue
 		}
 
-		var solutionProjectIds = make(StringHashSet)
+		var solutionProjectIds = make(collections.StringHashSet)
 		for _, sp := range sln.Projects {
 			solutionProjectIds.Add(sp.Id)
 		}

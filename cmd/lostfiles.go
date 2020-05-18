@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"os"
@@ -24,7 +25,7 @@ var lostfilesCmd = &cobra.Command{
 	Short:   "Find lost files in the folder specified",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var foundFiles []string
-		var packagesFolders = make(StringHashSet)
+		var packagesFolders = make(collections.StringHashSet)
 
 		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
 
@@ -64,7 +65,7 @@ func init() {
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension")
 }
 
-func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders StringHashSet, foundFiles []string) ([]string, map[string][]string) {
+func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders collections.StringHashSet, foundFiles []string) ([]string, map[string][]string) {
 	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree, fs)
 	excludedFolders = append(excludedFolders, packagesFolders.Items()...)
 
@@ -83,10 +84,10 @@ func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders Stri
 	return result, unexistFiles
 }
 
-func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.Fs) (StringHashSet, []string, map[string][]string) {
+func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.Fs) (collections.StringHashSet, []string, map[string][]string) {
 	var excludeFolders []string
 	unexistFiles := make(map[string][]string)
-	var includedFiles = make(StringHashSet)
+	var includedFiles = make(collections.StringHashSet)
 
 	foldersTree.Ascend(func(key *rbtree.Comparable) bool {
 		info := (*key).(projectTreeNode).info

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"log"
@@ -78,9 +79,9 @@ func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution, 
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, StringHashSet) {
+func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, collections.StringHashSet) {
 	var projectsOutsideSolution []*folderInfo
-	var filesInsideSolution = make(StringHashSet)
+	var filesInsideSolution = make(collections.StringHashSet)
 
 	foldersTree.Ascend(func(c *rbtree.Comparable) bool {
 		info := (*c).(projectTreeNode).info
@@ -107,7 +108,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 	return projectsOutsideSolution, filesInsideSolution
 }
 
-func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution StringHashSet) ([]string, []string) {
+func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution collections.StringHashSet) ([]string, []string) {
 	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
 	for _, info := range projectsOutsideSolution {
