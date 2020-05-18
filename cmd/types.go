@@ -81,11 +81,11 @@ type projectTreeNode struct {
 }
 
 func (x projectTreeNode) LessThan(y interface{}) bool {
-	return sortfold.CompareFold(x.path, (y.(projectTreeNode)).path) < 0
+	return sortfold.CompareFold(*x.info.projectPath, *(y.(projectTreeNode)).info.projectPath) < 0
 }
 
 func (x projectTreeNode) EqualTo(y interface{}) bool {
-	return strings.EqualFold(x.path, (y.(projectTreeNode)).path)
+	return strings.EqualFold(*x.info.projectPath, *(y.(projectTreeNode)).info.projectPath)
 }
 
 func newProjectTreeNode(path string, info *folderInfo) *rbtree.Comparable {
