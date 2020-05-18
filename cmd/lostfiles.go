@@ -51,7 +51,7 @@ var lostfilesCmd = &cobra.Command{
 		sortAndOutput(appWriter, lostFiles)
 
 		if len(unexistFiles) > 0 {
-			fmt.Printf("\nThese files included into projects but not exist in the file system.\n")
+			fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
 		}
 
 		outputSortedMap(appWriter, unexistFiles, "Project")
