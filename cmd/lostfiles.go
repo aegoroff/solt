@@ -62,7 +62,7 @@ var lostfilesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(lostfilesCmd)
-	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension")
+	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
 }
 
 func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders collections.StringHashSet, foundFiles []string) ([]string, map[string][]string) {
