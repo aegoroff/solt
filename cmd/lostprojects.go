@@ -5,7 +5,6 @@ import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
-	"log"
 	"os"
 	"path/filepath"
 	"solt/solution"
@@ -26,16 +25,10 @@ var lostprojectsCmd = &cobra.Command{
 	Aliases: []string{"lp"},
 	Short:   "Find projects that not included into any solution",
 	Run: func(cmd *cobra.Command, args []string) {
-		var solutions []string
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
-			ext := strings.ToLower(filepath.Ext(we.Name))
-			if ext == solutionFileExt {
-				sp := filepath.Join(we.Parent, we.Name)
-				solutions = append(solutions, sp)
-			}
-		})
 
-		allProjectsWithinSolutions := getAllSolutionsProjects(solutions, appFileSystem)
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
+
+		allProjectsWithinSolutions := getAllSolutionsProjects(foldersTree)
 
 		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
 
@@ -80,26 +73,29 @@ func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution, 
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*folderInfo, collections.StringHashSet) {
-	var projectsOutsideSolution []*folderInfo
+func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*msbuildProject, collections.StringHashSet) {
+	var projectsOutsideSolution []*msbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
 	foldersTree.Ascend(func(c *rbtree.Comparable) bool {
-		info := (*c).(projectTreeNode).info
-		if info.project == nil {
+		folder := (*c).(*folder)
+		content := folder.content
+		if len(content.projects) == 0 {
 			return true
 		}
 
-		projectPath := strings.ToUpper(*info.projectPath)
+		for _, prj := range content.projects {
+			projectPath := strings.ToUpper(prj.file)
 
-		_, ok := allProjectsWithinSolutions[projectPath]
-		if !ok {
-			projectsOutsideSolution = append(projectsOutsideSolution, info)
-		} else {
-			filesIncluded := getFilesIncludedIntoProject(info)
+			_, ok := allProjectsWithinSolutions[projectPath]
+			if !ok {
+				projectsOutsideSolution = append(projectsOutsideSolution, prj)
+			} else {
+				filesIncluded := getFilesIncludedIntoProject(prj)
 
-			for _, f := range filesIncluded {
-				filesInsideSolution.Add(strings.ToUpper(f))
+				for _, f := range filesIncluded {
+					filesInsideSolution.Add(strings.ToUpper(f))
+				}
 			}
 		}
 
@@ -109,11 +105,11 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 	return projectsOutsideSolution, filesInsideSolution
 }
 
-func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideSolution collections.StringHashSet) ([]string, []string) {
+func separateOutsideProjects(projectsOutsideSolution []*msbuildProject, filesInsideSolution collections.StringHashSet) ([]string, []string) {
 	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
-	for _, info := range projectsOutsideSolution {
-		projectFiles := getFilesIncludedIntoProject(info)
+	for _, prj := range projectsOutsideSolution {
+		projectFiles := getFilesIncludedIntoProject(prj)
 
 		var includedIntoOther = false
 		for _, f := range projectFiles {
@@ -122,7 +118,7 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 				continue
 			}
 
-			dir := filepath.Dir(*info.projectPath)
+			dir := filepath.Dir(prj.file)
 
 			if strings.Contains(pf, strings.ToUpper(dir)) {
 				includedIntoOther = true
@@ -131,54 +127,50 @@ func separateOutsideProjects(projectsOutsideSolution []*folderInfo, filesInsideS
 		}
 
 		if !includedIntoOther {
-			projectsOutside = append(projectsOutside, *info.projectPath)
+			projectsOutside = append(projectsOutside, prj.file)
 		} else {
-			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, *info.projectPath)
+			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, prj.file)
 		}
 	}
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
 }
 
-func getAllSolutionsProjects(solutions []string, fs afero.Fs) map[string]*projectSolution {
+func getAllSolutionsProjects(foldersTree *rbtree.RbTree) map[string]*projectSolution {
 
 	var projectsInSolution = make(map[string]*projectSolution)
-	for _, solpath := range solutions {
-		f, err := fs.Open(filepath.Clean(solpath))
-		if err != nil {
-			log.Println(err)
-			continue
+
+	// Select only folders that contain solution(s)
+	foldersTree.WalkInorder(func(n *rbtree.Node) {
+		fold := (*n.Key).(*folder)
+		content := fold.content
+		if len(content.solutions) == 0 {
+			return
 		}
 
-		sln, err := solution.Parse(f)
+		for _, sln := range content.solutions {
 
-		if err != nil {
-			closeResource(f)
-			log.Println(err)
-			continue
-		}
+			for _, prj := range sln.solution.Projects {
+				// Skip solution folders
+				if prj.TypeId == solution.IdSolutionFolder {
+					continue
+				}
 
-		for _, p := range sln.Projects {
-			// Skip solution folders
-			if p.TypeId == solution.IdSolutionFolder {
-				continue
-			}
+				fullProjectPath := filepath.Join(fold.path, prj.Path)
+				key := strings.ToUpper(fullProjectPath)
 
-			basePath := filepath.Dir(solpath)
-			fullProjectPath := filepath.Join(basePath, p.Path)
-			key := strings.ToUpper(fullProjectPath)
+				// Already added
+				if _, ok := projectsInSolution[key]; ok {
+					continue
+				}
 
-			// Already added
-			if _, ok := projectsInSolution[key]; ok {
-				continue
-			}
-
-			projectsInSolution[key] = &projectSolution{
-				path:     fullProjectPath,
-				id:       strings.ToUpper(p.Id),
-				solution: solpath,
+				projectsInSolution[key] = &projectSolution{
+					path:     fullProjectPath,
+					id:       strings.ToUpper(prj.Id),
+					solution: filepath.Join(fold.path, sln.file),
+				}
 			}
 		}
-		closeResource(f)
-	}
+	})
+
 	return projectsInSolution
 }

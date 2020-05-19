@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"log"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -17,47 +17,36 @@ var infoCmd = &cobra.Command{
 	Aliases: []string{"in"},
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var solutions []string
-		readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
-			ext := strings.ToLower(filepath.Ext(we.Name))
-			if ext == solutionFileExt {
-				solutions = append(solutions, filepath.Join(we.Parent, we.Name))
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
+
+		foldersTree.Ascend(func(c *rbtree.Comparable) bool {
+			folder := (*c).(*folder)
+			content := folder.content
+
+			for _, solution := range content.solutions {
+				solutionPath := filepath.Join(folder.path, solution.file)
+				sln := solution.solution
+
+				fmt.Printf(" %s\n", solutionPath)
+
+				const format = "  %v\t%v\n"
+				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
+
+				fmt.Fprintf(tw, format, "Header", sln.Header)
+				fmt.Fprintf(tw, format, "Product", sln.Comment)
+				fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
+				fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+
+				tw.Flush()
+
+				fmt.Println()
+
+				showProjectsInfo(sln.Projects)
+				showSectionsInfo(sln.GlobalSections)
 			}
+
+			return true
 		})
-
-		for _, sol := range solutions {
-			f, err := appFileSystem.Open(filepath.Clean(sol))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-
-			sln, err := solution.Parse(f)
-
-			if err != nil {
-				closeResource(f)
-				continue
-			}
-
-			fmt.Printf(" %s\n", sol)
-
-			const format = "  %v\t%v\n"
-			tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
-
-			fmt.Fprintf(tw, format, "Header", sln.Header)
-			fmt.Fprintf(tw, format, "Product", sln.Comment)
-			fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
-			fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
-
-			tw.Flush()
-
-			fmt.Println()
-
-			showProjectsInfo(sln.Projects)
-			showSectionsInfo(sln.GlobalSections)
-
-			closeResource(f)
-		}
 
 		return nil
 	},

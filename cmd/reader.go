@@ -2,45 +2,72 @@ package cmd
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/akutz/sortfold"
 	"github.com/spf13/afero"
 	"log"
 	"os"
 	"path/filepath"
+	"solt/solution"
 	"strings"
 	"sync"
 )
 
-type folderInfo struct {
-	packages    *Packages
-	project     *Project
-	projectPath *string
+type msbuildProject struct {
+	project *Project
+	file    string
+}
+
+type visualStudioSolution struct {
+	solution *solution.Solution
+	file     string
+}
+
+type folderContent struct {
+	packages  *Packages
+	projects  []*msbuildProject
+	solutions []*visualStudioSolution
 }
 
 type folder struct {
-	info *folderInfo
-	path string
+	content *folderContent
+	path    string
 }
 
-func getFilesIncludedIntoProject(info *folderInfo) []string {
-	dir := filepath.Dir(*info.projectPath)
+func (x *folder) LessThan(y interface{}) bool {
+	return sortfold.CompareFold(x.path, (y.(*folder)).path) < 0
+}
+
+func (x *folder) EqualTo(y interface{}) bool {
+	return strings.EqualFold(x.path, (y.(*folder)).path)
+}
+
+func newTreeNode(f *folder) *rbtree.Comparable {
+	var r rbtree.Comparable
+	r = f
+	return &r
+}
+
+func getFilesIncludedIntoProject(prj *msbuildProject) []string {
 	var result []string
-	result = append(result, getFiles(info.project.Contents, dir)...)
-	result = append(result, getFiles(info.project.Nones, dir)...)
-	result = append(result, getFiles(info.project.CLCompiles, dir)...)
-	result = append(result, getFiles(info.project.CLInclude, dir)...)
-	result = append(result, getFiles(info.project.Compiles, dir)...)
+	folderPath := filepath.Dir(prj.file)
+	result = append(result, createPaths(prj.project.Contents, folderPath)...)
+	result = append(result, createPaths(prj.project.Nones, folderPath)...)
+	result = append(result, createPaths(prj.project.CLCompiles, folderPath)...)
+	result = append(result, createPaths(prj.project.CLInclude, folderPath)...)
+	result = append(result, createPaths(prj.project.Compiles, folderPath)...)
+
 	return result
 }
 
-func getFiles(includes []Include, dir string) []string {
-	if includes == nil {
+func createPaths(paths []Include, basePath string) []string {
+	if paths == nil {
 		return []string{}
 	}
 
 	var result []string
 
-	for _, c := range includes {
-		fp := filepath.Join(dir, c.Path)
+	for _, c := range paths {
+		fp := filepath.Join(basePath, c.Path)
 		result = append(result, fp)
 	}
 
@@ -58,22 +85,21 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	// Aggregating goroutine
 	go func() {
 		defer wg.Done()
-		for folder := range aggregateChannel {
-			key := newProjectTreeNode(folder.path, folder.info)
-
+		for f := range aggregateChannel {
+			key := newTreeNode(f)
 			if current, ok := result.Search(key); !ok {
+				// Create new node
 				n := rbtree.NewNode(key)
 				result.Insert(n)
 			} else {
 				// Update folder node that has already been created before
-				info := (*current.Key).(projectTreeNode).info
-				if info.project == nil {
-					// Project read after packages.config
-					info.project = folder.info.project
-					info.projectPath = folder.info.projectPath
-				} else if info.packages == nil {
-					// Project read before packages.config
-					info.packages = folder.info.packages
+				content := (*current.Key).(*folder).content
+
+				if f.content.packages != nil {
+					content.packages = f.content.packages
+				} else {
+					content.projects = append(content.projects, f.content.projects...)
+					content.solutions = append(content.solutions, f.content.solutions...)
 				}
 			}
 		}
@@ -93,6 +119,12 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 			ext := filepath.Ext(we.Name)
 			if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
 				if folder, ok := onMsbuildProject(we, fs); ok {
+					aggregateChannel <- folder
+				}
+			}
+
+			if strings.EqualFold(ext, solutionFileExt) {
+				if folder, ok := onSolution(we, fs); ok {
 					aggregateChannel <- folder
 				}
 			}
@@ -123,12 +155,14 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 func onPackagesConfig(we *walkEntry, fs afero.Fs) (*folder, bool) {
 	pack := Packages{}
 
-	f, ok := onXmlFile(we, fs, &pack)
-	if !ok {
+	err := onXmlFile(we, fs, &pack)
+	if err != nil {
 		return nil, false
 	}
 
-	f.info.packages = &pack
+	f := createFolder(we)
+
+	f.content.packages = &pack
 
 	return f, true
 }
@@ -137,29 +171,64 @@ func onPackagesConfig(we *walkEntry, fs afero.Fs) (*folder, bool) {
 func onMsbuildProject(we *walkEntry, fs afero.Fs) (*folder, bool) {
 	project := Project{}
 
-	f, ok := onXmlFile(we, fs, &project)
-	if !ok {
+	err := onXmlFile(we, fs, &project)
+	if err != nil {
 		return nil, false
 	}
 
-	f.info.project = &project
+	f := createFolder(we)
+
+	p := msbuildProject{project: &project, file: filepath.Join(we.Parent, we.Name)}
+
+	f.content.projects = append(f.content.projects, &p)
 
 	return f, true
 }
 
-func onXmlFile(we *walkEntry, fs afero.Fs, result interface{}) (*folder, bool) {
+// Create solution model from file
+func onSolution(we *walkEntry, fs afero.Fs) (*folder, bool) {
+	solpath := filepath.Join(we.Parent, we.Name)
+	reader, err := fs.Open(filepath.Clean(solpath))
+	if err != nil {
+		log.Println(err)
+		return nil, false
+	}
+
+	sln, err := solution.Parse(reader)
+
+	if err != nil {
+		log.Println(err)
+		return nil, false
+	}
+
+	f := createFolder(we)
+
+	s := visualStudioSolution{solution: sln, file: we.Name}
+
+	f.content.solutions = append(f.content.solutions, &s)
+
+	return f, true
+}
+
+func createFolder(we *walkEntry) *folder {
+	f := folder{
+		content: &folderContent{
+			solutions: []*visualStudioSolution{},
+			projects:  []*msbuildProject{},
+		},
+		path: we.Parent,
+	}
+	return &f
+}
+
+func onXmlFile(we *walkEntry, fs afero.Fs, result interface{}) error {
 	full := filepath.Join(we.Parent, we.Name)
 
 	err := unmarshalXmlFrom(full, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", full, err)
-		return nil, false
+		return err
 	}
 
-	f := folder{
-		info: &folderInfo{projectPath: &full},
-		path: we.Parent,
-	}
-
-	return &f, true
+	return nil
 }

@@ -5,11 +5,10 @@ import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/spf13/cobra"
 )
 
 var subfolderToExclude = []string{
@@ -90,40 +89,45 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 	var includedFiles = make(collections.StringHashSet)
 
 	foldersTree.Ascend(func(key *rbtree.Comparable) bool {
-		info := (*key).(projectTreeNode).info
-		if info.project == nil {
+		folder := (*key).(*folder)
+		content := folder.content
+
+		if len(content.projects) == 0 {
 			return true
 		}
 
-		project := *info.projectPath
+		for _, prj := range content.projects {
+			project := prj.file
 
-		// Add project base + exclude subfolder into exclude folders list
-		parent := filepath.Dir(project)
-		for _, s := range subfolderToExclude {
-			sub := filepath.Join(parent, s)
-			excludeFolders = append(excludeFolders, sub)
-		}
-
-		if info.project.OutputPaths != nil {
-			for _, s := range info.project.OutputPaths {
-				sub := filepath.Join(parent, s)
+			// Add project base + exclude subfolder into exclude folders list
+			for _, s := range subfolderToExclude {
+				sub := filepath.Join(folder.path, s)
 				excludeFolders = append(excludeFolders, sub)
 			}
-		}
 
-		// Add compiles, contents and nones into included files map
-		filesIncluded := getFilesIncludedIntoProject(info)
-		for _, f := range filesIncluded {
-			includedFiles.Add(strings.ToUpper(f))
-			if _, err := fs.Stat(f); os.IsNotExist(err) {
-				if found, ok := unexistFiles[project]; ok {
-					found = append(found, f)
-					unexistFiles[project] = found
-				} else {
-					unexistFiles[project] = []string{f}
+			// Exclude output paths too
+			if prj.project.OutputPaths != nil {
+				for _, out := range prj.project.OutputPaths {
+					sub := filepath.Join(folder.path, out)
+					excludeFolders = append(excludeFolders, sub)
+				}
+			}
+
+			// Add compiles, contents and nones into included files map
+			filesIncluded := getFilesIncludedIntoProject(prj)
+			for _, f := range filesIncluded {
+				includedFiles.Add(strings.ToUpper(f))
+				if _, err := fs.Stat(f); os.IsNotExist(err) {
+					if found, ok := unexistFiles[project]; ok {
+						found = append(found, f)
+						unexistFiles[project] = found
+					} else {
+						unexistFiles[project] = []string{f}
+					}
 				}
 			}
 		}
+
 		return true
 	})
 

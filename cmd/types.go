@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"encoding/xml"
-	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/akutz/sortfold"
-	"strings"
 )
 
 // Packages is Nuget packages structure
@@ -73,26 +70,4 @@ type walkEntry struct {
 	Parent string
 	Name   string
 	IsDir  bool
-}
-
-type projectTreeNode struct {
-	info *folderInfo
-	path string
-}
-
-func (x projectTreeNode) LessThan(y interface{}) bool {
-	return sortfold.CompareFold(x.path, (y.(projectTreeNode)).path) < 0
-}
-
-func (x projectTreeNode) EqualTo(y interface{}) bool {
-	return strings.EqualFold(x.path, (y.(projectTreeNode)).path)
-}
-
-func newProjectTreeNode(path string, info *folderInfo) *rbtree.Comparable {
-	var r rbtree.Comparable
-	r = projectTreeNode{
-		path: path,
-		info: info,
-	}
-	return &r
 }

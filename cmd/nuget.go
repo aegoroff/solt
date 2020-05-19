@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/spf13/afero"
-	"log"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -27,13 +25,7 @@ var nugetCmd = &cobra.Command{
 	Aliases: []string{"nu"},
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var solutions []string
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
-			ext := strings.ToLower(filepath.Ext(we.Name))
-			if ext == solutionFileExt {
-				solutions = append(solutions, filepath.Join(we.Parent, we.Name))
-			}
-		})
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
 
 		findNugetMismatches, err := cmd.Flags().GetBool(mismatchParamName)
 
@@ -42,7 +34,7 @@ var nugetCmd = &cobra.Command{
 		}
 
 		if findNugetMismatches {
-			showMismatches(solutions, foldersTree, appFileSystem)
+			showMismatches(foldersTree)
 		} else {
 			showPackagesInfoByFolders(foldersTree)
 		}
@@ -57,9 +49,58 @@ func init() {
 	nugetCmd.Flags().BoolP(mismatchParamName, "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
 }
 
-func showMismatches(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs) {
+func showMismatches(foldersTree *rbtree.RbTree) {
 
-	solutionProjects := getProjectsOfSolutions(solutions, foldersTree, fs)
+	var solutionFolders []*folder
+	// Select only folders that contain solution(s)
+	foldersTree.WalkInorder(func(n *rbtree.Node) {
+		f := (*n.Key).(*folder)
+		content := f.content
+		if len(content.solutions) == 0 {
+			return
+		}
+		solutionFolders = append(solutionFolders, f)
+	})
+
+	var solutionProjects = make(map[string][]*folderContent)
+
+	for _, f := range solutionFolders {
+		// Each found solution
+		for _, sln := range f.content.solutions {
+			var solutionProjectPaths = make(collections.StringHashSet)
+			for _, sp := range sln.solution.Projects {
+				if sp.TypeId == solution.IdSolutionFolder {
+					continue
+				}
+				basePath := f.path
+				fullProjectPath := filepath.Join(basePath, sp.Path)
+				key := strings.ToUpper(fullProjectPath)
+
+				solutionProjectPaths.Add(key)
+			}
+
+			solutionPath := filepath.Join(f.path, sln.file)
+
+			foldersTree.WalkInorder(func(n *rbtree.Node) {
+				projectFolder := (*n.Key).(*folder)
+				content := projectFolder.content
+				if len(content.projects) == 0 {
+					return
+				}
+				// All found projects
+				for _, prj := range content.projects {
+					projectPath := prj.file
+					if solutionProjectPaths.Contains(strings.ToUpper(projectPath)) {
+						if v, ok := solutionProjects[solutionPath]; !ok {
+							solutionProjects[solutionPath] = []*folderContent{content}
+						} else {
+							solutionProjects[solutionPath] = append(v, content)
+						}
+					}
+				}
+			})
+		}
+	}
 
 	mismatches := calculateMismatches(solutionProjects)
 
@@ -83,57 +124,12 @@ func showMismatches(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs)
 	}
 }
 
-func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs afero.Fs) map[string][]*folderInfo {
-	var solutionProjects = make(map[string][]*folderInfo)
-	for _, sol := range solutions {
-		f, err := fs.Open(filepath.Clean(sol))
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		sln, err := solution.Parse(f)
-
-		if err != nil {
-			closeResource(f)
-			log.Println(err)
-			continue
-		}
-
-		var solutionProjectPaths = make(collections.StringHashSet)
-		for _, sp := range sln.Projects {
-			basePath := filepath.Dir(sol)
-			fullProjectPath := filepath.Join(basePath, sp.Path)
-			key := strings.ToUpper(fullProjectPath)
-
-			solutionProjectPaths.Add(key)
-		}
-
-		foldersTree.WalkInorder(func(n *rbtree.Node) {
-			finfo := (*n.Key).(projectTreeNode).info
-			if finfo.project == nil {
-				return
-			}
-
-			if solutionProjectPaths.Contains(strings.ToUpper(*finfo.projectPath)) {
-				if v, ok := solutionProjects[sol]; !ok {
-					solutionProjects[sol] = []*folderInfo{finfo}
-				} else {
-					solutionProjects[sol] = append(v, finfo)
-				}
-			}
-		})
-		closeResource(f)
-	}
-	return solutionProjects
-}
-
-func calculateMismatches(solutionProjects map[string][]*folderInfo) map[string][]*mismatch {
+func calculateMismatches(solutionProjects map[string][]*folderContent) map[string][]*mismatch {
 	var mismatches = make(map[string][]*mismatch)
 	for sol, projects := range solutionProjects {
 		var packagesMap = make(map[string][]string)
 		for _, prj := range projects {
-			if prj.packages == nil && (prj.project == nil || prj.project.PackageReferences == nil) {
+			if prj.packages == nil && len(prj.projects) == 0 {
 				continue
 			}
 
@@ -186,14 +182,15 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		fi := (*n.Key).(projectTreeNode).info
-		if fi.packages == nil && (fi.project == nil || fi.project.PackageReferences == nil) {
+		folder := (*n.Key).(*folder)
+		content := folder.content
+		if content.packages == nil && len(content.projects) == 0 {
 			return
 		}
 
-		nugetPackages := getNugetPackages(fi)
+		nugetPackages := getNugetPackages(content)
 
-		parent := filepath.Dir(*fi.projectPath)
+		parent := folder.path
 		fmt.Printf(" %s\n", parent)
 		fmt.Fprintf(tw, format, "Package", "Version")
 		fmt.Fprintf(tw, format, "-------", "--------")
@@ -207,19 +204,24 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	})
 }
 
-func getNugetPackages(fi *folderInfo) []nugetPackage {
+func getNugetPackages(content *folderContent) []nugetPackage {
 	var nugetPackages []nugetPackage
-	if fi.packages != nil {
-		for _, p := range fi.packages.Packages {
+	if content.packages != nil {
+		for _, p := range content.packages.Packages {
 			n := nugetPackage{Id: p.Id, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}
-	if fi.project != nil && fi.project.PackageReferences != nil {
-		for _, p := range fi.project.PackageReferences {
+	for _, prj := range content.projects {
+		if prj.project.PackageReferences == nil {
+			continue
+		}
+
+		for _, p := range prj.project.PackageReferences {
 			n := nugetPackage{Id: p.Id, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}
+
 	return nugetPackages
 }
