@@ -46,7 +46,7 @@ var lostfilesCmd = &cobra.Command{
 			}
 		})
 
-		lostFiles, unexistFiles := findLostFiles(foldersTree, appFileSystem, packagesFolders, foundFiles)
+		lostFiles, unexistFiles := findLostFiles(appFileSystem, foldersTree, packagesFolders.Items(), foundFiles)
 
 		sortAndOutput(appWriter, lostFiles)
 
@@ -64,9 +64,9 @@ func init() {
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
 }
 
-func findLostFiles(foldersTree *rbtree.RbTree, fs afero.Fs, packagesFolders collections.StringHashSet, foundFiles []string) ([]string, map[string][]string) {
+func findLostFiles(fs afero.Fs, foldersTree *rbtree.RbTree, additionalFoldersToExclude []string, foundFiles []string) ([]string, map[string][]string) {
 	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree, fs)
-	excludedFolders = append(excludedFolders, packagesFolders.Items()...)
+	excludedFolders = append(excludedFolders, additionalFoldersToExclude...)
 
 	exmach, err := createAhoCorasickMachine(excludedFolders)
 	if err != nil {
