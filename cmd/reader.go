@@ -58,8 +58,8 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	// Aggregating goroutine
 	go func() {
 		defer wg.Done()
-		for f := range aggregateChannel {
-			key := newProjectTreeNode(f.path, f.info)
+		for folder := range aggregateChannel {
+			key := newProjectTreeNode(folder.path, folder.info)
 
 			if current, ok := result.Search(key); !ok {
 				n := rbtree.NewNode(key)
@@ -69,11 +69,11 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 				info := (*current.Key).(projectTreeNode).info
 				if info.project == nil {
 					// Project read after packages.config
-					info.project = f.info.project
-					info.projectPath = f.info.projectPath
+					info.project = folder.info.project
+					info.projectPath = folder.info.projectPath
 				} else if info.packages == nil {
 					// Project read before packages.config
-					info.packages = f.info.packages
+					info.packages = folder.info.packages
 				}
 			}
 		}

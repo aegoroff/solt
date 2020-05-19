@@ -57,11 +57,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 
 	// Assert
 	actual := buf.String()
-	ass.Equal(`
-These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
-
- a\a\a1.csproj
-`, actual)
+	ass.Equal(``, actual)
 }
 
 func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing.T) {

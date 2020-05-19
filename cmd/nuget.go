@@ -100,9 +100,13 @@ func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs a
 			continue
 		}
 
-		var solutionProjectIds = make(collections.StringHashSet)
+		var solutionProjectPaths = make(collections.StringHashSet)
 		for _, sp := range sln.Projects {
-			solutionProjectIds.Add(sp.Id)
+			basePath := filepath.Dir(sol)
+			fullProjectPath := filepath.Join(basePath, sp.Path)
+			key := strings.ToUpper(fullProjectPath)
+
+			solutionProjectPaths.Add(key)
 		}
 
 		foldersTree.WalkInorder(func(n *rbtree.Node) {
@@ -111,7 +115,7 @@ func getProjectsOfSolutions(solutions []string, foldersTree *rbtree.RbTree, fs a
 				return
 			}
 
-			if solutionProjectIds.Contains(finfo.project.Id) {
+			if solutionProjectPaths.Contains(strings.ToUpper(*finfo.projectPath)) {
 				if v, ok := solutionProjects[sol]; !ok {
 					solutionProjects[sol] = []*folderInfo{finfo}
 				} else {
