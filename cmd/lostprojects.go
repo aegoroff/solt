@@ -15,7 +15,8 @@ import (
 )
 
 type projectSolution struct {
-	project  string
+	id       string
+	path     string
 	solution string
 }
 
@@ -65,15 +66,15 @@ func init() {
 func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
 	for _, prj := range allProjectsWithinSolutions {
-		if _, err := fs.Stat(prj.project); !os.IsNotExist(err) {
+		if _, err := fs.Stat(prj.path); !os.IsNotExist(err) {
 			continue
 		}
 
 		if found, ok := result[prj.solution]; ok {
-			found = append(found, prj.project)
+			found = append(found, prj.path)
 			result[prj.solution] = found
 		} else {
-			result[prj.solution] = []string{prj.project}
+			result[prj.solution] = []string{prj.path}
 		}
 	}
 	return result
@@ -89,9 +90,9 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 			return true
 		}
 
-		id := strings.ToUpper(info.project.Id)
+		projectPath := strings.ToUpper(*info.projectPath)
 
-		_, ok := allProjectsWithinSolutions[id]
+		_, ok := allProjectsWithinSolutions[projectPath]
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, info)
 		} else {
@@ -162,18 +163,18 @@ func getAllSolutionsProjects(solutions []string, fs afero.Fs) map[string]*projec
 				continue
 			}
 
-			id := strings.ToUpper(p.Id)
+			basePath := filepath.Dir(solpath)
+			fullProjectPath := filepath.Join(basePath, p.Path)
+			key := strings.ToUpper(fullProjectPath)
 
 			// Already added
-			if _, ok := projectsInSolution[id]; ok {
+			if _, ok := projectsInSolution[key]; ok {
 				continue
 			}
 
-			parent := filepath.Dir(solpath)
-			pp := filepath.Join(parent, p.Path)
-
-			projectsInSolution[id] = &projectSolution{
-				project:  pp,
+			projectsInSolution[key] = &projectSolution{
+				path:     fullProjectPath,
+				id:       strings.ToUpper(p.Id),
 				solution: solpath,
 			}
 		}
