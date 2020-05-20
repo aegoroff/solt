@@ -43,6 +43,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
 	afero.WriteFile(memfs, dir+"a/a1.csproj", []byte(testProjectContent2), 0644)
 	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
@@ -74,6 +75,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
 	afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent2), 0644)
 	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
@@ -100,6 +102,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	memfs.MkdirAll(dir+"a/Properties", 0755)
 	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
 	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
