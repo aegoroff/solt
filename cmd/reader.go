@@ -14,12 +14,12 @@ import (
 
 type msbuildProject struct {
 	project *Project
-	file    string
+	path    string
 }
 
 type visualStudioSolution struct {
 	solution *solution.Solution
-	file     string
+	path     string
 }
 
 type folderContent struct {
@@ -49,7 +49,7 @@ func newTreeNode(f *folder) *rbtree.Comparable {
 
 func getFilesIncludedIntoProject(prj *msbuildProject) []string {
 	var result []string
-	folderPath := filepath.Dir(prj.file)
+	folderPath := filepath.Dir(prj.path)
 	result = append(result, createPaths(prj.project.Contents, folderPath)...)
 	result = append(result, createPaths(prj.project.Nones, folderPath)...)
 	result = append(result, createPaths(prj.project.CLCompiles, folderPath)...)
@@ -178,7 +178,7 @@ func onMsbuildProject(we *walkEntry, fs afero.Fs) (*folder, bool) {
 
 	f := createFolder(we)
 
-	p := msbuildProject{project: &project, file: filepath.Join(we.Parent, we.Name)}
+	p := msbuildProject{project: &project, path: filepath.Join(we.Parent, we.Name)}
 
 	f.content.projects = append(f.content.projects, &p)
 
@@ -203,7 +203,7 @@ func onSolution(we *walkEntry, fs afero.Fs) (*folder, bool) {
 
 	f := createFolder(we)
 
-	s := visualStudioSolution{solution: sln, file: we.Name}
+	s := visualStudioSolution{solution: sln, path: filepath.Join(we.Parent, we.Name)}
 
 	f.content.solutions = append(f.content.solutions, &s)
 

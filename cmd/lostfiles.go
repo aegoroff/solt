@@ -97,7 +97,7 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 		}
 
 		for _, prj := range content.projects {
-			project := prj.file
+			project := prj.path
 
 			// Add project base + exclude subfolder into exclude folders list
 			for _, s := range subfolderToExclude {

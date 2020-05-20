@@ -79,8 +79,6 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 				solutionProjectPaths.Add(key)
 			}
 
-			solutionPath := filepath.Join(f.path, sln.file)
-
 			foldersTree.WalkInorder(func(n *rbtree.Node) {
 				projectFolder := (*n.Key).(*folder)
 				content := projectFolder.content
@@ -89,12 +87,11 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 				}
 				// All found projects
 				for _, prj := range content.projects {
-					projectPath := prj.file
-					if solutionProjectPaths.Contains(strings.ToUpper(projectPath)) {
-						if v, ok := solutionProjects[solutionPath]; !ok {
-							solutionProjects[solutionPath] = []*folderContent{content}
+					if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
+						if v, ok := solutionProjects[sln.path]; !ok {
+							solutionProjects[sln.path] = []*folderContent{content}
 						} else {
-							solutionProjects[solutionPath] = append(v, content)
+							solutionProjects[sln.path] = append(v, content)
 						}
 					}
 				}

@@ -85,9 +85,10 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 		}
 
 		for _, prj := range content.projects {
-			projectPath := strings.ToUpper(prj.file)
+			// Path in upper registry is the project's key
+			projectKey := strings.ToUpper(prj.path)
 
-			_, ok := allProjectsWithinSolutions[projectPath]
+			_, ok := allProjectsWithinSolutions[projectKey]
 			if !ok {
 				projectsOutsideSolution = append(projectsOutsideSolution, prj)
 			} else {
@@ -118,7 +119,7 @@ func separateOutsideProjects(projectsOutsideSolution []*msbuildProject, filesIns
 				continue
 			}
 
-			dir := filepath.Dir(prj.file)
+			dir := filepath.Dir(prj.path)
 
 			if strings.Contains(pf, strings.ToUpper(dir)) {
 				includedIntoOther = true
@@ -127,9 +128,9 @@ func separateOutsideProjects(projectsOutsideSolution []*msbuildProject, filesIns
 		}
 
 		if !includedIntoOther {
-			projectsOutside = append(projectsOutside, prj.file)
+			projectsOutside = append(projectsOutside, prj.path)
 		} else {
-			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, prj.file)
+			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, prj.path)
 		}
 	}
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
@@ -166,7 +167,7 @@ func getAllSolutionsProjects(foldersTree *rbtree.RbTree) map[string]*projectSolu
 				projectsInSolution[key] = &projectSolution{
 					path:     fullProjectPath,
 					id:       strings.ToUpper(prj.Id),
-					solution: filepath.Join(fold.path, sln.file),
+					solution: sln.path,
 				}
 			}
 		}

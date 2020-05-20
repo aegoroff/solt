@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"path/filepath"
 	"solt/solution"
 	"strings"
 	"text/tabwriter"
@@ -24,10 +23,9 @@ var infoCmd = &cobra.Command{
 			content := folder.content
 
 			for _, solution := range content.solutions {
-				solutionPath := filepath.Join(folder.path, solution.file)
 				sln := solution.solution
 
-				fmt.Printf(" %s\n", solutionPath)
+				fmt.Printf(" %s\n", solution.path)
 
 				const format = "  %v\t%v\n"
 				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
