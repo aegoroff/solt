@@ -62,6 +62,66 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 }
 
+func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	memfs.MkdirAll(dir+"a/Properties", 0755)
+	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+
+	buf := bytes.NewBufferString("")
+
+	appWriter = buf
+	appFileSystem = memfs
+
+	// Act
+	rootCmd.SetArgs([]string{"lf", "-p", dir, "-r"})
+	rootCmd.Execute()
+
+	// Assert
+	actual := buf.String()
+	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed sucessfully.\n", actual)
+	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
+	ass.Error(err)
+}
+
+func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	memfs.MkdirAll(dir+"a/Properties", 0755)
+	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+
+	buf := bytes.NewBufferString("")
+
+	appWriter = buf
+	appFileSystem = afero.NewReadOnlyFs(memfs)
+
+	// Act
+	rootCmd.SetArgs([]string{"lf", "-p", dir, "-r"})
+	rootCmd.Execute()
+
+	// Assert
+	actual := buf.String()
+	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
+	ass.NoError(err)
+}
+
 func Test_FindLostFilesCmd_UnesistFilesFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)

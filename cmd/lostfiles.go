@@ -6,6 +6,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +17,7 @@ var subfolderToExclude = []string{
 }
 
 const filterParamName = "file"
+const removeParamName = "remove"
 
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
@@ -27,6 +29,12 @@ var lostfilesCmd = &cobra.Command{
 		var packagesFolders = make(collections.StringHashSet)
 
 		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
+
+		if err != nil {
+			return err
+		}
+
+		removeLostFiles, err := cmd.Flags().GetBool(removeParamName)
 
 		if err != nil {
 			return err
@@ -55,6 +63,17 @@ var lostfilesCmd = &cobra.Command{
 		}
 
 		outputSortedMap(appWriter, unexistFiles, "Project")
+
+		if removeLostFiles {
+			for _, f := range lostFiles {
+				err = appFileSystem.Remove(f)
+				if err != nil {
+					log.Printf("%v\n", err)
+				} else {
+					fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
+				}
+			}
+		}
 		return nil
 	},
 }
@@ -62,6 +81,7 @@ var lostfilesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(lostfilesCmd)
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
+	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
 }
 
 func findLostFiles(fs afero.Fs, foldersTree *rbtree.RbTree, additionalFoldersToExclude []string, foundFiles []string) ([]string, map[string][]string) {
