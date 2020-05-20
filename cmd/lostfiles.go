@@ -111,6 +111,10 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 				}
 			}
 
+			if prj.project.isSdkProject() {
+				excludeFolders = append(excludeFolders, filepath.Dir(prj.path))
+			}
+
 			// Add compiles, contents and nones into included files map
 			filesIncluded := getFilesIncludedIntoProject(prj)
 			for _, f := range filesIncluded {
