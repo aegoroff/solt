@@ -13,12 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type projectSolution struct {
-	id       string
-	path     string
-	solution string
-}
-
 // lostprojectsCmd represents the lostprojects command
 var lostprojectsCmd = &cobra.Command{
 	Use:     "lostprojects",
@@ -54,7 +48,7 @@ var lostprojectsCmd = &cobra.Command{
 		sortAndOutput(appWriter, lostProjects)
 
 		if len(lostProjectsThatIncludeSolutionProjectsFiles) > 0 {
-			fmt.Fprintf(appWriter, "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
+			_, _ = fmt.Fprintf(appWriter, "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 		}
 
 		sortAndOutput(appWriter, lostProjectsThatIncludeSolutionProjectsFiles)
@@ -62,7 +56,7 @@ var lostprojectsCmd = &cobra.Command{
 		unexistProjects := getUnexistProjects(projectsBySolution, appFileSystem)
 
 		if len(unexistProjects) > 0 {
-			fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
+			_, _ = fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
 		}
 
 		outputSortedMap(appWriter, unexistProjects, "Solution")
@@ -98,30 +92,20 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, pmm *g
 	var projectsOutsideSolution []*msbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
-	foldersTree.Ascend(func(c *rbtree.Comparable) bool {
-		folder := (*c).(*folder)
-		content := folder.content
-		if len(content.projects) == 0 {
-			return true
-		}
+	walkProjects(foldersTree, func(prj *msbuildProject, fold *folder) {
+		// Path in upper registry is the project's key
+		projectKey := strings.ToUpper(prj.path)
 
-		for _, prj := range content.projects {
-			// Path in upper registry is the project's key
-			projectKey := strings.ToUpper(prj.path)
+		ok := Match(pmm, projectKey)
+		if !ok {
+			projectsOutsideSolution = append(projectsOutsideSolution, prj)
+		} else {
+			filesIncluded := getFilesIncludedIntoProject(prj)
 
-			ok := Match(pmm, projectKey)
-			if !ok {
-				projectsOutsideSolution = append(projectsOutsideSolution, prj)
-			} else {
-				filesIncluded := getFilesIncludedIntoProject(prj)
-
-				for _, f := range filesIncluded {
-					filesInsideSolution.Add(strings.ToUpper(f))
-				}
+			for _, f := range filesIncluded {
+				filesInsideSolution.Add(strings.ToUpper(f))
 			}
 		}
-
-		return true
 	})
 
 	return projectsOutsideSolution, filesInsideSolution

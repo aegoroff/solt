@@ -56,20 +56,12 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 	for _, sln := range solutions {
 		solutionProjectPaths := selectAllSolutionProjectPaths(sln, true)
 
-		foldersTree.WalkInorder(func(n *rbtree.Node) {
-			fold := (*n.Key).(*folder)
-			content := fold.content
-			if len(content.projects) == 0 {
-				return
-			}
-			// All found projects
-			for _, prj := range content.projects {
-				if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
-					if v, ok := solutionProjects[sln.path]; !ok {
-						solutionProjects[sln.path] = []*folderContent{content}
-					} else {
-						solutionProjects[sln.path] = append(v, content)
-					}
+		walkProjects(foldersTree, func(prj *msbuildProject, fold *folder) {
+			if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
+				if v, ok := solutionProjects[sln.path]; !ok {
+					solutionProjects[sln.path] = []*folderContent{fold.content}
+				} else {
+					solutionProjects[sln.path] = append(v, fold.content)
 				}
 			}
 		})

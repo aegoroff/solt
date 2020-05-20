@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
+	goahocorasick "github.com/anknown/ahocorasick"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
@@ -54,12 +55,20 @@ var lostfilesCmd = &cobra.Command{
 			}
 		})
 
-		lostFiles, unexistFiles := findLostFiles(appFileSystem, foldersTree, packagesFolders.Items(), foundFiles)
+		includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree, appFileSystem)
+		excludedFolders = append(excludedFolders, packagesFolders.Items()...)
+
+		exmach, err := createAhoCorasickMachine(excludedFolders)
+		if err != nil {
+			return err
+		}
+
+		lostFiles := findLostFiles(exmach, foundFiles, includedFiles)
 
 		sortAndOutput(appWriter, lostFiles)
 
 		if len(unexistFiles) > 0 {
-			fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
+			_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
 		}
 
 		outputSortedMap(appWriter, unexistFiles, "Project")
@@ -70,7 +79,7 @@ var lostfilesCmd = &cobra.Command{
 				if err != nil {
 					log.Printf("%v\n", err)
 				} else {
-					fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
+					_, _ = fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
 				}
 			}
 		}
@@ -84,23 +93,15 @@ func init() {
 	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
 }
 
-func findLostFiles(fs afero.Fs, foldersTree *rbtree.RbTree, additionalFoldersToExclude []string, foundFiles []string) ([]string, map[string][]string) {
-	includedFiles, excludedFolders, unexistFiles := createIncludedFilesAndExcludedFolders(foldersTree, fs)
-	excludedFolders = append(excludedFolders, additionalFoldersToExclude...)
-
-	exmach, err := createAhoCorasickMachine(excludedFolders)
-	if err != nil {
-		fmt.Println(err)
-		return []string{}, unexistFiles
-	}
+func findLostFiles(exm *goahocorasick.Machine, foundFiles []string, includedFiles collections.StringHashSet) []string {
 	var result []string
 	for _, file := range foundFiles {
-		if !includedFiles.Contains(strings.ToUpper(file)) && !Match(exmach, file) {
+		if !includedFiles.Contains(strings.ToUpper(file)) && !Match(exm, file) {
 			result = append(result, file)
 		}
 	}
 
-	return result, unexistFiles
+	return result
 }
 
 func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.Fs) (collections.StringHashSet, []string, map[string][]string) {
@@ -108,50 +109,39 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(collections.StringHashSet)
 
-	foldersTree.Ascend(func(key *rbtree.Comparable) bool {
-		folder := (*key).(*folder)
-		content := folder.content
-
-		if len(content.projects) == 0 {
-			return true
+	walkProjects(foldersTree, func(prj *msbuildProject, fold *folder) {
+		// Add project base + exclude subfolder into exclude folders list
+		for _, s := range subfolderToExclude {
+			sub := filepath.Join(fold.path, s)
+			excludeFolders = append(excludeFolders, sub)
 		}
 
-		for _, prj := range content.projects {
-			// Add project base + exclude subfolder into exclude folders list
-			for _, s := range subfolderToExclude {
-				sub := filepath.Join(folder.path, s)
+		// Exclude output paths too
+		if prj.project.OutputPaths != nil {
+			for _, out := range prj.project.OutputPaths {
+				sub := filepath.Join(fold.path, out)
 				excludeFolders = append(excludeFolders, sub)
 			}
+		}
 
-			// Exclude output paths too
-			if prj.project.OutputPaths != nil {
-				for _, out := range prj.project.OutputPaths {
-					sub := filepath.Join(folder.path, out)
-					excludeFolders = append(excludeFolders, sub)
-				}
-			}
+		// In case of SDK projects all files inside project folder are considered included
+		if prj.project.isSdkProject() {
+			excludeFolders = append(excludeFolders, filepath.Dir(prj.path))
+		}
 
-			// In case of SDK projects all files inside project folder are considered included
-			if prj.project.isSdkProject() {
-				excludeFolders = append(excludeFolders, filepath.Dir(prj.path))
-			}
-
-			// Add compiles, contents and nones into included files map
-			filesIncluded := getFilesIncludedIntoProject(prj)
-			for _, f := range filesIncluded {
-				includedFiles.Add(strings.ToUpper(f))
-				if _, err := fs.Stat(f); os.IsNotExist(err) {
-					if found, ok := unexistFiles[prj.path]; ok {
-						found = append(found, f)
-						unexistFiles[prj.path] = found
-					} else {
-						unexistFiles[prj.path] = []string{f}
-					}
+		// Add compiles, contents and nones into included files map
+		filesIncluded := getFilesIncludedIntoProject(prj)
+		for _, f := range filesIncluded {
+			includedFiles.Add(strings.ToUpper(f))
+			if _, err := fs.Stat(f); os.IsNotExist(err) {
+				if found, ok := unexistFiles[prj.path]; ok {
+					found = append(found, f)
+					unexistFiles[prj.path] = found
+				} else {
+					unexistFiles[prj.path] = []string{f}
 				}
 			}
 		}
-
-		return true
 	})
 
 	return includedFiles, excludeFolders, unexistFiles
