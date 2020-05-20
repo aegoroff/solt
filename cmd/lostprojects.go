@@ -47,17 +47,17 @@ var lostprojectsCmd = &cobra.Command{
 			return err
 		}
 
-		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, pmm)
+		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, pmm)
 
-		projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
+		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
 
-		sortAndOutput(appWriter, projectsOutside)
+		sortAndOutput(appWriter, lostProjects)
 
-		if len(projectsOutsideSolutionWithFilesInside) > 0 {
+		if len(lostProjectsThatIncludeSolutionProjectsFiles) > 0 {
 			fmt.Fprintf(appWriter, "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
 		}
 
-		sortAndOutput(appWriter, projectsOutsideSolutionWithFilesInside)
+		sortAndOutput(appWriter, lostProjectsThatIncludeSolutionProjectsFiles)
 
 		unexistProjects := getUnexistProjects(projectsBySolution, appFileSystem)
 
@@ -127,7 +127,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, pmm *g
 	return projectsOutsideSolution, filesInsideSolution
 }
 
-func separateOutsideProjects(projectsOutsideSolution []*msbuildProject, filesInsideSolution collections.StringHashSet) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msbuildProject, filesInsideSolution collections.StringHashSet) ([]string, []string) {
 	var projectsOutside []string
 	var projectsOutsideSolutionWithFilesInside []string
 	for _, prj := range projectsOutsideSolution {
