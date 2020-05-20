@@ -111,6 +111,7 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 				}
 			}
 
+			// In case of SDK projects all files inside project folder are considered included
 			if prj.project.isSdkProject() {
 				excludeFolders = append(excludeFolders, filepath.Dir(prj.path))
 			}
