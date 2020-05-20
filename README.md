@@ -32,7 +32,7 @@ Flags:
 
 Use "solt [command] --help" for more information about a command.
 ```
-###Search lost files syntax:
+### Search lost files syntax:
 
 ```
 Find lost files in the folder specified
@@ -51,7 +51,7 @@ Find lost files in the folder specified
    Global Flags:
      -p, --path string   REQUIRED. Path to the sources folder
 ```
-###Search lost projects syntax:
+### Search lost projects syntax:
 ```
 Find projects that not included into any solution
 
@@ -67,7 +67,7 @@ Flags:
 Global Flags:
   -p, --path string   REQUIRED. Path to the sources folder
 ```
-###Nuget information syntax:
+### Nuget information syntax:
 ```
 Get nuget packages information within projects or find Nuget mismatches in solution
 
