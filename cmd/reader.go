@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/spf13/afero"
@@ -33,21 +34,6 @@ type folder struct {
 	path    string
 }
 
-func (p *msbuildProject) isSdkProject() bool {
-	if len(p.project.Sdk) > 0 {
-		return true
-	}
-	if len(p.project.Imports) == 0 {
-		return false
-	}
-	for _, imp := range p.project.Imports {
-		if len(imp.Sdk) > 0 {
-			return true
-		}
-	}
-	return false
-}
-
 func (x *folder) LessThan(y interface{}) bool {
 	return sortfold.CompareFold(x.path, (y.(*folder)).path) < 0
 }
@@ -60,18 +46,6 @@ func newTreeNode(f *folder) *rbtree.Comparable {
 	var r rbtree.Comparable
 	r = f
 	return &r
-}
-
-func getFilesIncludedIntoProject(prj *msbuildProject) []string {
-	var result []string
-	folderPath := filepath.Dir(prj.path)
-	result = append(result, createPaths(prj.project.Contents, folderPath)...)
-	result = append(result, createPaths(prj.project.Nones, folderPath)...)
-	result = append(result, createPaths(prj.project.CLCompiles, folderPath)...)
-	result = append(result, createPaths(prj.project.CLInclude, folderPath)...)
-	result = append(result, createPaths(prj.project.Compiles, folderPath)...)
-
-	return result
 }
 
 func selectSolutions(foldersTree *rbtree.RbTree) []*visualStudioSolution {
@@ -88,6 +62,37 @@ func selectSolutions(foldersTree *rbtree.RbTree) []*visualStudioSolution {
 		}
 	})
 	return solutions
+}
+
+func selectAllSolutionProjectPaths(sln *visualStudioSolution, normalize bool) collections.StringHashSet {
+	solutionPath := filepath.Dir(sln.path)
+	var paths = make(collections.StringHashSet)
+	for _, sp := range sln.solution.Projects {
+		if sp.TypeId == solution.IdSolutionFolder {
+			continue
+		}
+		fullProjectPath := filepath.Join(solutionPath, sp.Path)
+
+		if normalize {
+			key := strings.ToUpper(fullProjectPath)
+			paths.Add(key)
+		} else {
+			paths.Add(fullProjectPath)
+		}
+	}
+	return paths
+}
+
+func getFilesIncludedIntoProject(prj *msbuildProject) []string {
+	var result []string
+	folderPath := filepath.Dir(prj.path)
+	result = append(result, createPaths(prj.project.Contents, folderPath)...)
+	result = append(result, createPaths(prj.project.Nones, folderPath)...)
+	result = append(result, createPaths(prj.project.CLCompiles, folderPath)...)
+	result = append(result, createPaths(prj.project.CLInclude, folderPath)...)
+	result = append(result, createPaths(prj.project.Compiles, folderPath)...)
+
+	return result
 }
 
 func createPaths(paths []Include, basePath string) []string {

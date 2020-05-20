@@ -78,3 +78,18 @@ type walkEntry struct {
 	Name   string
 	IsDir  bool
 }
+
+func (p *Project) isSdkProject() bool {
+	if len(p.Sdk) > 0 {
+		return true
+	}
+	if len(p.Imports) == 0 {
+		return false
+	}
+	for _, imp := range p.Imports {
+		if len(imp.Sdk) > 0 {
+			return true
+		}
+	}
+	return false
+}

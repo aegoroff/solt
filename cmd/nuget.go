@@ -2,10 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"path/filepath"
-	"solt/solution"
 	"strings"
 	"text/tabwriter"
 
@@ -57,21 +54,11 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 
 	// Each found solution
 	for _, sln := range solutions {
-		solutionPath := filepath.Dir(sln.path)
-		var solutionProjectPaths = make(collections.StringHashSet)
-		for _, sp := range sln.solution.Projects {
-			if sp.TypeId == solution.IdSolutionFolder {
-				continue
-			}
-			fullProjectPath := filepath.Join(solutionPath, sp.Path)
-			key := strings.ToUpper(fullProjectPath)
-
-			solutionProjectPaths.Add(key)
-		}
+		solutionProjectPaths := selectAllSolutionProjectPaths(sln, true)
 
 		foldersTree.WalkInorder(func(n *rbtree.Node) {
-			projectFolder := (*n.Key).(*folder)
-			content := projectFolder.content
+			fold := (*n.Key).(*folder)
+			content := fold.content
 			if len(content.projects) == 0 {
 				return
 			}

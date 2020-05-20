@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
+	goahocorasick "github.com/anknown/ahocorasick"
 	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
-	"solt/solution"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -24,13 +24,30 @@ var lostprojectsCmd = &cobra.Command{
 	Use:     "lostprojects",
 	Aliases: []string{"lp"},
 	Short:   "Find projects that not included into any solution",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
 
-		allProjectsWithinSolutions := getAllSolutionsProjects(foldersTree)
+		solutions := selectSolutions(foldersTree)
 
-		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, allProjectsWithinSolutions)
+		var projectsInSolutions []string
+		projectsBySolution := make(map[string]collections.StringHashSet)
+		// Each found solution
+		for _, sln := range solutions {
+			solutionProjectPaths := selectAllSolutionProjectPaths(sln, false)
+			projectsBySolution[sln.path] = solutionProjectPaths
+			for _, item := range solutionProjectPaths.Items() {
+				projectsInSolutions = append(projectsInSolutions, strings.ToUpper(item))
+			}
+		}
+
+		// Create projects matching machine
+		pmm, err := createAhoCorasickMachine(projectsInSolutions)
+		if err != nil {
+			return err
+		}
+
+		projectsOutsideSolution, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, pmm)
 
 		projectsOutside, projectsOutsideSolutionWithFilesInside := separateOutsideProjects(projectsOutsideSolution, filesInsideSolution)
 
@@ -42,13 +59,15 @@ var lostprojectsCmd = &cobra.Command{
 
 		sortAndOutput(appWriter, projectsOutsideSolutionWithFilesInside)
 
-		unexistProjects := getUnexistProjects(allProjectsWithinSolutions, appFileSystem)
+		unexistProjects := getUnexistProjects(projectsBySolution, appFileSystem)
 
 		if len(unexistProjects) > 0 {
 			fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
 		}
 
 		outputSortedMap(appWriter, unexistProjects, "Solution")
+
+		return nil
 	},
 }
 
@@ -56,24 +75,26 @@ func init() {
 	rootCmd.AddCommand(lostprojectsCmd)
 }
 
-func getUnexistProjects(allProjectsWithinSolutions map[string]*projectSolution, fs afero.Fs) map[string][]string {
+func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
-	for _, prj := range allProjectsWithinSolutions {
-		if _, err := fs.Stat(prj.path); !os.IsNotExist(err) {
-			continue
-		}
+	for sol, projects := range projectsInSolutions {
+		for _, prj := range projects.Items() {
+			if _, err := fs.Stat(prj); !os.IsNotExist(err) {
+				continue
+			}
 
-		if found, ok := result[prj.solution]; ok {
-			found = append(found, prj.path)
-			result[prj.solution] = found
-		} else {
-			result[prj.solution] = []string{prj.path}
+			if found, ok := result[sol]; ok {
+				found = append(found, prj)
+				result[sol] = found
+			} else {
+				result[sol] = []string{prj}
+			}
 		}
 	}
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allProjectsWithinSolutions map[string]*projectSolution) ([]*msbuildProject, collections.StringHashSet) {
+func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, pmm *goahocorasick.Machine) ([]*msbuildProject, collections.StringHashSet) {
 	var projectsOutsideSolution []*msbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
@@ -88,7 +109,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, allPro
 			// Path in upper registry is the project's key
 			projectKey := strings.ToUpper(prj.path)
 
-			_, ok := allProjectsWithinSolutions[projectKey]
+			ok := Match(pmm, projectKey)
 			if !ok {
 				projectsOutsideSolution = append(projectsOutsideSolution, prj)
 			} else {
@@ -134,44 +155,4 @@ func separateOutsideProjects(projectsOutsideSolution []*msbuildProject, filesIns
 		}
 	}
 	return projectsOutside, projectsOutsideSolutionWithFilesInside
-}
-
-func getAllSolutionsProjects(foldersTree *rbtree.RbTree) map[string]*projectSolution {
-
-	var projectsInSolution = make(map[string]*projectSolution)
-
-	// Select only folders that contain solution(s)
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		fold := (*n.Key).(*folder)
-		content := fold.content
-		if len(content.solutions) == 0 {
-			return
-		}
-
-		for _, sln := range content.solutions {
-
-			for _, prj := range sln.solution.Projects {
-				// Skip solution folders
-				if prj.TypeId == solution.IdSolutionFolder {
-					continue
-				}
-
-				fullProjectPath := filepath.Join(fold.path, prj.Path)
-				key := strings.ToUpper(fullProjectPath)
-
-				// Already added
-				if _, ok := projectsInSolution[key]; ok {
-					continue
-				}
-
-				projectsInSolution[key] = &projectSolution{
-					path:     fullProjectPath,
-					id:       strings.ToUpper(prj.Id),
-					solution: sln.path,
-				}
-			}
-		}
-	})
-
-	return projectsInSolution
 }
