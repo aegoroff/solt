@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"solt/solution"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -75,8 +77,8 @@ func showProjectsInfo(projects []*solution.Project) {
 }
 
 func showSectionsInfo(sections []*solution.Section) {
-	var configurations = make(map[string]bool)
-	var platforms = make(map[string]bool)
+	var configurations = make(collections.StringHashSet)
+	var platforms = make(collections.StringHashSet)
 
 	for _, s := range sections {
 		if s.Name != "SolutionConfigurationPlatforms" {
@@ -86,12 +88,8 @@ func showSectionsInfo(sections []*solution.Section) {
 			parts := strings.Split(item.Key, "|")
 			configuration := parts[0]
 			platform := parts[1]
-			if _, ok := configurations[configuration]; !ok {
-				configurations[configuration] = true
-			}
-			if _, ok := platforms[platform]; !ok {
-				platforms[platform] = true
-			}
+			configurations.Add(configuration)
+			platforms.Add(platform)
 		}
 	}
 
@@ -101,7 +99,10 @@ func showSectionsInfo(sections []*solution.Section) {
 	fmt.Fprintf(tw, format, "Configuration")
 	fmt.Fprintf(tw, format, "------------")
 
-	for k := range configurations {
+	sortedConfigurations := configurations.Items()
+	sort.Strings(sortedConfigurations)
+
+	for _, k := range sortedConfigurations {
 		fmt.Fprintf(tw, format, k)
 	}
 	tw.Flush()
@@ -110,7 +111,10 @@ func showSectionsInfo(sections []*solution.Section) {
 	fmt.Fprintf(tw, format, "Platform")
 	fmt.Fprintf(tw, format, "--------")
 
-	for k := range platforms {
+	sortedPlatforms := platforms.Items()
+	sort.Strings(sortedPlatforms)
+
+	for _, k := range sortedPlatforms {
 		fmt.Fprintf(tw, format, k)
 	}
 	tw.Flush()
