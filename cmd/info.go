@@ -32,12 +32,12 @@ var infoCmd = &cobra.Command{
 				const format = "  %v\t%v\n"
 				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-				fmt.Fprintf(tw, format, "Header", sln.Header)
-				fmt.Fprintf(tw, format, "Product", sln.Comment)
-				fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
-				fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+				_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
+				_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
+				_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
+				_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
 
-				tw.Flush()
+				_ = tw.Flush()
 
 				fmt.Println()
 
@@ -66,13 +66,13 @@ func showProjectsInfo(projects []*solution.Project) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	fmt.Fprintf(tw, format, "Project type", "Count")
-	fmt.Fprintf(tw, format, "------------", "-----")
+	_, _ = fmt.Fprintf(tw, format, "Project type", "Count")
+	_, _ = fmt.Fprintf(tw, format, "------------", "-----")
 
 	for k, v := range byType {
-		fmt.Fprintf(tw, format, k, v)
+		_, _ = fmt.Fprintf(tw, format, k, v)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 	fmt.Println()
 }
 
@@ -96,27 +96,27 @@ func showSectionsInfo(sections []*solution.Section) {
 	const format = "  %v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	fmt.Fprintf(tw, format, "Configuration")
-	fmt.Fprintf(tw, format, "------------")
+	_, _ = fmt.Fprintf(tw, format, "Configuration")
+	_, _ = fmt.Fprintf(tw, format, "------------")
 
 	sortedConfigurations := configurations.Items()
 	sort.Strings(sortedConfigurations)
 
 	for _, k := range sortedConfigurations {
-		fmt.Fprintf(tw, format, k)
+		_, _ = fmt.Fprintf(tw, format, k)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 	fmt.Println()
 
-	fmt.Fprintf(tw, format, "Platform")
-	fmt.Fprintf(tw, format, "--------")
+	_, _ = fmt.Fprintf(tw, format, "Platform")
+	_, _ = fmt.Fprintf(tw, format, "--------")
 
 	sortedPlatforms := platforms.Items()
 	sort.Strings(sortedPlatforms)
 
 	for _, k := range sortedPlatforms {
-		fmt.Fprintf(tw, format, k)
+		_, _ = fmt.Fprintf(tw, format, k)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 	fmt.Println()
 }

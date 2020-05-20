@@ -80,12 +80,12 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 
 	for sol, m := range mismatches {
 		fmt.Printf("\n %s\n", sol)
-		fmt.Fprintf(tw, format, "Package", "Versions")
-		fmt.Fprintf(tw, format, "-------", "--------")
+		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
+		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 		for _, item := range m {
-			fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+			_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
 		}
-		tw.Flush()
+		_ = tw.Flush()
 	}
 }
 
@@ -161,14 +161,14 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 
 		parent := folder.path
 		fmt.Printf(" %s\n", parent)
-		fmt.Fprintf(tw, format, "Package", "Version")
-		fmt.Fprintf(tw, format, "-------", "--------")
+		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
+		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
 		for _, p := range nugetPackages {
-			fmt.Fprintf(tw, format, p.Id, p.Version)
+			_, _ = fmt.Fprintf(tw, format, p.Id, p.Version)
 		}
 
-		tw.Flush()
+		_ = tw.Flush()
 		fmt.Println()
 	})
 }
