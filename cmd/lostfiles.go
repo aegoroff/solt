@@ -97,8 +97,6 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 		}
 
 		for _, prj := range content.projects {
-			project := prj.path
-
 			// Add project base + exclude subfolder into exclude folders list
 			for _, s := range subfolderToExclude {
 				sub := filepath.Join(folder.path, s)
@@ -118,11 +116,11 @@ func createIncludedFilesAndExcludedFolders(foldersTree *rbtree.RbTree, fs afero.
 			for _, f := range filesIncluded {
 				includedFiles.Add(strings.ToUpper(f))
 				if _, err := fs.Stat(f); os.IsNotExist(err) {
-					if found, ok := unexistFiles[project]; ok {
+					if found, ok := unexistFiles[prj.path]; ok {
 						found = append(found, f)
-						unexistFiles[project] = found
+						unexistFiles[prj.path] = found
 					} else {
-						unexistFiles[project] = []string{f}
+						unexistFiles[prj.path] = []string{f}
 					}
 				}
 			}
