@@ -51,7 +51,7 @@ func init() {
 
 func showMismatches(foldersTree *rbtree.RbTree) {
 
-	var solutionFolders []*folder
+	var solutions []*visualStudioSolution
 	// Select only folders that contain solution(s)
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
 		f := (*n.Key).(*folder)
@@ -59,44 +59,44 @@ func showMismatches(foldersTree *rbtree.RbTree) {
 		if len(content.solutions) == 0 {
 			return
 		}
-		solutionFolders = append(solutionFolders, f)
+		for _, sln := range content.solutions {
+			solutions = append(solutions, sln)
+		}
 	})
 
 	var solutionProjects = make(map[string][]*folderContent)
 
-	for _, f := range solutionFolders {
-		// Each found solution
-		for _, sln := range f.content.solutions {
-			var solutionProjectPaths = make(collections.StringHashSet)
-			for _, sp := range sln.solution.Projects {
-				if sp.TypeId == solution.IdSolutionFolder {
-					continue
-				}
-				basePath := f.path
-				fullProjectPath := filepath.Join(basePath, sp.Path)
-				key := strings.ToUpper(fullProjectPath)
-
-				solutionProjectPaths.Add(key)
+	// Each found solution
+	for _, sln := range solutions {
+		solutionPath := filepath.Dir(sln.path)
+		var solutionProjectPaths = make(collections.StringHashSet)
+		for _, sp := range sln.solution.Projects {
+			if sp.TypeId == solution.IdSolutionFolder {
+				continue
 			}
+			fullProjectPath := filepath.Join(solutionPath, sp.Path)
+			key := strings.ToUpper(fullProjectPath)
 
-			foldersTree.WalkInorder(func(n *rbtree.Node) {
-				projectFolder := (*n.Key).(*folder)
-				content := projectFolder.content
-				if len(content.projects) == 0 {
-					return
-				}
-				// All found projects
-				for _, prj := range content.projects {
-					if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
-						if v, ok := solutionProjects[sln.path]; !ok {
-							solutionProjects[sln.path] = []*folderContent{content}
-						} else {
-							solutionProjects[sln.path] = append(v, content)
-						}
+			solutionProjectPaths.Add(key)
+		}
+
+		foldersTree.WalkInorder(func(n *rbtree.Node) {
+			projectFolder := (*n.Key).(*folder)
+			content := projectFolder.content
+			if len(content.projects) == 0 {
+				return
+			}
+			// All found projects
+			for _, prj := range content.projects {
+				if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
+					if v, ok := solutionProjects[sln.path]; !ok {
+						solutionProjects[sln.path] = []*folderContent{content}
+					} else {
+						solutionProjects[sln.path] = append(v, content)
 					}
 				}
-			})
-		}
+			}
+		})
 	}
 
 	mismatches := calculateMismatches(solutionProjects)
@@ -186,6 +186,10 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 		}
 
 		nugetPackages := getNugetPackages(content)
+
+		if len(nugetPackages) == 0 {
+			return
+		}
 
 		parent := folder.path
 		fmt.Printf(" %s\n", parent)
