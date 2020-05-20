@@ -51,18 +51,7 @@ func init() {
 
 func showMismatches(foldersTree *rbtree.RbTree) {
 
-	var solutions []*visualStudioSolution
-	// Select only folders that contain solution(s)
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		f := (*n.Key).(*folder)
-		content := f.content
-		if len(content.solutions) == 0 {
-			return
-		}
-		for _, sln := range content.solutions {
-			solutions = append(solutions, sln)
-		}
-	})
+	solutions := selectSolutions(foldersTree)
 
 	var solutionProjects = make(map[string][]*folderContent)
 

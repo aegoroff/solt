@@ -34,6 +34,7 @@ type Project struct {
 	ProjectReferences []ProjectReference `xml:"ItemGroup>ProjectReference"`
 	PackageReferences []PackageReference `xml:"ItemGroup>PackageReference"`
 	OutputPaths       []string           `xml:"PropertyGroup>OutputPath"`
+	Imports           []Import           `xml:"Import"`
 }
 
 // Include attribute in MSBuild file
@@ -58,6 +59,12 @@ type ProjectReference struct {
 type PackageReference struct {
 	Id      string `xml:"Include,attr"`
 	Version string `xml:"Version,attr"`
+}
+
+// Import attribute in MSBuild file
+type Import struct {
+	Project string `xml:"Project,attr"`
+	Sdk     string `xml:"Sdk,attr"`
 }
 
 type nugetPackage struct {

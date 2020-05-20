@@ -33,6 +33,21 @@ type folder struct {
 	path    string
 }
 
+func (p *msbuildProject) isSdkProject() bool {
+	if len(p.project.Sdk) > 0 {
+		return true
+	}
+	if len(p.project.Imports) == 0 {
+		return false
+	}
+	for _, imp := range p.project.Imports {
+		if len(imp.Sdk) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func (x *folder) LessThan(y interface{}) bool {
 	return sortfold.CompareFold(x.path, (y.(*folder)).path) < 0
 }
@@ -57,6 +72,22 @@ func getFilesIncludedIntoProject(prj *msbuildProject) []string {
 	result = append(result, createPaths(prj.project.Compiles, folderPath)...)
 
 	return result
+}
+
+func selectSolutions(foldersTree *rbtree.RbTree) []*visualStudioSolution {
+	var solutions []*visualStudioSolution
+	// Select only folders that contain solution(s)
+	foldersTree.WalkInorder(func(n *rbtree.Node) {
+		f := (*n.Key).(*folder)
+		content := f.content
+		if len(content.solutions) == 0 {
+			return
+		}
+		for _, sln := range content.solutions {
+			solutions = append(solutions, sln)
+		}
+	})
+	return solutions
 }
 
 func createPaths(paths []Include, basePath string) []string {
