@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -36,14 +37,14 @@ var lostfilesCmd = &cobra.Command{
 			return err
 		}
 
-		return executeCommand(lostFilesFilter, removeLostFiles)
+		return executeCommand(lostFilesFilter, removeLostFiles, appFileSystem)
 	},
 }
 
-func executeCommand(lostFilesFilter string, removeLostFiles bool) error {
+func executeCommand(lostFilesFilter string, removeLostFiles bool, fs afero.Fs) error {
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
-	foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {
+	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
 		// Add file to filtered files slice
 		ext := strings.ToLower(filepath.Ext(we.Name))
 		if ext == lostFilesFilter {
@@ -84,7 +85,7 @@ func executeCommand(lostFilesFilter string, removeLostFiles bool) error {
 		filesIncluded := getFilesIncludedIntoProject(prj)
 		for _, f := range filesIncluded {
 			includedFiles.Add(strings.ToUpper(f))
-			if _, err := appFileSystem.Stat(f); os.IsNotExist(err) {
+			if _, err := fs.Stat(f); os.IsNotExist(err) {
 				if found, ok := unexistFiles[prj.path]; ok {
 					found = append(found, f)
 					unexistFiles[prj.path] = found
@@ -110,14 +111,7 @@ func executeCommand(lostFilesFilter string, removeLostFiles bool) error {
 	outputSortedMap(appWriter, unexistFiles, "Project")
 
 	if removeLostFiles {
-		for _, f := range lostFiles {
-			err = appFileSystem.Remove(f)
-			if err != nil {
-				log.Printf("%v\n", err)
-			} else {
-				_, _ = fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
-			}
-		}
+		removeLostfiles(lostFiles, fs)
 	}
 	return nil
 }
@@ -145,4 +139,15 @@ func findLostFiles(excludeFolders collections.StringHashSet, foundFiles []string
 	}
 
 	return result, err
+}
+
+func removeLostfiles(lostFiles []string, fs afero.Fs) {
+	for _, f := range lostFiles {
+		err := fs.Remove(f)
+		if err != nil {
+			log.Printf("%v\n", err)
+		} else {
+			_, _ = fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
+		}
+	}
 }
