@@ -37,11 +37,17 @@ var lostfilesCmd = &cobra.Command{
 			return err
 		}
 
-		return executeCommand(lostFilesFilter, removeLostFiles, appFileSystem)
+		return executeLostFilesCommand(lostFilesFilter, removeLostFiles, appFileSystem)
 	},
 }
 
-func executeCommand(lostFilesFilter string, removeLostFiles bool, fs afero.Fs) error {
+func init() {
+	rootCmd.AddCommand(lostfilesCmd)
+	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
+	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
+}
+
+func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, fs afero.Fs) error {
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
 	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
@@ -114,12 +120,6 @@ func executeCommand(lostFilesFilter string, removeLostFiles bool, fs afero.Fs) e
 		removeLostfiles(lostFiles, fs)
 	}
 	return nil
-}
-
-func init() {
-	rootCmd.AddCommand(lostfilesCmd)
-	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
-	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
 }
 
 func findLostFiles(excludeFolders collections.StringHashSet, foundFiles []string, includedFiles collections.StringHashSet) ([]string, error) {
