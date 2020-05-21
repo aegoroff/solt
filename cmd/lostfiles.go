@@ -90,7 +90,8 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, fs af
 		// Add compiles, contents and nones into included files map
 		filesIncluded := getFilesIncludedIntoProject(prj)
 		for _, f := range filesIncluded {
-			includedFiles.Add(strings.ToUpper(f))
+			normalized := normalize(f)
+			includedFiles.Add(normalized)
 			if _, err := fs.Stat(f); os.IsNotExist(err) {
 				if found, ok := unexistFiles[prj.path]; ok {
 					found = append(found, f)
@@ -123,22 +124,24 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, fs af
 }
 
 func findLostFiles(excludeFolders collections.StringHashSet, foundFiles []string, includedFiles collections.StringHashSet) ([]string, error) {
-	normalizer := func(s string) string { return strings.ToUpper(s) }
-
-	exm, err := createAhoCorasickMachine(excludeFolders.ItemsDecorated(normalizer))
+	exm, err := createAhoCorasickMachine(excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return nil, err
 	}
 
 	var result []string
 	for _, file := range foundFiles {
-		normalized := normalizer(file)
+		normalized := normalize(file)
 		if !includedFiles.Contains(normalized) && !Match(exm, normalized) {
 			result = append(result, file)
 		}
 	}
 
 	return result, err
+}
+
+func normalize(s string) string {
+	return strings.ToUpper(s)
 }
 
 func removeLostfiles(lostFiles []string, fs afero.Fs) {
