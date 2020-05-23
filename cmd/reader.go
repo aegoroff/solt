@@ -5,7 +5,6 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"log"
-	"os"
 	"path/filepath"
 	"solt/solution"
 	"strings"
@@ -127,16 +126,18 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 
 	// Start reading path
 	wg.Add(1)
-	walkDirBreadthFirst(path, fs, func(parent string, entry os.FileInfo) {
-		if entry.IsDir() {
-			return
-		}
 
-		we := &walkEntry{IsDir: false, Size: entry.Size(), Parent: parent, Name: entry.Name()}
+	filesystemCh := make(chan filesystemItem, 1024)
+	go func() {
+		walkDirBreadthFirst(path, fs, filesystemCh)
+	}()
+
+	for fsItem := range filesystemCh {
+		we := &walkEntry{IsDir: false, Size: fsItem.entry.Size(), Parent: fsItem.dir, Name: fsItem.entry.Name()}
 		slowReadChannel <- we
 
 		action(we)
-	})
+	}
 
 	close(slowReadChannel)
 

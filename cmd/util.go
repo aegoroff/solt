@@ -10,7 +10,13 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"sync"
 )
+
+type filesystemItem struct {
+	dir   string
+	entry os.FileInfo
+}
 
 func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
@@ -54,22 +60,66 @@ func unmarshalXml(r io.Reader, result interface{}) error {
 	return err
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, action func(parent string, entry os.FileInfo)) {
+func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- filesystemItem) {
+	defer close(results)
+
+	var wg sync.WaitGroup
+	var mu sync.RWMutex
 	queue := make([]string, 0)
 
 	queue = append(queue, path)
 
-	for len(queue) > 0 {
-		curr := queue[0]
+	ql := len(queue)
 
-		for _, entry := range dirents(curr, fs) {
-			action(curr, entry)
-			if entry.IsDir() {
-				queue = append(queue, filepath.Join(curr, entry.Name()))
+	for ql > 0 {
+		// Peek
+		mu.RLock()
+		currentDir := queue[0]
+		mu.RUnlock()
+
+		wg.Add(1)
+		go func(d string) {
+			defer wg.Done()
+
+			entries := dirents(d, fs)
+
+			if entries == nil {
+				return
 			}
-		}
 
+			for _, entry := range entries {
+				if entry.IsDir() {
+					// Queue subdirs to walk in a queue
+					subdir := filepath.Join(d, entry.Name())
+
+					// Push
+					mu.Lock()
+					queue = append(queue, subdir)
+					mu.Unlock()
+				} else {
+					// Send file to channel
+					results <- filesystemItem{
+						dir:   d,
+						entry: entry,
+					}
+				}
+			}
+		}(currentDir)
+
+		// Pop
+		mu.Lock()
 		queue = queue[1:]
+		ql = len(queue)
+		mu.Unlock()
+
+		if ql == 0 {
+			// Waiting pending goroutines
+			wg.Wait()
+
+			mu.RLock()
+			ql = len(queue)
+			mu.RUnlock()
+		}
 	}
 }
 
