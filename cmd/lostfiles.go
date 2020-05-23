@@ -58,10 +58,11 @@ func init() {
 func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
+	ef := normalize(lostFilesFilter)
 	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
 		// Add file to filtered files slice
-		ext := strings.ToLower(filepath.Ext(we.Name))
-		if ext == lostFilesFilter {
+		ext := normalize(filepath.Ext(we.Name))
+		if ext == ef {
 			fp := filepath.Join(we.Parent, we.Name)
 			foundFiles = append(foundFiles, fp)
 		}
