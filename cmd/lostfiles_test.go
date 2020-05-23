@@ -62,6 +62,43 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 }
 
+func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
+	var tests = []struct {
+		filter string
+	}{
+		{".cs"},
+		{".CS"},
+	}
+
+	for _, tst := range tests {
+		// Arrange
+		ass := assert.New(t)
+		dir := "a/"
+		memfs := afero.NewMemMapFs()
+		memfs.MkdirAll(dir+"a/Properties", 0755)
+		afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+		afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+		afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+		afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+		afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+
+		buf := bytes.NewBufferString("")
+
+		appWriter = buf
+		appFileSystem = memfs
+
+		// Act
+		rootCmd.SetArgs([]string{"lf", "-p", dir, "-f", tst.filter})
+		rootCmd.Execute()
+
+		// Assert
+		actual := buf.String()
+		ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+	}
+}
+
 func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
