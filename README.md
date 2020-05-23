@@ -36,20 +36,21 @@ Use "solt [command] --help" for more information about a command.
 
 ```
 Find lost files in the folder specified
-   
-   Usage:
-     solt lostfiles [flags]
-   
-   Aliases:
-     lostfiles, lf
-   
-   Flags:
-     -f, --file string   Lost files filter extension. If not set .cs extension used (default ".cs")
-     -h, --help          help for lostfiles
-     -r, --remove        Remove lost files
-   
-   Global Flags:
-     -p, --path string   REQUIRED. Path to the sources folder
+
+Usage:
+  solt lostfiles [flags]
+
+Aliases:
+  lostfiles, lf
+
+Flags:
+  -f, --file string   Lost files filter extension. If not set .cs extension used (default ".cs")
+  -h, --help          help for lostfiles
+  -l, --onlylost      Show only lost files. Don't show unexist files. If not set all shown
+  -r, --remove        Remove lost files
+
+Global Flags:
+  -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
 ```
