@@ -15,9 +15,11 @@ const (
 	packagesConfigFile = "packages.config"
 
 	pathParamName = "path"
+	diagParamName = "diag"
 )
 
 var sourcesPath string
+var showMemUsage bool
 
 var appFileSystem afero.Fs
 var appWriter io.Writer
@@ -44,4 +46,5 @@ func init() {
 	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
+	rootCmd.PersistentFlags().BoolVarP(&showMemUsage, diagParamName, "d", false, "Show memory statistic after run")
 }

@@ -48,6 +48,10 @@ var infoCmd = &cobra.Command{
 			return true
 		})
 
+		if showMemUsage {
+			printMemUsage(appWriter)
+		}
+
 		return nil
 	},
 }

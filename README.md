@@ -27,6 +27,7 @@ Available Commands:
   version      Print the version number of solt
 
 Flags:
+  -d, --diag          Show memory statistic after run
   -h, --help          help for solt
   -p, --path string   REQUIRED. Path to the sources folder
 
@@ -50,6 +51,7 @@ Flags:
   -r, --remove        Remove lost files
 
 Global Flags:
+  -d, --diag          Show memory statistic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
@@ -66,6 +68,7 @@ Flags:
   -h, --help   help for lostprojects
 
 Global Flags:
+  -d, --diag          Show memory statistic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Nuget information syntax:
@@ -83,5 +86,6 @@ Flags:
   -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
 
 Global Flags:
+  -d, --diag          Show memory statistic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
