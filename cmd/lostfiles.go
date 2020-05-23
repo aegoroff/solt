@@ -17,6 +17,7 @@ var subfolderToExclude = []string{
 
 const filterParamName = "file"
 const removeParamName = "remove"
+const onlyLostParamName = "onlylost"
 
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
@@ -37,7 +38,13 @@ var lostfilesCmd = &cobra.Command{
 			return err
 		}
 
-		return executeLostFilesCommand(lostFilesFilter, removeLostFiles, appFileSystem)
+		onlyLost, err := cmd.Flags().GetBool(onlyLostParamName)
+
+		if err != nil {
+			return err
+		}
+
+		return executeLostFilesCommand(lostFilesFilter, removeLostFiles, onlyLost, appFileSystem)
 	},
 }
 
@@ -45,9 +52,10 @@ func init() {
 	rootCmd.AddCommand(lostfilesCmd)
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
 	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
+	lostfilesCmd.Flags().BoolP(onlyLostParamName, "l", false, "Show only lost files. Don't show unexist files. If not set all shown")
 }
 
-func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, fs afero.Fs) error {
+func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
 	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
@@ -111,11 +119,13 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, fs af
 
 	sortAndOutput(appWriter, lostFiles)
 
-	if len(unexistFiles) > 0 {
-		_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
-	}
+	if !onlyLost {
+		if len(unexistFiles) > 0 {
+			_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
+		}
 
-	outputSortedMap(appWriter, unexistFiles, "Project")
+		outputSortedMap(appWriter, unexistFiles, "Project")
+	}
 
 	if removeLostFiles {
 		removeLostfiles(lostFiles, fs)
@@ -150,7 +160,7 @@ func removeLostfiles(lostFiles []string, fs afero.Fs) {
 		if err != nil {
 			log.Printf("%v\n", err)
 		} else {
-			_, _ = fmt.Fprintf(appWriter, "File: %s removed sucessfully.\n", f)
+			_, _ = fmt.Fprintf(appWriter, "File: %s removed successfully.\n", f)
 		}
 	}
 }
