@@ -18,8 +18,8 @@ const mismatchParamName = "mismatch"
 
 // nugetCmd represents the nuget command
 var nugetCmd = &cobra.Command{
-	Use:     "nuget",
-	Aliases: []string{"nu"},
+	Use:     "nu",
+	Aliases: []string{"nuget"},
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})

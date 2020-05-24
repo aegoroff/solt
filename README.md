@@ -19,12 +19,12 @@ Usage:
   solt [command]
 
 Available Commands:
-  help         Help about any command
-  info         Get information about found solutions
-  lostfiles    Find lost files in the folder specified
-  lostprojects Find projects that not included into any solution
-  nuget        Get nuget packages information within projects or find Nuget mismatches in solution
-  version      Print the version number of solt
+  help        Help about any command
+  in          Get information about found solutions
+  lf          Find lost files in the folder specified
+  lp          Find projects that not included into any solution
+  nu          Get nuget packages information within projects or find Nuget mismatches in solution
+  ver         Print the version number of solt
 
 Flags:
   -d, --diag          Show memory statistic after run
@@ -39,14 +39,14 @@ Use "solt [command] --help" for more information about a command.
 Find lost files in the folder specified
 
 Usage:
-  solt lostfiles [flags]
+  solt lf [flags]
 
 Aliases:
-  lostfiles, lf
+  lf, lostfiles
 
 Flags:
   -f, --file string   Lost files filter extension. If not set .cs extension used (default ".cs")
-  -h, --help          help for lostfiles
+  -h, --help          help for lf
   -l, --onlylost      Show only lost files. Don't show unexist files. If not set all shown
   -r, --remove        Remove lost files
 
@@ -59,13 +59,13 @@ Global Flags:
 Find projects that not included into any solution
 
 Usage:
-  solt lostprojects [flags]
+  solt lp [flags]
 
 Aliases:
-  lostprojects, lp
+  lp, lostprojects
 
 Flags:
-  -h, --help   help for lostprojects
+  -h, --help   help for lp
 
 Global Flags:
   -d, --diag          Show memory statistic after run
@@ -76,13 +76,13 @@ Global Flags:
 Get nuget packages information within projects or find Nuget mismatches in solution
 
 Usage:
-  solt nuget [flags]
+  solt nu [flags]
 
 Aliases:
-  nuget, nu
+  nu, nuget
 
 Flags:
-  -h, --help       help for nuget
+  -h, --help       help for nu
   -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
 
 Global Flags:

@@ -15,8 +15,8 @@ import (
 
 // lostprojectsCmd represents the lostprojects command
 var lostprojectsCmd = &cobra.Command{
-	Use:     "lostprojects",
-	Aliases: []string{"lp"},
+	Use:     "lp",
+	Aliases: []string{"lostprojects"},
 	Short:   "Find projects that not included into any solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
 

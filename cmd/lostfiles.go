@@ -21,8 +21,8 @@ const onlyLostParamName = "onlylost"
 
 // lostfilesCmd represents the lostfiles command
 var lostfilesCmd = &cobra.Command{
-	Use:     "lostfiles",
-	Aliases: []string{"lf"},
+	Use:     "lf",
+	Aliases: []string{"lostfiles"},
 	Short:   "Find lost files in the folder specified",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
