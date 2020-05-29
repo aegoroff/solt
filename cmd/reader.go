@@ -79,14 +79,13 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 	go func() {
 		defer wg.Done()
 		for f := range aggregateChannel {
-			key := newTreeNode(f)
-			if current, ok := result.Search(key); !ok {
+			if current, ok := result.Search(f); !ok {
 				// Create new node
-				n := rbtree.NewNode(key)
+				n := rbtree.NewNode(f)
 				result.Insert(n)
 			} else {
 				// Update folder node that has already been created before
-				content := (*current.Key).(*folder).content
+				content := current.Key.(*folder).content
 
 				if f.content.packages != nil {
 					content.packages = f.content.packages

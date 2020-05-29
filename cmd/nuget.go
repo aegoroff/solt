@@ -151,7 +151,7 @@ func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		folder := (*n.Key).(*folder)
+		folder := n.Key.(*folder)
 		content := folder.content
 		if content.packages == nil && len(content.projects) == 0 {
 			return
