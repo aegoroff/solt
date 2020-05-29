@@ -59,6 +59,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
 	ef := normalize(lostFilesFilter)
+	sln := normalize(solutionFileExt)
 	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
 		// Add file to filtered files slice
 		ext := normalize(filepath.Ext(we.Name))
@@ -67,7 +68,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 			foundFiles = append(foundFiles, fp)
 		}
 
-		if ext == solutionFileExt {
+		if ext == sln {
 			ppath := filepath.Join(we.Parent, "packages")
 			excludeFolders.Add(ppath)
 		}
