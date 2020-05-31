@@ -20,8 +20,8 @@ var infoCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
 
-		foldersTree.Ascend(func(c rbtree.Comparable) bool {
-			folder := c.(*folder)
+		foldersTree.Ascend(func(c rbtree.Node) bool {
+			folder := c.Key().(*folder)
 			content := folder.content
 
 			for _, solution := range content.solutions {

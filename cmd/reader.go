@@ -67,7 +67,7 @@ func createPaths(paths []Include, basePath string) []string {
 	return result
 }
 
-func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtree.RbTree {
+func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
 	aggregateChannel := make(chan *folder, 4)
@@ -81,11 +81,10 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) *rbtre
 		for f := range aggregateChannel {
 			if current, ok := result.Search(f); !ok {
 				// Create new node
-				n := rbtree.NewNode(f)
-				result.Insert(n)
+				result.Insert(f)
 			} else {
 				// Update folder node that has already been created before
-				content := current.Key.(*folder).content
+				content := current.Key().(*folder).content
 
 				if f.content.packages != nil {
 					content.packages = f.content.packages

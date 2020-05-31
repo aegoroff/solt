@@ -50,7 +50,7 @@ func init() {
 	nugetCmd.Flags().BoolP(mismatchParamName, "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
 }
 
-func showMismatches(foldersTree *rbtree.RbTree) {
+func showMismatches(foldersTree rbtree.RbTree) {
 
 	solutions := selectSolutions(foldersTree)
 
@@ -146,12 +146,12 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func showPackagesInfoByFolders(foldersTree *rbtree.RbTree) {
+func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		folder := n.Key.(*folder)
+	foldersTree.WalkInorder(func(n rbtree.Node) {
+		folder := n.Key().(*folder)
 		content := folder.content
 		if content.packages == nil && len(content.projects) == 0 {
 			return
