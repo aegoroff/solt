@@ -25,9 +25,13 @@ func (x *folder) EqualTo(y interface{}) bool {
 	return strings.EqualFold(x.path, (y.(*folder)).path)
 }
 
-func walkProjects(foldersTree *rbtree.RbTree, action func(prj *msbuildProject, fold *folder)) {
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		fold := n.Key.(*folder)
+func (x *folder) String() string {
+	return x.path
+}
+
+func walkProjects(foldersTree rbtree.RbTree, action func(prj *msbuildProject, fold *folder)) {
+	foldersTree.WalkInorder(func(n rbtree.Node) {
+		fold := n.Key().(*folder)
 		content := fold.content
 		if len(content.projects) == 0 {
 			return
@@ -40,11 +44,11 @@ func walkProjects(foldersTree *rbtree.RbTree, action func(prj *msbuildProject, f
 	})
 }
 
-func selectSolutions(foldersTree *rbtree.RbTree) []*visualStudioSolution {
+func selectSolutions(foldersTree rbtree.RbTree) []*visualStudioSolution {
 	var solutions []*visualStudioSolution
 	// Select only folders that contain solution(s)
-	foldersTree.WalkInorder(func(n *rbtree.Node) {
-		f := n.Key.(*folder)
+	foldersTree.WalkInorder(func(n rbtree.Node) {
+		f := n.Key().(*folder)
 		content := f.content
 		if len(content.solutions) == 0 {
 			return

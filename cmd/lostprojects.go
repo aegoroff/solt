@@ -92,7 +92,7 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree *rbtree.RbTree, pmm *goahocorasick.Machine) ([]*msbuildProject, collections.StringHashSet) {
+func getOutsideProjectsAndFilesInsideSolution(foldersTree rbtree.RbTree, pmm *goahocorasick.Machine) ([]*msbuildProject, collections.StringHashSet) {
 	var projectsOutsideSolution []*msbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
