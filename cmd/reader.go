@@ -220,7 +220,7 @@ func createFolder(we *walkEntry) *folder {
 func onXmlFile(we *walkEntry, fs afero.Fs, result interface{}) error {
 	full := we.Path
 
-	err := unmarshalXmlFrom(full, fs, result)
+	err := sys.UnmarshalXmlFrom(full, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", full, err)
 		return err

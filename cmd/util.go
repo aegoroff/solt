@@ -1,14 +1,9 @@
 package cmd
 
 import (
-	"bufio"
-	"encoding/xml"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"github.com/spf13/afero"
 	"io"
-	"log"
-	"path/filepath"
 	"runtime"
 	"sort"
 )
@@ -31,34 +26,6 @@ func sortAndOutput(writer io.Writer, items []string) {
 	sort.Strings(items)
 	for _, item := range items {
 		_, _ = fmt.Fprintf(writer, " %s\n", item)
-	}
-}
-
-func unmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
-	f, err := fs.Open(filepath.Clean(path))
-	if err != nil {
-		log.Print(err)
-		return err
-	}
-	defer closeResource(f)
-
-	return unmarshalXml(f, result)
-}
-
-func unmarshalXml(r io.Reader, result interface{}) error {
-	s := bufio.NewScanner(r)
-	var data []byte
-	for s.Scan() {
-		data = append(data, s.Bytes()...)
-	}
-	err := xml.Unmarshal(data, result)
-	return err
-}
-
-func closeResource(c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		log.Println(err)
 	}
 }
 

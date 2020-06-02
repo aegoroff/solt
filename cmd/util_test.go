@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
+	"solt/internal/sys"
 	"strings"
 	"testing"
 )
@@ -48,7 +49,7 @@ func Test_unmarshalXmlPackagesConfig(t *testing.T) {
 `
 	r := strings.NewReader(packangesconfig)
 	// Act
-	unmarshalXml(r, &packages)
+	sys.UnmarshalXml(r, &packages)
 
 	// Assert
 	ass.Equal(1, len(packages.Packages))
@@ -121,7 +122,7 @@ func Test_unmarshalXmlMsbuildProject(t *testing.T) {
 	r := strings.NewReader(project)
 
 	// Act
-	unmarshalXml(r, &prj)
+	sys.UnmarshalXml(r, &prj)
 
 	// Assert
 	ass.Equal(2, len(prj.Compiles))
