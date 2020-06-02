@@ -165,10 +165,11 @@ type readerSolution struct {
 
 func (r *readerModules) handler(path string) {
 	for _, m := range r.modules {
-		if m.filter(path) {
-			if folder, ok := m.read(path); ok {
-				r.aggregator <- folder
-			}
+		if !m.filter(path) {
+			continue
+		}
+		if folder, ok := m.read(path); ok {
+			r.aggregator <- folder
 		}
 	}
 }
