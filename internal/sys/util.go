@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 )
 
+// UnmarshalXmlFrom reads xml from file system and unmarshal it to interface specified
 func UnmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
 	f, err := fs.Open(filepath.Clean(path))
 	if err != nil {
@@ -20,6 +21,7 @@ func UnmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
 	return UnmarshalXml(f, result)
 }
 
+// UnmarshalXml reads xml from reader and unmarshal it to interface specified
 func UnmarshalXml(r io.Reader, result interface{}) error {
 	s := bufio.NewScanner(r)
 	var data []byte
