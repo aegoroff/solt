@@ -72,11 +72,6 @@ type nugetPackage struct {
 	Version string
 }
 
-type walkEntry struct {
-	Size int64
-	Path string
-}
-
 func (p *Project) isSdkProject() bool {
 	if len(p.Sdk) > 0 {
 		return true

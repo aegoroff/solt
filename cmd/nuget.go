@@ -22,7 +22,7 @@ var nugetCmd = &cobra.Command{
 	Aliases: []string{"nuget"},
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
+		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(string) {})
 
 		findNugetMismatches, err := cmd.Flags().GetBool(mismatchParamName)
 

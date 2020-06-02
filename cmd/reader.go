@@ -77,11 +77,11 @@ func createPaths(paths []Include, basePath string) []string {
 	return result
 }
 
-func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree.RbTree {
+func readProjectDir(path string, fs afero.Fs, action func(path string)) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
 	aggregateChannel := make(chan *folder, 4)
-	slowReadChannel := make(chan *walkEntry, 16)
+	slowReadChannel := make(chan string, 16)
 
 	var wg sync.WaitGroup
 
@@ -119,8 +119,8 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree
 	go func(rh readerHandler) {
 		defer close(aggregateChannel)
 
-		for we := range slowReadChannel {
-			rh.handler(we.Path)
+		for path := range slowReadChannel {
+			rh.handler(path)
 		}
 	}(&rm)
 
@@ -129,9 +129,8 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree
 			return
 		}
 		f := evt.File
-		we := &walkEntry{Size: f.Size, Path: f.Path}
-		slowReadChannel <- we
-		action(we)
+		slowReadChannel <- f.Path
+		action(f.Path)
 	}}
 
 	// Start reading path
