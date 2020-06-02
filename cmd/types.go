@@ -73,10 +73,8 @@ type nugetPackage struct {
 }
 
 type walkEntry struct {
-	Size   int64
-	Parent string
-	Name   string
-	IsDir  bool
+	Size int64
+	Path string
 }
 
 func (p *Project) isSdkProject() bool {

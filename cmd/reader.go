@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/afero"
 	"log"
 	"path/filepath"
+	"solt/internal/sys"
 	"solt/solution"
 	"strings"
 	"sync"
@@ -101,13 +102,14 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree
 		defer close(aggregateChannel)
 
 		for we := range slowReadChannel {
-			if strings.EqualFold(we.Name, packagesConfigFile) {
+			_, file := filepath.Split(we.Path)
+			if strings.EqualFold(file, packagesConfigFile) {
 				if folder, ok := onPackagesConfig(we, fs); ok {
 					aggregateChannel <- folder
 				}
 			}
 
-			ext := filepath.Ext(we.Name)
+			ext := filepath.Ext(we.Path)
 			if strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt) {
 				if folder, ok := onMsbuildProject(we, fs); ok {
 					aggregateChannel <- folder
@@ -125,17 +127,18 @@ func readProjectDir(path string, fs afero.Fs, action func(we *walkEntry)) rbtree
 	// Start reading path
 	wg.Add(1)
 
-	filesystemCh := make(chan filesystemItem, 1024)
-	go func() {
-		walkDirBreadthFirst(path, fs, filesystemCh)
-	}()
-
-	for fsItem := range filesystemCh {
-		we := &walkEntry{IsDir: false, Size: fsItem.entry.Size(), Parent: fsItem.dir, Name: fsItem.entry.Name()}
+	handlers := []sys.ScanHandler{func(evt *sys.ScanEvent) {
+		if evt.File == nil {
+			return
+		}
+		f := evt.File
+		we := &walkEntry{Size: f.Size, Path: f.Path}
 		slowReadChannel <- we
 
 		action(we)
-	}
+	}}
+
+	sys.Scan(path, fs, handlers)
 
 	close(slowReadChannel)
 
@@ -171,7 +174,7 @@ func onMsbuildProject(we *walkEntry, fs afero.Fs) (*folder, bool) {
 
 	f := createFolder(we)
 
-	p := msbuildProject{project: &project, path: filepath.Join(we.Parent, we.Name)}
+	p := msbuildProject{project: &project, path: we.Path}
 
 	f.content.projects = append(f.content.projects, &p)
 
@@ -180,7 +183,7 @@ func onMsbuildProject(we *walkEntry, fs afero.Fs) (*folder, bool) {
 
 // Create solution model from file
 func onSolution(we *walkEntry, fs afero.Fs) (*folder, bool) {
-	solpath := filepath.Join(we.Parent, we.Name)
+	solpath := we.Path
 	reader, err := fs.Open(filepath.Clean(solpath))
 	if err != nil {
 		log.Println(err)
@@ -196,7 +199,7 @@ func onSolution(we *walkEntry, fs afero.Fs) (*folder, bool) {
 
 	f := createFolder(we)
 
-	s := visualStudioSolution{solution: sln, path: filepath.Join(we.Parent, we.Name)}
+	s := visualStudioSolution{solution: sln, path: solpath}
 
 	f.content.solutions = append(f.content.solutions, &s)
 
@@ -209,13 +212,13 @@ func createFolder(we *walkEntry) *folder {
 			solutions: []*visualStudioSolution{},
 			projects:  []*msbuildProject{},
 		},
-		path: we.Parent,
+		path: filepath.Dir(we.Path),
 	}
 	return &f
 }
 
 func onXmlFile(we *walkEntry, fs afero.Fs, result interface{}) error {
-	full := filepath.Join(we.Parent, we.Name)
+	full := we.Path
 
 	err := unmarshalXmlFrom(full, fs, result)
 	if err != nil {

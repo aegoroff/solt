@@ -62,14 +62,14 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	sln := normalize(solutionFileExt)
 	foldersTree := readProjectDir(sourcesPath, fs, func(we *walkEntry) {
 		// Add file to filtered files slice
-		ext := normalize(filepath.Ext(we.Name))
+		ext := normalize(filepath.Ext(we.Path))
 		if ext == ef {
-			fp := filepath.Join(we.Parent, we.Name)
-			foundFiles = append(foundFiles, fp)
+			foundFiles = append(foundFiles, we.Path)
 		}
 
 		if ext == sln {
-			ppath := filepath.Join(we.Parent, "packages")
+			dir, _ := filepath.Split(we.Path)
+			ppath := filepath.Join(dir, "packages")
 			excludeFolders.Add(ppath)
 		}
 	})
