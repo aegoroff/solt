@@ -78,11 +78,11 @@ func createPaths(paths []include, basePath string) []string {
 // ReadSolutionDir reads filesystem directory and all its childs to get information
 // about all solutions and projects in this tree.
 // It returns tree
-func ReadSolutionDir(path string, fs afero.Fs, action func(path string)) rbtree.RbTree {
+func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
 	aggregateChannel := make(chan *Folder, 4)
-	slowReadChannel := make(chan string, 16)
+	fileChannel := make(chan string, 16)
 
 	var wg sync.WaitGroup
 
@@ -114,24 +114,28 @@ func ReadSolutionDir(path string, fs afero.Fs, action func(path string)) rbtree.
 	sol := readerSolution{fs}
 	modules = append(modules, &pack, &msbuild, &sol)
 
-	rm := readerModules{aggregator: aggregateChannel, modules: modules}
+	rm := reader{aggregator: aggregateChannel, modules: modules}
+
+	fhandlers := []ReaderHandler{&rm}
+	fhandlers = append(fhandlers, fileHandlers...)
 
 	// Reading files goroutine
-	go func(rh readerHandler) {
+	go func(handlers []ReaderHandler) {
 		defer close(aggregateChannel)
 
-		for path := range slowReadChannel {
-			rh.handler(path)
+		for path := range fileChannel {
+			for _, h := range handlers {
+				h.Handler(path)
+			}
 		}
-	}(&rm)
+	}(fhandlers)
 
 	handlers := []sys.ScanHandler{func(evt *sys.ScanEvent) {
 		if evt.File == nil {
 			return
 		}
 		f := evt.File
-		slowReadChannel <- f.Path
-		action(f.Path)
+		fileChannel <- f.Path
 	}}
 
 	// Start reading path
@@ -139,7 +143,7 @@ func ReadSolutionDir(path string, fs afero.Fs, action func(path string)) rbtree.
 
 	sys.Scan(path, fs, handlers)
 
-	close(slowReadChannel)
+	close(fileChannel)
 
 	wg.Wait()
 

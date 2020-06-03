@@ -9,8 +9,10 @@ import (
 	"strings"
 )
 
-type readerHandler interface {
-	handler(path string)
+// ReaderHandler defines file system scanning handler
+type ReaderHandler interface {
+	// Handler method called on each file and folder scanned
+	Handler(path string)
 }
 
 type readerModule interface {
@@ -18,7 +20,7 @@ type readerModule interface {
 	read(path string) (*Folder, bool)
 }
 
-type readerModules struct {
+type reader struct {
 	modules    []readerModule
 	aggregator chan *Folder
 }
@@ -35,7 +37,7 @@ type readerSolution struct {
 	fs afero.Fs
 }
 
-func (r *readerModules) handler(path string) {
+func (r *reader) Handler(path string) {
 	for _, m := range r.modules {
 		if !m.filter(path) {
 			continue

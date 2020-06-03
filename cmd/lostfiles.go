@@ -56,24 +56,37 @@ func init() {
 	lostfilesCmd.Flags().BoolP(onlyLostParamName, "l", false, "Show only lost files. Don't show unexist files. If not set all shown")
 }
 
-func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
-	var foundFiles []string
-	var excludeFolders = make(collections.StringHashSet)
-	ef := normalize(lostFilesFilter)
-	sln := normalize(msvc.SolutionFileExt)
-	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, func(path string) {
-		// Add file to filtered files slice
-		ext := normalize(filepath.Ext(path))
-		if ext == ef {
-			foundFiles = append(foundFiles, path)
-		}
+type lostFilesHandler struct {
+	foundFiles      []string
+	excludeFolders  collections.StringHashSet
+	lostFilesFilter string
+}
 
-		if ext == sln {
-			dir, _ := filepath.Split(path)
-			ppath := filepath.Join(dir, "packages")
-			excludeFolders.Add(ppath)
-		}
-	})
+func (r *lostFilesHandler) Handler(path string) {
+	ef := normalize(r.lostFilesFilter)
+	sln := normalize(msvc.SolutionFileExt)
+
+	// Add file to filtered files slice
+	ext := normalize(filepath.Ext(path))
+	if ext == ef {
+		r.foundFiles = append(r.foundFiles, path)
+	}
+
+	if ext == sln {
+		dir, _ := filepath.Split(path)
+		ppath := filepath.Join(dir, "packages")
+		r.excludeFolders.Add(ppath)
+	}
+}
+
+func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
+	lh := lostFilesHandler{
+		foundFiles:      make([]string, 0),
+		excludeFolders:  make(collections.StringHashSet),
+		lostFilesFilter: lostFilesFilter,
+	}
+
+	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, &lh)
 
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(collections.StringHashSet)
@@ -82,20 +95,20 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 		// Add project base + exclude subfolder into exclude folders list
 		for _, s := range subfolderToExclude {
 			sub := filepath.Join(fold.Path, s)
-			excludeFolders.Add(sub)
+			lh.excludeFolders.Add(sub)
 		}
 
 		// Exclude output paths too
 		if prj.Project.OutputPaths != nil {
 			for _, out := range prj.Project.OutputPaths {
 				sub := filepath.Join(fold.Path, out)
-				excludeFolders.Add(sub)
+				lh.excludeFolders.Add(sub)
 			}
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
 		if prj.Project.IsSdkProject() {
-			excludeFolders.Add(filepath.Dir(prj.Path))
+			lh.excludeFolders.Add(filepath.Dir(prj.Path))
 		}
 
 		// Add compiles, contents and nones into included files map
@@ -114,7 +127,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 		}
 	})
 
-	lostFiles, err := findLostFiles(excludeFolders, foundFiles, includedFiles)
+	lostFiles, err := findLostFiles(lh.excludeFolders, lh.foundFiles, includedFiles)
 
 	if err != nil {
 		return err

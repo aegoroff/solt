@@ -19,7 +19,7 @@ var infoCmd = &cobra.Command{
 	Aliases: []string{"info"},
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem, func(string) {})
+		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
 		foldersTree.Ascend(func(c rbtree.Node) bool {
 			folder := c.Key().(*msvc.Folder)
