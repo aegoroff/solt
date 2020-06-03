@@ -107,7 +107,7 @@ func ReadSolutionDir(path string, fs afero.Fs, action func(path string)) rbtree.
 		}
 	}()
 
-	var modules []readerModule
+	var modules []ReaderModule
 
 	pack := readerPackagesConfig{fs}
 	msbuild := readerMsbuild{fs}

@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	// SolutionFileExt defines visual studio extension
 	SolutionFileExt    = ".sln"
 	csharpProjectExt   = ".csproj"
 	cppProjectExt      = ".vcxproj"

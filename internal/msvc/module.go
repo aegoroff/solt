@@ -13,13 +13,14 @@ type readerHandler interface {
 	handler(path string)
 }
 
-type readerModule interface {
-	filter(path string) bool
-	read(path string) (*Folder, bool)
+// ReaderModule defines reader module interface
+type ReaderModule interface {
+	Filter(path string) bool
+	Read(path string) (*Folder, bool)
 }
 
 type readerModules struct {
-	modules    []readerModule
+	modules    []ReaderModule
 	aggregator chan *Folder
 }
 
@@ -37,10 +38,10 @@ type readerSolution struct {
 
 func (r *readerModules) handler(path string) {
 	for _, m := range r.modules {
-		if !m.filter(path) {
+		if !m.Filter(path) {
 			continue
 		}
-		if folder, ok := m.read(path); ok {
+		if folder, ok := m.Read(path); ok {
 			r.aggregator <- folder
 		}
 	}
@@ -48,12 +49,12 @@ func (r *readerModules) handler(path string) {
 
 // packages.config
 
-func (r *readerPackagesConfig) filter(path string) bool {
+func (r *readerPackagesConfig) Filter(path string) bool {
 	_, file := filepath.Split(path)
 	return strings.EqualFold(file, packagesConfigFile)
 }
 
-func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
+func (r *readerPackagesConfig) Read(path string) (*Folder, bool) {
 	pack := packages{}
 
 	err := onXMLFile(path, r.fs, &pack)
@@ -70,12 +71,12 @@ func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 
 // MSBuild projects
 
-func (r *readerMsbuild) filter(path string) bool {
+func (r *readerMsbuild) Filter(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt)
 }
 
-func (r *readerMsbuild) read(path string) (*Folder, bool) {
+func (r *readerMsbuild) Read(path string) (*Folder, bool) {
 	project := msbuildProject{}
 
 	err := onXMLFile(path, r.fs, &project)
@@ -94,12 +95,12 @@ func (r *readerMsbuild) read(path string) (*Folder, bool) {
 
 // VS Solutions
 
-func (r *readerSolution) filter(path string) bool {
+func (r *readerSolution) Filter(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, SolutionFileExt)
 }
 
-func (r *readerSolution) read(path string) (*Folder, bool) {
+func (r *readerSolution) Read(path string) (*Folder, bool) {
 	reader, err := r.fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Println(err)
