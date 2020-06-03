@@ -11,69 +11,6 @@ const (
 	packagesConfigFile = "packages.config"
 )
 
-// Packages is Nuget packages structure
-type Packages struct {
-	XMLName  xml.Name  `xml:"packages"`
-	Packages []Package `xml:"package"`
-}
-
-// Package is Nuget package definition
-type Package struct {
-	ID                    string `xml:"id,attr"`
-	Version               string `xml:"version,attr"`
-	TargetFramework       string `xml:"targetFramework,attr"`
-	DevelopmentDependency string `xml:"developmentDependency,attr"`
-}
-
-// Project is MSBuild project definition
-type Project struct {
-	XMLName           xml.Name           `xml:"Project"`
-	Sdk               string             `xml:"Sdk,attr"`
-	ToolsVersion      string             `xml:"ToolsVersion,attr"`
-	DefaultTargets    string             `xml:"DefaultTargets,attr"`
-	ID                string             `xml:"PropertyGroup>ProjectGuid"`
-	Compiles          []Include          `xml:"ItemGroup>Compile"`
-	CLCompiles        []Include          `xml:"ItemGroup>ClCompile"`
-	CLInclude         []Include          `xml:"ItemGroup>ClInclude"`
-	Contents          []Include          `xml:"ItemGroup>Content"`
-	Nones             []Include          `xml:"ItemGroup>None"`
-	References        []Reference        `xml:"ItemGroup>Reference"`
-	ProjectReferences []ProjectReference `xml:"ItemGroup>ProjectReference"`
-	PackageReferences []PackageReference `xml:"ItemGroup>PackageReference"`
-	OutputPaths       []string           `xml:"PropertyGroup>OutputPath"`
-	Imports           []Import           `xml:"Import"`
-}
-
-// Include attribute in MSBuild file
-type Include struct {
-	Path string `xml:"Include,attr"`
-}
-
-// Reference definition in MSBuild file
-type Reference struct {
-	Assembly string `xml:"Include,attr"`
-	HintPath string `xml:"HintPath"`
-}
-
-// ProjectReference is project reference definition in MSBuild file
-type ProjectReference struct {
-	Path        string `xml:"Include,attr"`
-	ProjectGUID string `xml:"Project"`
-	Name        string `xml:"Name"`
-}
-
-// PackageReference is nuget reference definition in MSBuild file
-type PackageReference struct {
-	ID      string `xml:"Include,attr"`
-	Version string `xml:"Version,attr"`
-}
-
-// Import attribute in MSBuild file
-type Import struct {
-	Project string `xml:"Project,attr"`
-	Sdk     string `xml:"Sdk,attr"`
-}
-
 // NugetPackage defines nuget package descriptor
 type NugetPackage struct {
 	ID      string
@@ -81,7 +18,7 @@ type NugetPackage struct {
 }
 
 // IsSdkProject gets wheter a project is a the new VS 2017 or later project
-func (p *Project) IsSdkProject() bool {
+func (p *msbuildProject) IsSdkProject() bool {
 	if len(p.Sdk) > 0 {
 		return true
 	}
@@ -94,4 +31,59 @@ func (p *Project) IsSdkProject() bool {
 		}
 	}
 	return false
+}
+
+type packages struct {
+	XMLName  xml.Name       `xml:"packages"`
+	Packages []nugetPackage `xml:"package"`
+}
+
+type nugetPackage struct {
+	ID                    string `xml:"id,attr"`
+	Version               string `xml:"version,attr"`
+	TargetFramework       string `xml:"targetFramework,attr"`
+	DevelopmentDependency string `xml:"developmentDependency,attr"`
+}
+
+type msbuildProject struct {
+	XMLName           xml.Name           `xml:"Project"`
+	Sdk               string             `xml:"Sdk,attr"`
+	ToolsVersion      string             `xml:"ToolsVersion,attr"`
+	DefaultTargets    string             `xml:"DefaultTargets,attr"`
+	ID                string             `xml:"PropertyGroup>ProjectGuid"`
+	Compiles          []include          `xml:"ItemGroup>Compile"`
+	CLCompiles        []include          `xml:"ItemGroup>ClCompile"`
+	CLInclude         []include          `xml:"ItemGroup>ClInclude"`
+	Contents          []include          `xml:"ItemGroup>Content"`
+	Nones             []include          `xml:"ItemGroup>None"`
+	References        []reference        `xml:"ItemGroup>Reference"`
+	ProjectReferences []projectReference `xml:"ItemGroup>ProjectReference"`
+	PackageReferences []packageReference `xml:"ItemGroup>PackageReference"`
+	OutputPaths       []string           `xml:"PropertyGroup>OutputPath"`
+	Imports           []msbuildImport    `xml:"Import"`
+}
+
+type include struct {
+	Path string `xml:"Include,attr"`
+}
+
+type reference struct {
+	Assembly string `xml:"Include,attr"`
+	HintPath string `xml:"HintPath"`
+}
+
+type projectReference struct {
+	Path        string `xml:"Include,attr"`
+	ProjectGUID string `xml:"Project"`
+	Name        string `xml:"Name"`
+}
+
+type packageReference struct {
+	ID      string `xml:"Include,attr"`
+	Version string `xml:"Version,attr"`
+}
+
+type msbuildImport struct {
+	Project string `xml:"Project,attr"`
+	Sdk     string `xml:"Sdk,attr"`
 }

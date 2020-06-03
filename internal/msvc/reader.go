@@ -14,7 +14,7 @@ import (
 
 // MsbuildProject defines MSBuild project structure
 type MsbuildProject struct {
-	Project *Project
+	Project *msbuildProject
 	Path    string
 }
 
@@ -70,7 +70,7 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	return result
 }
 
-func createPaths(paths []Include, basePath string) []string {
+func createPaths(paths []include, basePath string) []string {
 	if paths == nil {
 		return []string{}
 	}
@@ -191,7 +191,7 @@ func (r *readerPackagesConfig) filter(path string) bool {
 
 // Create packages model from packages.config
 func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
-	pack := Packages{}
+	pack := packages{}
 
 	err := onXMLFile(path, r.fs, &pack)
 	if err != nil {
@@ -212,7 +212,7 @@ func (r *readerMsbuild) filter(path string) bool {
 
 // Create project model from project file
 func (r *readerMsbuild) read(path string) (*Folder, bool) {
-	project := Project{}
+	project := msbuildProject{}
 
 	err := onXMLFile(path, r.fs, &project)
 	if err != nil {

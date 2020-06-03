@@ -9,7 +9,7 @@ import (
 // FolderContent defines a filesystem folder information about
 // it's MSVC content (solutions, projects, etc.)
 type FolderContent struct {
-	Packages  *Packages
+	Packages  *packages
 	Projects  []*MsbuildProject
 	Solutions []*VisualStudioSolution
 }
