@@ -38,7 +38,7 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	includes = append(includes, msp.CLInclude...)
 	includes = append(includes, msp.Compiles...)
 
-	result = append(result, createPaths(includes, folderPath)...)
+	result = append(result, createPathsFromIncludes(includes, folderPath)...)
 
 	return result
 }
@@ -147,7 +147,7 @@ func merge(to *Folder, from *Folder) {
 	}
 }
 
-func createPaths(paths []include, basePath string) []string {
+func createPathsFromIncludes(paths []include, basePath string) []string {
 	if paths == nil {
 		return []string{}
 	}
