@@ -15,6 +15,16 @@ type ReaderHandler interface {
 	Handler(path string)
 }
 
+func newReaderModules(fs afero.Fs) []readerModule {
+	var modules []readerModule
+
+	pack := readerPackagesConfig{fs}
+	msbuild := readerMsbuild{fs}
+	sol := readerSolution{fs}
+	modules = append(modules, &pack, &msbuild, &sol)
+	return modules
+}
+
 type readerModule interface {
 	filter(path string) bool
 	read(path string) (*Folder, bool)

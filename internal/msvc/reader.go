@@ -92,16 +92,11 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 		}
 	}()
 
-	var modules []readerModule
+	modules := newReaderModules(fs)
 
-	pack := readerPackagesConfig{fs}
-	msbuild := readerMsbuild{fs}
-	sol := readerSolution{fs}
-	modules = append(modules, &pack, &msbuild, &sol)
+	rdr := reader{aggregator: aggregateChannel, modules: modules}
 
-	rm := reader{aggregator: aggregateChannel, modules: modules}
-
-	fhandlers := []ReaderHandler{&rm}
+	fhandlers := []ReaderHandler{&rdr}
 	fhandlers = append(fhandlers, fileHandlers...)
 
 	// Reading files goroutine
