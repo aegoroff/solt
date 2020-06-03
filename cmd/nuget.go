@@ -109,6 +109,7 @@ func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[
 				if v, ok := packagesMap[pkg.ID]; !ok {
 					packagesMap[pkg.ID] = []string{pkg.Version}
 				} else {
+					// Only unique versions added
 					if contains(v, pkg.Version) {
 						continue
 					}
