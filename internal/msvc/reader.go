@@ -21,8 +21,11 @@ type MsbuildProject struct {
 // VisualStudioSolution defines VS solution that contains *solution.Solution
 // and it's path
 type VisualStudioSolution struct {
+	// Solution structure
 	Solution *solution.Solution
-	Path     string
+
+	// filesystem pa
+	Path string
 }
 
 type readerHandler interface {
@@ -39,7 +42,7 @@ func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, normalize bool) co
 	solutionPath := filepath.Dir(sln.Path)
 	var paths = make(collections.StringHashSet)
 	for _, sp := range sln.Solution.Projects {
-		if sp.TypeId == solution.IdSolutionFolder {
+		if sp.TypeID == solution.IDSolutionFolder {
 			continue
 		}
 		fullProjectPath := filepath.Join(solutionPath, sp.Path)
@@ -190,7 +193,7 @@ func (r *readerPackagesConfig) filter(path string) bool {
 func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 	pack := Packages{}
 
-	err := onXmlFile(path, r.fs, &pack)
+	err := onXMLFile(path, r.fs, &pack)
 	if err != nil {
 		return nil, false
 	}
@@ -211,7 +214,7 @@ func (r *readerMsbuild) filter(path string) bool {
 func (r *readerMsbuild) read(path string) (*Folder, bool) {
 	project := Project{}
 
-	err := onXmlFile(path, r.fs, &project)
+	err := onXMLFile(path, r.fs, &project)
 	if err != nil {
 		return nil, false
 	}
@@ -265,9 +268,9 @@ func createFolder(path string) *Folder {
 	return &f
 }
 
-func onXmlFile(path string, fs afero.Fs, result interface{}) error {
+func onXMLFile(path string, fs afero.Fs, result interface{}) error {
 
-	err := sys.UnmarshalXmlFrom(path, fs, result)
+	err := sys.UnmarshalXMLFrom(path, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", path, err)
 		return err

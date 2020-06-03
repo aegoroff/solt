@@ -106,14 +106,14 @@ func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[
 			nugetPackages := getNugetPackages(prj)
 
 			for _, pkg := range nugetPackages {
-				if v, ok := packagesMap[pkg.Id]; !ok {
-					packagesMap[pkg.Id] = []string{pkg.Version}
+				if v, ok := packagesMap[pkg.ID]; !ok {
+					packagesMap[pkg.ID] = []string{pkg.Version}
 				} else {
 					if contains(v, pkg.Version) {
 						continue
 					}
 
-					packagesMap[pkg.Id] = append(v, pkg.Version)
+					packagesMap[pkg.ID] = append(v, pkg.Version)
 				}
 			}
 		}
@@ -170,7 +170,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
 		for _, p := range nugetPackages {
-			_, _ = fmt.Fprintf(tw, format, p.Id, p.Version)
+			_, _ = fmt.Fprintf(tw, format, p.ID, p.Version)
 		}
 
 		_ = tw.Flush()
@@ -182,7 +182,7 @@ func getNugetPackages(content *msvc.FolderContent) []msvc.NugetPackage {
 	var nugetPackages []msvc.NugetPackage
 	if content.Packages != nil {
 		for _, p := range content.Packages.Packages {
-			n := msvc.NugetPackage{Id: p.Id, Version: p.Version}
+			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}
@@ -192,7 +192,7 @@ func getNugetPackages(content *msvc.FolderContent) []msvc.NugetPackage {
 		}
 
 		for _, p := range prj.Project.PackageReferences {
-			n := msvc.NugetPackage{Id: p.Id, Version: p.Version}
+			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}

@@ -19,7 +19,7 @@ type Packages struct {
 
 // Package is Nuget package definition
 type Package struct {
-	Id                    string `xml:"id,attr"`
+	ID                    string `xml:"id,attr"`
 	Version               string `xml:"version,attr"`
 	TargetFramework       string `xml:"targetFramework,attr"`
 	DevelopmentDependency string `xml:"developmentDependency,attr"`
@@ -31,7 +31,7 @@ type Project struct {
 	Sdk               string             `xml:"Sdk,attr"`
 	ToolsVersion      string             `xml:"ToolsVersion,attr"`
 	DefaultTargets    string             `xml:"DefaultTargets,attr"`
-	Id                string             `xml:"PropertyGroup>ProjectGuid"`
+	ID                string             `xml:"PropertyGroup>ProjectGuid"`
 	Compiles          []Include          `xml:"ItemGroup>Compile"`
 	CLCompiles        []Include          `xml:"ItemGroup>ClCompile"`
 	CLInclude         []Include          `xml:"ItemGroup>ClInclude"`
@@ -58,13 +58,13 @@ type Reference struct {
 // ProjectReference is project reference definition in MSBuild file
 type ProjectReference struct {
 	Path        string `xml:"Include,attr"`
-	ProjectGuid string `xml:"Project"`
+	ProjectGUID string `xml:"Project"`
 	Name        string `xml:"Name"`
 }
 
 // PackageReference is nuget reference definition in MSBuild file
 type PackageReference struct {
-	Id      string `xml:"Include,attr"`
+	ID      string `xml:"Include,attr"`
 	Version string `xml:"Version,attr"`
 }
 
@@ -76,7 +76,7 @@ type Import struct {
 
 // NugetPackage defines nuget package descriptor
 type NugetPackage struct {
-	Id      string
+	ID      string
 	Version string
 }
 

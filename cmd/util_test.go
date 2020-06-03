@@ -50,11 +50,11 @@ func Test_unmarshalXmlPackagesConfig(t *testing.T) {
 `
 	r := strings.NewReader(packangesconfig)
 	// Act
-	sys.UnmarshalXml(r, &packages)
+	sys.UnmarshalXML(r, &packages)
 
 	// Assert
 	ass.Equal(1, len(packages.Packages))
-	ass.Equal("YaccLexTools", packages.Packages[0].Id)
+	ass.Equal("YaccLexTools", packages.Packages[0].ID)
 	ass.Equal("0.2.2", packages.Packages[0].Version)
 	ass.Equal("net45", packages.Packages[0].TargetFramework)
 }
@@ -123,11 +123,11 @@ func Test_unmarshalXmlMsbuildProject(t *testing.T) {
 	r := strings.NewReader(project)
 
 	// Act
-	sys.UnmarshalXml(r, &prj)
+	sys.UnmarshalXML(r, &prj)
 
 	// Assert
 	ass.Equal(2, len(prj.Compiles))
 	ass.Equal(1, len(prj.Nones))
-	ass.Equal("{99B7AE2B-EF73-48A6-BBE1-ACF5E0CA569D}", prj.Id)
+	ass.Equal("{99B7AE2B-EF73-48A6-BBE1-ACF5E0CA569D}", prj.ID)
 	ass.Equal(8, len(prj.References))
 }

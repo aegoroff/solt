@@ -6,25 +6,31 @@ import (
 	"strings"
 )
 
+// FolderContent defines a filesystem folder information about
+// it's MSVC content (solutions, projects, etc.)
 type FolderContent struct {
 	Packages  *Packages
 	Projects  []*MsbuildProject
 	Solutions []*VisualStudioSolution
 }
 
+// Folder defines filesystem folder descriptor (path and content structure)
 type Folder struct {
 	Content *FolderContent
 	Path    string
 }
 
+// LessThan implements rbtree.Comparable interface
 func (x *Folder) LessThan(y interface{}) bool {
 	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
 }
 
+// EqualTo implements rbtree.Comparable interface
 func (x *Folder) EqualTo(y interface{}) bool {
 	return strings.EqualFold(x.Path, (y.(*Folder)).Path)
 }
 
+// String implements rbtree.Comparable interface
 func (x *Folder) String() string {
 	return x.Path
 }

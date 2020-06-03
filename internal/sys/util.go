@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 )
 
-// UnmarshalXmlFrom reads xml from file system and unmarshal it to interface specified
-func UnmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
+// UnmarshalXMLFrom reads xml from file system and unmarshal it to interface specified
+func UnmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
 	f, err := fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Print(err)
@@ -18,11 +18,11 @@ func UnmarshalXmlFrom(path string, fs afero.Fs, result interface{}) error {
 	}
 	defer closeResource(f)
 
-	return UnmarshalXml(f, result)
+	return UnmarshalXML(f, result)
 }
 
-// UnmarshalXml reads xml from reader and unmarshal it to interface specified
-func UnmarshalXml(r io.Reader, result interface{}) error {
+// UnmarshalXML reads xml from reader and unmarshal it to interface specified
+func UnmarshalXML(r io.Reader, result interface{}) error {
 	s := bufio.NewScanner(r)
 	var data []byte
 	for s.Scan() {
