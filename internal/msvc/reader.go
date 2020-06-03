@@ -136,12 +136,13 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 }
 
 func merge(to *Folder, from *Folder) {
-	content := to.Content
-	if from.Content.Packages != nil {
-		content.Packages = from.Content.Packages
+	toC := to.Content
+	fromC := from.Content
+	if fromC.Packages != nil {
+		toC.Packages = fromC.Packages
 	} else {
-		content.Projects = append(content.Projects, from.Content.Projects...)
-		content.Solutions = append(content.Solutions, from.Content.Solutions...)
+		toC.Projects = append(toC.Projects, fromC.Projects...)
+		toC.Solutions = append(toC.Solutions, fromC.Solutions...)
 	}
 }
 
