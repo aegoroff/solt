@@ -95,14 +95,8 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 				result.Insert(f)
 			} else {
 				// Update folder node that has already been created before
-				content := current.Key().(*Folder).Content
-
-				if f.Content.Packages != nil {
-					content.Packages = f.Content.Packages
-				} else {
-					content.Projects = append(content.Projects, f.Content.Projects...)
-					content.Solutions = append(content.Solutions, f.Content.Solutions...)
-				}
+				current := current.Key().(*Folder)
+				merge(current, f)
 			}
 		}
 	}()
@@ -148,4 +142,14 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	wg.Wait()
 
 	return result
+}
+
+func merge(to *Folder, from *Folder) {
+	content := to.Content
+	if from.Content.Packages != nil {
+		content.Packages = from.Content.Packages
+	} else {
+		content.Projects = append(content.Projects, from.Content.Projects...)
+		content.Solutions = append(content.Solutions, from.Content.Solutions...)
+	}
 }
