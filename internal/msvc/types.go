@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	solutionFileExt    = ".sln"
+	SolutionFileExt    = ".sln"
 	csharpProjectExt   = ".csproj"
 	cppProjectExt      = ".vcxproj"
 	packagesConfigFile = "packages.config"

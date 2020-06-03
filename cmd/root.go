@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	solutionFileExt = ".sln"
-	pathParamName   = "path"
-	diagParamName   = "diag"
+	pathParamName = "path"
+	diagParamName = "diag"
 )
 
 var sourcesPath string

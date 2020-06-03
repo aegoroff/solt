@@ -96,7 +96,7 @@ func (r *readerMsbuild) read(path string) (*Folder, bool) {
 
 func (r *readerSolution) filter(path string) bool {
 	ext := filepath.Ext(path)
-	return strings.EqualFold(ext, solutionFileExt)
+	return strings.EqualFold(ext, SolutionFileExt)
 }
 
 func (r *readerSolution) read(path string) (*Folder, bool) {

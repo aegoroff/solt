@@ -60,7 +60,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	var foundFiles []string
 	var excludeFolders = make(collections.StringHashSet)
 	ef := normalize(lostFilesFilter)
-	sln := normalize(solutionFileExt)
+	sln := normalize(msvc.SolutionFileExt)
 	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, func(path string) {
 		// Add file to filtered files slice
 		ext := normalize(filepath.Ext(path))
