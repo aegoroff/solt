@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"solt/internal/msvc"
 	"strings"
 	"text/tabwriter"
 
@@ -22,7 +23,7 @@ var nugetCmd = &cobra.Command{
 	Aliases: []string{"nuget"},
 	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(string) {})
+		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem, func(string) {})
 
 		findNugetMismatches, err := cmd.Flags().GetBool(mismatchParamName)
 
@@ -52,20 +53,20 @@ func init() {
 
 func showMismatches(foldersTree rbtree.RbTree) {
 
-	solutions := selectSolutions(foldersTree)
+	solutions := msvc.SelectSolutions(foldersTree)
 
-	var solutionProjects = make(map[string][]*folderContent)
+	var solutionProjects = make(map[string][]*msvc.FolderContent)
 
 	// Each found solution
 	for _, sln := range solutions {
-		solutionProjectPaths := selectAllSolutionProjectPaths(sln, true)
+		solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, true)
 
-		walkProjects(foldersTree, func(prj *msbuildProject, fold *folder) {
-			if solutionProjectPaths.Contains(strings.ToUpper(prj.path)) {
-				if v, ok := solutionProjects[sln.path]; !ok {
-					solutionProjects[sln.path] = []*folderContent{fold.content}
+		msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+			if solutionProjectPaths.Contains(strings.ToUpper(prj.Path)) {
+				if v, ok := solutionProjects[sln.Path]; !ok {
+					solutionProjects[sln.Path] = []*msvc.FolderContent{fold.Content}
 				} else {
-					solutionProjects[sln.path] = append(v, fold.content)
+					solutionProjects[sln.Path] = append(v, fold.Content)
 				}
 			}
 		})
@@ -93,12 +94,12 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	}
 }
 
-func calculateMismatches(solutionProjects map[string][]*folderContent) map[string][]*mismatch {
+func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[string][]*mismatch {
 	var mismatches = make(map[string][]*mismatch)
 	for sol, projects := range solutionProjects {
 		var packagesMap = make(map[string][]string)
 		for _, prj := range projects {
-			if prj.packages == nil && len(prj.projects) == 0 {
+			if prj.Packages == nil && len(prj.Projects) == 0 {
 				continue
 			}
 
@@ -151,9 +152,9 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	foldersTree.WalkInorder(func(n rbtree.Node) {
-		folder := n.Key().(*folder)
-		content := folder.content
-		if content.packages == nil && len(content.projects) == 0 {
+		folder := n.Key().(*msvc.Folder)
+		content := folder.Content
+		if content.Packages == nil && len(content.Projects) == 0 {
 			return
 		}
 
@@ -163,7 +164,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 			return
 		}
 
-		parent := folder.path
+		parent := folder.Path
 		fmt.Printf(" %s\n", parent)
 		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
@@ -177,21 +178,21 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	})
 }
 
-func getNugetPackages(content *folderContent) []nugetPackage {
-	var nugetPackages []nugetPackage
-	if content.packages != nil {
-		for _, p := range content.packages.Packages {
-			n := nugetPackage{Id: p.Id, Version: p.Version}
+func getNugetPackages(content *msvc.FolderContent) []msvc.NugetPackage {
+	var nugetPackages []msvc.NugetPackage
+	if content.Packages != nil {
+		for _, p := range content.Packages.Packages {
+			n := msvc.NugetPackage{Id: p.Id, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}
-	for _, prj := range content.projects {
-		if prj.project.PackageReferences == nil {
+	for _, prj := range content.Projects {
+		if prj.Project.PackageReferences == nil {
 			continue
 		}
 
-		for _, p := range prj.project.PackageReferences {
-			n := nugetPackage{Id: p.Id, Version: p.Version}
+		for _, p := range prj.Project.PackageReferences {
+			n := msvc.NugetPackage{Id: p.Id, Version: p.Version}
 			nugetPackages = append(nugetPackages, n)
 		}
 	}

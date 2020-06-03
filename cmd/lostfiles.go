@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"solt/internal/msvc"
 	"strings"
 )
 
@@ -60,7 +61,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	var excludeFolders = make(collections.StringHashSet)
 	ef := normalize(lostFilesFilter)
 	sln := normalize(solutionFileExt)
-	foldersTree := readProjectDir(sourcesPath, fs, func(path string) {
+	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, func(path string) {
 		// Add file to filtered files slice
 		ext := normalize(filepath.Ext(path))
 		if ext == ef {
@@ -77,37 +78,37 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(collections.StringHashSet)
 
-	walkProjects(foldersTree, func(prj *msbuildProject, fold *folder) {
+	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		// Add project base + exclude subfolder into exclude folders list
 		for _, s := range subfolderToExclude {
-			sub := filepath.Join(fold.path, s)
+			sub := filepath.Join(fold.Path, s)
 			excludeFolders.Add(sub)
 		}
 
 		// Exclude output paths too
-		if prj.project.OutputPaths != nil {
-			for _, out := range prj.project.OutputPaths {
-				sub := filepath.Join(fold.path, out)
+		if prj.Project.OutputPaths != nil {
+			for _, out := range prj.Project.OutputPaths {
+				sub := filepath.Join(fold.Path, out)
 				excludeFolders.Add(sub)
 			}
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
-		if prj.project.isSdkProject() {
-			excludeFolders.Add(filepath.Dir(prj.path))
+		if prj.Project.IsSdkProject() {
+			excludeFolders.Add(filepath.Dir(prj.Path))
 		}
 
 		// Add compiles, contents and nones into included files map
-		filesIncluded := getFilesIncludedIntoProject(prj)
+		filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
 		for _, f := range filesIncluded {
 			normalized := normalize(f)
 			includedFiles.Add(normalized)
 			if _, err := fs.Stat(f); os.IsNotExist(err) {
-				if found, ok := unexistFiles[prj.path]; ok {
+				if found, ok := unexistFiles[prj.Path]; ok {
 					found = append(found, f)
-					unexistFiles[prj.path] = found
+					unexistFiles[prj.Path] = found
 				} else {
-					unexistFiles[prj.path] = []string{f}
+					unexistFiles[prj.Path] = []string{f}
 				}
 			}
 		}

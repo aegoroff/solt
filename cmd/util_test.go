@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
+	"solt/internal/msvc"
 	"solt/internal/sys"
 	"strings"
 	"testing"
@@ -40,7 +41,7 @@ func Test_outputSortedMap(t *testing.T) {
 func Test_unmarshalXmlPackagesConfig(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	packages := Packages{}
+	packages := msvc.Packages{}
 	const packangesconfig = `
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
@@ -61,7 +62,7 @@ func Test_unmarshalXmlPackagesConfig(t *testing.T) {
 func Test_unmarshalXmlMsbuildProject(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	prj := Project{}
+	prj := msvc.Project{}
 	const project = `
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"solt/internal/msvc"
 	"solt/solution"
 	"sort"
 	"strings"
@@ -18,16 +19,16 @@ var infoCmd = &cobra.Command{
 	Aliases: []string{"info"},
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(string) {})
+		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem, func(string) {})
 
 		foldersTree.Ascend(func(c rbtree.Node) bool {
-			folder := c.Key().(*folder)
-			content := folder.content
+			folder := c.Key().(*msvc.Folder)
+			content := folder.Content
 
-			for _, solution := range content.solutions {
-				sln := solution.solution
+			for _, solution := range content.Solutions {
+				sln := solution.Solution
 
-				fmt.Printf(" %s\n", solution.path)
+				fmt.Printf(" %s\n", solution.Path)
 
 				const format = "  %v\t%v\n"
 				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)

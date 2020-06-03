@@ -9,13 +9,9 @@ import (
 )
 
 const (
-	solutionFileExt    = ".sln"
-	csharpProjectExt   = ".csproj"
-	cppProjectExt      = ".vcxproj"
-	packagesConfigFile = "packages.config"
-
-	pathParamName = "path"
-	diagParamName = "diag"
+	solutionFileExt = ".sln"
+	pathParamName   = "path"
+	diagParamName   = "diag"
 )
 
 var sourcesPath string

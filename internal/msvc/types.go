@@ -1,7 +1,14 @@
-package cmd
+package msvc
 
 import (
 	"encoding/xml"
+)
+
+const (
+	solutionFileExt    = ".sln"
+	csharpProjectExt   = ".csproj"
+	cppProjectExt      = ".vcxproj"
+	packagesConfigFile = "packages.config"
 )
 
 // Packages is Nuget packages structure
@@ -67,12 +74,14 @@ type Import struct {
 	Sdk     string `xml:"Sdk,attr"`
 }
 
-type nugetPackage struct {
+// NugetPackage defines nuget package descriptor
+type NugetPackage struct {
 	Id      string
 	Version string
 }
 
-func (p *Project) isSdkProject() bool {
+// IsSdkProject gets wheter a project is a the new VS 2017 or later project
+func (p *Project) IsSdkProject() bool {
 	if len(p.Sdk) > 0 {
 		return true
 	}

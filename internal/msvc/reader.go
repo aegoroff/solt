@@ -1,4 +1,4 @@
-package cmd
+package msvc
 
 import (
 	"github.com/aegoroff/godatastruct/collections"
@@ -12,14 +12,17 @@ import (
 	"sync"
 )
 
-type msbuildProject struct {
-	project *Project
-	path    string
+// MsbuildProject defines MSBuild project structure
+type MsbuildProject struct {
+	Project *Project
+	Path    string
 }
 
-type visualStudioSolution struct {
-	solution *solution.Solution
-	path     string
+// VisualStudioSolution defines VS solution that contains *solution.Solution
+// and it's path
+type VisualStudioSolution struct {
+	Solution *solution.Solution
+	Path     string
 }
 
 type readerHandler interface {
@@ -28,13 +31,14 @@ type readerHandler interface {
 
 type readerModule interface {
 	filter(path string) bool
-	read(path string) (*folder, bool)
+	read(path string) (*Folder, bool)
 }
 
-func selectAllSolutionProjectPaths(sln *visualStudioSolution, normalize bool) collections.StringHashSet {
-	solutionPath := filepath.Dir(sln.path)
+// SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
+func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, normalize bool) collections.StringHashSet {
+	solutionPath := filepath.Dir(sln.Path)
 	var paths = make(collections.StringHashSet)
-	for _, sp := range sln.solution.Projects {
+	for _, sp := range sln.Solution.Projects {
 		if sp.TypeId == solution.IdSolutionFolder {
 			continue
 		}
@@ -50,14 +54,15 @@ func selectAllSolutionProjectPaths(sln *visualStudioSolution, normalize bool) co
 	return paths
 }
 
-func getFilesIncludedIntoProject(prj *msbuildProject) []string {
+// GetFilesIncludedIntoProject gets all files included into MSBuild project
+func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	var result []string
-	folderPath := filepath.Dir(prj.path)
-	result = append(result, createPaths(prj.project.Contents, folderPath)...)
-	result = append(result, createPaths(prj.project.Nones, folderPath)...)
-	result = append(result, createPaths(prj.project.CLCompiles, folderPath)...)
-	result = append(result, createPaths(prj.project.CLInclude, folderPath)...)
-	result = append(result, createPaths(prj.project.Compiles, folderPath)...)
+	folderPath := filepath.Dir(prj.Path)
+	result = append(result, createPaths(prj.Project.Contents, folderPath)...)
+	result = append(result, createPaths(prj.Project.Nones, folderPath)...)
+	result = append(result, createPaths(prj.Project.CLCompiles, folderPath)...)
+	result = append(result, createPaths(prj.Project.CLInclude, folderPath)...)
+	result = append(result, createPaths(prj.Project.Compiles, folderPath)...)
 
 	return result
 }
@@ -77,10 +82,13 @@ func createPaths(paths []Include, basePath string) []string {
 	return result
 }
 
-func readProjectDir(path string, fs afero.Fs, action func(path string)) rbtree.RbTree {
+// ReadSolutionDir reads filesystem directory and all its childs to get information
+// about all solutions and projects in this tree.
+// It returns tree
+func ReadSolutionDir(path string, fs afero.Fs, action func(path string)) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
-	aggregateChannel := make(chan *folder, 4)
+	aggregateChannel := make(chan *Folder, 4)
 	slowReadChannel := make(chan string, 16)
 
 	var wg sync.WaitGroup
@@ -94,13 +102,13 @@ func readProjectDir(path string, fs afero.Fs, action func(path string)) rbtree.R
 				result.Insert(f)
 			} else {
 				// Update folder node that has already been created before
-				content := current.Key().(*folder).content
+				content := current.Key().(*Folder).Content
 
-				if f.content.packages != nil {
-					content.packages = f.content.packages
+				if f.Content.Packages != nil {
+					content.Packages = f.Content.Packages
 				} else {
-					content.projects = append(content.projects, f.content.projects...)
-					content.solutions = append(content.solutions, f.content.solutions...)
+					content.Projects = append(content.Projects, f.Content.Projects...)
+					content.Solutions = append(content.Solutions, f.Content.Solutions...)
 				}
 			}
 		}
@@ -147,7 +155,7 @@ func readProjectDir(path string, fs afero.Fs, action func(path string)) rbtree.R
 
 type readerModules struct {
 	modules    []readerModule
-	aggregator chan *folder
+	aggregator chan *Folder
 }
 
 type readerPackagesConfig struct {
@@ -179,7 +187,7 @@ func (r *readerPackagesConfig) filter(path string) bool {
 }
 
 // Create packages model from packages.config
-func (r *readerPackagesConfig) read(path string) (*folder, bool) {
+func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 	pack := Packages{}
 
 	err := onXmlFile(path, r.fs, &pack)
@@ -189,7 +197,7 @@ func (r *readerPackagesConfig) read(path string) (*folder, bool) {
 
 	f := createFolder(path)
 
-	f.content.packages = &pack
+	f.Content.Packages = &pack
 
 	return f, true
 }
@@ -200,7 +208,7 @@ func (r *readerMsbuild) filter(path string) bool {
 }
 
 // Create project model from project file
-func (r *readerMsbuild) read(path string) (*folder, bool) {
+func (r *readerMsbuild) read(path string) (*Folder, bool) {
 	project := Project{}
 
 	err := onXmlFile(path, r.fs, &project)
@@ -210,9 +218,9 @@ func (r *readerMsbuild) read(path string) (*folder, bool) {
 
 	f := createFolder(path)
 
-	p := msbuildProject{project: &project, path: path}
+	p := MsbuildProject{Project: &project, Path: path}
 
-	f.content.projects = append(f.content.projects, &p)
+	f.Content.Projects = append(f.Content.Projects, &p)
 
 	return f, true
 }
@@ -223,7 +231,7 @@ func (r *readerSolution) filter(path string) bool {
 }
 
 // Create solution model from file
-func (r *readerSolution) read(path string) (*folder, bool) {
+func (r *readerSolution) read(path string) (*Folder, bool) {
 	reader, err := r.fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Println(err)
@@ -239,20 +247,20 @@ func (r *readerSolution) read(path string) (*folder, bool) {
 
 	f := createFolder(path)
 
-	s := visualStudioSolution{solution: sln, path: path}
+	s := VisualStudioSolution{Solution: sln, Path: path}
 
-	f.content.solutions = append(f.content.solutions, &s)
+	f.Content.Solutions = append(f.Content.Solutions, &s)
 
 	return f, true
 }
 
-func createFolder(path string) *folder {
-	f := folder{
-		content: &folderContent{
-			solutions: []*visualStudioSolution{},
-			projects:  []*msbuildProject{},
+func createFolder(path string) *Folder {
+	f := Folder{
+		Content: &FolderContent{
+			Solutions: []*VisualStudioSolution{},
+			Projects:  []*MsbuildProject{},
 		},
-		path: filepath.Dir(path),
+		Path: filepath.Dir(path),
 	}
 	return &f
 }
