@@ -120,6 +120,7 @@ func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[
 		}
 
 		for pkg, vers := range packagesMap {
+			// If one version it's OK (no mismatches)
 			if len(vers) < 2 {
 				continue
 			}
