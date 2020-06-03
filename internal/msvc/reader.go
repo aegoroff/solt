@@ -10,24 +10,8 @@ import (
 	"sync"
 )
 
-// MsbuildProject defines MSBuild project structure
-type MsbuildProject struct {
-	Project *msbuildProject
-	Path    string
-}
-
-// VisualStudioSolution defines VS solution that contains *solution.Solution
-// and it's path
-type VisualStudioSolution struct {
-	// Solution structure
-	Solution *solution.Solution
-
-	// filesystem pa
-	Path string
-}
-
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
-func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, decorator func(s string) string) collections.StringHashSet {
+func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator StringDecorator) collections.StringHashSet {
 	solutionPath := filepath.Dir(sln.Path)
 	var paths = make(collections.StringHashSet)
 	for _, sp := range sln.Solution.Projects {
@@ -35,7 +19,7 @@ func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, decorator func(s s
 			continue
 		}
 		fullProjectPath := filepath.Join(solutionPath, sp.Path)
-		paths.Add(decorator(fullProjectPath))
+		paths.Add(pathDecorator(fullProjectPath))
 	}
 	return paths
 }
@@ -53,19 +37,33 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	return result
 }
 
-func createPaths(paths []include, basePath string) []string {
-	if paths == nil {
-		return []string{}
+// WalkProjects traverse all projects found in solution(s) folder
+func WalkProjects(foldersTree rbtree.RbTree, action ProjectHandler) {
+	w := &walkPrj{handler: action}
+	walk(foldersTree, w)
+}
+
+// SelectSolutions gets all Visual Studion solutions found in a directory
+func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
+	w := walkSol{solutions: make([]*VisualStudioSolution, 0)}
+	walk(foldersTree, &w)
+	return w.solutions
+}
+
+// IsSdkProject gets whether a project is a the new VS 2017 or later project
+func (p *msbuildProject) IsSdkProject() bool {
+	if len(p.Sdk) > 0 {
+		return true
 	}
-
-	var result []string
-
-	for _, c := range paths {
-		fp := filepath.Join(basePath, c.Path)
-		result = append(result, fp)
+	if len(p.Imports) == 0 {
+		return false
 	}
-
-	return result
+	for _, imp := range p.Imports {
+		if len(imp.Sdk) > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // ReadSolutionDir reads filesystem directory and all its childs to get information
@@ -145,4 +143,19 @@ func merge(to *Folder, from *Folder) {
 		content.Projects = append(content.Projects, from.Content.Projects...)
 		content.Solutions = append(content.Solutions, from.Content.Solutions...)
 	}
+}
+
+func createPaths(paths []include, basePath string) []string {
+	if paths == nil {
+		return []string{}
+	}
+
+	var result []string
+
+	for _, c := range paths {
+		fp := filepath.Join(basePath, c.Path)
+		result = append(result, fp)
+	}
+
+	return result
 }

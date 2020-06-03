@@ -2,6 +2,9 @@ package msvc
 
 import (
 	"encoding/xml"
+	"github.com/akutz/sortfold"
+	"solt/solution"
+	"strings"
 )
 
 const (
@@ -18,20 +21,55 @@ type NugetPackage struct {
 	Version string
 }
 
-// IsSdkProject gets whether a project is a the new VS 2017 or later project
-func (p *msbuildProject) IsSdkProject() bool {
-	if len(p.Sdk) > 0 {
-		return true
-	}
-	if len(p.Imports) == 0 {
-		return false
-	}
-	for _, imp := range p.Imports {
-		if len(imp.Sdk) > 0 {
-			return true
-		}
-	}
-	return false
+// FolderContent defines a filesystem folder information about
+// it's MSVC content (solutions, projects, etc.)
+type FolderContent struct {
+	Packages  *packages
+	Projects  []*MsbuildProject
+	Solutions []*VisualStudioSolution
+}
+
+// Folder defines filesystem folder descriptor (path and content structure)
+type Folder struct {
+	Content *FolderContent
+	Path    string
+}
+
+// MsbuildProject defines MSBuild project structure
+type MsbuildProject struct {
+	Project *msbuildProject
+	Path    string
+}
+
+// VisualStudioSolution defines VS solution that contains *solution.Solution
+// and it's path
+type VisualStudioSolution struct {
+	// Solution structure
+	Solution *solution.Solution
+
+	// filesystem path
+	Path string
+}
+
+// ProjectHandler defines project handler function prototype
+type ProjectHandler func(*MsbuildProject, *Folder)
+
+// StringDecorator defines string decorating function
+type StringDecorator func(s string) string
+
+// LessThan implements rbtree.Comparable interface
+func (x *Folder) LessThan(y interface{}) bool {
+	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
+}
+
+// EqualTo implements rbtree.Comparable interface
+func (x *Folder) EqualTo(y interface{}) bool {
+	return strings.EqualFold(x.Path, (y.(*Folder)).Path)
+}
+
+// String implements rbtree.Comparable interface
+func (x *Folder) String() string {
+	return x.Path
 }
 
 type packages struct {
