@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/solution"
-	"strings"
 	"sync"
 )
 
@@ -28,7 +27,7 @@ type VisualStudioSolution struct {
 }
 
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
-func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, normalize bool) collections.StringHashSet {
+func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, decorator func(s string) string) collections.StringHashSet {
 	solutionPath := filepath.Dir(sln.Path)
 	var paths = make(collections.StringHashSet)
 	for _, sp := range sln.Solution.Projects {
@@ -36,13 +35,7 @@ func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, normalize bool) co
 			continue
 		}
 		fullProjectPath := filepath.Join(solutionPath, sp.Path)
-
-		if normalize {
-			key := strings.ToUpper(fullProjectPath)
-			paths.Add(key)
-		} else {
-			paths.Add(fullProjectPath)
-		}
+		paths.Add(decorator(fullProjectPath))
 	}
 	return paths
 }

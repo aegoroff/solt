@@ -59,10 +59,10 @@ func showMismatches(foldersTree rbtree.RbTree) {
 
 	// Each found solution
 	for _, sln := range solutions {
-		solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, true)
+		solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return normalize(s) })
 
 		msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-			if solutionProjectPaths.Contains(strings.ToUpper(prj.Path)) {
+			if solutionProjectPaths.Contains(normalize(prj.Path)) {
 				if v, ok := solutionProjects[sln.Path]; !ok {
 					solutionProjects[sln.Path] = []*msvc.FolderContent{fold.Content}
 				} else {

@@ -29,7 +29,7 @@ var lostprojectsCmd = &cobra.Command{
 		projectsBySolution := make(map[string]collections.StringHashSet)
 		// Each found solution
 		for _, sln := range solutions {
-			solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, false)
+			solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
 			projectsBySolution[sln.Path] = solutionProjectPaths
 			for _, item := range solutionProjectPaths.Items() {
 				projectsInSolutions = append(projectsInSolutions, strings.ToUpper(item))
