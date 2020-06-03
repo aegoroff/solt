@@ -28,11 +28,17 @@ func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator Stri
 func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	var result []string
 	folderPath := filepath.Dir(prj.Path)
-	result = append(result, createPaths(prj.Project.Contents, folderPath)...)
-	result = append(result, createPaths(prj.Project.Nones, folderPath)...)
-	result = append(result, createPaths(prj.Project.CLCompiles, folderPath)...)
-	result = append(result, createPaths(prj.Project.CLInclude, folderPath)...)
-	result = append(result, createPaths(prj.Project.Compiles, folderPath)...)
+
+	msp := prj.Project
+
+	var includes []include
+	includes = append(includes, msp.Contents...)
+	includes = append(includes, msp.Nones...)
+	includes = append(includes, msp.CLCompiles...)
+	includes = append(includes, msp.CLInclude...)
+	includes = append(includes, msp.Compiles...)
+
+	result = append(result, createPaths(includes, folderPath)...)
 
 	return result
 }
