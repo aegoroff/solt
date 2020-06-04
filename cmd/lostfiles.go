@@ -56,37 +56,10 @@ func init() {
 	lostfilesCmd.Flags().BoolP(onlyLostParamName, "l", false, "Show only lost files. Don't show unexist files. If not set all shown")
 }
 
-type lostFilesHandler struct {
-	foundFiles      []string
-	excludeFolders  collections.StringHashSet
-	lostFilesFilter string
-}
-
-func (r *lostFilesHandler) Handler(path string) {
-	ef := normalize(r.lostFilesFilter)
-	sln := normalize(msvc.SolutionFileExt)
-
-	// Add file to filtered files slice
-	ext := normalize(filepath.Ext(path))
-	if ext == ef {
-		r.foundFiles = append(r.foundFiles, path)
-	}
-
-	if ext == sln {
-		dir, _ := filepath.Split(path)
-		ppath := filepath.Join(dir, "packages")
-		r.excludeFolders.Add(ppath)
-	}
-}
-
 func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
-	lh := lostFilesHandler{
-		foundFiles:      make([]string, 0),
-		excludeFolders:  make(collections.StringHashSet),
-		lostFilesFilter: lostFilesFilter,
-	}
+	lh := newLostFilesHandler(lostFilesFilter)
 
-	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, &lh)
+	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
 
 	unexistFiles := make(map[string][]string)
 	var includedFiles = make(collections.StringHashSet)
