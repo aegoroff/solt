@@ -99,7 +99,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree rbtree.RbTree, pmm *go
 
 	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		// Path in upper registry is the project's key
-		projectKey := strings.ToUpper(prj.Path)
+		projectKey := normalize(prj.Path)
 
 		ok := Match(pmm, projectKey)
 		if !ok {
@@ -124,14 +124,14 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 
 		var includedIntoOther = false
 		for _, f := range projectFiles {
-			pf := strings.ToUpper(f)
+			pf := normalize(f)
 			if !filesInsideSolution.Contains(pf) {
 				continue
 			}
 
 			dir := filepath.Dir(prj.Path)
 
-			if strings.Contains(pf, strings.ToUpper(dir)) {
+			if strings.Contains(pf, normalize(dir)) {
 				includedIntoOther = true
 				break
 			}
