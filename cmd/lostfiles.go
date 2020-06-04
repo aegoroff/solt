@@ -2,12 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"solt/internal/msvc"
-	"strings"
 )
 
 var subfolderToExclude = []string{
@@ -61,7 +59,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 
 	msvc.WalkProjects(foldersTree, lh.projectHandler)
 
-	lostFiles, err := findLostFiles(lh.excludeFolders, lh.foundFiles, lh.includedFiles)
+	lostFiles, err := lh.findLostFiles()
 
 	if err != nil {
 		return err
@@ -85,27 +83,6 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 		printMemUsage(appWriter)
 	}
 	return nil
-}
-
-func findLostFiles(excludeFolders collections.StringHashSet, foundFiles []string, includedFiles collections.StringHashSet) ([]string, error) {
-	exm, err := createAhoCorasickMachine(excludeFolders.ItemsDecorated(normalize))
-	if err != nil {
-		return nil, err
-	}
-
-	var result []string
-	for _, file := range foundFiles {
-		normalized := normalize(file)
-		if !includedFiles.Contains(normalized) && !Match(exm, normalized) {
-			result = append(result, file)
-		}
-	}
-
-	return result, err
-}
-
-func normalize(s string) string {
-	return strings.ToUpper(s)
 }
 
 func removeLostfiles(lostFiles []string, fs afero.Fs) {

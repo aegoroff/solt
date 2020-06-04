@@ -80,3 +80,20 @@ func (r *lostFilesHandler) projectHandler(prj *msvc.MsbuildProject, fo *msvc.Fol
 		}
 	}
 }
+
+func (r *lostFilesHandler) findLostFiles() ([]string, error) {
+	exm, err := createAhoCorasickMachine(r.excludeFolders.ItemsDecorated(normalize))
+	if err != nil {
+		return nil, err
+	}
+
+	var result []string
+	for _, file := range r.foundFiles {
+		normalized := normalize(file)
+		if !r.includedFiles.Contains(normalized) && !Match(exm, normalized) {
+			result = append(result, file)
+		}
+	}
+
+	return result, err
+}

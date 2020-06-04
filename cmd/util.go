@@ -6,7 +6,12 @@ import (
 	"io"
 	"runtime"
 	"sort"
+	"strings"
 )
+
+func normalize(s string) string {
+	return strings.ToUpper(s)
+}
 
 func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
