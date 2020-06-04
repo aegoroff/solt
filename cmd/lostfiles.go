@@ -6,8 +6,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
-	"path/filepath"
 	"solt/internal/msvc"
 	"strings"
 )
@@ -57,50 +55,13 @@ func init() {
 }
 
 func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
-	lh := newLostFilesHandler(lostFilesFilter)
+	lh := newLostFilesHandler(lostFilesFilter, fs)
 
 	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
 
-	unexistFiles := make(map[string][]string)
-	var includedFiles = make(collections.StringHashSet)
+	msvc.WalkProjects(foldersTree, lh.projectHandler)
 
-	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		// Add project base + exclude subfolder into exclude folders list
-		for _, s := range subfolderToExclude {
-			sub := filepath.Join(fold.Path, s)
-			lh.excludeFolders.Add(sub)
-		}
-
-		// Exclude output paths too
-		if prj.Project.OutputPaths != nil {
-			for _, out := range prj.Project.OutputPaths {
-				sub := filepath.Join(fold.Path, out)
-				lh.excludeFolders.Add(sub)
-			}
-		}
-
-		// In case of SDK projects all files inside project folder are considered included
-		if prj.Project.IsSdkProject() {
-			lh.excludeFolders.Add(filepath.Dir(prj.Path))
-		}
-
-		// Add compiles, contents and nones into included files map
-		filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
-		for _, f := range filesIncluded {
-			normalized := normalize(f)
-			includedFiles.Add(normalized)
-			if _, err := fs.Stat(f); os.IsNotExist(err) {
-				if found, ok := unexistFiles[prj.Path]; ok {
-					found = append(found, f)
-					unexistFiles[prj.Path] = found
-				} else {
-					unexistFiles[prj.Path] = []string{f}
-				}
-			}
-		}
-	})
-
-	lostFiles, err := findLostFiles(lh.excludeFolders, lh.foundFiles, includedFiles)
+	lostFiles, err := findLostFiles(lh.excludeFolders, lh.foundFiles, lh.includedFiles)
 
 	if err != nil {
 		return err
@@ -109,11 +70,11 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 	sortAndOutput(appWriter, lostFiles)
 
 	if !onlyLost {
-		if len(unexistFiles) > 0 {
+		if len(lh.unexistFiles) > 0 {
 			_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
 		}
 
-		outputSortedMap(appWriter, unexistFiles, "Project")
+		outputSortedMap(appWriter, lh.unexistFiles, "Project")
 	}
 
 	if removeLostFiles {
