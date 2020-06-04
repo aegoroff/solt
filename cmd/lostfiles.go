@@ -57,7 +57,9 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 
 	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
 
-	msvc.WalkProjects(foldersTree, lh.projectHandler)
+	projects := msvc.SelectProjects(foldersTree)
+
+	lh.projectHandler(projects)
 
 	lostFiles, err := lh.findLostFiles()
 

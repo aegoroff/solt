@@ -40,10 +40,15 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 	return result
 }
 
-// WalkProjects traverse all projects found in solution(s) folder
-func WalkProjects(foldersTree rbtree.RbTree, action ProjectHandler) {
-	w := &walkPrj{handler: action}
-	walk(foldersTree, w)
+// SelectProjects gets all Visual Studion solutions found in a directory
+func SelectProjects(foldersTree rbtree.RbTree) []*MsbuildProject {
+	var projects []*MsbuildProject
+
+	WalkProjects(foldersTree, func(project *MsbuildProject, folder *Folder) {
+		projects = append(projects, project)
+	})
+
+	return projects
 }
 
 // SelectSolutions gets all Visual Studion solutions found in a directory
@@ -51,6 +56,12 @@ func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
 	w := walkSol{solutions: make([]*VisualStudioSolution, 0)}
 	walk(foldersTree, &w)
 	return w.solutions
+}
+
+// WalkProjects traverse all projects found in solution(s) folder
+func WalkProjects(foldersTree rbtree.RbTree, action ProjectHandler) {
+	w := &walkPrj{handler: action}
+	walk(foldersTree, w)
 }
 
 // IsSdkProject gets whether a project is a the new VS 2017 or later project

@@ -96,14 +96,14 @@ func showMismatches(foldersTree rbtree.RbTree) {
 
 func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[string][]*mismatch {
 	var mismatches = make(map[string][]*mismatch)
-	for sol, projects := range solutionProjects {
+	for sol, contents := range solutionProjects {
 		var packagesMap = make(map[string][]string)
-		for _, prj := range projects {
-			if prj.Packages == nil && len(prj.Projects) == 0 {
+		for _, cnt := range contents {
+			if cnt.Packages == nil && len(cnt.Projects) == 0 {
 				continue
 			}
 
-			nugetPackages := getNugetPackages(prj)
+			nugetPackages := getNugetPackages(cnt)
 
 			for _, pkg := range nugetPackages {
 				if v, ok := packagesMap[pkg.ID]; !ok {

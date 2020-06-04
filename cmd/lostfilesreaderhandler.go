@@ -47,37 +47,39 @@ func (r *lostFilesHandler) Handler(path string) {
 }
 
 // Executed on each found folder that contains msbuild projects
-func (r *lostFilesHandler) projectHandler(prj *msvc.MsbuildProject, fo *msvc.Folder) {
-	// Add project base + exclude subfolder into exclude folders list
-	for _, s := range subfolderToExclude {
-		sub := filepath.Join(fo.Path, s)
-		r.excludeFolders.Add(sub)
-	}
-
-	// Exclude output paths too
-	if prj.Project.OutputPaths != nil {
-		for _, out := range prj.Project.OutputPaths {
-			sub := filepath.Join(fo.Path, out)
+func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
+	for _, prj := range projects {
+		// Add project base + exclude subfolder into exclude folders list
+		for _, s := range subfolderToExclude {
+			sub := filepath.Join(prj.Path, s)
 			r.excludeFolders.Add(sub)
 		}
-	}
 
-	// In case of SDK projects all files inside project folder are considered included
-	if prj.Project.IsSdkProject() {
-		r.excludeFolders.Add(filepath.Dir(prj.Path))
-	}
+		// Exclude output paths too
+		if prj.Project.OutputPaths != nil {
+			for _, out := range prj.Project.OutputPaths {
+				sub := filepath.Join(prj.Path, out)
+				r.excludeFolders.Add(sub)
+			}
+		}
 
-	// Add compiles, contents and nones into included files map
-	filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
-	for _, f := range filesIncluded {
-		normalized := normalize(f)
-		r.includedFiles.Add(normalized)
-		if _, err := r.fs.Stat(f); os.IsNotExist(err) {
-			if found, ok := r.unexistFiles[prj.Path]; ok {
-				found = append(found, f)
-				r.unexistFiles[prj.Path] = found
-			} else {
-				r.unexistFiles[prj.Path] = []string{f}
+		// In case of SDK projects all files inside project folder are considered included
+		if prj.Project.IsSdkProject() {
+			r.excludeFolders.Add(filepath.Dir(prj.Path))
+		}
+
+		// Add compiles, contents and nones into included files map
+		filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
+		for _, f := range filesIncluded {
+			normalized := normalize(f)
+			r.includedFiles.Add(normalized)
+			if _, err := r.fs.Stat(f); os.IsNotExist(err) {
+				if found, ok := r.unexistFiles[prj.Path]; ok {
+					found = append(found, f)
+					r.unexistFiles[prj.Path] = found
+				} else {
+					r.unexistFiles[prj.Path] = []string{f}
+				}
 			}
 		}
 	}

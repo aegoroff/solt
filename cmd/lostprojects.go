@@ -98,7 +98,8 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree rbtree.RbTree, pmm *go
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
-	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+	projects := msvc.SelectProjects(foldersTree)
+	for _, prj := range projects {
 		// Path in upper registry is the project's key
 		projectKey := normalize(prj.Path)
 
@@ -112,7 +113,7 @@ func getOutsideProjectsAndFilesInsideSolution(foldersTree rbtree.RbTree, pmm *go
 				filesInsideSolution.Add(strings.ToUpper(f))
 			}
 		}
-	})
+	}
 
 	return projectsOutsideSolution, filesInsideSolution
 }

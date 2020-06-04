@@ -14,6 +14,7 @@ type walkPrj struct {
 
 func (w *walkPrj) onFolder(f *Folder) {
 	content := f.Content
+
 	if len(content.Projects) == 0 {
 		return
 	}
