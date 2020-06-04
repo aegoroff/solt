@@ -11,7 +11,7 @@ func Match(m *goahocorasick.Machine, s string) bool {
 	return len(terms) > 0
 }
 
-func createAhoCorasickMachine(matches []string) (*goahocorasick.Machine, error) {
+func newAhoCorasickMachine(matches []string) (*goahocorasick.Machine, error) {
 	var runes [][]rune
 	for _, s := range matches {
 		runes = append(runes, bytes.Runes([]byte(s)))

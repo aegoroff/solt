@@ -31,13 +31,14 @@ var lostprojectsCmd = &cobra.Command{
 		for _, sln := range solutions {
 			solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
 			projectsBySolution[sln.Path] = solutionProjectPaths
-			for _, item := range solutionProjectPaths.Items() {
-				projectsInSolutions = append(projectsInSolutions, strings.ToUpper(item))
+			// to create projectsInSolutions you shoud normalize path to build AhoCorasickMachine
+			for _, item := range solutionProjectPaths.ItemsDecorated(normalize) {
+				projectsInSolutions = append(projectsInSolutions, item)
 			}
 		}
 
 		// Create projects matching machine
-		pmm, err := createAhoCorasickMachine(projectsInSolutions)
+		pmm, err := newAhoCorasickMachine(projectsInSolutions)
 		if err != nil {
 			return err
 		}
