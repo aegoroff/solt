@@ -28,6 +28,7 @@ func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler 
 	}
 }
 
+// executed on each found file in a folder
 func (r *lostFilesHandler) Handler(path string) {
 	ef := normalize(r.lostFilesFilter)
 	sln := normalize(msvc.SolutionFileExt)
@@ -45,6 +46,7 @@ func (r *lostFilesHandler) Handler(path string) {
 	}
 }
 
+// Executed on each found folder that contains msbuild projects
 func (r *lostFilesHandler) projectHandler(prj *msvc.MsbuildProject, fo *msvc.Folder) {
 	// Add project base + exclude subfolder into exclude folders list
 	for _, s := range subfolderToExclude {
