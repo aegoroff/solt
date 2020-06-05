@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_unmarshalXmlPackagesConfig(t *testing.T) {
+func Test_UnmarshalXmlPackagesConfig(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	packages := packages{}
@@ -28,7 +28,7 @@ func Test_unmarshalXmlPackagesConfig(t *testing.T) {
 	ass.Equal("net45", packages.Packages[0].TargetFramework)
 }
 
-func Test_unmarshalXmlMsbuildProject(t *testing.T) {
+func Test_UnmarshalXmlMsbuildProject(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	prj := msbuildProject{}
