@@ -49,23 +49,24 @@ func (r *lostFilesHandler) Handler(path string) {
 // Executed on each found folder that contains msbuild projects
 func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
+		pdir := filepath.Dir(prj.Path)
 		// Add project base + exclude subfolder into exclude folders list
 		for _, s := range subfolderToExclude {
-			sub := filepath.Join(prj.Path, s)
+			sub := filepath.Join(pdir, s)
 			r.excludeFolders.Add(sub)
 		}
 
 		// Exclude output paths too
 		if prj.Project.OutputPaths != nil {
 			for _, out := range prj.Project.OutputPaths {
-				sub := filepath.Join(prj.Path, out)
+				sub := filepath.Join(pdir, out)
 				r.excludeFolders.Add(sub)
 			}
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
 		if prj.Project.IsSdkProject() {
-			r.excludeFolders.Add(filepath.Dir(prj.Path))
+			r.excludeFolders.Add(pdir)
 		}
 
 		// Add compiles, contents and nones into included files map

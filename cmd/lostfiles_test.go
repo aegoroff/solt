@@ -34,33 +34,43 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	ass.Equal(``, actual)
 }
 
-func Test_FindLostFilesCmdFilesInPackagesFolder_NoLostFilesFound(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	dir := "a/"
-	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	memfs.MkdirAll(dir+"a/packages", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
+	var tests = []struct {
+		path string
+	}{
+		{"packages/Program.cs"},
+		{"a/packages/Program.cs"},
+		{"a/obj/Debug/Program.cs"},
+	}
+	for _, tst := range tests {
+		// Arrange
+		ass := assert.New(t)
+		dir := "a/"
+		memfs := afero.NewMemMapFs()
+		memfs.MkdirAll(dir+"a/Properties", 0755)
+		memfs.MkdirAll(dir+"packages", 0755)
+		memfs.MkdirAll(dir+"a/packages", 0755)
+		afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+		afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+		afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+		afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+		afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+		afero.WriteFile(memfs, dir+tst.path, []byte(codeFileContent), 0644)
+		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	buf := bytes.NewBufferString("")
+		buf := bytes.NewBufferString("")
 
-	appWriter = buf
-	appFileSystem = memfs
+		appWriter = buf
+		appFileSystem = memfs
 
-	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir})
-	rootCmd.Execute()
+		// Act
+		rootCmd.SetArgs([]string{"lf", "-p", dir})
+		rootCmd.Execute()
 
-	// Assert
-	actual := buf.String()
-	ass.Equal(``, actual)
+		// Assert
+		actual := buf.String()
+		ass.Equal(``, actual)
+	}
 }
 
 func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
