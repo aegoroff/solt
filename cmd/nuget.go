@@ -69,7 +69,6 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		for k, v := range allSolutionPaths {
 			if v.Contains(normalize(prj.Path)) {
 				solutionProjects[k] = append(solutionProjects[k], fold.Content)
-				break
 			}
 		}
 	})
