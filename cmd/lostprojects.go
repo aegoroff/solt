@@ -24,19 +24,22 @@ var lostprojectsCmd = &cobra.Command{
 		solutions := msvc.SelectSolutions(foldersTree)
 		allProjects := msvc.SelectProjects(foldersTree)
 
-		var projectsInSolutions []string
-		projectsBySolution := make(map[string]collections.StringHashSet)
+		// linked from any solution projects list
+		// so these projects are not considered lost
+		var linkedProjects []string
+
+		projectLinksBySolution := make(map[string]collections.StringHashSet)
 		// Each found solution
 		for _, sln := range solutions {
-			solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
-			projectsBySolution[sln.Path] = solutionProjectPaths
+			links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
+			projectLinksBySolution[sln.Path] = links
 			// to create projectsInSolutions you shoud normalize path to build Matcher
-			for _, item := range solutionProjectPaths.ItemsDecorated(normalize) {
-				projectsInSolutions = append(projectsInSolutions, item)
+			for _, item := range links.ItemsDecorated(normalize) {
+				linkedProjects = append(linkedProjects, item)
 			}
 		}
 
-		projectsOutsideSolutions, filesInsideSolution := filterProjects(allProjects, projectsInSolutions)
+		projectsOutsideSolutions, filesInsideSolution := filterProjects(allProjects, linkedProjects)
 		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
 
 		sortAndOutput(appWriter, lostProjects)
@@ -47,7 +50,7 @@ var lostprojectsCmd = &cobra.Command{
 
 		sortAndOutput(appWriter, lostProjectsThatIncludeSolutionProjectsFiles)
 
-		unexistProjects := getUnexistProjects(projectsBySolution, appFileSystem)
+		unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
 
 		if len(unexistProjects) > 0 {
 			_, _ = fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
@@ -82,9 +85,9 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	return result
 }
 
-func filterProjects(allProjects []*msvc.MsbuildProject, projectsInSolutions []string) ([]*msvc.MsbuildProject, collections.StringHashSet) {
+func filterProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]*msvc.MsbuildProject, collections.StringHashSet) {
 	// Create projects matching machine
-	projectMatch := NewExactMatchS(projectsInSolutions)
+	projectMatch := NewExactMatchS(linkedProjects)
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
