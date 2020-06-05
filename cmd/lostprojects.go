@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
-	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
@@ -23,6 +22,7 @@ var lostprojectsCmd = &cobra.Command{
 		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
 		solutions := msvc.SelectSolutions(foldersTree)
+		allProjects := msvc.SelectProjects(foldersTree)
 
 		var projectsInSolutions []string
 		projectsBySolution := make(map[string]collections.StringHashSet)
@@ -36,11 +36,7 @@ var lostprojectsCmd = &cobra.Command{
 			}
 		}
 
-		// Create projects matching machine
-		projectMatch := NewExactMatchS(projectsInSolutions)
-
-		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, projectMatch)
-
+		projectsOutsideSolutions, filesInsideSolution := filterProjects(allProjects, projectsInSolutions)
 		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
 
 		sortAndOutput(appWriter, lostProjects)
@@ -86,12 +82,13 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(ftree rbtree.RbTree, projectMatch Matcher) ([]*msvc.MsbuildProject, collections.StringHashSet) {
+func filterProjects(allProjects []*msvc.MsbuildProject, projectsInSolutions []string) ([]*msvc.MsbuildProject, collections.StringHashSet) {
+	// Create projects matching machine
+	projectMatch := NewExactMatchS(projectsInSolutions)
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
-	projects := msvc.SelectProjects(ftree)
-	for _, prj := range projects {
+	for _, prj := range allProjects {
 		// Path in upper registry is the project's key
 		projectKey := normalize(prj.Path)
 
