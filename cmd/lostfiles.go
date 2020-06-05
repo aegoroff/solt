@@ -81,9 +81,6 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 		removeLostfiles(lostFiles, fs)
 	}
 
-	if diag {
-		printMemUsage(appWriter)
-	}
 	return nil
 }
 

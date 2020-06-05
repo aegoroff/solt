@@ -38,10 +38,6 @@ var nugetCmd = &cobra.Command{
 			showPackagesInfoByFolders(foldersTree)
 		}
 
-		if diag {
-			printMemUsage(appWriter)
-		}
-
 		return nil
 	},
 }

@@ -63,10 +63,6 @@ var lostprojectsCmd = &cobra.Command{
 
 		outputSortedMap(appWriter, unexistProjects, "Solution")
 
-		if diag {
-			printMemUsage(appWriter)
-		}
-
 		return nil
 	},
 }

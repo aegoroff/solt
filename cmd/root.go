@@ -40,6 +40,7 @@ func Execute() {
 	elapsed := time.Since(start)
 
 	if diag {
+		printMemUsage(appWriter)
 		_, _ = fmt.Fprintf(appWriter, "Working time: %v\n", elapsed)
 	}
 }

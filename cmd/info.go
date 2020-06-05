@@ -49,10 +49,6 @@ var infoCmd = &cobra.Command{
 			return true
 		})
 
-		if diag {
-			printMemUsage(appWriter)
-		}
-
 		return nil
 	},
 }
