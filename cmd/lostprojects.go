@@ -30,19 +30,16 @@ var lostprojectsCmd = &cobra.Command{
 		for _, sln := range solutions {
 			solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
 			projectsBySolution[sln.Path] = solutionProjectPaths
-			// to create projectsInSolutions you shoud normalize path to build AhoCorasickMachine
+			// to create projectsInSolutions you shoud normalize path to build Matcher
 			for _, item := range solutionProjectPaths.ItemsDecorated(normalize) {
 				projectsInSolutions = append(projectsInSolutions, item)
 			}
 		}
 
 		// Create projects matching machine
-		matcher, err := NewPartialMatcher(projectsInSolutions)
-		if err != nil {
-			return err
-		}
+		projectMatch := NewExactMatchS(projectsInSolutions)
 
-		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, matcher)
+		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, projectMatch)
 
 		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
 
