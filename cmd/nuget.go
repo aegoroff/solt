@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"solt/internal/msvc"
 	"strings"
@@ -55,15 +54,16 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	var solutionProjects = make(map[string][]*msvc.FolderContent)
 
 	// Each found solution
-	allSolutionPaths := make(map[string]collections.StringHashSet)
+	allSolutionPaths := make(map[string]Matcher)
 	for _, sln := range solutions {
-		allSolutionPaths[sln.Path] = msvc.SelectAllSolutionProjectPaths(sln, normalize)
+		h := msvc.SelectAllSolutionProjectPaths(sln, normalize)
+		allSolutionPaths[sln.Path] = NewExactMatchHS(&h)
 		solutionProjects[sln.Path] = []*msvc.FolderContent{}
 	}
 
 	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		for k, v := range allSolutionPaths {
-			if v.Contains(normalize(prj.Path)) {
+			if v.Match(normalize(prj.Path)) {
 				solutionProjects[k] = append(solutionProjects[k], fold.Content)
 			}
 		}

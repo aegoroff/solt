@@ -2,16 +2,28 @@ package cmd
 
 import (
 	"bytes"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/anknown/ahocorasick"
 )
 
-// Match do string matching to several patterns that defined by goahocorasick.Machine
-func Match(m *goahocorasick.Machine, s string) bool {
-	terms := m.MultiPatternSearch([]rune(s), true)
-	return len(terms) > 0
+// Matcher defines string matcher interface
+type Matcher interface {
+	// Match do string matching to several patterns
+	Match(s string) bool
 }
 
-func newAhoCorasickMachine(matches []string) (*goahocorasick.Machine, error) {
+type ahocorasick struct {
+	machine *goahocorasick.Machine
+}
+
+type hashset struct {
+	hashset collections.StringHashSet
+}
+
+// NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
+// Partial means that string should contain one of the matcher's strings as substring
+// or whole string
+func NewPartialMatcher(matches []string) (Matcher, error) {
 	var runes [][]rune
 	for _, s := range matches {
 		runes = append(runes, bytes.Runes([]byte(s)))
@@ -21,5 +33,36 @@ func newAhoCorasickMachine(matches []string) (*goahocorasick.Machine, error) {
 	if err != nil {
 		return nil, err
 	}
-	return machine, nil
+	aho := ahocorasick{machine: machine}
+
+	return &aho, nil
+}
+
+// NewExactMatchS creates exacth matcher from strings slice
+// Exact means that string must exactly match one of the matcher's strings
+func NewExactMatchS(matches []string) Matcher {
+	h := make(collections.StringHashSet)
+	for _, s := range matches {
+		h.Add(s)
+	}
+
+	return NewExactMatchHS(&h)
+}
+
+// NewExactMatchHS creates exacth matcher from strings slice
+// Exact means that string must exactly match one of the matcher's strings
+func NewExactMatchHS(existing *collections.StringHashSet) Matcher {
+	hs := hashset{hashset: *existing}
+	return &hs
+}
+
+// Match do string matching to several patterns
+func (a *ahocorasick) Match(s string) bool {
+	terms := a.machine.MultiPatternSearch([]rune(s), true)
+	return len(terms) > 0
+}
+
+// Match do string matching to several patterns
+func (h *hashset) Match(s string) bool {
+	return h.hashset.Contains(s)
 }

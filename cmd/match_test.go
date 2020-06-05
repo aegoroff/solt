@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_MatchOneOfPatterns(t *testing.T) {
+func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	var tests = []struct {
@@ -22,8 +22,33 @@ func Test_MatchOneOfPatterns(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		m, _ := newAhoCorasickMachine(test.patterns)
-		result := Match(m, test.input)
+		m, _ := NewPartialMatcher(test.patterns)
+		result := m.Match(test.input)
+
+		// Assert
+		ass.Equal(test.result, result)
+	}
+}
+
+func Test_MatchOneOfPatterns_Exact(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	var tests = []struct {
+		patterns []string
+		input    string
+		result   bool
+	}{
+		{[]string{"xxx", "yyy", "zzz"}, "yyyyy", false},
+		{[]string{"xxx", "yyy", "zzz"}, "yyy", true},
+		{[]string{"xxx", "yyy", "zzz"}, "yyyzzz", false},
+		{[]string{"xxx", "yyy", "zzz"}, "cccyyybbb", false},
+		{[]string{"xxx", "yyy", "zzz"}, "aaa", false},
+	}
+
+	for _, test := range tests {
+		// Act
+		m := NewExactMatchS(test.patterns)
+		result := m.Match(test.input)
 
 		// Assert
 		ass.Equal(test.result, result)

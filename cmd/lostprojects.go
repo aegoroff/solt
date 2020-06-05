@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
-	goahocorasick "github.com/anknown/ahocorasick"
 	"github.com/spf13/afero"
 	"os"
 	"path/filepath"
@@ -38,12 +37,12 @@ var lostprojectsCmd = &cobra.Command{
 		}
 
 		// Create projects matching machine
-		pmm, err := newAhoCorasickMachine(projectsInSolutions)
+		matcher, err := NewPartialMatcher(projectsInSolutions)
 		if err != nil {
 			return err
 		}
 
-		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, pmm)
+		projectsOutsideSolutions, filesInsideSolution := getOutsideProjectsAndFilesInsideSolution(foldersTree, matcher)
 
 		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
 
@@ -90,23 +89,23 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	return result
 }
 
-func getOutsideProjectsAndFilesInsideSolution(foldersTree rbtree.RbTree, pmm *goahocorasick.Machine) ([]*msvc.MsbuildProject, collections.StringHashSet) {
+func getOutsideProjectsAndFilesInsideSolution(ftree rbtree.RbTree, projectMatch Matcher) ([]*msvc.MsbuildProject, collections.StringHashSet) {
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var filesInsideSolution = make(collections.StringHashSet)
 
-	projects := msvc.SelectProjects(foldersTree)
+	projects := msvc.SelectProjects(ftree)
 	for _, prj := range projects {
 		// Path in upper registry is the project's key
 		projectKey := normalize(prj.Path)
 
-		ok := Match(pmm, projectKey)
+		ok := projectMatch.Match(projectKey)
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, prj)
 		} else {
 			filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
 
 			for _, f := range filesIncluded {
-				filesInsideSolution.Add(strings.ToUpper(f))
+				filesInsideSolution.Add(normalize(f))
 			}
 		}
 	}
