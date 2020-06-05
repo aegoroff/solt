@@ -58,6 +58,19 @@ func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
 	return w.solutions
 }
 
+// SelectSolutionsAndProjects gets all Visual Studion solutions and projects found in a directory
+func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolution, []*MsbuildProject) {
+	ws := walkSol{solutions: make([]*VisualStudioSolution, 0)}
+	var projects []*MsbuildProject
+
+	wp := walkPrj{handler: func(project *MsbuildProject, folder *Folder) {
+		projects = append(projects, project)
+	}}
+
+	walk(foldersTree, &ws, &wp)
+	return ws.solutions, projects
+}
+
 // WalkProjects traverse all projects found in solution(s) folder
 func WalkProjects(foldersTree rbtree.RbTree, action ProjectHandler) {
 	w := &walkPrj{handler: action}

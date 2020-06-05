@@ -21,8 +21,7 @@ var lostprojectsCmd = &cobra.Command{
 
 		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
-		solutions := msvc.SelectSolutions(foldersTree)
-		allProjects := msvc.SelectProjects(foldersTree)
+		solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
 		// linked from any solution projects list
 		// so these projects are not considered lost

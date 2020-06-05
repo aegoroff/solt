@@ -40,9 +40,11 @@ func (w *walkSol) onFolder(f *Folder) {
 	}
 }
 
-func walk(foldersTree rbtree.RbTree, w walker) {
+func walk(foldersTree rbtree.RbTree, walkers ...walker) {
 	foldersTree.WalkInorder(func(n rbtree.Node) {
 		fold := n.Key().(*Folder)
-		w.onFolder(fold)
+		for _, w := range walkers {
+			w.onFolder(fold)
+		}
 	})
 }
