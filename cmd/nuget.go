@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"solt/internal/msvc"
 	"strings"
@@ -58,19 +59,22 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	var solutionProjects = make(map[string][]*msvc.FolderContent)
 
 	// Each found solution
+	allSolutionPaths := make(map[string]collections.StringHashSet)
 	for _, sln := range solutions {
-		solutionProjectPaths := msvc.SelectAllSolutionProjectPaths(sln, normalize)
+		allSolutionPaths[sln.Path] = msvc.SelectAllSolutionProjectPaths(sln, normalize)
+	}
 
-		msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-			if solutionProjectPaths.Contains(normalize(prj.Path)) {
-				if v, ok := solutionProjects[sln.Path]; !ok {
-					solutionProjects[sln.Path] = []*msvc.FolderContent{fold.Content}
+	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+		for k, v := range allSolutionPaths {
+			if v.Contains(normalize(prj.Path)) {
+				if v, ok := solutionProjects[k]; !ok {
+					solutionProjects[k] = []*msvc.FolderContent{fold.Content}
 				} else {
-					solutionProjects[sln.Path] = append(v, fold.Content)
+					solutionProjects[k] = append(v, fold.Content)
 				}
 			}
-		})
-	}
+		}
+	})
 
 	mismatches := calculateMismatches(solutionProjects)
 
