@@ -72,6 +72,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 				} else {
 					solutionProjects[k] = append(v, fold.Content)
 				}
+				break
 			}
 		}
 	})
