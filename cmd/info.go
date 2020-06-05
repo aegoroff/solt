@@ -49,7 +49,7 @@ var infoCmd = &cobra.Command{
 			return true
 		})
 
-		if showMemUsage {
+		if diag {
 			printMemUsage(appWriter)
 		}
 
