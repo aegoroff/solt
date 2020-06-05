@@ -62,16 +62,13 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	allSolutionPaths := make(map[string]collections.StringHashSet)
 	for _, sln := range solutions {
 		allSolutionPaths[sln.Path] = msvc.SelectAllSolutionProjectPaths(sln, normalize)
+		solutionProjects[sln.Path] = []*msvc.FolderContent{}
 	}
 
 	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		for k, v := range allSolutionPaths {
 			if v.Contains(normalize(prj.Path)) {
-				if v, ok := solutionProjects[k]; !ok {
-					solutionProjects[k] = []*msvc.FolderContent{fold.Content}
-				} else {
-					solutionProjects[k] = append(v, fold.Content)
-				}
+				solutionProjects[k] = append(solutionProjects[k], fold.Content)
 				break
 			}
 		}
