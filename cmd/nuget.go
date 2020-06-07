@@ -88,7 +88,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
 	for sol, m := range mismatches {
-		fmt.Printf("\n %s\n", sol)
+		_, _ = fmt.Fprintf(appWriter, "\n %s\n", sol)
 		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 		sort.Sort(m)
@@ -191,7 +191,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 		}
 
 		parent := fold.Path
-		fmt.Printf(" %s\n", parent)
+		_, _ = fmt.Fprintf(appWriter, " %s\n", parent)
 		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
@@ -201,7 +201,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 		}
 
 		_ = tw.Flush()
-		fmt.Println()
+		_, _ = fmt.Fprintln(appWriter)
 	})
 }
 

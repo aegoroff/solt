@@ -31,9 +31,11 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := buf.String()
-	ass.Equal(`  Package    Version
+	ass.Equal(` a\a
+  Package    Version
   -------    --------
   CmdLine    1.0.7.509
+
 `, actual)
 }
 
