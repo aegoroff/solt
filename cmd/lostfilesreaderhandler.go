@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"solt/internal/msvc"
+	"strings"
 )
 
 type lostFilesHandler struct {
@@ -30,16 +31,13 @@ func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler 
 
 // executed on each found file in a folder
 func (r *lostFilesHandler) Handler(path string) {
-	ef := normalize(r.lostFilesFilter)
-	sln := normalize(msvc.SolutionFileExt)
-
 	// Add file to filtered files slice
-	ext := normalize(filepath.Ext(path))
-	if ext == ef {
+	ext := filepath.Ext(path)
+	if strings.EqualFold(ext, r.lostFilesFilter) {
 		r.foundFiles = append(r.foundFiles, path)
 	}
 
-	if ext == sln {
+	if strings.EqualFold(ext, msvc.SolutionFileExt) {
 		dir, _ := filepath.Split(path)
 		ppath := filepath.Join(dir, "packages")
 		r.excludeFolders.Add(ppath)
