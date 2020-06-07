@@ -60,7 +60,7 @@ func (r *reader) Handler(path string) {
 
 // packages.config
 
-func (_ *readerPackagesConfig) filter(path string) bool {
+func (*readerPackagesConfig) filter(path string) bool {
 	_, file := filepath.Split(path)
 	return strings.EqualFold(file, packagesConfigFile)
 }
@@ -82,7 +82,7 @@ func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 
 // MSBuild projects
 
-func (_ *readerMsbuild) filter(path string) bool {
+func (*readerMsbuild) filter(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt)
 }
@@ -106,7 +106,7 @@ func (r *readerMsbuild) read(path string) (*Folder, bool) {
 
 // VS Solutions
 
-func (_ *readerSolution) filter(path string) bool {
+func (*readerSolution) filter(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, SolutionFileExt)
 }
