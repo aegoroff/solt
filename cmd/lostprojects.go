@@ -67,17 +67,16 @@ func init() {
 
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
-	for sol, projects := range projectsInSolutions {
-		for _, prj := range projects.Items() {
-			if _, err := fs.Stat(prj); !os.IsNotExist(err) {
+	for spath, projects := range projectsInSolutions {
+		for _, ppath := range projects.Items() {
+			if _, err := fs.Stat(ppath); !os.IsNotExist(err) {
 				continue
 			}
 
-			if found, ok := result[sol]; ok {
-				found = append(found, prj)
-				result[sol] = found
+			if found, ok := result[spath]; ok {
+				result[spath] = append(found, ppath)
 			} else {
-				result[sol] = []string{prj}
+				result[spath] = []string{ppath}
 			}
 		}
 	}
