@@ -98,13 +98,8 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 		}
 
 		var packagesMap map[string]string
-
-		if m, ok := packagesByProject[ppath]; !ok {
-			packagesMap = make(map[string]string)
-			packagesByProject[ppath] = packagesMap
-		} else {
-			packagesMap = m
-		}
+		packagesMap = make(map[string]string)
+		packagesByProject[ppath] = packagesMap
 
 		nugetPackages := getNugetPackages(content)
 
