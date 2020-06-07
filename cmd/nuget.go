@@ -82,7 +82,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		return
 	}
 
-	fmt.Println(" Different nuget package's versions in the same solution found:")
+	_, _ = fmt.Fprintln(appWriter, " Different nuget package's versions in the same solution found:")
 
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
