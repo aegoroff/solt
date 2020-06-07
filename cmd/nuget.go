@@ -51,25 +51,20 @@ func showMismatches(foldersTree rbtree.RbTree) {
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
-	var solutionProjects = make(map[string][]*msvc.FolderContent)
+	var allProjectFolders = make(map[string]*msvc.FolderContent)
 
 	// Each found solution
 	allSolutionPaths := make(map[string]Matcher)
 	for _, sln := range solutions {
 		h := msvc.SelectAllSolutionProjectPaths(sln, normalize)
 		allSolutionPaths[sln.Path] = NewExactMatchHS(&h)
-		solutionProjects[sln.Path] = []*msvc.FolderContent{}
 	}
 
 	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		for k, v := range allSolutionPaths {
-			if v.Match(normalize(prj.Path)) {
-				solutionProjects[k] = append(solutionProjects[k], fold.Content)
-			}
-		}
+		allProjectFolders[normalize(prj.Path)] = fold.Content
 	})
 
-	mismatches := calculateMismatches(solutionProjects)
+	mismatches := calculateMismatches(allSolutionPaths, allProjectFolders)
 
 	if len(mismatches) == 0 {
 		return
@@ -91,32 +86,57 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	}
 }
 
-func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[string][]*mismatch {
+func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string][]*mismatch {
 	var mismatches = make(map[string][]*mismatch)
-	for sol, contents := range solutionProjects {
-		var packagesMap = make(map[string][]string)
-		for _, cnt := range contents {
-			if len(cnt.Projects) == 0 {
+
+	var packagesByProject = make(map[string]map[string]string)
+
+	// Map packages
+	for ppath, content := range allPrjFolders {
+		if len(content.Projects) == 0 {
+			continue
+		}
+
+		var packagesMap map[string]string
+
+		if m, ok := packagesByProject[ppath]; !ok {
+			packagesMap = make(map[string]string)
+			packagesByProject[ppath] = packagesMap
+		} else {
+			packagesMap = m
+		}
+
+		nugetPackages := getNugetPackages(content)
+
+		for _, pkg := range nugetPackages {
+			packagesMap[pkg.ID] = pkg.Version
+		}
+	}
+
+	// Reduce packages
+	for spath, match := range allSolPaths {
+		packagesVers := make(map[string][]string)
+
+		for ppath, pkg := range packagesByProject {
+			if !match.Match(ppath) {
 				continue
 			}
 
-			nugetPackages := getNugetPackages(cnt)
-
-			for _, pkg := range nugetPackages {
-				if v, ok := packagesMap[pkg.ID]; !ok {
-					packagesMap[pkg.ID] = []string{pkg.Version}
+			for pkg, ver := range pkg {
+				if v, ok := packagesVers[pkg]; !ok {
+					packagesVers[pkg] = []string{ver}
 				} else {
 					// Only unique versions added
-					if contains(v, pkg.Version) {
+					if contains(v, ver) {
 						continue
 					}
 
-					packagesMap[pkg.ID] = append(v, pkg.Version)
+					packagesVers[pkg] = append(v, ver)
 				}
 			}
 		}
 
-		for pkg, vers := range packagesMap {
+		for pkg, vers := range packagesVers {
 			// If one version it's OK (no mismatches)
 			if len(vers) < 2 {
 				continue
@@ -127,13 +147,14 @@ func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[
 				versions: vers,
 			}
 
-			if v, ok := mismatches[sol]; !ok {
-				mismatches[sol] = []*mismatch{&m}
+			if v, ok := mismatches[spath]; !ok {
+				mismatches[spath] = []*mismatch{&m}
 			} else {
-				mismatches[sol] = append(v, &m)
+				mismatches[spath] = append(v, &m)
 			}
 		}
 	}
+
 	return mismatches
 }
 
