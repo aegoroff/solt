@@ -60,7 +60,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		allSolutionPaths[sln.Path] = NewExactMatchHS(&h)
 	}
 
-	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		allProjectFolders[normalize(prj.Path)] = fold.Content
 	})
 
@@ -168,7 +168,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
 		nugetPackages := getNugetPackages(content)
 

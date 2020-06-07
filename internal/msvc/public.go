@@ -44,7 +44,7 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 func SelectProjects(foldersTree rbtree.RbTree) []*MsbuildProject {
 	var projects []*MsbuildProject
 
-	WalkProjects(foldersTree, func(project *MsbuildProject, folder *Folder) {
+	WalkProjectFolders(foldersTree, func(project *MsbuildProject, folder *Folder) {
 		projects = append(projects, project)
 	})
 
@@ -71,8 +71,8 @@ func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolut
 	return ws.solutions, projects
 }
 
-// WalkProjects traverse all projects found in solution(s) folder
-func WalkProjects(foldersTree rbtree.RbTree, action ProjectHandler) {
+// WalkProjectFolders traverse all projects found in solution(s) folder
+func WalkProjectFolders(foldersTree rbtree.RbTree, action ProjectHandler) {
 	w := &walkPrj{handler: action}
 	walk(foldersTree, w)
 }
