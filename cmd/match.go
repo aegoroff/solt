@@ -12,11 +12,13 @@ type Matcher interface {
 	Match(s string) bool
 }
 
-type ahocorasick struct {
+// matchP defines partial matching
+type matchP struct {
 	machine *goahocorasick.Machine
 }
 
-type hashset struct {
+// matchP defines exact matching
+type matchE struct {
 	hashset collections.StringHashSet
 }
 
@@ -33,7 +35,7 @@ func NewPartialMatcher(matches []string) (Matcher, error) {
 	if err != nil {
 		return nil, err
 	}
-	aho := ahocorasick{machine: machine}
+	aho := matchP{machine: machine}
 
 	return &aho, nil
 }
@@ -52,17 +54,17 @@ func NewExactMatchS(matches []string) Matcher {
 // NewExactMatchHS creates exacth matcher from strings slice
 // Exact means that string must exactly match one of the matcher's strings
 func NewExactMatchHS(existing *collections.StringHashSet) Matcher {
-	hs := hashset{hashset: *existing}
+	hs := matchE{hashset: *existing}
 	return &hs
 }
 
 // Match do string matching to several patterns
-func (a *ahocorasick) Match(s string) bool {
+func (a *matchP) Match(s string) bool {
 	terms := a.machine.MultiPatternSearch([]rune(s), true)
 	return len(terms) > 0
 }
 
 // Match do string matching to several patterns
-func (h *hashset) Match(s string) bool {
+func (h *matchE) Match(s string) bool {
 	return h.hashset.Contains(s)
 }
