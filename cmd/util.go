@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/spf13/afero"
 	"io"
+	"os"
 	"runtime"
 	"sort"
 	"strings"
@@ -11,6 +13,18 @@ import (
 
 func normalize(s string) string {
 	return strings.ToUpper(s)
+}
+
+// checkExistence validate files passed to be present in file system
+// The list of non exist files returned
+func checkExistence(files []string, fs afero.Fs) []string {
+	result := []string{}
+	for _, f := range files {
+		if _, err := fs.Stat(f); os.IsNotExist(err) {
+			result = append(result, f)
+		}
+	}
+	return result
 }
 
 func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix string) {

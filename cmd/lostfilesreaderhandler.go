@@ -67,15 +67,13 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 		}
 
 		// Add compiles, contents and nones into included files map
-		non := nonexist{
-			incl: msvc.GetFilesIncludedIntoProject(prj),
-		}
-
-		for _, f := range non.incl {
+		includes := msvc.GetFilesIncludedIntoProject(prj)
+		for _, f := range includes {
 			r.includedFiles.Add(normalize(f))
 		}
 
-		nonexist := find(&non, r.fs)
+		nonexist := checkExistence(includes, r.fs)
+
 		if len(nonexist) > 0 {
 			r.unexistFiles[prj.Path] = append(r.unexistFiles[prj.Path], nonexist...)
 		}

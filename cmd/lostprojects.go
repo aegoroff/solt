@@ -68,12 +68,8 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	var result = make(map[string][]string)
 
 	for spath, projects := range projectsInSolutions {
+		nonexist := checkExistence(projects.Items(), fs)
 
-		non := nonexist{
-			incl: projects.Items(),
-		}
-
-		nonexist := find(&non, fs)
 		if len(nonexist) > 0 {
 			result[spath] = append(result[spath], nonexist...)
 		}
