@@ -18,11 +18,6 @@ type lostFilesHandler struct {
 	subfoldersToExclude []string
 }
 
-type nonexistFiles struct {
-	nonexist
-	includedFiles collections.StringHashSet
-}
-
 func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler {
 	return &lostFilesHandler{
 		fs:                  fs,
@@ -72,11 +67,12 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 		}
 
 		// Add compiles, contents and nones into included files map
-		non := nonexistFiles{
-			nonexist: nonexist{
-				incl: msvc.GetFilesIncludedIntoProject(prj),
-			},
-			includedFiles: r.includedFiles,
+		non := nonexist{
+			incl: msvc.GetFilesIncludedIntoProject(prj),
+		}
+
+		for _, f := range non.incl {
+			r.includedFiles.Add(normalize(f))
 		}
 
 		nonexist := find(&non, r.fs)
@@ -84,11 +80,6 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 			r.unexistFiles[prj.Path] = append(r.unexistFiles[prj.Path], nonexist...)
 		}
 	}
-}
-
-func (n *nonexistFiles) each(incl string) {
-	normalized := normalize(incl)
-	n.includedFiles.Add(normalized)
 }
 
 func (r *lostFilesHandler) findLostFiles() ([]string, error) {
