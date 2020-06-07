@@ -96,7 +96,7 @@ func calculateMismatches(solutionProjects map[string][]*msvc.FolderContent) map[
 	for sol, contents := range solutionProjects {
 		var packagesMap = make(map[string][]string)
 		for _, cnt := range contents {
-			if cnt.Packages == nil && len(cnt.Projects) == 0 {
+			if len(cnt.Projects) == 0 {
 				continue
 			}
 
@@ -150,20 +150,15 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	foldersTree.WalkInorder(func(n rbtree.Node) {
-		folder := n.Key().(*msvc.Folder)
-		content := folder.Content
-		if content.Packages == nil && len(content.Projects) == 0 {
-			return
-		}
-
+	msvc.WalkProjects(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+		content := fold.Content
 		nugetPackages := getNugetPackages(content)
 
 		if len(nugetPackages) == 0 {
 			return
 		}
 
-		parent := folder.Path
+		parent := fold.Path
 		fmt.Printf(" %s\n", parent)
 		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
