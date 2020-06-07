@@ -18,7 +18,6 @@ var lostprojectsCmd = &cobra.Command{
 	Aliases: []string{"lostprojects"},
 	Short:   "Find projects that not included into any solution",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
 		solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)

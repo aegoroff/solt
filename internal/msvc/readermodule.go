@@ -146,7 +146,6 @@ func createFolder(path string) *Folder {
 }
 
 func onXMLFile(path string, fs afero.Fs, result interface{}) error {
-
 	err := sys.UnmarshalXMLFrom(path, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", path, err)

@@ -60,7 +60,6 @@ func init() {
 }
 
 func showMismatches(foldersTree rbtree.RbTree) {
-
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	var allProjectFolders = make(map[string]*msvc.FolderContent)
@@ -100,7 +99,6 @@ func showMismatches(foldersTree rbtree.RbTree) {
 }
 
 func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string]mismatches {
-
 	var packagesByProject = make(map[string]map[string]string)
 
 	// Map packages

@@ -22,7 +22,6 @@ var lostfilesCmd = &cobra.Command{
 	Aliases: []string{"lostfiles"},
 	Short:   "Find lost files in the folder specified",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
 
 		if err != nil {
