@@ -99,9 +99,69 @@ func showMismatches(foldersTree rbtree.RbTree) {
 }
 
 func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string]mismatches {
+	allPkg := mapAllPackages(allPrjFolders)
+
+	var mismatches = make(map[string]mismatches)
+
+	// Reduce packages
+	for spath, match := range allSolPaths {
+		packagesVers := mapPackagesInSolution(allPkg, match)
+
+		// Reduce packages in solution
+		reducePackages(packagesVers, mismatches, spath)
+	}
+
+	return mismatches
+}
+
+func reducePackages(packagesVers map[string][]string, mismatches map[string]mismatches, solPath string) {
+	for pkg, vers := range packagesVers {
+		// If one version it's OK (no mismatches)
+		if len(vers) < 2 {
+			continue
+		}
+
+		m := mismatch{
+			pkg:      pkg,
+			versions: vers,
+		}
+
+		if v, ok := mismatches[solPath]; !ok {
+			mismatches[solPath] = []*mismatch{&m}
+		} else {
+			mismatches[solPath] = append(v, &m)
+		}
+	}
+}
+
+func mapPackagesInSolution(packagesByProject map[string]map[string]string, match Matcher) map[string][]string {
+	packagesVers := make(map[string][]string)
+
+	for ppath, pkg := range packagesByProject {
+		if !match.Match(ppath) {
+			continue
+		}
+
+		for pkg, ver := range pkg {
+			if v, ok := packagesVers[pkg]; !ok {
+				packagesVers[pkg] = []string{ver}
+			} else {
+				// Only unique versions added
+				if contains(v, ver) {
+					continue
+				}
+
+				packagesVers[pkg] = append(v, ver)
+			}
+		}
+	}
+
+	return packagesVers
+}
+
+func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map[string]string {
 	var packagesByProject = make(map[string]map[string]string)
 
-	// Map packages
 	for ppath, content := range allPrjFolders {
 		if len(content.Projects) == 0 {
 			continue
@@ -117,54 +177,7 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 			packagesMap[pkg.ID] = pkg.Version
 		}
 	}
-
-	var mismatches = make(map[string]mismatches)
-
-	// Reduce packages
-	for spath, match := range allSolPaths {
-		packagesVers := make(map[string][]string)
-
-		// Map packages in solution
-		for ppath, pkg := range packagesByProject {
-			if !match.Match(ppath) {
-				continue
-			}
-
-			for pkg, ver := range pkg {
-				if v, ok := packagesVers[pkg]; !ok {
-					packagesVers[pkg] = []string{ver}
-				} else {
-					// Only unique versions added
-					if contains(v, ver) {
-						continue
-					}
-
-					packagesVers[pkg] = append(v, ver)
-				}
-			}
-		}
-
-		// Reduce packages in solution
-		for pkg, vers := range packagesVers {
-			// If one version it's OK (no mismatches)
-			if len(vers) < 2 {
-				continue
-			}
-
-			m := mismatch{
-				pkg:      pkg,
-				versions: vers,
-			}
-
-			if v, ok := mismatches[spath]; !ok {
-				mismatches[spath] = []*mismatch{&m}
-			} else {
-				mismatches[spath] = append(v, &m)
-			}
-		}
-	}
-
-	return mismatches
+	return packagesByProject
 }
 
 func contains(s []string, e string) bool {
