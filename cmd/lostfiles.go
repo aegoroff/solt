@@ -8,10 +8,6 @@ import (
 	"solt/internal/msvc"
 )
 
-var subfolderToExclude = []string{
-	"obj",
-}
-
 const filterParamName = "file"
 const removeParamName = "remove"
 const onlyLostParamName = "onlylost"

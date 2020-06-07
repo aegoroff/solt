@@ -10,22 +10,24 @@ import (
 )
 
 type lostFilesHandler struct {
-	fs              afero.Fs
-	foundFiles      []string
-	excludeFolders  collections.StringHashSet
-	lostFilesFilter string
-	unexistFiles    map[string][]string
-	includedFiles   collections.StringHashSet
+	fs                  afero.Fs
+	foundFiles          []string
+	excludeFolders      collections.StringHashSet
+	lostFilesFilter     string
+	unexistFiles        map[string][]string
+	includedFiles       collections.StringHashSet
+	subfoldersToExclude []string
 }
 
 func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler {
 	return &lostFilesHandler{
-		fs:              fs,
-		foundFiles:      make([]string, 0),
-		excludeFolders:  make(collections.StringHashSet),
-		lostFilesFilter: lostFilesFilter,
-		unexistFiles:    make(map[string][]string),
-		includedFiles:   make(collections.StringHashSet),
+		fs:                  fs,
+		foundFiles:          make([]string, 0),
+		excludeFolders:      make(collections.StringHashSet),
+		lostFilesFilter:     lostFilesFilter,
+		unexistFiles:        make(map[string][]string),
+		includedFiles:       make(collections.StringHashSet),
+		subfoldersToExclude: []string{"obj"},
 	}
 }
 
@@ -48,18 +50,16 @@ func (r *lostFilesHandler) Handler(path string) {
 func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
-		// Add project base + exclude subfolder into exclude folders list
-		for _, s := range subfolderToExclude {
-			sub := filepath.Join(pdir, s)
-			r.excludeFolders.Add(sub)
-		}
 
 		// Exclude output paths too
 		if prj.Project.OutputPaths != nil {
-			for _, out := range prj.Project.OutputPaths {
-				sub := filepath.Join(pdir, out)
-				r.excludeFolders.Add(sub)
-			}
+			r.subfoldersToExclude = append(r.subfoldersToExclude, prj.Project.OutputPaths...)
+		}
+
+		// Add project base + exclude subfolder into exclude folders list
+		for _, s := range r.subfoldersToExclude {
+			sub := filepath.Join(pdir, s)
+			r.excludeFolders.Add(sub)
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
