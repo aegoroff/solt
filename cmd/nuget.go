@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"solt/internal/msvc"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -14,6 +15,17 @@ type mismatch struct {
 	pkg      string
 	versions []string
 }
+
+type nugetPackages []*msvc.NugetPackage
+type mismatches []*mismatch
+
+func (n nugetPackages) Len() int           { return len(n) }
+func (n nugetPackages) Less(i, j int) bool { return n[i].ID < n[j].ID }
+func (n nugetPackages) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
+
+func (m mismatches) Len() int           { return len(m) }
+func (m mismatches) Less(i, j int) bool { return m[i].pkg < m[j].pkg }
+func (m mismatches) Swap(i, j int)      { m[i], m[j] = m[j], m[i] }
 
 const mismatchParamName = "mismatch"
 
@@ -79,6 +91,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		fmt.Printf("\n %s\n", sol)
 		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
+		sort.Sort(m)
 		for _, item := range m {
 			_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
 		}
@@ -86,8 +99,7 @@ func showMismatches(foldersTree rbtree.RbTree) {
 	}
 }
 
-func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string][]*mismatch {
-	var mismatches = make(map[string][]*mismatch)
+func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string]mismatches {
 
 	var packagesByProject = make(map[string]map[string]string)
 
@@ -107,6 +119,8 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 			packagesMap[pkg.ID] = pkg.Version
 		}
 	}
+
+	var mismatches = make(map[string]mismatches)
 
 	// Reduce packages
 	for spath, match := range allSolPaths {
@@ -181,6 +195,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
+		sort.Sort(nugetPackages)
 		for _, p := range nugetPackages {
 			_, _ = fmt.Fprintf(tw, format, p.ID, p.Version)
 		}
@@ -190,12 +205,12 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	})
 }
 
-func getNugetPackages(content *msvc.FolderContent) []msvc.NugetPackage {
-	var nugetPackages []msvc.NugetPackage
+func getNugetPackages(content *msvc.FolderContent) nugetPackages {
+	var nugetPackages []*msvc.NugetPackage
 	if content.Packages != nil {
 		for _, p := range content.Packages.Packages {
 			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
-			nugetPackages = append(nugetPackages, n)
+			nugetPackages = append(nugetPackages, &n)
 		}
 	}
 	for _, prj := range content.Projects {
@@ -205,7 +220,7 @@ func getNugetPackages(content *msvc.FolderContent) []msvc.NugetPackage {
 
 		for _, p := range prj.Project.PackageReferences {
 			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
-			nugetPackages = append(nugetPackages, n)
+			nugetPackages = append(nugetPackages, &n)
 		}
 	}
 
