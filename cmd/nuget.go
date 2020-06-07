@@ -108,13 +108,17 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 		packagesVers := mapPackagesInSolution(allPkg, match)
 
 		// Reduce packages in solution
-		reducePackages(packagesVers, mismatches, spath)
+		mm := reducePackages(packagesVers)
+		if len(mm) > 0 {
+			mismatches[spath] = mm
+		}
 	}
 
 	return mismatches
 }
 
-func reducePackages(packagesVers map[string][]string, mismatches map[string]mismatches, solPath string) {
+func reducePackages(packagesVers map[string][]string) mismatches {
+	var result []*mismatch
 	for pkg, vers := range packagesVers {
 		// If one version it's OK (no mismatches)
 		if len(vers) < 2 {
@@ -126,12 +130,9 @@ func reducePackages(packagesVers map[string][]string, mismatches map[string]mism
 			versions: vers,
 		}
 
-		if v, ok := mismatches[solPath]; !ok {
-			mismatches[solPath] = []*mismatch{&m}
-		} else {
-			mismatches[solPath] = append(v, &m)
-		}
+		result = append(result, &m)
 	}
+	return result
 }
 
 func mapPackagesInSolution(packagesByProject map[string]map[string]string, match Matcher) map[string][]string {
