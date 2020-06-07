@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/msvc"
+	"solt/internal/sys"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -68,7 +69,7 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	var result = make(map[string][]string)
 
 	for spath, projects := range projectsInSolutions {
-		nonexist := checkExistence(projects.Items(), fs)
+		nonexist := sys.CheckExistence(projects.Items(), fs)
 
 		if len(nonexist) > 0 {
 			result[spath] = append(result[spath], nonexist...)

@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/msvc"
+	"solt/internal/sys"
 	"strings"
 )
 
@@ -72,7 +73,7 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 			r.includedFiles.Add(normalize(f))
 		}
 
-		nonexist := checkExistence(includes, r.fs)
+		nonexist := sys.CheckExistence(includes, r.fs)
 
 		if len(nonexist) > 0 {
 			r.unexistFiles[prj.Path] = append(r.unexistFiles[prj.Path], nonexist...)
