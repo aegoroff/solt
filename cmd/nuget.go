@@ -112,6 +112,7 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 	for spath, match := range allSolPaths {
 		packagesVers := make(map[string][]string)
 
+		// Map packages in solution
 		for ppath, pkg := range packagesByProject {
 			if !match.Match(ppath) {
 				continue
@@ -131,6 +132,7 @@ func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[strin
 			}
 		}
 
+		// Reduce packages in solution
 		for pkg, vers := range packagesVers {
 			// If one version it's OK (no mismatches)
 			if len(vers) < 2 {
