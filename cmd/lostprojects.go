@@ -43,7 +43,8 @@ var lostprojectsCmd = &cobra.Command{
 		sortAndOutput(appWriter, lostProjects)
 
 		if len(lostProjectsThatIncludeSolutionProjectsFiles) > 0 {
-			_, _ = fmt.Fprintf(appWriter, "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n")
+			m := "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n"
+			_, _ = fmt.Fprintf(appWriter, m)
 		}
 
 		sortAndOutput(appWriter, lostProjectsThatIncludeSolutionProjectsFiles)

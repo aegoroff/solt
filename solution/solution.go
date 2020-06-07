@@ -37,7 +37,7 @@ func (lx *lexer) Lex(lval *yySymType) int {
 	return int(lval.tok)
 }
 
-func (lx *lexer) Error(e string) {
+func (_ *lexer) Error(e string) {
 	log.Print(e)
 }
 
