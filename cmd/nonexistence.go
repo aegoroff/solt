@@ -15,7 +15,7 @@ type nonexist struct {
 }
 
 func (n *nonexist) includes() []string { return n.incl }
-func (n *nonexist) each(string)        {}
+func (*nonexist) each(string)          {}
 
 func find(non nonexistence, fs afero.Fs) []string {
 	result := []string{}
