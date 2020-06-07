@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"os"
 	"path/filepath"
 	"solt/internal/msvc"
 	"strings"
@@ -67,17 +66,16 @@ func init() {
 
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
-	for spath, projects := range projectsInSolutions {
-		for _, ppath := range projects.Items() {
-			if _, err := fs.Stat(ppath); !os.IsNotExist(err) {
-				continue
-			}
 
-			if found, ok := result[spath]; ok {
-				result[spath] = append(found, ppath)
-			} else {
-				result[spath] = []string{ppath}
-			}
+	for spath, projects := range projectsInSolutions {
+
+		non := nonexist{
+			incl: projects.Items(),
+		}
+
+		nonexist := find(&non, fs)
+		if len(nonexist) > 0 {
+			result[spath] = append(result[spath], nonexist...)
 		}
 	}
 	return result

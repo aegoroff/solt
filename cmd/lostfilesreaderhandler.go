@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"os"
 	"path/filepath"
 	"solt/internal/msvc"
 	"strings"
@@ -17,6 +16,11 @@ type lostFilesHandler struct {
 	unexistFiles        map[string][]string
 	includedFiles       collections.StringHashSet
 	subfoldersToExclude []string
+}
+
+type nonexistFiles struct {
+	nonexist
+	includedFiles collections.StringHashSet
 }
 
 func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler {
@@ -68,20 +72,23 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 		}
 
 		// Add compiles, contents and nones into included files map
-		filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
-		for _, f := range filesIncluded {
-			normalized := normalize(f)
-			r.includedFiles.Add(normalized)
-			if _, err := r.fs.Stat(f); os.IsNotExist(err) {
-				if found, ok := r.unexistFiles[prj.Path]; ok {
-					found = append(found, f)
-					r.unexistFiles[prj.Path] = found
-				} else {
-					r.unexistFiles[prj.Path] = []string{f}
-				}
-			}
+		non := nonexistFiles{
+			nonexist: nonexist{
+				incl: msvc.GetFilesIncludedIntoProject(prj),
+			},
+			includedFiles: r.includedFiles,
+		}
+
+		nonexist := find(&non, r.fs)
+		if len(nonexist) > 0 {
+			r.unexistFiles[prj.Path] = append(r.unexistFiles[prj.Path], nonexist...)
 		}
 	}
+}
+
+func (n *nonexistFiles) each(incl string) {
+	normalized := normalize(incl)
+	n.includedFiles.Add(normalized)
 }
 
 func (r *lostFilesHandler) findLostFiles() ([]string, error) {
