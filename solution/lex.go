@@ -524,7 +524,7 @@ func lexComment(lx *lexer) stateFn {
 }
 
 // lexSkip ignores all slurped input and moves on to the next state.
-func lexSkip(lx *lexer, nextState stateFn) stateFn {
+func lexSkip(_ *lexer, nextState stateFn) stateFn {
 	return func(lx *lexer) stateFn {
 		lx.ignore()
 		return nextState
