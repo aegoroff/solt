@@ -37,17 +37,18 @@ var lostprojectsCmd = &cobra.Command{
 			}
 		}
 
-		projectsOutsideSolutions, filesInsideSolution := filterProjects(allProjects, linkedProjects)
-		lostProjects, lostProjectsThatIncludeSolutionProjectsFiles := separateProjects(projectsOutsideSolutions, filesInsideSolution)
+		lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
-		sortAndOutput(appWriter, lostProjects)
+		// Lost projects
+		sortAndOutput(appWriter, lost)
 
-		if len(lostProjectsThatIncludeSolutionProjectsFiles) > 0 {
+		if len(lostWithIncludes) > 0 {
 			m := "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n"
 			_, _ = fmt.Fprintf(appWriter, m)
 		}
 
-		sortAndOutput(appWriter, lostProjectsThatIncludeSolutionProjectsFiles)
+		// Lost projects that have includes files that used
+		sortAndOutput(appWriter, lostWithIncludes)
 
 		unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
 
@@ -55,6 +56,7 @@ var lostprojectsCmd = &cobra.Command{
 			_, _ = fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
 		}
 
+		// Included but not exist in FS
 		outputSortedMap(appWriter, unexistProjects, "Solution")
 
 		return nil
@@ -78,7 +80,7 @@ func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet
 	return result
 }
 
-func filterProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]*msvc.MsbuildProject, collections.StringHashSet) {
+func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
 	projectMatch := NewExactMatchS(linkedProjects)
 	var projectsOutsideSolution []*msvc.MsbuildProject
@@ -100,12 +102,12 @@ func filterProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string)
 		}
 	}
 
-	return projectsOutsideSolution, filesInsideSolution
+	return separateProjects(projectsOutsideSolution, filesInsideSolution)
 }
 
 func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsideSolution collections.StringHashSet) ([]string, []string) {
-	var projectsOutside []string
-	var projectsOutsideSolutionWithFilesInside []string
+	var lost []string
+	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
 		projectFiles := msvc.GetFilesIncludedIntoProject(prj)
 
@@ -125,10 +127,10 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 		}
 
 		if !includedIntoOther {
-			projectsOutside = append(projectsOutside, prj.Path)
+			lost = append(lost, prj.Path)
 		} else {
-			projectsOutsideSolutionWithFilesInside = append(projectsOutsideSolutionWithFilesInside, prj.Path)
+			lostWithIncludes = append(lostWithIncludes, prj.Path)
 		}
 	}
-	return projectsOutside, projectsOutsideSolutionWithFilesInside
+	return lost, lostWithIncludes
 }
