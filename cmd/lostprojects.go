@@ -109,22 +109,7 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
-		projectFiles := msvc.GetFilesIncludedIntoProject(prj)
-
-		var includedIntoOther = false
-		for _, f := range projectFiles {
-			pf := normalize(f)
-			if !filesInsideSolution.Contains(pf) {
-				continue
-			}
-
-			dir := filepath.Dir(prj.Path)
-
-			if strings.Contains(pf, normalize(dir)) {
-				includedIntoOther = true
-				break
-			}
-		}
+		includedIntoOther := hasFilesIncludedIntoActual(prj, filesInsideSolution)
 
 		if !includedIntoOther {
 			lost = append(lost, prj.Path)
@@ -133,4 +118,22 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 		}
 	}
 	return lost, lostWithIncludes
+}
+
+func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, filesInsideSolution collections.StringHashSet) bool {
+	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
+
+	for _, f := range projectFiles {
+		pf := normalize(f)
+		if !filesInsideSolution.Contains(pf) {
+			continue
+		}
+
+		dir := filepath.Dir(prj.Path)
+
+		if strings.Contains(pf, normalize(dir)) {
+			return true
+		}
+	}
+	return false
 }
