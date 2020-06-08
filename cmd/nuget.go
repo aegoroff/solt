@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/akutz/sortfold"
 	"solt/internal/msvc"
 	"sort"
 	"strings"
@@ -80,7 +81,9 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
-		sort.Slice(m, func(i, j int) bool { return m[i].pkg < m[j].pkg })
+		sort.Slice(m, func(i, j int) bool {
+			return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
+		})
 
 		for _, item := range m {
 			_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
@@ -199,7 +202,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
 		sort.Slice(nugetPackages, func(i, j int) bool {
-			return nugetPackages[i].ID < nugetPackages[j].ID
+			return sortfold.CompareFold(nugetPackages[i].ID, nugetPackages[j].ID) < 0
 		})
 
 		for _, p := range nugetPackages {
