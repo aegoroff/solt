@@ -26,8 +26,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"nu", "-p", dir})
-	rootCmd.Execute()
+	Execute("nu", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -58,8 +57,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"nu", "-p", dir, "-m"})
-	rootCmd.Execute()
+	Execute("nu", "-p", dir, "-m")
 
 	// Assert
 	actual := buf.String()

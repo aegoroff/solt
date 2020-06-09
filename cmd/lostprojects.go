@@ -12,59 +12,58 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// lostprojectsCmd represents the lostprojects command
-var lostprojectsCmd = &cobra.Command{
-	Use:     "lp",
-	Aliases: []string{"lostprojects"},
-	Short:   "Find projects that not included into any solution",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+func newLostProjects() *cobra.Command {
+	var lostprojectsCmd = &cobra.Command{
+		Use:     "lp",
+		Aliases: []string{"lostprojects"},
+		Short:   "Find projects that not included into any solution",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
-		solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
-		// linked from any solution projects list
-		// so these projects are not considered lost
-		var linkedProjects []string
+			// linked from any solution projects list
+			// so these projects are not considered lost
+			var linkedProjects []string
 
-		projectLinksBySolution := make(map[string]collections.StringHashSet)
-		// Each found solution
-		for _, sln := range solutions {
-			links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
-			projectLinksBySolution[sln.Path] = links
-			// to create projectsInSolutions you shoud normalize path to build Matcher
-			for _, item := range links.ItemsDecorated(normalize) {
-				linkedProjects = append(linkedProjects, item)
+			projectLinksBySolution := make(map[string]collections.StringHashSet)
+			// Each found solution
+			for _, sln := range solutions {
+				links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
+				projectLinksBySolution[sln.Path] = links
+				// to create projectsInSolutions you shoud normalize path to build Matcher
+				for _, item := range links.ItemsDecorated(normalize) {
+					linkedProjects = append(linkedProjects, item)
+				}
 			}
-		}
 
-		lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
+			lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
-		// Lost projects
-		sortAndOutput(appWriter, lost)
+			// Lost projects
+			sortAndOutput(appWriter, lost)
 
-		if len(lostWithIncludes) > 0 {
-			m := "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n"
-			_, _ = fmt.Fprintf(appWriter, m)
-		}
+			if len(lostWithIncludes) > 0 {
+				m := "\nThese projects are not included into any solution but files from the projects' folders are used in another projects within a solution:\n\n"
+				_, _ = fmt.Fprintf(appWriter, m)
+			}
 
-		// Lost projects that have includes files that used
-		sortAndOutput(appWriter, lostWithIncludes)
+			// Lost projects that have includes files that used
+			sortAndOutput(appWriter, lostWithIncludes)
 
-		unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
+			unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
 
-		if len(unexistProjects) > 0 {
-			_, _ = fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
-		}
+			if len(unexistProjects) > 0 {
+				_, _ = fmt.Fprintf(appWriter, "\nThese projects are included into a solution but not found in the file system:\n")
+			}
 
-		// Included but not exist in FS
-		outputSortedMap(appWriter, unexistProjects, "Solution")
+			// Included but not exist in FS
+			outputSortedMap(appWriter, unexistProjects, "Solution")
 
-		return nil
-	},
-}
+			return nil
+		},
+	}
 
-func init() {
-	rootCmd.AddCommand(lostprojectsCmd)
+	return lostprojectsCmd
 }
 
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {

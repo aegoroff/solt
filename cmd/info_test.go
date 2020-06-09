@@ -26,8 +26,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"in", "-p", dir})
-	rootCmd.Execute()
+	Execute("in", "-p", dir)
 
 	// Assert
 	actual := buf.String()
