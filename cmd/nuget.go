@@ -115,19 +115,25 @@ func showPackagesInfoBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	for sol, m := range mismatches {
-		_, _ = fmt.Fprintf(appWriter, "\n %s\n", sol)
-		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
-		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
+	sort.Slice(solutions, func(i, j int) bool {
+		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
+	})
 
-		sort.Slice(m, func(i, j int) bool {
-			return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
-		})
+	for _, sln := range solutions {
+		if m, ok := mismatches[sln.Path]; ok {
+			_, _ = fmt.Fprintf(appWriter, "\n %s\n", sln.Path)
+			_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
+			_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
-		for _, item := range m {
-			_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+			sort.Slice(m, func(i, j int) bool {
+				return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
+			})
+
+			for _, item := range m {
+				_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+			}
+			_ = tw.Flush()
 		}
-		_ = tw.Flush()
 	}
 }
 
