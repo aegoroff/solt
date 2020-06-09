@@ -1,25 +1,22 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/afero"
 	"io"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
 
 const (
-	solutionFileExt    = ".sln"
-	csharpProjectExt   = ".csproj"
-	cppProjectExt      = ".vcxproj"
-	packagesConfigFile = "packages.config"
-
 	pathParamName = "path"
 	diagParamName = "diag"
 )
 
 var sourcesPath string
-var showMemUsage bool
+var diag bool
 
 var appFileSystem afero.Fs
 var appWriter io.Writer
@@ -36,8 +33,15 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	start := time.Now()
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
+	}
+	elapsed := time.Since(start)
+
+	if diag {
+		printMemUsage(appWriter)
+		_, _ = fmt.Fprintf(appWriter, "Working time: %v\n", elapsed)
 	}
 }
 
@@ -46,5 +50,5 @@ func init() {
 	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
-	rootCmd.PersistentFlags().BoolVarP(&showMemUsage, diagParamName, "d", false, "Show memory statistic after run")
+	rootCmd.PersistentFlags().BoolVarP(&diag, diagParamName, "d", false, "Show application diagnostic after run")
 }

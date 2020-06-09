@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
-	"github.com/aegoroff/godatastruct/rbtree"
+	"solt/internal/msvc"
 	"solt/solution"
 	"sort"
 	"strings"
@@ -18,38 +18,29 @@ var infoCmd = &cobra.Command{
 	Aliases: []string{"info"},
 	Short:   "Get information about found solutions",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := readProjectDir(sourcesPath, appFileSystem, func(we *walkEntry) {})
+		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
-		foldersTree.Ascend(func(c rbtree.Node) bool {
-			folder := c.Key().(*folder)
-			content := folder.content
+		solutions := msvc.SelectSolutions(foldersTree)
 
-			for _, solution := range content.solutions {
-				sln := solution.solution
+		for _, solution := range solutions {
+			sln := solution.Solution
 
-				fmt.Printf(" %s\n", solution.path)
+			fmt.Printf(" %s\n", solution.Path)
 
-				const format = "  %v\t%v\n"
-				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
+			const format = "  %v\t%v\n"
+			tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-				_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
-				_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
-				_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
-				_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+			_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
+			_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
+			_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
+			_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
 
-				_ = tw.Flush()
+			_ = tw.Flush()
 
-				fmt.Println()
+			fmt.Println()
 
-				showProjectsInfo(sln.Projects)
-				showSectionsInfo(sln.GlobalSections)
-			}
-
-			return true
-		})
-
-		if showMemUsage {
-			printMemUsage(appWriter)
+			showProjectsInfo(sln.Projects)
+			showSectionsInfo(sln.GlobalSections)
 		}
 
 		return nil

@@ -37,7 +37,7 @@ func (lx *lexer) Lex(lval *yySymType) int {
 	return int(lval.tok)
 }
 
-func (lx *lexer) Error(e string) {
+func (*lexer) Error(e string) {
 	log.Print(e)
 }
 
@@ -113,12 +113,12 @@ func parse(str string) *Solution {
 
 func onProject(projectType, name, path, id string) {
 	p := Project{
-		TypeId: projectType,
+		TypeID: projectType,
 		Name:   name,
 		Path:   path,
-		Id:     id,
+		ID:     id,
 	}
-	if v, ok := ProjectsGuids[p.TypeId]; ok {
+	if v, ok := ProjectsGuids[p.TypeID]; ok {
 		p.Type = v
 	}
 
