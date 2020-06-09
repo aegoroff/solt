@@ -46,13 +46,13 @@ Aliases:
   lf, lostfiles
 
 Flags:
+  -a, --all           Search all lost files including that have links to but not exists in file system
   -f, --file string   Lost files filter extension. If not set .cs extension used (default ".cs")
   -h, --help          help for lf
-  -l, --onlylost      Show only lost files. Don't show unexist files. If not set all shown
   -r, --remove        Remove lost files
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:

@@ -210,7 +210,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir, "-n")
+	Execute("lf", "-p", dir, "-a")
 
 	// Assert
 	actual := buf.String()

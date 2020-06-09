@@ -10,7 +10,7 @@ import (
 
 const filterParamName = "file"
 const removeParamName = "remove"
-const nonexistParamName = "nonexistent"
+const allParamName = "all"
 
 func newLostFiles() *cobra.Command {
 	var lostfilesCmd = &cobra.Command{
@@ -30,19 +30,19 @@ func newLostFiles() *cobra.Command {
 				return err
 			}
 
-			nonExist, err := cmd.Flags().GetBool(nonexistParamName)
+			all, err := cmd.Flags().GetBool(allParamName)
 
 			if err != nil {
 				return err
 			}
 
-			return executeLostFilesCommand(lostFilesFilter, removeLostFiles, nonExist, appFileSystem)
+			return executeLostFilesCommand(lostFilesFilter, removeLostFiles, all, appFileSystem)
 		},
 	}
 
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
 	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
-	lostfilesCmd.Flags().BoolP(nonexistParamName, "n", false, "Search files that have links to but not exists in file system")
+	lostfilesCmd.Flags().BoolP(allParamName, "a", false, "Search all lost files including that have links to but not exists in file system")
 
 	return lostfilesCmd
 }
