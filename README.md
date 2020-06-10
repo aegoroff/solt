@@ -74,7 +74,7 @@ Global Flags:
 ```
 ### Nuget information syntax:
 ```
-Get nuget packages information within projects or find Nuget mismatches in solution
+Get nuget packages information within solutions, projects or find Nuget mismatches in solution
 
 Usage:
   solt nu [flags]
@@ -85,8 +85,9 @@ Aliases:
 Flags:
   -h, --help       help for nu
   -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
+  -r, --project    Show packages by projects instead
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```

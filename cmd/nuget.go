@@ -42,9 +42,9 @@ func newNuget() *cobra.Command {
 			}
 
 			if mismatches || !byProject {
-				showPackagesInfoBySolutions(foldersTree, mismatches)
+				nugetBySolutions(foldersTree, mismatches)
 			} else {
-				showPackagesInfoByFolders(foldersTree)
+				nugetByProjects(foldersTree)
 			}
 
 			return nil
@@ -57,7 +57,7 @@ func newNuget() *cobra.Command {
 	return nugetCmd
 }
 
-func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
+func nugetByProjects(foldersTree rbtree.RbTree) {
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
@@ -87,7 +87,7 @@ func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
 	})
 }
 
-func showPackagesInfoBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
+func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	var allProjectFolders = make(map[string]*msvc.FolderContent)
