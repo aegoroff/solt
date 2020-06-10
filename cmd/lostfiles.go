@@ -7,43 +7,28 @@ import (
 	"solt/msvc"
 )
 
-const filterParamName = "file"
-const removeParamName = "remove"
-const allParamName = "all"
+type lostFilesCmd struct {
+	removeLost bool
+	searchAll  bool
+	filter     string
+}
 
 func newLostFiles() *cobra.Command {
-	var lostfilesCmd = &cobra.Command{
+	opts := lostFilesCmd{}
+	var cmd = &cobra.Command{
 		Use:     "lf",
 		Aliases: []string{"lostfiles"},
 		Short:   "Find lost files in the folder specified",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
-
-			if err != nil {
-				return err
-			}
-
-			removeLostFiles, err := cmd.Flags().GetBool(removeParamName)
-
-			if err != nil {
-				return err
-			}
-
-			all, err := cmd.Flags().GetBool(allParamName)
-
-			if err != nil {
-				return err
-			}
-
-			return executeLostFilesCommand(lostFilesFilter, removeLostFiles, all, appFileSystem)
+			return executeLostFilesCommand(opts.filter, opts.removeLost, opts.searchAll, appFileSystem)
 		},
 	}
 
-	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
-	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
-	lostfilesCmd.Flags().BoolP(allParamName, "a", false, "Search all lost files including that have links to but not exists in file system")
+	cmd.Flags().StringVarP(&opts.filter, "file", "f", ".cs", "Lost files filter extension. If not set .cs extension used")
+	cmd.Flags().BoolVarP(&opts.removeLost, "remove", "r", false, "Remove lost files")
+	cmd.Flags().BoolVarP(&opts.searchAll, "all", "a", false, "Search all lost files including that have links to but not exists in file system")
 
-	return lostfilesCmd
+	return cmd
 }
 
 func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonExist bool, fs afero.Fs) error {

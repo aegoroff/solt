@@ -13,7 +13,7 @@ import (
 )
 
 func newInfo() *cobra.Command {
-	var infoCmd = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:     "in",
 		Aliases: []string{"info"},
 		Short:   "Get information about found solutions",
@@ -46,7 +46,7 @@ func newInfo() *cobra.Command {
 			return nil
 		},
 	}
-	return infoCmd
+	return cmd
 }
 
 func showProjectsInfo(projects []*solution.Project) {

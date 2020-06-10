@@ -13,7 +13,7 @@ import (
 )
 
 func newLostProjects() *cobra.Command {
-	var lostprojectsCmd = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:     "lp",
 		Aliases: []string{"lostprojects"},
 		Short:   "Find projects that not included into any solution",
@@ -63,7 +63,7 @@ func newLostProjects() *cobra.Command {
 		},
 	}
 
-	return lostprojectsCmd
+	return cmd
 }
 
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {

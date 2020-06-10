@@ -10,11 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	pathParamName = "path"
-	diagParamName = "diag"
-)
-
 var sourcesPath string
 var diag bool
 
@@ -35,8 +30,8 @@ func newRoot() *cobra.Command {
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute(args ...string) {
 	rootCmd := newRoot()
-	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
-	rootCmd.PersistentFlags().BoolVarP(&diag, diagParamName, "d", false, "Show application diagnostic after run")
+	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
+	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
 	rootCmd.AddCommand(newInfo())
 	rootCmd.AddCommand(newLostFiles())
