@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
-	"solt/internal/msvc"
+	"solt/msvc"
 	"solt/solution"
 	"sort"
 	"strings"

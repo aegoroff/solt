@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
-	"solt/internal/msvc"
+	"solt/msvc"
 	"sort"
 	"strings"
 	"text/tabwriter"

@@ -4,8 +4,8 @@ import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"path/filepath"
-	"solt/internal/msvc"
 	"solt/internal/sys"
+	"solt/msvc"
 	"strings"
 )
 
