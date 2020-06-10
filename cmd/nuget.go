@@ -89,6 +89,10 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 
 	packs := getNugetPacks(allSolutionPaths, allProjectFolders, onlyMismatch)
 
+	printNugetBySolutions(solutions, packs, onlyMismatch)
+}
+
+func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[string][]*pack, onlyMismatch bool) {
 	if len(packs) == 0 {
 		return
 	}
