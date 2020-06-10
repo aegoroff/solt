@@ -24,11 +24,11 @@ Available Commands:
   in          Get information about found solutions
   lf          Find lost files in the folder specified
   lp          Find projects that not included into any solution
-  nu          Get nuget packages information within projects or find Nuget mismatches in solution
+  nu          Get nuget packages information within solutions, projects or find Nuget mismatches in solution
   ver         Print the version number of solt
 
 Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -h, --help          help for solt
   -p, --path string   REQUIRED. Path to the sources folder
 
@@ -69,7 +69,7 @@ Flags:
   -h, --help   help for lp
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Nuget information syntax:
