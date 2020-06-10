@@ -25,8 +25,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lp", "-p", dir})
-	rootCmd.Execute()
+	Execute("lp", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -53,8 +52,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lp", "-p", dir})
-	rootCmd.Execute()
+	Execute("lp", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -85,8 +83,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lp", "-p", dir})
-	rootCmd.Execute()
+	Execute("lp", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -112,8 +109,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lp", "-p", dir})
-	rootCmd.Execute()
+	Execute("lp", "-p", dir)
 
 	// Assert
 	actual := buf.String()

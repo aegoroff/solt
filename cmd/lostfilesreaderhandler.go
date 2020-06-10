@@ -17,9 +17,10 @@ type lostFilesHandler struct {
 	unexistFiles        map[string][]string
 	includedFiles       collections.StringHashSet
 	subfoldersToExclude []string
+	nonExistence        bool
 }
 
-func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler {
+func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs) *lostFilesHandler {
 	return &lostFilesHandler{
 		fs:                  fs,
 		foundFiles:          make([]string, 0),
@@ -28,6 +29,7 @@ func newLostFilesHandler(lostFilesFilter string, fs afero.Fs) *lostFilesHandler 
 		unexistFiles:        make(map[string][]string),
 		includedFiles:       make(collections.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
+		nonExistence:        nonExistence,
 	}
 }
 
@@ -73,11 +75,19 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 			r.includedFiles.Add(normalize(f))
 		}
 
-		nonexist := sys.CheckExistence(includes, r.fs)
+		r.checkExistence(prj.Path, includes)
+	}
+}
 
-		if len(nonexist) > 0 {
-			r.unexistFiles[prj.Path] = append(r.unexistFiles[prj.Path], nonexist...)
-		}
+func (r *lostFilesHandler) checkExistence(project string, includes []string) {
+	if !r.nonExistence {
+		return
+	}
+
+	nonexist := sys.CheckExistence(includes, r.fs)
+
+	if len(nonexist) > 0 {
+		r.unexistFiles[project] = append(r.unexistFiles[project], nonexist...)
 	}
 }
 

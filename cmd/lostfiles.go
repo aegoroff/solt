@@ -10,45 +10,45 @@ import (
 
 const filterParamName = "file"
 const removeParamName = "remove"
-const onlyLostParamName = "onlylost"
+const allParamName = "all"
 
-// lostfilesCmd represents the lostfiles command
-var lostfilesCmd = &cobra.Command{
-	Use:     "lf",
-	Aliases: []string{"lostfiles"},
-	Short:   "Find lost files in the folder specified",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
+func newLostFiles() *cobra.Command {
+	var lostfilesCmd = &cobra.Command{
+		Use:     "lf",
+		Aliases: []string{"lostfiles"},
+		Short:   "Find lost files in the folder specified",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			lostFilesFilter, err := cmd.Flags().GetString(filterParamName)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		removeLostFiles, err := cmd.Flags().GetBool(removeParamName)
+			removeLostFiles, err := cmd.Flags().GetBool(removeParamName)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		onlyLost, err := cmd.Flags().GetBool(onlyLostParamName)
+			all, err := cmd.Flags().GetBool(allParamName)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		return executeLostFilesCommand(lostFilesFilter, removeLostFiles, onlyLost, appFileSystem)
-	},
-}
+			return executeLostFilesCommand(lostFilesFilter, removeLostFiles, all, appFileSystem)
+		},
+	}
 
-func init() {
-	rootCmd.AddCommand(lostfilesCmd)
 	lostfilesCmd.Flags().StringP(filterParamName, "f", ".cs", "Lost files filter extension. If not set .cs extension used")
 	lostfilesCmd.Flags().BoolP(removeParamName, "r", false, "Remove lost files")
-	lostfilesCmd.Flags().BoolP(onlyLostParamName, "l", false, "Show only lost files. Don't show unexist files. If not set all shown")
+	lostfilesCmd.Flags().BoolP(allParamName, "a", false, "Search all lost files including that have links to but not exists in file system")
+
+	return lostfilesCmd
 }
 
-func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyLost bool, fs afero.Fs) error {
-	lh := newLostFilesHandler(lostFilesFilter, fs)
+func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonExist bool, fs afero.Fs) error {
+	lh := newLostFilesHandler(lostFilesFilter, nonExist, fs)
 
 	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
 
@@ -64,10 +64,8 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, onlyL
 
 	sortAndOutput(appWriter, lostFiles)
 
-	if !onlyLost {
-		if len(lh.unexistFiles) > 0 {
-			_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
-		}
+	if len(lh.unexistFiles) > 0 {
+		_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
 
 		outputSortedMap(appWriter, lh.unexistFiles, "Project")
 	}

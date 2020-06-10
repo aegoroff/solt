@@ -12,44 +12,82 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type mismatch struct {
+// pack defines nuget package descriptor
+type pack struct {
 	pkg      string
 	versions []string
 }
 
 const mismatchParamName = "mismatch"
+const byProject = "project"
 
-// nugetCmd represents the nuget command
-var nugetCmd = &cobra.Command{
-	Use:     "nu",
-	Aliases: []string{"nuget"},
-	Short:   "Get nuget packages information within projects or find Nuget mismatches in solution",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+func newNuget() *cobra.Command {
+	var nugetCmd = &cobra.Command{
+		Use:     "nu",
+		Aliases: []string{"nuget"},
+		Short:   "Get nuget packages information within solutions, projects or find Nuget mismatches in solution",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
-		findNugetMismatches, err := cmd.Flags().GetBool(mismatchParamName)
+			mismatches, err := cmd.Flags().GetBool(mismatchParamName)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		if findNugetMismatches {
-			showMismatches(foldersTree)
-		} else {
-			showPackagesInfoByFolders(foldersTree)
-		}
+			byProject, err := cmd.Flags().GetBool(byProject)
 
-		return nil
-	},
-}
+			if err != nil {
+				return err
+			}
 
-func init() {
-	rootCmd.AddCommand(nugetCmd)
+			if mismatches || !byProject {
+				nugetBySolutions(foldersTree, mismatches)
+			} else {
+				nugetByProjects(foldersTree)
+			}
+
+			return nil
+		},
+	}
 
 	nugetCmd.Flags().BoolP(mismatchParamName, "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
+	nugetCmd.Flags().BoolP(byProject, "r", false, "Show packages by projects instead")
+
+	return nugetCmd
 }
 
-func showMismatches(foldersTree rbtree.RbTree) {
+func nugetByProjects(foldersTree rbtree.RbTree) {
+	const format = "  %v\t%v\n"
+	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
+
+	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+		content := fold.Content
+		nugetPackages := getNugetPackages(content)
+
+		if len(nugetPackages) == 0 {
+			return
+		}
+
+		parent := fold.Path
+		_, _ = fmt.Fprintf(appWriter, " %s\n", parent)
+		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
+		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
+
+		sort.Slice(nugetPackages, func(i, j int) bool {
+			return sortfold.CompareFold(nugetPackages[i].ID, nugetPackages[j].ID) < 0
+		})
+
+		for _, p := range nugetPackages {
+			_, _ = fmt.Fprintf(tw, format, p.ID, p.Version)
+		}
+
+		_ = tw.Flush()
+		_, _ = fmt.Fprintln(appWriter)
+	})
+}
+
+func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	var allProjectFolders = make(map[string]*msvc.FolderContent)
@@ -65,61 +103,69 @@ func showMismatches(foldersTree rbtree.RbTree) {
 		allProjectFolders[normalize(prj.Path)] = fold.Content
 	})
 
-	mismatches := calculateMismatches(allSolutionPaths, allProjectFolders)
+	packs := getNugetPacks(allSolutionPaths, allProjectFolders, onlyMismatch)
 
-	if len(mismatches) == 0 {
+	if len(packs) == 0 {
 		return
 	}
 
-	_, _ = fmt.Fprintln(appWriter, " Different nuget package's versions in the same solution found:")
+	if onlyMismatch {
+		_, _ = fmt.Fprintln(appWriter, " Different nuget package's versions in the same solution found:")
+	}
 
 	const format = "  %v\t%v\n"
 	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	for sol, m := range mismatches {
-		_, _ = fmt.Fprintf(appWriter, "\n %s\n", sol)
-		_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
-		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
+	sort.Slice(solutions, func(i, j int) bool {
+		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
+	})
 
-		sort.Slice(m, func(i, j int) bool {
-			return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
-		})
+	for _, sln := range solutions {
+		if m, ok := packs[sln.Path]; ok {
+			_, _ = fmt.Fprintf(appWriter, "\n %s\n", sln.Path)
+			_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
+			_, _ = fmt.Fprintf(tw, format, "-------", "--------")
 
-		for _, item := range m {
-			_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+			sort.Slice(m, func(i, j int) bool {
+				return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
+			})
+
+			for _, item := range m {
+				_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
+			}
+			_ = tw.Flush()
 		}
-		_ = tw.Flush()
 	}
 }
 
-func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent) map[string][]*mismatch {
+func getNugetPacks(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent, onlyMismatch bool) map[string][]*pack {
 	allPkg := mapAllPackages(allPrjFolders)
 
-	var mismatches = make(map[string][]*mismatch)
+	var result = make(map[string][]*pack)
 
 	// Reduce packages
 	for spath, match := range allSolPaths {
 		packagesVers := mapPackagesInSolution(allPkg, match)
 
 		// Reduce packages in solution
-		mm := reducePackages(packagesVers)
-		if len(mm) > 0 {
-			mismatches[spath] = mm
+		packs := reducePacks(packagesVers, onlyMismatch)
+		if len(packs) > 0 {
+			result[spath] = packs
 		}
 	}
 
-	return mismatches
+	return result
 }
 
-func reducePackages(packagesVers map[string][]string) []*mismatch {
-	var result []*mismatch
+func reducePacks(packagesVers map[string][]string, onlyMismatch bool) []*pack {
+	var result []*pack
 	for pkg, vers := range packagesVers {
 		// If one version it's OK (no mismatches)
-		if len(vers) < 2 {
+		if onlyMismatch && len(vers) < 2 {
 			continue
 		}
 
-		m := mismatch{
+		m := pack{
 			pkg:      pkg,
 			versions: vers,
 		}
@@ -182,36 +228,6 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
-}
-
-func showPackagesInfoByFolders(foldersTree rbtree.RbTree) {
-	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
-
-	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		content := fold.Content
-		nugetPackages := getNugetPackages(content)
-
-		if len(nugetPackages) == 0 {
-			return
-		}
-
-		parent := fold.Path
-		_, _ = fmt.Fprintf(appWriter, " %s\n", parent)
-		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
-		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
-
-		sort.Slice(nugetPackages, func(i, j int) bool {
-			return sortfold.CompareFold(nugetPackages[i].ID, nugetPackages[j].ID) < 0
-		})
-
-		for _, p := range nugetPackages {
-			_, _ = fmt.Fprintf(tw, format, p.ID, p.Version)
-		}
-
-		_ = tw.Flush()
-		_, _ = fmt.Fprintln(appWriter)
-	})
 }
 
 func getNugetPackages(content *msvc.FolderContent) []*msvc.NugetPackage {

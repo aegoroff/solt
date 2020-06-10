@@ -24,11 +24,11 @@ Available Commands:
   in          Get information about found solutions
   lf          Find lost files in the folder specified
   lp          Find projects that not included into any solution
-  nu          Get nuget packages information within projects or find Nuget mismatches in solution
+  nu          Get nuget packages information within solutions, projects or find Nuget mismatches in solution
   ver         Print the version number of solt
 
 Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -h, --help          help for solt
   -p, --path string   REQUIRED. Path to the sources folder
 
@@ -46,13 +46,13 @@ Aliases:
   lf, lostfiles
 
 Flags:
+  -a, --all           Search all lost files including that have links to but not exists in file system
   -f, --file string   Lost files filter extension. If not set .cs extension used (default ".cs")
   -h, --help          help for lf
-  -l, --onlylost      Show only lost files. Don't show unexist files. If not set all shown
   -r, --remove        Remove lost files
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
@@ -69,12 +69,12 @@ Flags:
   -h, --help   help for lp
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
 ### Nuget information syntax:
 ```
-Get nuget packages information within projects or find Nuget mismatches in solution
+Get nuget packages information within solutions, projects or find Nuget mismatches in solution
 
 Usage:
   solt nu [flags]
@@ -85,8 +85,9 @@ Aliases:
 Flags:
   -h, --help       help for nu
   -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
+  -r, --project    Show packages by projects instead
 
 Global Flags:
-  -d, --diag          Show memory statistic after run
+  -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```

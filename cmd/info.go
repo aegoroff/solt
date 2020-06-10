@@ -12,43 +12,41 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// infoCmd represents the info command
-var infoCmd = &cobra.Command{
-	Use:     "in",
-	Aliases: []string{"info"},
-	Short:   "Get information about found solutions",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+func newInfo() *cobra.Command {
+	var infoCmd = &cobra.Command{
+		Use:     "in",
+		Aliases: []string{"info"},
+		Short:   "Get information about found solutions",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
-		solutions := msvc.SelectSolutions(foldersTree)
+			solutions := msvc.SelectSolutions(foldersTree)
 
-		for _, solution := range solutions {
-			sln := solution.Solution
+			for _, sol := range solutions {
+				sln := sol.Solution
 
-			fmt.Printf(" %s\n", solution.Path)
+				fmt.Printf(" %s\n", sol.Path)
 
-			const format = "  %v\t%v\n"
-			tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
+				const format = "  %v\t%v\n"
+				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-			_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
-			_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
-			_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
-			_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+				_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
+				_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
+				_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
+				_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
 
-			_ = tw.Flush()
+				_ = tw.Flush()
 
-			fmt.Println()
+				fmt.Println()
 
-			showProjectsInfo(sln.Projects)
-			showSectionsInfo(sln.GlobalSections)
-		}
+				showProjectsInfo(sln.Projects)
+				showSectionsInfo(sln.GlobalSections)
+			}
 
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(infoCmd)
+			return nil
+		},
+	}
+	return infoCmd
 }
 
 func showProjectsInfo(projects []*solution.Project) {

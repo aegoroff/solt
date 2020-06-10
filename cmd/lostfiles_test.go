@@ -26,8 +26,7 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -64,8 +63,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		appFileSystem = memfs
 
 		// Act
-		rootCmd.SetArgs([]string{"lf", "-p", dir})
-		rootCmd.Execute()
+		Execute("lf", "-p", dir)
 
 		// Assert
 		actual := buf.String()
@@ -93,8 +91,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir)
 
 	// Assert
 	actual := buf.String()
@@ -129,8 +126,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		appFileSystem = memfs
 
 		// Act
-		rootCmd.SetArgs([]string{"lf", "-p", dir, "-f", tst.filter})
-		rootCmd.Execute()
+		Execute("lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
 		actual := buf.String()
@@ -158,8 +154,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir, "-r"})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir, "-r")
 
 	// Assert
 	actual := buf.String()
@@ -188,8 +183,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	appFileSystem = afero.NewReadOnlyFs(memfs)
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir, "-r"})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir, "-r")
 
 	// Assert
 	actual := buf.String()
@@ -198,7 +192,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	ass.NoError(err)
 }
 
-func Test_FindLostFilesCmd_UnesistFilesFound(t *testing.T) {
+func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	dir := "a/"
@@ -216,15 +210,14 @@ func Test_FindLostFilesCmd_UnesistFilesFound(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir, "-a")
 
 	// Assert
 	actual := buf.String()
 	ass.Equal("\nThese files included into projects but not exist in the file system.\n\nProject: a\\a\\a.csproj\n a\\a\\Properties\\AssemblyInfo.cs\n", actual)
 }
 
-func Test_FindLostFilesCmdShowOnlyLost_UnesistFilesNotShown(t *testing.T) {
+func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	dir := "a/"
@@ -242,8 +235,7 @@ func Test_FindLostFilesCmdShowOnlyLost_UnesistFilesNotShown(t *testing.T) {
 	appFileSystem = memfs
 
 	// Act
-	rootCmd.SetArgs([]string{"lf", "-p", dir, "-l"})
-	rootCmd.Execute()
+	Execute("lf", "-p", dir)
 
 	// Assert
 	actual := buf.String()

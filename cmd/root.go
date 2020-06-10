@@ -21,18 +21,33 @@ var diag bool
 var appFileSystem afero.Fs
 var appWriter io.Writer
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "solt",
-	Short: "SOLution Tool that analyzes Microsoft Visual Studio solutions and projects",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-	},
+func newRoot() *cobra.Command {
+	return &cobra.Command{
+		Use:   "solt",
+		Short: "SOLution Tool that analyzes Microsoft Visual Studio solutions and projects",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
+		},
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(args ...string) {
+	rootCmd := newRoot()
+	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
+	rootCmd.PersistentFlags().BoolVarP(&diag, diagParamName, "d", false, "Show application diagnostic after run")
+
+	rootCmd.AddCommand(newInfo())
+	rootCmd.AddCommand(newLostFiles())
+	rootCmd.AddCommand(newLostProjects())
+	rootCmd.AddCommand(newNuget())
+	rootCmd.AddCommand(newVersion())
+
+	if args != nil && len(args) > 0 {
+		rootCmd.SetArgs(args)
+	}
+
 	start := time.Now()
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
@@ -49,6 +64,4 @@ func init() {
 	appWriter = os.Stdout
 	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
-	rootCmd.PersistentFlags().StringVarP(&sourcesPath, pathParamName, "p", "", "REQUIRED. Path to the sources folder")
-	rootCmd.PersistentFlags().BoolVarP(&diag, diagParamName, "d", false, "Show application diagnostic after run")
 }
