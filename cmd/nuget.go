@@ -4,19 +4,10 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"github.com/spf13/cobra"
 	"solt/msvc"
 	"sort"
-	"strings"
-	"text/tabwriter"
-
-	"github.com/spf13/cobra"
 )
-
-// pack defines nuget package descriptor
-type pack struct {
-	pkg      string
-	versions []string
-}
 
 const mismatchParamName = "mismatch"
 const byProject = "project"
@@ -58,9 +49,7 @@ func newNuget() *cobra.Command {
 }
 
 func nugetByProjects(foldersTree rbtree.RbTree) {
-	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
-
+	prn := newNugetPrinter(appWriter)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
 		nugetPackages := getNugetPackages(content)
@@ -69,21 +58,16 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 			return
 		}
 
-		parent := fold.Path
-		_, _ = fmt.Fprintf(appWriter, " %s\n", parent)
-		_, _ = fmt.Fprintf(tw, format, "Package", "Version")
-		_, _ = fmt.Fprintf(tw, format, "-------", "--------")
-
-		sort.Slice(nugetPackages, func(i, j int) bool {
-			return sortfold.CompareFold(nugetPackages[i].ID, nugetPackages[j].ID) < 0
-		})
-
-		for _, p := range nugetPackages {
-			_, _ = fmt.Fprintf(tw, format, p.ID, p.Version)
+		var packs []*pack
+		for _, np := range nugetPackages {
+			p := pack{
+				pkg:      np.ID,
+				versions: []string{np.Version},
+			}
+			packs = append(packs, &p)
 		}
 
-		_ = tw.Flush()
-		_, _ = fmt.Fprintln(appWriter)
+		prn.print(fold.Path, packs)
 	})
 }
 
@@ -113,27 +97,14 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 		_, _ = fmt.Fprintln(appWriter, " Different nuget package's versions in the same solution found:")
 	}
 
-	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
-
 	sort.Slice(solutions, func(i, j int) bool {
 		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
 	})
 
+	prn := newNugetPrinter(appWriter)
 	for _, sln := range solutions {
-		if m, ok := packs[sln.Path]; ok {
-			_, _ = fmt.Fprintf(appWriter, "\n %s\n", sln.Path)
-			_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
-			_, _ = fmt.Fprintf(tw, format, "-------", "--------")
-
-			sort.Slice(m, func(i, j int) bool {
-				return sortfold.CompareFold(m[i].pkg, m[j].pkg) < 0
-			})
-
-			for _, item := range m {
-				_, _ = fmt.Fprintf(tw, format, item.pkg, strings.Join(item.versions, ", "))
-			}
-			_ = tw.Flush()
+		if pks, ok := packs[sln.Path]; ok {
+			prn.print(sln.Path, pks)
 		}
 	}
 }
