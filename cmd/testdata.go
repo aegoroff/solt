@@ -208,4 +208,5 @@ using System.Runtime.InteropServices;
 const packagesConfingContent = `<?xml version="1.0" encoding="utf-8"?>
 <packages>
   <package id="CmdLine" version="1.0.7.509" targetFramework="net472" />
+  <package id="Newtonsoft.Json" version="12.0.1" targetFramework="net472" />
 </packages>`

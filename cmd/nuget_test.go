@@ -32,9 +32,10 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	actual := buf.String()
 	ass.Equal(`
  a\a
-  Package    Version
-  -------    -------
-  CmdLine    1.0.7.509
+  Package            Version
+  -------            -------
+  CmdLine            1.0.7.509
+  Newtonsoft.Json    12.0.1
 `, actual)
 }
 
@@ -89,8 +90,9 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	actual := buf.String()
 	ass.Equal(`
  a\a.sln
-  Package    Version
-  -------    -------
-  CmdLine    1.0.7.509
+  Package            Version
+  -------            -------
+  CmdLine            1.0.7.509
+  Newtonsoft.Json    12.0.1
 `, actual)
 }
