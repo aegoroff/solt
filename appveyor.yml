@@ -39,7 +39,7 @@ build_script:
   - go build -ldflags "-X solt/cmd.Version=%APPVEYOR_BUILD_VERSION%" solt
 
 test_script:
-  - go test -coverprofile=coverage.txt -coverpkg *sys,*msvc,*cmd,*solution -covermode=atomic solt/...
+  - go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/solution -covermode=atomic solt/...
 
 after_test:
   - ps: |
