@@ -2,12 +2,11 @@ package msvc
 
 import (
 	"github.com/stretchr/testify/assert"
-	"solt/internal/sys"
 	"strings"
 	"testing"
 )
 
-func Test_UnmarshalXmlPackagesConfig(t *testing.T) {
+func TestUnmarshalXML_PackagesConfig(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	packages := packages{}
@@ -19,7 +18,7 @@ func Test_UnmarshalXmlPackagesConfig(t *testing.T) {
 `
 	r := strings.NewReader(packangesconfig)
 	// Act
-	sys.UnmarshalXML(r, &packages)
+	_ = UnmarshalXML(r, &packages)
 
 	// Assert
 	ass.Equal(1, len(packages.Packages))
@@ -28,7 +27,7 @@ func Test_UnmarshalXmlPackagesConfig(t *testing.T) {
 	ass.Equal("net45", packages.Packages[0].TargetFramework)
 }
 
-func Test_UnmarshalXmlMsbuildProject(t *testing.T) {
+func TestUnmarshalXML_MsbuildProject(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	prj := msbuildProject{}
@@ -92,7 +91,7 @@ func Test_UnmarshalXmlMsbuildProject(t *testing.T) {
 	r := strings.NewReader(project)
 
 	// Act
-	sys.UnmarshalXML(r, &prj)
+	_ = UnmarshalXML(r, &prj)
 
 	// Assert
 	ass.Equal(2, len(prj.Compiles))

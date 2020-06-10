@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/afero"
 	"log"
 	"path/filepath"
-	"solt/internal/sys"
 	"solt/solution"
 	"strings"
 )
@@ -146,7 +145,7 @@ func createFolder(path string) *Folder {
 }
 
 func onXMLFile(path string, fs afero.Fs, result interface{}) error {
-	err := sys.UnmarshalXMLFrom(path, fs, result)
+	err := UnmarshalXMLFrom(path, fs, result)
 	if err != nil {
 		log.Printf("%s: %v\n", path, err)
 		return err
