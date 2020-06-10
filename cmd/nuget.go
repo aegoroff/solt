@@ -12,7 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type mismatch struct {
+// pack defines nuget package descriptor
+type pack struct {
 	pkg      string
 	versions []string
 }
@@ -102,9 +103,9 @@ func showPackagesInfoBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 		allProjectFolders[normalize(prj.Path)] = fold.Content
 	})
 
-	mismatches := calculateMismatches(allSolutionPaths, allProjectFolders, onlyMismatch)
+	packs := getNugetPacks(allSolutionPaths, allProjectFolders, onlyMismatch)
 
-	if len(mismatches) == 0 {
+	if len(packs) == 0 {
 		return
 	}
 
@@ -120,7 +121,7 @@ func showPackagesInfoBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	})
 
 	for _, sln := range solutions {
-		if m, ok := mismatches[sln.Path]; ok {
+		if m, ok := packs[sln.Path]; ok {
 			_, _ = fmt.Fprintf(appWriter, "\n %s\n", sln.Path)
 			_, _ = fmt.Fprintf(tw, format, "Package", "Versions")
 			_, _ = fmt.Fprintf(tw, format, "-------", "--------")
@@ -137,34 +138,34 @@ func showPackagesInfoBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	}
 }
 
-func calculateMismatches(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent, onlyMismatch bool) map[string][]*mismatch {
+func getNugetPacks(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent, onlyMismatch bool) map[string][]*pack {
 	allPkg := mapAllPackages(allPrjFolders)
 
-	var mismatches = make(map[string][]*mismatch)
+	var result = make(map[string][]*pack)
 
 	// Reduce packages
 	for spath, match := range allSolPaths {
 		packagesVers := mapPackagesInSolution(allPkg, match)
 
 		// Reduce packages in solution
-		mm := reducePackages(packagesVers, onlyMismatch)
-		if len(mm) > 0 {
-			mismatches[spath] = mm
+		packs := reducePacks(packagesVers, onlyMismatch)
+		if len(packs) > 0 {
+			result[spath] = packs
 		}
 	}
 
-	return mismatches
+	return result
 }
 
-func reducePackages(packagesVers map[string][]string, onlyMismatch bool) []*mismatch {
-	var result []*mismatch
+func reducePacks(packagesVers map[string][]string, onlyMismatch bool) []*pack {
+	var result []*pack
 	for pkg, vers := range packagesVers {
 		// If one version it's OK (no mismatches)
 		if onlyMismatch && len(vers) < 2 {
 			continue
 		}
 
-		m := mismatch{
+		m := pack{
 			pkg:      pkg,
 			versions: vers,
 		}
