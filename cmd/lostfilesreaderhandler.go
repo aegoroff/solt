@@ -18,6 +18,7 @@ type lostFilesHandler struct {
 	includedFiles       collections.StringHashSet
 	subfoldersToExclude []string
 	nonExistence        bool
+	filer               sys.Filer
 }
 
 func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs) *lostFilesHandler {
@@ -30,6 +31,7 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 		includedFiles:       make(collections.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
 		nonExistence:        nonExistence,
+		filer:               sys.NewFiler(fs, appWriter),
 	}
 }
 
@@ -84,7 +86,7 @@ func (r *lostFilesHandler) checkExistence(project string, includes []string) {
 		return
 	}
 
-	nonexist := sys.CheckExistence(includes, r.fs)
+	nonexist := r.filer.CheckExistence(includes)
 
 	if len(nonexist) > 0 {
 		r.unexistFiles[project] = append(r.unexistFiles[project], nonexist...)
@@ -108,4 +110,8 @@ func (r *lostFilesHandler) findLostFiles() ([]string, error) {
 	}
 
 	return result, err
+}
+
+func (r *lostFilesHandler) removeLostFiles(lostFiles []string) {
+	r.filer.Remove(lostFiles)
 }

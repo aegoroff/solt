@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"log"
 	"solt/msvc"
 )
 
@@ -71,19 +70,8 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonEx
 	}
 
 	if removeLostFiles {
-		removeLostfiles(lostFiles, fs)
+		lh.removeLostFiles(lostFiles)
 	}
 
 	return nil
-}
-
-func removeLostfiles(lostFiles []string, fs afero.Fs) {
-	for _, f := range lostFiles {
-		err := fs.Remove(f)
-		if err != nil {
-			log.Printf("%v\n", err)
-		} else {
-			_, _ = fmt.Fprintf(appWriter, "File: %s removed successfully.\n", f)
-		}
-	}
 }
