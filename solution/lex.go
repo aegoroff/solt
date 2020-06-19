@@ -291,6 +291,10 @@ func lexNewLine(lx *lexer) stateFn {
 	case r == '\t':
 		lx.ignore()
 		return lexBareStringStart
+	case isCrlf(r):
+		lx.ignore()
+		lx.emit(CRLF)
+		return lexNewLine
 	case r == eof:
 		lx.emit(itemEOF)
 		return nil
