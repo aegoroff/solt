@@ -27,7 +27,7 @@ func Test_ParseSolution_ParsedSolution(t *testing.T) {
 
 	// Act
 	for _, test := range tests {
-		sol := parse(test.input)
+		sol := parse(test.input, false)
 
 		// Assert
 		ass.Equal(test.expectedComment, sol.Comment)
@@ -38,6 +38,17 @@ func Test_ParseSolution_ParsedSolution(t *testing.T) {
 		ass.Equal(test.expectedGsCount, len(sol.GlobalSections))
 		ass.Equal(test.expectedProjectType, sol.Projects[0].Type)
 	}
+}
+
+func Test_ParseInvalidSolution_NoCrashHeadExtracted(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+
+	// Act
+	sol := parse(Invalid, true)
+
+	// Assert
+	ass.Equal("# Visual Studio 2013", sol.Comment)
 }
 
 const Vs2013 = `
@@ -271,6 +282,30 @@ Global
 		{75E0C034-44C8-461B-A677-9A19566FE393}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{75E0C034-44C8-461B-A677-9A19566FE393}.Release|x86.ActiveCfg = Release|Any CPU
 		{75E0C034-44C8-461B-A677-9A19566FE393}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
+`
+
+const Invalid = `
+Microsoft Visual Studio Solution File
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")  "Grok", "Grok\Grok.csproj", "{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}"
+EndProject
+
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

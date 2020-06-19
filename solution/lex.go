@@ -34,6 +34,7 @@ type lexer struct {
 	line  int
 	state stateFn
 	items chan yySymType
+	debug bool
 
 	// Allow for backing up up to three runes.
 	// This is necessary because TOML contains 3-rune tokens (""" and ''').
@@ -62,13 +63,14 @@ func (lx *lexer) nextItem() yySymType {
 	}
 }
 
-func newLexer(input string) *lexer {
+func newLexer(input string, debug bool) *lexer {
 	lx := &lexer{
 		input: input,
 		state: lexTop,
 		line:  1,
 		items: make(chan yySymType, 10),
 		stack: make([]stateFn, 0, 10),
+		debug: debug,
 	}
 	return lx
 }

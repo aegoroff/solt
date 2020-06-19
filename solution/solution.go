@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"io"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -29,6 +27,9 @@ func (lx *lexer) Lex(lval *yySymType) int {
 	v := lx.nextItem()
 	if v.tok == itemEOF {
 		return 0
+	}
+	if lx.debug {
+		log.Println(v.tok.String())
 	}
 	lval.tok = v.tok
 	lval.str = v.str
@@ -68,29 +69,12 @@ func Parse(rdr io.Reader) (*Solution, error) {
 
 	str := sb.String()
 
-	sol := parse(str)
+	sol := parse(str, false)
 
 	return sol, nil
 }
 
-// ParseFile parses visual studio solution file specified by path
-func ParseFile(solutionPath string) (*Solution, error) {
-	f, err := os.Open(filepath.Clean(solutionPath))
-	if err != nil {
-		return nil, err
-	}
-	defer closeResource(f)
-	return Parse(f)
-}
-
-func closeResource(c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func parse(str string) *Solution {
+func parse(str string, debug bool) *Solution {
 	projects = []*Project{}
 	globalSections = []*Section{}
 	minimumVisualStudioVersion = ""
@@ -98,7 +82,7 @@ func parse(str string) *Solution {
 	comment = ""
 	words = []string{}
 	yyErrorVerbose = true
-	lx := newLexer(str)
+	lx := newLexer(str, debug)
 	yyParse(lx)
 
 	return &Solution{
