@@ -186,8 +186,7 @@ func lexTop(lx *lexer) stateFn {
 	// At this point, the only valid item can be an identifier, so we back up
 	// and let the key lexer do the rest.
 	lx.backup()
-	lx.push(lexTopEnd)
-	return lexIdentifier
+	return lexTopEnd
 }
 
 // lexTopEnd is entered whenever a top-level item has been consumed. (A value
@@ -198,10 +197,12 @@ func lexTopEnd(lx *lexer) stateFn {
 	switch {
 	case r == commentStart:
 		// a comment will read to a newline for us.
-		lx.push(lexTop)
+		lx.push(lexOther)
 		return lexCommentStart
 	case isWhitespace(r):
 		return lexTopEnd
+	case isIdentifierChar(r):
+		return lexIdentifier
 	case isNL(r):
 		return lexSkip(lx, lexTop)
 	case r == eof:
