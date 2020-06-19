@@ -203,8 +203,7 @@ func lexTopEnd(lx *lexer) stateFn {
 	case isWhitespace(r):
 		return lexTopEnd
 	case isNL(r):
-		lx.ignore()
-		return lexTop
+		return lexSkip(lx, lexTop)
 	case r == eof:
 		lx.emit(itemEOF)
 		return nil
@@ -300,12 +299,8 @@ func lexNewLine(lx *lexer) stateFn {
 
 func lexBareStringStart(lx *lexer) stateFn {
 	switch r := lx.next(); {
-	case r == '\t':
-		lx.ignore()
-		return lexBareString
-	case r == ' ':
-		lx.ignore()
-		return lexBareString
+	case r == '\t', r == ' ':
+		return lexSkip(lx, lexBareString)
 	case isIdentifierChar(r):
 		return lexIdentifier
 	default:
@@ -335,8 +330,7 @@ func lexBareString(lx *lexer) stateFn {
 func lexBareStringEnd(lx *lexer) stateFn {
 	switch r := lx.next(); {
 	case r == '\r':
-		lx.ignore()
-		return lexBareStringEnd
+		return lexSkip(lx, lexBareStringEnd)
 	case r == eq:
 		lx.ignore()
 		lx.emit(EQ)
@@ -366,8 +360,8 @@ func lexValue(lx *lexer) stateFn {
 	}
 	switch r {
 	case stringStart:
-		lx.ignore() // ignore the '"'
-		return lexString
+		// ignore the '"'
+		return lexSkip(lx, lexString)
 	case '+', '-':
 		return lexNumberStart
 	case '.': // special error case, be kind to users
@@ -506,8 +500,7 @@ func lexFloat(lx *lexer) stateFn {
 // lexCommentStart begins the lexing of a comment. It will emit
 // itemCommentStart and consume no characters, passing control to lexComment.
 func lexCommentStart(lx *lexer) stateFn {
-	lx.ignore()
-	return lexComment
+	return lexSkip(lx, lexComment)
 }
 
 // lexComment lexes an entire comment. It assumes that '#' has been consumed.
