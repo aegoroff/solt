@@ -12,7 +12,6 @@ const (
 	itemError tokenType = iota
 	itemNIL             // used in the parser to indicate no type
 	itemEOF
-	itemDatetime
 )
 
 const (
@@ -466,8 +465,6 @@ func (itype tokenType) String() string {
 		return "EOF"
 	case itemNIL:
 		return "NIL"
-	case itemDatetime:
-		return "DateTime"
 	}
 	panic(fmt.Sprintf("BUG: Unknown type '%d'.", int(itype)))
 }
