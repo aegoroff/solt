@@ -310,15 +310,7 @@ func lexBareStringStart(lx *lexer) stateFn {
 
 func lexBareString(lx *lexer) stateFn {
 	switch r := lx.next(); {
-	case isCrlf(r):
-		lx.backup()
-		lx.emitTrim(BARE_STRING)
-		return lexBareStringEnd
-	case r == eq:
-		lx.backup()
-		lx.emitTrim(BARE_STRING)
-		return lexBareStringEnd
-	case r == '\r':
+	case isCrlf(r), r == eq, r == '\r':
 		lx.backup()
 		lx.emitTrim(BARE_STRING)
 		return lexBareStringEnd
