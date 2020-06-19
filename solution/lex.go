@@ -12,6 +12,7 @@ const (
 	itemError tokenType = iota
 	itemNIL             // used in the parser to indicate no type
 	itemEOF
+	itemDatetime
 )
 
 const (
@@ -234,6 +235,10 @@ func lexOther(lx *lexer) stateFn {
 		lx.ignore()
 		lx.emit(EQ)
 		return lexOther
+	case isDigit(r):
+		lx.push(lexOther)
+		lx.backup() // avoid an extra state and use the same as above
+		return lexNumberOrDateStart
 	case isWhitespace(r):
 		return lexSkip(lx, lexOther)
 	case r == parenOpen:
@@ -341,9 +346,18 @@ func lexValue(lx *lexer) stateFn {
 	switch {
 	case isWhitespace(r):
 		return lexSkip(lx, lexValue)
-	case r == stringStart:
+	case isDigit(r):
+		lx.backup() // avoid an extra state and use the same as above
+		return lexNumberOrDateStart
+	}
+	switch r {
+	case stringStart:
 		// ignore the '"'
 		return lexSkip(lx, lexString)
+	case '+', '-':
+		return lexNumberStart
+	case '.': // special error case, be kind to users
+		return lx.errorf("floats must start with a digit, not '.'")
 	}
 	return lx.errorf("expected value but found %q instead", r)
 }
@@ -368,6 +382,111 @@ func lexString(lx *lexer) stateFn {
 		return lx.pop()
 	}
 	return lexString
+}
+
+// lexNumberOrDateStart consumes either an integer, a float, or datetime.
+func lexNumberOrDateStart(lx *lexer) stateFn {
+	r := lx.next()
+	if isDigit(r) {
+		return lexNumberOrDate
+	}
+	switch r {
+	case '_':
+		return lexNumber
+	case 'e', 'E':
+		return lexFloat
+	case '.':
+		return lx.errorf("floats must start with a digit, not '.'")
+	}
+	return lx.errorf("expected a digit but got %q", r)
+}
+
+// lexNumberOrDate consumes either an integer, float or datetime.
+func lexNumberOrDate(lx *lexer) stateFn {
+	r := lx.next()
+	if isDigit(r) {
+		return lexNumberOrDate
+	}
+	switch r {
+	case '-':
+		return lexDatetime
+	case '_':
+		return lexNumber
+	case '.', 'e', 'E':
+		return lexFloat
+	}
+
+	lx.backup()
+	lx.emit(NUMBER)
+	return lx.pop()
+}
+
+// lexDatetime consumes a Datetime, to a first approximation.
+// The parser validates that it matches one of the accepted formats.
+func lexDatetime(lx *lexer) stateFn {
+	r := lx.next()
+	if isDigit(r) {
+		return lexDatetime
+	}
+	switch r {
+	case '-', 'T', ':', '.', 'Z', '+':
+		return lexDatetime
+	}
+
+	lx.backup()
+	lx.emit(itemDatetime)
+	return lx.pop()
+}
+
+// lexNumberStart consumes either an integer or a float. It assumes that a sign
+// has already been read, but that *no* digits have been consumed.
+// lexNumberStart will move to the appropriate integer or float states.
+func lexNumberStart(lx *lexer) stateFn {
+	// We MUST see a digit. Even floats have to start with a digit.
+	r := lx.next()
+	if !isDigit(r) {
+		if r == '.' {
+			return lx.errorf("floats must start with a digit, not '.'")
+		}
+		return lx.errorf("expected a digit but got %q", r)
+	}
+	return lexNumber
+}
+
+// lexNumber consumes an integer or a float after seeing the first digit.
+func lexNumber(lx *lexer) stateFn {
+	r := lx.next()
+	if isDigit(r) {
+		return lexNumber
+	}
+	switch r {
+	case '_':
+		return lexNumber
+	case '.', 'e', 'E':
+		return lexFloat
+	}
+
+	lx.backup()
+	lx.emit(NUMBER)
+	return lx.pop()
+}
+
+// lexFloat consumes the elements of a float. It allows any sequence of
+// float-like characters, so floats emitted by the lexer are only a first
+// approximation and must be validated by the parser.
+func lexFloat(lx *lexer) stateFn {
+	r := lx.next()
+	if isDigit(r) {
+		return lexFloat
+	}
+	switch r {
+	case '_', '.', '-', '+', 'e', 'E':
+		return lexFloat
+	}
+
+	lx.backup()
+	lx.emit(NUMBER)
+	return lx.pop()
 }
 
 // lexCommentStart begins the lexing of a comment. It will emit
@@ -411,11 +530,13 @@ func isCrlf(r rune) bool {
 	return r == '\n'
 }
 
+func isDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
 func isIdentifierChar(r rune) bool {
 	return (r >= 'A' && r <= 'Z') ||
-		(r >= 'a' && r <= 'z') ||
-		(r >= '0' && r <= '9') ||
-		r == '.'
+		(r >= 'a' && r <= 'z')
 }
 
 func (itype tokenType) String() string {
@@ -424,6 +545,8 @@ func (itype tokenType) String() string {
 		return "CRLF"
 	case IDENTIFIER:
 		return "IDENTIFIER"
+	case NUMBER:
+		return "NUMBER"
 	case COMMA:
 		return "COMMA"
 	case COMMENT:
@@ -444,6 +567,8 @@ func (itype tokenType) String() string {
 		return "EOF"
 	case itemNIL:
 		return "NIL"
+	case itemDatetime:
+		return "DateTime"
 	}
 	panic(fmt.Sprintf("BUG: Unknown type '%d'.", int(itype)))
 }

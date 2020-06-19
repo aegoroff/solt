@@ -17,6 +17,7 @@ package solution
 %token PAREN_OPEN
 %token PAREN_CLOSE
 %token COMMENT
+%token NUMBER
 %token CRLF
 
 %token <str> IDENTIFIER
@@ -24,6 +25,7 @@ package solution
 %token <str> BARE_STRING
 %token <str> COMMENT
 %token <str> COMMA
+%token <str> NUMBER
 
 %type <str> project_type_id project_name project_type project_path project_id project_section_name project_section_type
 %type <str> project_section_start project_section_key project_section_value comment lvalue rvalue
@@ -61,6 +63,7 @@ words: word
 
 word : IDENTIFIER { onWord($1) }
      | COMMA
+     | NUMBER { onWord($1) }
      ;
 
 version
@@ -69,7 +72,7 @@ version
 
 lvalue : IDENTIFIER ;
 
-rvalue : IDENTIFIER ;
+rvalue : IDENTIFIER | NUMBER ;
 
 project_start
         : IDENTIFIER project_type EQ project_name COMMA project_path COMMA project_id { onProject($2, $4, $6, $8) }
