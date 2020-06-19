@@ -22,7 +22,7 @@ const EQ = 57348
 const PAREN_OPEN = 57349
 const PAREN_CLOSE = 57350
 const COMMENT = 57351
-const NUMBER = 57352
+const DIGIT_OR_DOT = 57352
 const CRLF = 57353
 const IDENTIFIER = 57354
 const STRING = 57355
@@ -38,7 +38,7 @@ var yyToknames = [...]string{
 	"PAREN_OPEN",
 	"PAREN_CLOSE",
 	"COMMENT",
-	"NUMBER",
+	"DIGIT_OR_DOT",
 	"CRLF",
 	"IDENTIFIER",
 	"STRING",
