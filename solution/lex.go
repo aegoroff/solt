@@ -23,6 +23,9 @@ const (
 	stringEnd    = '"'
 	parenOpen    = '('
 	parenClose   = ')'
+	braceOpen    = '{'
+	braceClose   = '}'
+	minus        = '-'
 )
 
 type stateFn func(lx *lexer) stateFn
@@ -364,6 +367,8 @@ func lexValue(lx *lexer) stateFn {
 func lexString(lx *lexer) stateFn {
 	r := lx.next()
 	switch {
+	case r == braceOpen:
+		return lexGuid
 	case r == eof:
 		return lx.errorf("unexpected EOF")
 	case isNL(r):
@@ -376,6 +381,20 @@ func lexString(lx *lexer) stateFn {
 		return lx.pop()
 	}
 	return lexString
+}
+
+func lexGuid(lx *lexer) stateFn {
+	switch r := lx.next(); {
+	case isGuidChar(r), r == braceClose:
+		return lexGuid
+	case r == stringEnd:
+		lx.backup()
+		lx.emit(GUID)
+		lx.next()
+		lx.ignore()
+		return lx.pop()
+	}
+	return lx.errorf("expected GUID call")
 }
 
 // lexDigitOrDot consumes either an digit or datetime.
@@ -443,6 +462,10 @@ func isIdentifierChar(r rune) bool {
 	return (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z')
 }
 
+func isGuidChar(r rune) bool {
+	return isIdentifierChar(r) || isDigit(r) || r == minus
+}
+
 func (itype tokenType) String() string {
 	switch itype {
 	case CRLF:
@@ -457,12 +480,18 @@ func (itype tokenType) String() string {
 		return "COMMENT"
 	case STRING:
 		return "STRING"
+	case GUID:
+		return "GUID"
 	case BARE_STRING:
 		return "BARE_STRING"
 	case PAREN_OPEN:
 		return "PAREN_OPEN"
 	case PAREN_CLOSE:
 		return "PAREN_CLOSE"
+	case braceOpen:
+		return "{"
+	case braceClose:
+		return "}"
 	case EQ:
 		return "EQ"
 	case itemError:

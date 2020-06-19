@@ -19,6 +19,7 @@ package solution
 %token COMMENT
 %token DIGIT_OR_DOT
 %token CRLF
+%token GUID
 
 %token <str> IDENTIFIER
 %token <str> STRING
@@ -26,6 +27,7 @@ package solution
 %token <str> COMMENT
 %token <str> COMMA
 %token <str> DIGIT_OR_DOT
+%token <str> GUID
 
 %type <str> project_type_id project_name project_type project_path project_id project_section_name project_section_type
 %type <str> project_section_start project_section_key project_section_value comment lvalue rvalue
@@ -80,13 +82,13 @@ project_start
 
 project_type : PAREN_OPEN project_type_id PAREN_CLOSE { $$ = $2; };
 
-project_type_id : STRING { $$ = $1; };
+project_type_id : GUID { $$ = $1; };
 
 project_name : STRING { $$ = $1; };
 
 project_path : STRING { $$ = $1; };
 
-project_id : STRING { $$ = $1; };
+project_id : GUID { $$ = $1; };
 
 project_end : IDENTIFIER ;
 

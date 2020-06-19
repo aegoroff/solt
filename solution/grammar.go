@@ -24,9 +24,10 @@ const PAREN_CLOSE = 57350
 const COMMENT = 57351
 const DIGIT_OR_DOT = 57352
 const CRLF = 57353
-const IDENTIFIER = 57354
-const STRING = 57355
-const BARE_STRING = 57356
+const GUID = 57354
+const IDENTIFIER = 57355
+const STRING = 57356
+const BARE_STRING = 57357
 
 var yyToknames = [...]string{
 	"$end",
@@ -40,6 +41,7 @@ var yyToknames = [...]string{
 	"COMMENT",
 	"DIGIT_OR_DOT",
 	"CRLF",
+	"GUID",
 	"IDENTIFIER",
 	"STRING",
 	"BARE_STRING",
@@ -50,7 +52,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line grammar.y:111
+//line grammar.y:113
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -70,21 +72,21 @@ const yyLast = 55
 
 var yyAct = [...]int{
 
-	14, 3, 18, 18, 37, 35, 34, 16, 19, 19,
-	12, 27, 17, 53, 50, 26, 43, 41, 45, 40,
-	20, 47, 29, 46, 23, 31, 38, 30, 28, 24,
+	14, 3, 18, 18, 37, 50, 43, 16, 19, 19,
+	45, 12, 27, 17, 41, 26, 20, 40, 34, 35,
+	53, 47, 29, 46, 23, 31, 38, 30, 28, 24,
 	51, 48, 25, 10, 9, 8, 7, 6, 5, 4,
 	2, 39, 15, 11, 36, 13, 22, 44, 33, 52,
 	49, 21, 42, 32, 1,
 }
 var yyPact = [...]int{
 
-	-2, -1000, 9, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-2, -1000, 5, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, 17, 23, -1, 22, -1000, -1000, -1000, -1000,
-	-2, 21, 19, -7, -10, -1, -1000, -1000, 7, -1000,
-	3, 6, 15, 13, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, 27, -1000, -1000, -1000, -1000, -1000, 1, 26,
-	-1000, 0, -1000, -1000,
+	-2, 21, 19, 6, -11, -1, -1000, -1000, 4, -1000,
+	-8, -3, 15, 13, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 27, -1000, -1000, -1000, -1000, -1000, -9, 26,
+	-1000, 8, -1000, -1000,
 }
 var yyPgo = [...]int{
 
@@ -109,11 +111,11 @@ var yyR2 = [...]int{
 var yyChk = [...]int{
 
 	-1000, -1, -15, -16, -17, -18, -19, -20, -21, -22,
-	-23, -12, 12, -10, -24, -13, 9, 14, 4, 10,
-	11, -4, -9, 7, 6, -25, -24, 12, 6, -16,
-	6, 6, -2, -7, 13, 12, -11, 14, -24, -14,
-	12, 10, -3, 13, -8, 12, 8, 8, 4, -5,
-	13, 4, -6, 13,
+	-23, -12, 13, -10, -24, -13, 9, 15, 4, 10,
+	11, -4, -9, 7, 6, -25, -24, 13, 6, -16,
+	6, 6, -2, -7, 12, 13, -11, 15, -24, -14,
+	13, 10, -3, 14, -8, 13, 8, 8, 4, -5,
+	14, 4, -6, 12,
 }
 var yyDef = [...]int{
 
@@ -131,7 +133,7 @@ var yyTok1 = [...]int{
 var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14,
+	12, 13, 14, 15,
 }
 var yyTok3 = [...]int{
 	0,
@@ -476,92 +478,92 @@ yydefault:
 
 	case 13:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:57
+//line grammar.y:59
 		{
 			yyVAL.str = yyDollar[1].str
 			onComment(yyDollar[1].str)
 		}
 	case 17:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:64
+//line grammar.y:66
 		{
 			onWord(yyDollar[1].str)
 		}
 	case 19:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:66
+//line grammar.y:68
 		{
 			onWord(yyDollar[1].str)
 		}
 	case 20:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line grammar.y:70
+//line grammar.y:72
 		{
 			onVersion(yyDollar[1].str, yyDollar[3].str)
 		}
 	case 24:
 		yyDollar = yyS[yypt-8 : yypt+1]
-//line grammar.y:78
+//line grammar.y:80
 		{
 			onProject(yyDollar[2].str, yyDollar[4].str, yyDollar[6].str, yyDollar[8].str)
 		}
 	case 25:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line grammar.y:81
+//line grammar.y:83
 		{
 			yyVAL.str = yyDollar[2].str
 		}
 	case 26:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:83
+//line grammar.y:85
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 27:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:85
+//line grammar.y:87
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 28:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:87
+//line grammar.y:89
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 29:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:89
+//line grammar.y:91
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 31:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line grammar.y:94
+//line grammar.y:96
 		{
 			onSection(yyDollar[1].str, yyDollar[2].str, yyDollar[4].str)
 		}
 	case 32:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line grammar.y:97
+//line grammar.y:99
 		{
 			yyVAL.str = yyDollar[2].str
 		}
 	case 33:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:99
+//line grammar.y:101
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 34:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line grammar.y:101
+//line grammar.y:103
 		{
 			yyVAL.str = yyDollar[1].str
 		}
 	case 35:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line grammar.y:104
+//line grammar.y:106
 		{
 			onSectionItem(yyDollar[1].str, yyDollar[3].str)
 		}
