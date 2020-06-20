@@ -368,7 +368,7 @@ func lexString(lx *lexer) stateFn {
 	r := lx.next()
 	switch {
 	case r == braceOpen:
-		return lexGuid
+		return lexGUID
 	case r == eof:
 		return lx.errorf("unexpected EOF")
 	case isNL(r):
@@ -383,10 +383,10 @@ func lexString(lx *lexer) stateFn {
 	return lexString
 }
 
-func lexGuid(lx *lexer) stateFn {
+func lexGUID(lx *lexer) stateFn {
 	switch r := lx.next(); {
-	case isGuidChar(r), r == braceClose:
-		return lexGuid
+	case isGUIDChar(r), r == braceClose:
+		return lexGUID
 	case r == stringEnd:
 		lx.backup()
 		lx.emit(GUID)
@@ -462,7 +462,7 @@ func isIdentifierChar(r rune) bool {
 	return (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z')
 }
 
-func isGuidChar(r rune) bool {
+func isGUIDChar(r rune) bool {
 	return isIdentifierChar(r) || isDigit(r) || r == minus
 }
 
