@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/akutz/sortfold"
+	"github.com/gookit/color"
 	"io"
 	"sort"
 	"strings"
@@ -33,8 +34,9 @@ type nugetprint struct {
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
+	color.Fprintf(n.w, "\n <gray>%s</>\n", parent)
+
 	const format = "  %v\t%v\n"
-	_, _ = fmt.Fprintf(n.w, "\n %s\n", parent)
 	_, _ = fmt.Fprintf(n.tw, format, "Package", "Version")
 	_, _ = fmt.Fprintf(n.tw, format, "-------", "-------")
 

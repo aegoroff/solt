@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
+	"github.com/gookit/color"
 	"solt/msvc"
 	"solt/solution"
 	"sort"
@@ -25,7 +26,7 @@ func newInfo() *cobra.Command {
 			for _, sol := range solutions {
 				sln := sol.Solution
 
-				fmt.Printf(" %s\n", sol.Path)
+				color.Printf(" <gray>%s</>\n", sol.Path)
 
 				const format = "  %v\t%v\n"
 				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)

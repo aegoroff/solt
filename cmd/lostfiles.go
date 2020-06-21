@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"solt/msvc"
@@ -49,7 +49,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonEx
 	sortAndOutput(appWriter, lostFiles)
 
 	if len(lh.unexistFiles) > 0 {
-		_, _ = fmt.Fprintf(appWriter, "\nThese files included into projects but not exist in the file system.\n")
+		color.Fprintf(appWriter, "\n<red>These files included into projects but not exist in the file system.</>\n")
 
 		outputSortedMap(appWriter, lh.unexistFiles, "Project")
 	}

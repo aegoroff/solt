@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"solt/msvc"
 	"sort"
@@ -89,7 +89,7 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 	}
 
 	if onlyMismatch {
-		_, _ = fmt.Fprintln(appWriter, " Different nuget package's versions in the same solution found:")
+		color.Fprintln(appWriter, " <red>Different nuget package's versions in the same solution found:</>")
 	}
 
 	sort.Slice(solutions, func(i, j int) bool {

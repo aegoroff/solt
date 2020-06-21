@@ -29,6 +29,7 @@ install:
   - go get -u "github.com/stretchr/testify/assert"
   - go get -u "github.com/aegoroff/godatastruct/rbtree"
   - go get -u "github.com/akutz/sortfold"
+  - go get -u "github.com/gookit/color"
   - go get -u "gonum.org/v1/gonum/graph/simple"
 
 stack: go ^1.14

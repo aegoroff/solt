@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/gookit/color"
 	"io"
 	"runtime"
 	"sort"
@@ -22,7 +23,7 @@ func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix s
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		_, _ = fmt.Fprintf(writer, "\n%s: %s\n", keyPrefix, k)
+		color.Fprintf(writer, "\n<gray>%s: %s</>\n", keyPrefix, k)
 		sortAndOutput(writer, itemsMap[k])
 	}
 }
