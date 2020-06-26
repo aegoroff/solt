@@ -7,20 +7,20 @@ import (
 	"solt/msvc"
 )
 
-type lostFilesCmd struct {
+type lostFilesOpts struct {
 	removeLost bool
 	searchAll  bool
 	filter     string
 }
 
 func newLostFiles() *cobra.Command {
-	opts := lostFilesCmd{}
+	opts := lostFilesOpts{}
 	var cmd = &cobra.Command{
 		Use:     "lf",
 		Aliases: []string{"lostfiles"},
 		Short:   "Find lost files in the folder specified",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return executeLostFilesCommand(opts.filter, opts.removeLost, opts.searchAll, appFileSystem)
+			return executeLostFilesCommand(opts, appFileSystem)
 		},
 	}
 
@@ -31,8 +31,8 @@ func newLostFiles() *cobra.Command {
 	return cmd
 }
 
-func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonExist bool, fs afero.Fs) error {
-	lh := newLostFilesHandler(lostFilesFilter, nonExist, fs)
+func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
+	lh := newLostFilesHandler(opts.filter, opts.searchAll, fs)
 
 	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
 
@@ -54,7 +54,7 @@ func executeLostFilesCommand(lostFilesFilter string, removeLostFiles bool, nonEx
 		outputSortedMap(appWriter, lh.unexistFiles, "Project")
 	}
 
-	if removeLostFiles {
+	if opts.removeLost {
 		lh.removeLostFiles(lostFiles)
 	}
 
