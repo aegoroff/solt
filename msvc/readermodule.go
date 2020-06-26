@@ -24,6 +24,17 @@ func newReaderModules(fs afero.Fs) []readerModule {
 	return modules
 }
 
+func newFolder(path string) *Folder {
+	f := Folder{
+		Content: &FolderContent{
+			Solutions: []*VisualStudioSolution{},
+			Projects:  []*MsbuildProject{},
+		},
+		Path: filepath.Dir(path),
+	}
+	return &f
+}
+
 type readerModule interface {
 	filter(path string) bool
 	read(path string) (*Folder, bool)
@@ -72,7 +83,7 @@ func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 		return nil, false
 	}
 
-	f := createFolder(path)
+	f := newFolder(path)
 
 	f.Content.Packages = &pack
 
@@ -94,7 +105,7 @@ func (r *readerMsbuild) read(path string) (*Folder, bool) {
 		return nil, false
 	}
 
-	f := createFolder(path)
+	f := newFolder(path)
 
 	p := MsbuildProject{Project: &project, Path: path}
 
@@ -124,24 +135,13 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 		return nil, false
 	}
 
-	f := createFolder(path)
+	f := newFolder(path)
 
 	s := VisualStudioSolution{Solution: sln, Path: path}
 
 	f.Content.Solutions = append(f.Content.Solutions, &s)
 
 	return f, true
-}
-
-func createFolder(path string) *Folder {
-	f := Folder{
-		Content: &FolderContent{
-			Solutions: []*VisualStudioSolution{},
-			Projects:  []*MsbuildProject{},
-		},
-		Path: filepath.Dir(path),
-	}
-	return &f
 }
 
 func onXMLFile(path string, fs afero.Fs, result interface{}) error {
