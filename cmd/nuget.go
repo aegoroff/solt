@@ -43,14 +43,11 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 	prn := newNugetPrinter(appWriter)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
-		nugetPackages := getNugetPackages(content)
+		pchan := make(chan *msvc.NugetPackage, 4)
+		go getNugetPackages(content, pchan)
 
-		if len(nugetPackages) == 0 {
-			return
-		}
-
-		var packs []*pack
-		for _, np := range nugetPackages {
+		packs := []*pack{}
+		for np := range pchan {
 			p := pack{
 				pkg:      np.ID,
 				versions: []string{np.Version},
@@ -58,7 +55,9 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 			packs = append(packs, &p)
 		}
 
-		prn.print(fold.Path, packs)
+		if len(packs) > 0 {
+			prn.print(fold.Path, packs)
+		}
 	})
 }
 
@@ -166,6 +165,15 @@ func mapPackagesInSolution(packagesByProject map[string]map[string]string, match
 	return packagesVers
 }
 
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map[string]string {
 	var packagesByProject = make(map[string]map[string]string)
 
@@ -178,30 +186,21 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 		packagesMap = make(map[string]string)
 		packagesByProject[ppath] = packagesMap
 
-		nugetPackages := getNugetPackages(content)
+		pchan := make(chan *msvc.NugetPackage, 4)
 
-		for _, pkg := range nugetPackages {
+		go getNugetPackages(content, pchan)
+
+		for pkg := range pchan {
 			packagesMap[pkg.ID] = pkg.Version
 		}
 	}
 	return packagesByProject
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-func getNugetPackages(content *msvc.FolderContent) []*msvc.NugetPackage {
-	var nugetPackages []*msvc.NugetPackage
+func getNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPackage) {
 	if content.Packages != nil {
 		for _, p := range content.Packages.Packages {
-			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
-			nugetPackages = append(nugetPackages, &n)
+			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
 		}
 	}
 	for _, prj := range content.Projects {
@@ -210,10 +209,8 @@ func getNugetPackages(content *msvc.FolderContent) []*msvc.NugetPackage {
 		}
 
 		for _, p := range prj.Project.PackageReferences {
-			n := msvc.NugetPackage{ID: p.ID, Version: p.Version}
-			nugetPackages = append(nugetPackages, &n)
+			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
 		}
 	}
-
-	return nugetPackages
+	close(pchan)
 }

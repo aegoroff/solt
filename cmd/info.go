@@ -26,7 +26,9 @@ func newInfo() *cobra.Command {
 			for _, sol := range solutions {
 				sln := sol.Solution
 
-				color.Printf(" <gray>%s</>\n", sol.Path)
+				_, _ = color.Set(color.FgGray)
+				_, _ = fmt.Printf(" %s\n", sol.Path)
+				_, _ = color.Reset()
 
 				const format = "  %v\t%v\n"
 				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)

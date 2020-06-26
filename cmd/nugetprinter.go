@@ -34,7 +34,9 @@ type nugetprint struct {
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
-	color.Fprintf(n.w, "\n <gray>%s</>\n", parent)
+	_, _ = color.Set(color.FgGray)
+	_, _ = fmt.Fprintf(n.w, "\n %s\n", parent)
+	_, _ = color.Reset()
 
 	const format = "  %v\t%v\n"
 	_, _ = fmt.Fprintf(n.tw, format, "Package", "Version")

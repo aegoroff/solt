@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"io"
 	"os"
@@ -51,7 +51,7 @@ func Execute(args ...string) {
 
 	if diag {
 		printMemUsage(appWriter)
-		_, _ = fmt.Fprintf(appWriter, "Working time: %v\n", elapsed)
+		color.Fprintf(appWriter, "<gray>Working time:</> <yellow>%v</>\n", elapsed)
 	}
 }
 
