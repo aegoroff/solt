@@ -77,11 +77,11 @@ func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 			r.includedFiles.Add(normalize(f))
 		}
 
-		r.checkExistence(prj.Path, includes)
+		r.addToUnexistIfNeeded(prj.Path, includes)
 	}
 }
 
-func (r *lostFilesHandler) checkExistence(project string, includes []string) {
+func (r *lostFilesHandler) addToUnexistIfNeeded(project string, includes []string) {
 	if !r.nonExistence {
 		return
 	}
