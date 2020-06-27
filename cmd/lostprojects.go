@@ -120,18 +120,18 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, filesInsideSolution collections.StringHashSet) bool {
+func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, solutionFiles collections.StringHashSet) bool {
 	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
 
+	pdir := filepath.Dir(prj.Path)
+
 	for _, f := range projectFiles {
-		pf := normalize(f)
-		if !filesInsideSolution.Contains(pf) {
+		pfile := normalize(f)
+		if !solutionFiles.Contains(pfile) {
 			continue
 		}
 
-		dir := filepath.Dir(prj.Path)
-
-		if strings.Contains(pf, normalize(dir)) {
+		if strings.HasPrefix(pfile, normalize(pdir)) {
 			return true
 		}
 	}
