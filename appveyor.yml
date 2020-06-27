@@ -42,10 +42,10 @@ build_script:
 test_script:
   - go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/solution -covermode=atomic solt/...
 
-after_test:
-  - ps: |
-      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-      bash codecov.sh -f "coverage.txt" -t $env:CODECOV_TOKEN
+#after_test:
+#  - ps: |
+#      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+#      bash codecov.sh -f "coverage.txt" -t $env:CODECOV_TOKEN
 
 artifacts:
   - path: solt.exe
