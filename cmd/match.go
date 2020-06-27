@@ -51,7 +51,7 @@ func NewExactMatchS(matches []string) Matcher {
 	return NewExactMatchHS(&h)
 }
 
-// NewExactMatchHS creates exacth matcher from strings slice
+// NewExactMatchHS creates exacth matcher from strings hashset
 // Exact means that string must exactly match one of the matcher's strings
 func NewExactMatchHS(existing *collections.StringHashSet) Matcher {
 	hs := matchE{hashset: *existing}
