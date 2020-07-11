@@ -51,7 +51,7 @@ func Execute(args ...string) {
 
 	if diag {
 		printMemUsage(appWriter)
-		color.Fprintf(appWriter, "<gray>Working time:</> <yellow>%v</>\n", elapsed)
+		color.Fprintf(appWriter, "<gray>Working time:</> <green>%v</>\n", elapsed)
 	}
 }
 
