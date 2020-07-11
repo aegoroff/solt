@@ -2,6 +2,8 @@ package sys
 
 import (
 	"github.com/spf13/afero"
+	"io"
+	"log"
 	"path/filepath"
 	"sync"
 )
@@ -189,7 +191,7 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 	if err != nil {
 		return nil
 	}
-	defer f.Close()
+	defer Close(f)
 
 	entries, err := f.Readdir(-1)
 	if err != nil {
@@ -203,4 +205,12 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 	}
 
 	return result
+}
+
+// Close wraps io.Closer Close func with error habdling
+func Close(c io.Closer) {
+	err := c.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }

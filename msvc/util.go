@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"solt/internal/sys"
 )
 
 func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
@@ -15,7 +16,7 @@ func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
 		log.Print(err)
 		return err
 	}
-	defer closeResource(f)
+	defer sys.Close(f)
 
 	return unmarshalXML(f, result)
 }
@@ -28,11 +29,4 @@ func unmarshalXML(r io.Reader, result interface{}) error {
 	}
 	err := xml.Unmarshal(data, result)
 	return err
-}
-
-func closeResource(c io.Closer) {
-	err := c.Close()
-	if err != nil {
-		log.Println(err)
-	}
 }
