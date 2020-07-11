@@ -3,6 +3,7 @@ solt
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b8b9bdf73cfb4e97888b6ff7b48bfc84)](https://app.codacy.com/manual/egoroff/solt?utm_source=github.com&utm_medium=referral&utm_content=aegoroff/solt&utm_campaign=Badge_Grade_Dashboard)
 [![Build status](https://ci.appveyor.com/api/projects/status/tgx6ai9erbgfq2ij?svg=true)](https://ci.appveyor.com/project/aegoroff/solt) [![codecov](https://codecov.io/gh/aegoroff/solt/branch/master/graph/badge.svg)](https://codecov.io/gh/aegoroff/solt) [![Go Report Card](https://goreportcard.com/badge/github.com/aegoroff/solt)](https://goreportcard.com/report/github.com/aegoroff/solt)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faegoroff%2Fsolt.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Faegoroff%2Fsolt?ref=badge_shield)
 
 **SOL**ution **T**ool is a small commandline app written in Go that allows you to easily analyze
 sources and Microsoft Visual Studion solutions and projects.
@@ -91,3 +92,6 @@ Global Flags:
   -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faegoroff%2Fsolt.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Faegoroff%2Fsolt?ref=badge_large)
