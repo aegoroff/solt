@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/afero"
 	"log"
 	"path/filepath"
+	"solt/internal/sys"
 	"solt/solution"
 	"strings"
 )
@@ -127,6 +128,7 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 		log.Println(err)
 		return nil, false
 	}
+	defer sys.Close(reader)
 
 	sln, err := solution.Parse(reader)
 
