@@ -53,7 +53,7 @@ func newInfo() *cobra.Command {
 }
 
 func showProjectsInfo(projects []*solution.Project) {
-	var byType = make(map[string]int)
+	var byType = make(map[string]int, len(projects))
 
 	for _, p := range projects {
 		byType[p.Type]++
@@ -73,8 +73,8 @@ func showProjectsInfo(projects []*solution.Project) {
 }
 
 func showSectionsInfo(sections []*solution.Section) {
-	var configurations = make(collections.StringHashSet)
-	var platforms = make(collections.StringHashSet)
+	var configurations = make(collections.StringHashSet, len(sections))
+	var platforms = make(collections.StringHashSet, len(sections))
 
 	for _, s := range sections {
 		if s.Name != "SolutionConfigurationPlatforms" {
