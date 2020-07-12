@@ -10,7 +10,7 @@ import (
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
 func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator StringDecorator) collections.StringHashSet {
 	solutionPath := filepath.Dir(sln.Path)
-	var paths = make(collections.StringHashSet)
+	var paths = make(collections.StringHashSet, len(sln.Solution.Projects))
 	for _, sp := range sln.Solution.Projects {
 		if sp.TypeID == solution.IDSolutionFolder {
 			continue
@@ -28,7 +28,8 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 
 	msp := prj.Project
 
-	var includes []include
+	l := len(msp.Contents) + len(msp.Nones) + len(msp.CLCompiles) + len(msp.CLInclude) + len(msp.Compiles)
+	includes := make([]include, 0, l)
 	includes = append(includes, msp.Contents...)
 	includes = append(includes, msp.Nones...)
 	includes = append(includes, msp.CLCompiles...)
@@ -98,7 +99,7 @@ func createPathsFromIncludes(paths []include, basePath string) []string {
 		return []string{}
 	}
 
-	var result []string
+	result := make([]string, 0, len(paths))
 
 	for _, c := range paths {
 		fp := filepath.Join(basePath, c.Path)
