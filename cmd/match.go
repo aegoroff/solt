@@ -26,7 +26,7 @@ type matchE struct {
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string
 func NewPartialMatcher(matches []string) (Matcher, error) {
-	var runes [][]rune
+	runes := make([][]rune, 0, len(matches))
 	for _, s := range matches {
 		runes = append(runes, bytes.Runes([]byte(s)))
 	}
