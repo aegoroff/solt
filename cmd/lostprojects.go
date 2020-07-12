@@ -84,7 +84,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	// Create projects matching machine
 	projectMatch := NewExactMatchS(linkedProjects)
 	var projectsOutsideSolution []*msvc.MsbuildProject
-	var filesInsideSolution = make(collections.StringHashSet, len(allProjects)*20)
+	var filesInsideSolution = make(collections.StringHashSet)
 
 	for _, prj := range allProjects {
 		// Path in upper registry is the project's key
