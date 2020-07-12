@@ -64,10 +64,10 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
-	var allProjectFolders = make(map[string]*msvc.FolderContent, foldersTree.Len())
+	var allProjectFolders = make(map[string]*msvc.FolderContent)
 
 	// Each found solution
-	allSolutionPaths := make(map[string]Matcher, len(solutions))
+	allSolutionPaths := make(map[string]Matcher)
 	for _, sln := range solutions {
 		h := msvc.SelectAllSolutionProjectPaths(sln, normalize)
 		allSolutionPaths[sln.Path] = NewExactMatchHS(&h)
@@ -106,7 +106,7 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 func getNugetPacks(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent, onlyMismatch bool) map[string][]*pack {
 	allPkg := mapAllPackages(allPrjFolders)
 
-	var result = make(map[string][]*pack, len(allSolPaths))
+	var result = make(map[string][]*pack)
 
 	// Reduce packages
 	for spath, match := range allSolPaths {
@@ -141,7 +141,7 @@ func reducePacks(packagesVers map[string][]string, onlyMismatch bool) []*pack {
 }
 
 func mapPackagesInSolution(packagesByProject map[string]map[string]string, match Matcher) map[string][]string {
-	packagesVers := make(map[string][]string, len(packagesByProject))
+	packagesVers := make(map[string][]string)
 
 	for ppath, pkg := range packagesByProject {
 		if !match.Match(ppath) {
@@ -175,7 +175,7 @@ func contains(s []string, e string) bool {
 }
 
 func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map[string]string {
-	var packagesByProject = make(map[string]map[string]string, len(allPrjFolders))
+	var packagesByProject = make(map[string]map[string]string)
 
 	for ppath, content := range allPrjFolders {
 		if len(content.Projects) == 0 {

@@ -26,7 +26,7 @@ func newLostProjects() *cobra.Command {
 			// so these projects are not considered lost
 			var linkedProjects []string
 
-			projectLinksBySolution := make(map[string]collections.StringHashSet, len(solutions))
+			projectLinksBySolution := make(map[string]collections.StringHashSet)
 			// Each found solution
 			for _, sln := range solutions {
 				links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
@@ -67,7 +67,7 @@ func newLostProjects() *cobra.Command {
 }
 
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
-	var result = make(map[string][]string, len(projectsInSolutions))
+	var result = make(map[string][]string)
 
 	filer := sys.NewFiler(fs, appWriter)
 	for spath, projects := range projectsInSolutions {

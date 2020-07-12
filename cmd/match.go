@@ -43,7 +43,7 @@ func NewPartialMatcher(matches []string) (Matcher, error) {
 // NewExactMatchS creates exacth matcher from strings slice
 // Exact means that string must exactly match one of the matcher's strings
 func NewExactMatchS(matches []string) Matcher {
-	h := make(collections.StringHashSet, len(matches))
+	h := make(collections.StringHashSet)
 	for _, s := range matches {
 		h.Add(s)
 	}
