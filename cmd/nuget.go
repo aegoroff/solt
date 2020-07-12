@@ -46,7 +46,7 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 		pchan := make(chan *msvc.NugetPackage, 4)
 		go getNugetPackages(content, pchan)
 
-		packs := []*pack{}
+		var packs []*pack
 		for np := range pchan {
 			p := pack{
 				pkg:      np.ID,
