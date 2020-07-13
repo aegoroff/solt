@@ -3,8 +3,8 @@ package msvc
 import (
 	"encoding/xml"
 	"github.com/akutz/sortfold"
+	"github.com/google/btree"
 	"solt/solution"
-	"strings"
 )
 
 const (
@@ -57,19 +57,8 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 // StringDecorator defines string decorating function
 type StringDecorator func(s string) string
 
-// LessThan implements rbtree.Comparable interface
-func (x *Folder) LessThan(y interface{}) bool {
+func (x *Folder) Less(y btree.Item) bool {
 	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
-}
-
-// EqualTo implements rbtree.Comparable interface
-func (x *Folder) EqualTo(y interface{}) bool {
-	return strings.EqualFold(x.Path, (y.(*Folder)).Path)
-}
-
-// String implements rbtree.Comparable interface
-func (x *Folder) String() string {
-	return x.Path
 }
 
 type packages struct {

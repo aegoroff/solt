@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"github.com/google/btree"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"solt/msvc"
@@ -39,7 +39,7 @@ func newNuget() *cobra.Command {
 	return cmd
 }
 
-func nugetByProjects(foldersTree rbtree.RbTree) {
+func nugetByProjects(foldersTree *btree.BTree) {
 	prn := newNugetPrinter(appWriter)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
@@ -61,7 +61,7 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 	})
 }
 
-func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
+func nugetBySolutions(foldersTree *btree.BTree, onlyMismatch bool) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	var allProjectFolders = make(map[string]*msvc.FolderContent, foldersTree.Len())

@@ -1,7 +1,7 @@
 package msvc
 
 import (
-	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/google/btree"
 )
 
 type walker interface {
@@ -40,11 +40,12 @@ func (w *walkSol) onFolder(f *Folder) {
 	}
 }
 
-func walk(foldersTree rbtree.RbTree, walkers ...walker) {
-	foldersTree.WalkInorder(func(n rbtree.Node) {
-		fold := n.Key().(*Folder)
+func walk(foldersTree *btree.BTree, walkers ...walker) {
+	foldersTree.Ascend(func(n btree.Item) bool {
+		fold := n.(*Folder)
 		for _, w := range walkers {
 			w.onFolder(fold)
 		}
+		return true
 	})
 }
