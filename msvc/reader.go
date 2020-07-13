@@ -71,7 +71,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) *b
 	return result
 }
 
-func merge(to *Folder, from *Folder) {
+func merge(to, from *Folder) {
 	toC := to.Content
 	fromC := from.Content
 	if fromC.Packages != nil {
