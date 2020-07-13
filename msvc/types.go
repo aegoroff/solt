@@ -57,6 +57,11 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 // StringDecorator defines string decorating function
 type StringDecorator func(s string) string
 
+// Less tests whether the current item is less than the given argument.
+//
+// This must provide a strict weak ordering.
+// If !a.Less(b) && !b.Less(a), we treat this to mean a == b (i.e. we can only
+// hold one of either a or b in the tree).
 func (x *Folder) Less(y btree.Item) bool {
 	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
 }
