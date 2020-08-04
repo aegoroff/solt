@@ -4,10 +4,6 @@ import (
 	"github.com/google/btree"
 )
 
-type walker interface {
-	onFolder(f *Folder)
-}
-
 type walkPrj struct {
 	handler ProjectHandler
 }

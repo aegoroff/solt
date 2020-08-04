@@ -9,12 +9,6 @@ import (
 	"strings"
 )
 
-// ReaderHandler defines file system scanning handler
-type ReaderHandler interface {
-	// Handler method called on each file and folder scanned
-	Handler(path string)
-}
-
 func newReaderModules(fs afero.Fs) []readerModule {
 	var modules []readerModule
 
@@ -34,11 +28,6 @@ func newFolder(path string) *Folder {
 		Path: filepath.Dir(path),
 	}
 	return &f
-}
-
-type readerModule interface {
-	filter(path string) bool
-	read(path string) (*Folder, bool)
 }
 
 type reader struct {
