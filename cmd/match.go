@@ -6,12 +6,6 @@ import (
 	"github.com/anknown/ahocorasick"
 )
 
-// Matcher defines string matcher interface
-type Matcher interface {
-	// Match do string matching to several patterns
-	Match(s string) bool
-}
-
 // matchP defines partial matching
 type matchP struct {
 	machine *goahocorasick.Machine

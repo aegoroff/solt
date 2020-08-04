@@ -24,10 +24,6 @@ func newNugetPrinter(w io.Writer) nugetprinter {
 	return &p
 }
 
-type nugetprinter interface {
-	print(parent string, packs []*pack)
-}
-
 type nugetprint struct {
 	w  io.Writer
 	tw *tabwriter.Writer
@@ -47,6 +43,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	})
 
 	for _, item := range packs {
+		sortfold.Strings(item.versions)
 		_, _ = fmt.Fprintf(n.tw, format, item.pkg, strings.Join(item.versions, ", "))
 	}
 	_ = n.tw.Flush()
