@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/akutz/sortfold"
 	"github.com/dustin/go-humanize"
 	"github.com/gookit/color"
 	"io"
 	"runtime"
-	"sort"
 	"strings"
 )
 
@@ -20,7 +20,7 @@ func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix s
 		keys = append(keys, k)
 	}
 
-	sort.Strings(keys)
+	sortfold.Strings(keys)
 
 	for _, k := range keys {
 		color.Fprintf(writer, "\n<gray>%s: %s</>\n", keyPrefix, k)
@@ -29,7 +29,7 @@ func outputSortedMap(writer io.Writer, itemsMap map[string][]string, keyPrefix s
 }
 
 func sortAndOutput(writer io.Writer, items []string) {
-	sort.Strings(items)
+	sortfold.Strings(items)
 	for _, item := range items {
 		_, _ = fmt.Fprintf(writer, " %s\n", item)
 	}
