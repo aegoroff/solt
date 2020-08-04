@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
+	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
 	"solt/msvc"
 	"solt/solution"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -96,7 +96,7 @@ func showSectionsInfo(sections []*solution.Section) {
 	_, _ = fmt.Fprintf(tw, format, "------------")
 
 	sortedConfigurations := configurations.Items()
-	sort.Strings(sortedConfigurations)
+	sortfold.Strings(sortedConfigurations)
 
 	for _, k := range sortedConfigurations {
 		_, _ = fmt.Fprintf(tw, format, k)
@@ -108,7 +108,7 @@ func showSectionsInfo(sections []*solution.Section) {
 	_, _ = fmt.Fprintf(tw, format, "--------")
 
 	sortedPlatforms := platforms.Items()
-	sort.Strings(sortedPlatforms)
+	sortfold.Strings(sortedPlatforms)
 
 	for _, k := range sortedPlatforms {
 		_, _ = fmt.Fprintf(tw, format, k)
