@@ -35,7 +35,7 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 	}
 }
 
-// executed on each found file in a folder
+// Handler executed on each found file in a folder
 func (r *lostFilesHandler) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
@@ -50,7 +50,7 @@ func (r *lostFilesHandler) Handler(path string) {
 	}
 }
 
-// Executed on each found folder that contains msbuild projects
+// projectHandler executed on each found folder that contains msbuild projects
 func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
