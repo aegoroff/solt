@@ -26,7 +26,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	Execute("nu", "-p", dir, "-r")
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(`
  a\a
   Package            Version
@@ -56,7 +56,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	Execute("nu", "-p", dir, "-m")
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal("", actual)
 }
 
@@ -80,7 +80,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	Execute("nu", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(`
  a\a.sln
   Package            Version

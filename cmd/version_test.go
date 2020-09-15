@@ -24,6 +24,6 @@ func Test_Version(t *testing.T) {
 		Execute(test.cmd)
 
 		// Assert
-		ass.Equal(fmt.Sprintf("solt v%s\n", Version), appPrinter.String())
+		ass.Equal(fmt.Sprintf("solt v%s\n", Version), appPrinter.(*mockprn).String())
 	}
 }

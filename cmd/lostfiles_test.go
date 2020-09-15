@@ -26,7 +26,7 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	Execute("lf", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(``, actual)
 }
 
@@ -61,7 +61,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		Execute("lf", "-p", dir)
 
 		// Assert
-		actual := appPrinter.String()
+		actual := appPrinter.(*mockprn).String()
 		ass.Equal(``, actual)
 	}
 }
@@ -87,7 +87,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	Execute("lf", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 }
 
@@ -120,7 +120,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		Execute("lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
-		actual := appPrinter.String()
+		actual := appPrinter.(*mockprn).String()
 		ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 	}
 }
@@ -146,7 +146,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	Execute("lf", "-p", dir, "-r")
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed successfully.\n", actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.Error(err)
@@ -173,7 +173,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	Execute("lf", "-p", dir, "-r")
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
@@ -198,7 +198,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	Execute("lf", "-p", dir, "-a")
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal("\n<red>These files included into projects but not exist in the file system.</>\n\n<gray>Project: a\\a\\a.csproj</>\n a\\a\\Properties\\AssemblyInfo.cs\n", actual)
 }
 
@@ -221,6 +221,6 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	Execute("lf", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal("", actual)
 }

@@ -25,7 +25,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	Execute("lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(``, actual)
 }
 
@@ -50,7 +50,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	Execute("lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(`
 <red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
@@ -79,7 +79,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	Execute("lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(` a\a1\a1.csproj
 `, actual)
 }
@@ -103,7 +103,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	Execute("lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(`
 <red>These projects are included into a solution but not found in the file system:</>
 

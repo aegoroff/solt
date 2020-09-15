@@ -17,6 +17,7 @@ type nugetprinter interface {
 
 type printer interface {
 	writer() io.Writer
+
 	flush()
 
 	// tprint prints using tab writer
@@ -30,6 +31,4 @@ type printer interface {
 
 	// resetColor resets console color
 	resetColor()
-
-	String() string
 }

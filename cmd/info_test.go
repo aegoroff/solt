@@ -71,7 +71,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	Execute("in", "-p", dir)
 
 	// Assert
-	actual := appPrinter.String()
+	actual := appPrinter.(*mockprn).String()
 	ass.Equal(` a\a.sln
   Header                            Microsoft Visual Studio Solution File, Format Version 12.00
   Product                           # Visual Studio Version 16

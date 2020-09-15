@@ -46,7 +46,3 @@ func (*prn) setColor(c color.Color) {
 func (*prn) resetColor() {
 	_, _ = color.Reset()
 }
-
-func (r *prn) String() string {
-	return ""
-}
