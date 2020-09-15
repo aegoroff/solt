@@ -15,7 +15,7 @@ func Test_sortAndOutput(t *testing.T) {
 	sortAndOutput(mockp, items)
 
 	// Assert
-	ass.Equal(" aa\n rr\n xy\n", mockp.(*mockprn).String())
+	ass.Equal(" aa\n rr\n xy\n", mockp.String())
 }
 
 func Test_outputSortedMap(t *testing.T) {
@@ -31,5 +31,5 @@ func Test_outputSortedMap(t *testing.T) {
 	outputSortedMap(mockp, m, "SI")
 
 	// Assert
-	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.(*mockprn).String())
+	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.String())
 }

@@ -30,4 +30,6 @@ type printer interface {
 
 	// resetColor resets console color
 	resetColor()
+
+	String() string
 }

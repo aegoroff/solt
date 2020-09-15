@@ -48,6 +48,10 @@ func (*prn) resetColor() {
 	_, _ = color.Reset()
 }
 
+func (r *prn) String() string {
+	return ""
+}
+
 type mockprn struct {
 	tw *tabwriter.Writer
 	w  *bytes.Buffer
