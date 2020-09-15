@@ -1,10 +1,54 @@
 package cmd
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"testing"
+	"text/tabwriter"
 )
+
+type mockprn struct {
+	tw *tabwriter.Writer
+	w  *bytes.Buffer
+}
+
+func (m *mockprn) String() string {
+	return m.w.String()
+}
+
+func newMockPrn() printer {
+	w := bytes.NewBufferString("")
+	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
+
+	p := mockprn{
+		tw: tw,
+		w:  w,
+	}
+	return &p
+}
+
+func (m *mockprn) tprint(format string, a ...interface{}) {
+	_, _ = fmt.Fprintf(m.tw, format, a...)
+}
+
+func (m *mockprn) cprint(format string, a ...interface{}) {
+	str := fmt.Sprintf(format, a...)
+	_, _ = fmt.Fprintf(m.w, str)
+}
+
+func (m *mockprn) writer() io.Writer { return m.w }
+
+func (*mockprn) setColor(_ color.Color) {}
+
+func (*mockprn) resetColor() {}
+
+func (m *mockprn) flush() {
+	_ = m.tw.Flush()
+}
 
 func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	// Arrange
