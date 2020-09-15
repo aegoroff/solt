@@ -31,5 +31,5 @@ func Test_outputSortedMap(t *testing.T) {
 	outputSortedMap(mockp, m, "SI")
 
 	// Assert
-	ass.Equal("\nSI: a\n gt\n rr\n xy\n\nSI: b\n ff\n lz\n xy\n", mockp.(*mockprn).String())
+	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.(*mockprn).String())
 }
