@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -20,7 +19,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	buf := bytes.NewBufferString("")
+	appPrinter = newMockPrn()
 
 	appFileSystem = memfs
 
@@ -28,8 +27,9 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	Execute("in", "-p", dir)
 
 	// Assert
-	actual := buf.String()
-	ass.Equal(`  Header                            Microsoft Visual Studio Solution File, Format Version 12.00
+	actual := appPrinter.String()
+	ass.Equal(` a\a.sln
+  Header                            Microsoft Visual Studio Solution File, Format Version 12.00
   Product                           # Visual Studio Version 16
   Visial Studion Version            16.0.30104.148
   Minimum Visial Studion Version    10.0.40219.1
@@ -43,5 +43,6 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   Platform
   --------
   Any CPU
+
 `, actual)
 }

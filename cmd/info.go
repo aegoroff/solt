@@ -109,5 +109,5 @@ func showSectionsInfo(sections []*solution.Section) {
 		appPrinter.tprint(format, k)
 	}
 	appPrinter.flush()
-	fmt.Println()
+	appPrinter.cprint("\n")
 }
