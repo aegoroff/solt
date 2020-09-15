@@ -28,6 +28,6 @@ type printer interface {
 	// setColor sets console color
 	setColor(c color.Color)
 
-	// sesetColor resets console color
+	// resetColor resets console color
 	resetColor()
 }
