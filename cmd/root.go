@@ -15,6 +15,7 @@ var diag bool
 
 var appFileSystem afero.Fs
 var appWriter io.Writer
+var appPrinter printer
 
 func newRoot() *cobra.Command {
 	return &cobra.Command{
@@ -50,13 +51,14 @@ func Execute(args ...string) {
 	elapsed := time.Since(start)
 
 	if diag {
-		printMemUsage(appWriter)
+		printMemUsage(appPrinter)
 		color.Fprintf(appWriter, "<gray>Working time:</> <green>%v</>\n", elapsed)
 	}
 }
 
 func init() {
 	appWriter = os.Stdout
+	appPrinter = newPrinter(os.Stdout)
 	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
 }

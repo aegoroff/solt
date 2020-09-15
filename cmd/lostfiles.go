@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"solt/msvc"
@@ -46,12 +45,12 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 		return err
 	}
 
-	sortAndOutput(appWriter, lostFiles)
+	sortAndOutput(appPrinter, lostFiles)
 
 	if len(lh.unexistFiles) > 0 {
-		color.Fprintf(appWriter, "\n<red>These files included into projects but not exist in the file system.</>\n")
+		appPrinter.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
-		outputSortedMap(appWriter, lh.unexistFiles, "Project")
+		outputSortedMap(appPrinter, lh.unexistFiles, "Project")
 	}
 
 	if opts.removeLost {

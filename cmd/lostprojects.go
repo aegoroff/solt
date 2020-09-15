@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/aegoroff/godatastruct/collections"
-	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/sys"
@@ -40,24 +39,24 @@ func newLostProjects() *cobra.Command {
 			lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
 			// Lost projects
-			sortAndOutput(appWriter, lost)
+			sortAndOutput(appPrinter, lost)
 
 			if len(lostWithIncludes) > 0 {
 				m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
-				color.Fprintf(appWriter, m)
+				appPrinter.cprint(m)
 			}
 
 			// Lost projects that have includes files that used
-			sortAndOutput(appWriter, lostWithIncludes)
+			sortAndOutput(appPrinter, lostWithIncludes)
 
 			unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
 
 			if len(unexistProjects) > 0 {
-				color.Fprintf(appWriter, "\n<red>These projects are included into a solution but not found in the file system:</>\n")
+				appPrinter.cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
 			}
 
 			// Included but not exist in FS
-			outputSortedMap(appWriter, unexistProjects, "Solution")
+			outputSortedMap(appPrinter, unexistProjects, "Solution")
 
 			return nil
 		},
