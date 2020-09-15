@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/akutz/sortfold"
 	"github.com/google/btree"
-	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"solt/msvc"
 	"sort"
@@ -40,7 +39,7 @@ func newNuget() *cobra.Command {
 }
 
 func nugetByProjects(foldersTree *btree.BTree) {
-	prn := newNugetPrinter(appWriter)
+	prn := newNugetPrinter(appPrinter)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
 		pchan := make(chan *msvc.NugetPackage, 4)
@@ -88,14 +87,14 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 	}
 
 	if onlyMismatch {
-		color.Fprintln(appWriter, " <red>Different nuget package's versions in the same solution found:</>")
+		appPrinter.cprint(" <red>Different nuget package's versions in the same solution found:</>")
 	}
 
 	sort.Slice(solutions, func(i, j int) bool {
 		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
 	})
 
-	prn := newNugetPrinter(appWriter)
+	prn := newNugetPrinter(appPrinter)
 	for _, sln := range solutions {
 		if pks, ok := packs[sln.Path]; ok {
 			prn.print(sln.Path, pks)

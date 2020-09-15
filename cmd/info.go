@@ -5,12 +5,10 @@ import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
+	"github.com/spf13/cobra"
 	"solt/msvc"
 	"solt/solution"
 	"strings"
-	"text/tabwriter"
-
-	"github.com/spf13/cobra"
 )
 
 func newInfo() *cobra.Command {
@@ -26,19 +24,18 @@ func newInfo() *cobra.Command {
 			for _, sol := range solutions {
 				sln := sol.Solution
 
-				_, _ = color.Set(color.FgGray)
-				_, _ = fmt.Printf(" %s\n", sol.Path)
-				_, _ = color.Reset()
+				appPrinter.setColor(color.FgGray)
+				appPrinter.cprint(" %s\n", sol.Path)
+				appPrinter.resetColor()
 
 				const format = "  %v\t%v\n"
-				tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-				_, _ = fmt.Fprintf(tw, format, "Header", sln.Header)
-				_, _ = fmt.Fprintf(tw, format, "Product", sln.Comment)
-				_, _ = fmt.Fprintf(tw, format, "Visial Studion Version", sln.VisualStudioVersion)
-				_, _ = fmt.Fprintf(tw, format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+				appPrinter.tprint(format, "Header", sln.Header)
+				appPrinter.tprint(format, "Product", sln.Comment)
+				appPrinter.tprint(format, "Visial Studion Version", sln.VisualStudioVersion)
+				appPrinter.tprint(format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
 
-				_ = tw.Flush()
+				appPrinter.flush()
 
 				fmt.Println()
 
@@ -60,15 +57,14 @@ func showProjectsInfo(projects []*solution.Project) {
 	}
 
 	const format = "  %v\t%v\n"
-	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	_, _ = fmt.Fprintf(tw, format, "Project type", "Count")
-	_, _ = fmt.Fprintf(tw, format, "------------", "-----")
+	appPrinter.tprint(format, "Project type", "Count")
+	appPrinter.tprint(format, "------------", "-----")
 
 	for k, v := range byType {
-		_, _ = fmt.Fprintf(tw, format, k, v)
+		appPrinter.tprint(format, k, v)
 	}
-	_ = tw.Flush()
+	appPrinter.flush()
 	fmt.Println()
 }
 
@@ -90,29 +86,28 @@ func showSectionsInfo(sections []*solution.Section) {
 	}
 
 	const format = "  %v\n"
-	tw := new(tabwriter.Writer).Init(appWriter, 0, 8, 4, ' ', 0)
 
-	_, _ = fmt.Fprintf(tw, format, "Configuration")
-	_, _ = fmt.Fprintf(tw, format, "------------")
+	appPrinter.tprint(format, "Configuration")
+	appPrinter.tprint(format, "------------")
 
 	sortedConfigurations := configurations.Items()
 	sortfold.Strings(sortedConfigurations)
 
 	for _, k := range sortedConfigurations {
-		_, _ = fmt.Fprintf(tw, format, k)
+		appPrinter.tprint(format, k)
 	}
-	_ = tw.Flush()
+	appPrinter.flush()
 	fmt.Println()
 
-	_, _ = fmt.Fprintf(tw, format, "Platform")
-	_, _ = fmt.Fprintf(tw, format, "--------")
+	appPrinter.tprint(format, "Platform")
+	appPrinter.tprint(format, "--------")
 
 	sortedPlatforms := platforms.Items()
 	sortfold.Strings(sortedPlatforms)
 
 	for _, k := range sortedPlatforms {
-		_, _ = fmt.Fprintf(tw, format, k)
+		appPrinter.tprint(format, k)
 	}
-	_ = tw.Flush()
+	appPrinter.flush()
 	fmt.Println()
 }

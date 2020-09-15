@@ -20,7 +20,6 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = memfs
 
 	// Act
@@ -56,7 +55,6 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 		appPrinter = newMockPrn()
-		appWriter = appPrinter.writer()
 		appFileSystem = memfs
 
 		// Act
@@ -83,7 +81,6 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = memfs
 
 	// Act
@@ -117,7 +114,6 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 		appPrinter = newMockPrn()
-		appWriter = appPrinter.writer()
 		appFileSystem = memfs
 
 		// Act
@@ -144,7 +140,6 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = memfs
 
 	// Act
@@ -172,7 +167,6 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = afero.NewReadOnlyFs(memfs)
 
 	// Act
@@ -198,7 +192,6 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = memfs
 
 	// Act
@@ -222,7 +215,6 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
-	appWriter = appPrinter.writer()
 	appFileSystem = memfs
 
 	// Act

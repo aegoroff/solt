@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +14,7 @@ func newVersion() *cobra.Command {
 		Short:   "Print the version number of solt",
 		Long:    `All software has versions. This is solt's`,
 		Run: func(cmd *cobra.Command, args []string) {
-			_, _ = fmt.Fprintf(appWriter, "solt v%s\n", Version)
+			appPrinter.cprint("solt v%s\n", Version)
 		},
 	}
 

@@ -1,13 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
-	"io"
 	"sort"
 	"strings"
-	"text/tabwriter"
 )
 
 // pack defines nuget package descriptor
@@ -16,27 +13,25 @@ type pack struct {
 	versions []string
 }
 
-func newNugetPrinter(w io.Writer) nugetprinter {
-	p := nugetprint{
-		w:  w,
-		tw: new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0),
+func newNugetPrinter(p printer) nugetprinter {
+	np := nugetprint{
+		p: p,
 	}
-	return &p
+	return &np
 }
 
 type nugetprint struct {
-	w  io.Writer
-	tw *tabwriter.Writer
+	p printer
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
-	_, _ = color.Set(color.FgGray)
-	_, _ = fmt.Fprintf(n.w, "\n %s\n", parent)
-	_, _ = color.Reset()
+	n.p.setColor(color.FgGray)
+	n.p.cprint("\n %s\n", parent)
+	n.p.resetColor()
 
 	const format = "  %v\t%v\n"
-	_, _ = fmt.Fprintf(n.tw, format, "Package", "Version")
-	_, _ = fmt.Fprintf(n.tw, format, "-------", "-------")
+	n.p.tprint(format, "Package", "Version")
+	n.p.tprint(format, "-------", "-------")
 
 	sort.Slice(packs, func(i, j int) bool {
 		return sortfold.CompareFold(packs[i].pkg, packs[j].pkg) < 0
@@ -44,7 +39,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 
 	for _, item := range packs {
 		sortfold.Strings(item.versions)
-		_, _ = fmt.Fprintf(n.tw, format, item.pkg, strings.Join(item.versions, ", "))
+		n.p.tprint(format, item.pkg, strings.Join(item.versions, ", "))
 	}
-	_ = n.tw.Flush()
+	n.p.flush()
 }

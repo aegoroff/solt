@@ -68,7 +68,7 @@ func newLostProjects() *cobra.Command {
 func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
 
-	filer := sys.NewFiler(fs, appWriter)
+	filer := sys.NewFiler(fs, appPrinter.writer())
 	for spath, projects := range projectsInSolutions {
 		nonexist := filer.CheckExistence(projects.Items())
 

@@ -22,7 +22,6 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
 	buf := bytes.NewBufferString("")
 
-	appWriter = buf
 	appFileSystem = memfs
 
 	// Act

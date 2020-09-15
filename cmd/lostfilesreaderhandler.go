@@ -31,7 +31,7 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 		includedFiles:       make(collections.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
 		nonExistence:        nonExistence,
-		filer:               sys.NewFiler(fs, appWriter),
+		filer:               sys.NewFiler(fs, appPrinter.writer()),
 	}
 }
 

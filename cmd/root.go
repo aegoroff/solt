@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"github.com/gookit/color"
 	"github.com/spf13/afero"
-	"io"
 	"os"
 	"time"
 
@@ -14,7 +12,6 @@ var sourcesPath string
 var diag bool
 
 var appFileSystem afero.Fs
-var appWriter io.Writer
 var appPrinter printer
 
 func newRoot() *cobra.Command {
@@ -52,12 +49,11 @@ func Execute(args ...string) {
 
 	if diag {
 		printMemUsage(appPrinter)
-		color.Fprintf(appWriter, "<gray>Working time:</> <green>%v</>\n", elapsed)
+		appPrinter.cprint("<gray>Working time:</> <green>%v</>\n", elapsed)
 	}
 }
 
 func init() {
-	appWriter = os.Stdout
 	appPrinter = newPrinter(os.Stdout)
 	appFileSystem = afero.NewOsFs()
 	cobra.MousetrapHelpText = ""
