@@ -27,6 +27,10 @@ func (r *prn) writer() io.Writer {
 	return r.w
 }
 
+func (r *prn) twriter() *tabwriter.Writer {
+	return r.tw
+}
+
 func (r *prn) flush() {
 	_ = r.tw.Flush()
 }

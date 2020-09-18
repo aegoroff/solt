@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/gookit/color"
 	"io"
+	"text/tabwriter"
 )
 
 // Matcher defines string matcher interface
@@ -17,6 +18,8 @@ type nugetprinter interface {
 
 type printer interface {
 	writer() io.Writer
+
+	twriter() *tabwriter.Writer
 
 	flush()
 

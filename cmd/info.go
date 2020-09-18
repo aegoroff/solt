@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
+	"github.com/cheynewallace/tabby"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"solt/msvc"
@@ -28,14 +29,14 @@ func newInfo() *cobra.Command {
 				appPrinter.cprint(" %s\n", sol.Path)
 				appPrinter.resetColor()
 
-				const format = "  %v\t%v\n"
+				t := tabby.NewCustom(appPrinter.twriter())
 
-				appPrinter.tprint(format, "Header", sln.Header)
-				appPrinter.tprint(format, "Product", sln.Comment)
-				appPrinter.tprint(format, "Visial Studion Version", sln.VisualStudioVersion)
-				appPrinter.tprint(format, "Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+				t.AddLine("  Header", sln.Header)
+				t.AddLine("  Product", sln.Comment)
+				t.AddLine("  Visial Studion Version", sln.VisualStudioVersion)
+				t.AddLine("  Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
 
-				appPrinter.flush()
+				t.Print()
 
 				fmt.Println()
 

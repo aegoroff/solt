@@ -42,6 +42,8 @@ func (m *mockprn) cprint(format string, a ...interface{}) {
 
 func (m *mockprn) writer() io.Writer { return m.w }
 
+func (m *mockprn) twriter() *tabwriter.Writer { return m.tw }
+
 func (*mockprn) setColor(_ color.Color) {}
 
 func (*mockprn) resetColor() {}
