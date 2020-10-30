@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/sys"
@@ -12,10 +12,10 @@ import (
 type lostFilesHandler struct {
 	fs                  afero.Fs
 	foundFiles          []string
-	excludeFolders      collections.StringHashSet
+	excludeFolders      c9s.StringHashSet
 	lostFilesFilter     string
 	unexistFiles        map[string][]string
-	includedFiles       collections.StringHashSet
+	includedFiles       c9s.StringHashSet
 	subfoldersToExclude []string
 	nonExistence        bool
 	filer               sys.Filer
@@ -25,10 +25,10 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 	return &lostFilesHandler{
 		fs:                  fs,
 		foundFiles:          make([]string, 0),
-		excludeFolders:      make(collections.StringHashSet),
+		excludeFolders:      make(c9s.StringHashSet),
 		lostFilesFilter:     lostFilesFilter,
 		unexistFiles:        make(map[string][]string),
-		includedFiles:       make(collections.StringHashSet),
+		includedFiles:       make(c9s.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
 		nonExistence:        nonExistence,
 		filer:               sys.NewFiler(fs, appPrinter.writer()),

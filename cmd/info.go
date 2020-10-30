@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/cheynewallace/tabby"
 	"github.com/gookit/color"
@@ -70,8 +70,8 @@ func showProjectsInfo(projects []*solution.Project) {
 }
 
 func showSectionsInfo(sections []*solution.Section) {
-	var configurations = make(collections.StringHashSet)
-	var platforms = make(collections.StringHashSet)
+	var configurations = make(c9s.StringHashSet)
+	var platforms = make(c9s.StringHashSet)
 
 	for _, s := range sections {
 		if s.Name != "SolutionConfigurationPlatforms" {

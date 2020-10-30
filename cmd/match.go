@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/anknown/ahocorasick"
 )
 
@@ -13,7 +13,7 @@ type matchP struct {
 
 // matchP defines exact matching
 type matchE struct {
-	hashset collections.StringHashSet
+	hashset c9s.StringHashSet
 }
 
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
@@ -37,7 +37,7 @@ func NewPartialMatcher(matches []string) (Matcher, error) {
 // NewExactMatchS creates exacth matcher from strings slice
 // Exact means that string must exactly match one of the matcher's strings
 func NewExactMatchS(matches []string) Matcher {
-	h := make(collections.StringHashSet, len(matches))
+	h := make(c9s.StringHashSet, len(matches))
 	for _, s := range matches {
 		h.Add(s)
 	}
@@ -47,7 +47,7 @@ func NewExactMatchS(matches []string) Matcher {
 
 // NewExactMatchHS creates exacth matcher from strings hashset
 // Exact means that string must exactly match one of the matcher's strings
-func NewExactMatchHS(existing *collections.StringHashSet) Matcher {
+func NewExactMatchHS(existing *c9s.StringHashSet) Matcher {
 	hs := matchE{hashset: *existing}
 	return &hs
 }

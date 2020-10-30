@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/sys"
@@ -25,7 +25,7 @@ func newLostProjects() *cobra.Command {
 			// so these projects are not considered lost
 			var linkedProjects []string
 
-			projectLinksBySolution := make(map[string]collections.StringHashSet)
+			projectLinksBySolution := make(map[string]c9s.StringHashSet)
 			// Each found solution
 			for _, sln := range solutions {
 				links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
@@ -65,7 +65,7 @@ func newLostProjects() *cobra.Command {
 	return cmd
 }
 
-func getUnexistProjects(projectsInSolutions map[string]collections.StringHashSet, fs afero.Fs) map[string][]string {
+func getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet, fs afero.Fs) map[string][]string {
 	var result = make(map[string][]string)
 
 	filer := sys.NewFiler(fs, appPrinter.writer())
@@ -83,7 +83,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	// Create projects matching machine
 	projectMatch := NewExactMatchS(linkedProjects)
 	var projectsOutsideSolution []*msvc.MsbuildProject
-	var filesInsideSolution = make(collections.StringHashSet)
+	var filesInsideSolution = make(c9s.StringHashSet)
 
 	for _, prj := range allProjects {
 		// Path in upper registry is the project's key
@@ -104,7 +104,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	return separateProjects(projectsOutsideSolution, filesInsideSolution)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsideSolution collections.StringHashSet) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsideSolution c9s.StringHashSet) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
@@ -119,7 +119,7 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, filesInsid
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, solutionFiles collections.StringHashSet) bool {
+func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, solutionFiles c9s.StringHashSet) bool {
 	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
 
 	pdir := filepath.Dir(prj.Path)
