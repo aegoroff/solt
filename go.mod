@@ -10,7 +10,7 @@ require (
 	github.com/cheynewallace/tabby v1.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/google/btree v1.0.0
-	github.com/gookit/color v1.3.1
+	github.com/gookit/color v1.3.2
 	github.com/spf13/afero v1.4.1
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.6.1
