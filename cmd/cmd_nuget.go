@@ -207,6 +207,7 @@ func getNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPacka
 			continue
 		}
 
+		// If SDK project nuget packages included into project file
 		for _, p := range prj.Project.PackageReferences {
 			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
 		}
