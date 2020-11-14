@@ -198,6 +198,7 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 
 func getNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPackage) {
 	if content.Packages != nil {
+		// old style projects (nuget packages references in separate files)
 		for _, p := range content.Packages.Packages {
 			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
 		}
