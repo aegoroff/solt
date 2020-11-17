@@ -34,7 +34,7 @@ type filer struct {
 // CheckExistence validates files passed to be present in file system
 // The list of non exist files returned
 func (f *filer) CheckExistence(files []string) []string {
-	result := []string{}
+	result := make([]string, 0)
 	for _, file := range files {
 		if _, err := f.fs.Stat(file); os.IsNotExist(err) {
 			result = append(result, file)
