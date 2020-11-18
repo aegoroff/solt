@@ -36,73 +36,73 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 }
 
 // Handler executed on each found file in a folder
-func (r *lostFilesHandler) Handler(path string) {
+func (h *lostFilesHandler) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
-	if strings.EqualFold(ext, r.lostFilesFilter) {
-		r.foundFiles = append(r.foundFiles, path)
+	if strings.EqualFold(ext, h.lostFilesFilter) {
+		h.foundFiles = append(h.foundFiles, path)
 	}
 
 	if strings.EqualFold(ext, msvc.SolutionFileExt) {
 		dir, _ := filepath.Split(path)
 		ppath := filepath.Join(dir, "packages")
-		r.excludeFolders.Add(ppath)
+		h.excludeFolders.Add(ppath)
 	}
 }
 
 // projectHandler executed on each found folder that contains msbuild projects
-func (r *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
+func (h *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
 
 		// Exclude output paths too
 		if prj.Project.OutputPaths != nil {
-			r.subfoldersToExclude = append(r.subfoldersToExclude, prj.Project.OutputPaths...)
+			h.subfoldersToExclude = append(h.subfoldersToExclude, prj.Project.OutputPaths...)
 		}
 
 		// Add project base + exclude subfolder into exclude folders list
-		for _, s := range r.subfoldersToExclude {
+		for _, s := range h.subfoldersToExclude {
 			sub := filepath.Join(pdir, s)
-			r.excludeFolders.Add(sub)
+			h.excludeFolders.Add(sub)
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
 		if prj.Project.IsSdkProject() {
-			r.excludeFolders.Add(pdir)
+			h.excludeFolders.Add(pdir)
 		}
 
 		// Add compiles, contents and nones into included files map
 		includes := msvc.GetFilesIncludedIntoProject(prj)
 		for _, f := range includes {
-			r.includedFiles.Add(normalize(f))
+			h.includedFiles.Add(normalize(f))
 		}
 
-		r.addToUnexistIfNeeded(prj.Path, includes)
+		h.addToUnexistIfNeeded(prj.Path, includes)
 	}
 }
 
-func (r *lostFilesHandler) addToUnexistIfNeeded(project string, includes []string) {
-	if !r.nonExistence {
+func (h *lostFilesHandler) addToUnexistIfNeeded(project string, includes []string) {
+	if !h.nonExistence {
 		return
 	}
 
-	nonexist := r.filer.CheckExistence(includes)
+	nonexist := h.filer.CheckExistence(includes)
 
 	if len(nonexist) > 0 {
-		r.unexistFiles[project] = append(r.unexistFiles[project], nonexist...)
+		h.unexistFiles[project] = append(h.unexistFiles[project], nonexist...)
 	}
 }
 
-func (r *lostFilesHandler) findLostFiles() ([]string, error) {
-	excludes, err := NewPartialMatcher(r.excludeFolders.ItemsDecorated(normalize))
+func (h *lostFilesHandler) findLostFiles() ([]string, error) {
+	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return nil, err
 	}
 
-	includes := NewExactMatchHS(&r.includedFiles)
+	includes := NewExactMatchHS(&h.includedFiles)
 
 	var result []string
-	for _, file := range r.foundFiles {
+	for _, file := range h.foundFiles {
 		normalized := normalize(file)
 		if !includes.Match(normalized) && !excludes.Match(normalized) {
 			result = append(result, file)
@@ -112,6 +112,6 @@ func (r *lostFilesHandler) findLostFiles() ([]string, error) {
 	return result, err
 }
 
-func (r *lostFilesHandler) removeLostFiles(lostFiles []string) {
-	r.filer.Remove(lostFiles)
+func (h *lostFilesHandler) removeLostFiles(lostFiles []string) {
+	h.filer.Remove(lostFiles)
 }
