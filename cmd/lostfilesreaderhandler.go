@@ -50,8 +50,8 @@ func (h *lostFilesHandler) Handler(path string) {
 	}
 }
 
-// projectHandler executed on each found folder that contains msbuild projects
-func (h *lostFilesHandler) projectHandler(projects []*msvc.MsbuildProject) {
+// updateMembers fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
+func (h *lostFilesHandler) updateMembers(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
 

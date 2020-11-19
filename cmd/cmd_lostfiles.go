@@ -37,7 +37,7 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	lh.projectHandler(projects)
+	lh.updateMembers(projects)
 
 	lostFiles, err := lh.findLostFiles()
 
