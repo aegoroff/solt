@@ -31,15 +31,16 @@ func newLostFiles() *cobra.Command {
 }
 
 func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
-	lh := newLostFilesHandler(opts.filter, opts.searchAll, fs)
+	ffh := newFileFilteringHandler(opts.filter)
 
-	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, lh)
+	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, ffh)
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	lh.updateMembers(projects)
+	logic := newLostFilesLogic(opts.searchAll, ffh.foundFiles, ffh.foldersToIgnore, fs)
+	logic.initialize(projects)
 
-	lostFiles, err := lh.findLostFiles()
+	lostFiles, err := logic.findLostFiles()
 
 	if err != nil {
 		return err
@@ -47,14 +48,14 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 
 	sortAndOutput(appPrinter, lostFiles)
 
-	if len(lh.unexistFiles) > 0 {
+	if len(logic.unexistFiles) > 0 {
 		appPrinter.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
-		outputSortedMap(appPrinter, lh.unexistFiles, "Project")
+		outputSortedMap(appPrinter, logic.unexistFiles, "Project")
 	}
 
 	if opts.removeLost {
-		lh.removeLostFiles(lostFiles)
+		logic.removeLostFiles(lostFiles)
 	}
 
 	return nil

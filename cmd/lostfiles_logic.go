@@ -6,14 +6,11 @@ import (
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
-	"strings"
 )
 
-type lostFilesHandler struct {
-	fs                  afero.Fs
+type lostFilesLogic struct {
 	foundFiles          []string
 	excludeFolders      c9s.StringHashSet
-	lostFilesFilter     string
 	unexistFiles        map[string][]string
 	includedFiles       c9s.StringHashSet
 	subfoldersToExclude []string
@@ -21,12 +18,10 @@ type lostFilesHandler struct {
 	filer               sys.Filer
 }
 
-func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs) *lostFilesHandler {
-	return &lostFilesHandler{
-		fs:                  fs,
-		foundFiles:          make([]string, 0),
-		excludeFolders:      make(c9s.StringHashSet),
-		lostFilesFilter:     lostFilesFilter,
+func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, fs afero.Fs) *lostFilesLogic {
+	return &lostFilesLogic{
+		foundFiles:          foundFiles,
+		excludeFolders:      foldersToIgnore,
 		unexistFiles:        make(map[string][]string),
 		includedFiles:       make(c9s.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
@@ -35,23 +30,8 @@ func newLostFilesHandler(lostFilesFilter string, nonExistence bool, fs afero.Fs)
 	}
 }
 
-// Handler executed on each found file in a folder
-func (h *lostFilesHandler) Handler(path string) {
-	// Add file to filtered files slice
-	ext := filepath.Ext(path)
-	if strings.EqualFold(ext, h.lostFilesFilter) {
-		h.foundFiles = append(h.foundFiles, path)
-	}
-
-	if strings.EqualFold(ext, msvc.SolutionFileExt) {
-		dir, _ := filepath.Split(path)
-		ppath := filepath.Join(dir, "packages")
-		h.excludeFolders.Add(ppath)
-	}
-}
-
-// updateMembers fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
-func (h *lostFilesHandler) updateMembers(projects []*msvc.MsbuildProject) {
+// initialize fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
+func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
 
@@ -81,7 +61,7 @@ func (h *lostFilesHandler) updateMembers(projects []*msvc.MsbuildProject) {
 	}
 }
 
-func (h *lostFilesHandler) addToUnexistIfNeeded(project string, includes []string) {
+func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string) {
 	if !h.nonExistence {
 		return
 	}
@@ -93,7 +73,7 @@ func (h *lostFilesHandler) addToUnexistIfNeeded(project string, includes []strin
 	}
 }
 
-func (h *lostFilesHandler) findLostFiles() ([]string, error) {
+func (h *lostFilesLogic) findLostFiles() ([]string, error) {
 	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return nil, err
@@ -112,6 +92,6 @@ func (h *lostFilesHandler) findLostFiles() ([]string, error) {
 	return result, err
 }
 
-func (h *lostFilesHandler) removeLostFiles(lostFiles []string) {
+func (h *lostFilesLogic) removeLostFiles(lostFiles []string) {
 	h.filer.Remove(lostFiles)
 }
