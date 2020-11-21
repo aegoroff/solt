@@ -7,39 +7,41 @@ import (
 	"strings"
 )
 
-type fileExtFilteringHandler struct {
-	foundFiles []string
-	filter     string
+type fileCollector struct {
+	files  []string
+	filter string
 }
 
-type folderIgnoreHandler struct {
+type ignoredFoldersCollector struct {
 	folders c9s.StringHashSet
 }
 
-func newFileExtFilteringHandler(filter string) *fileExtFilteringHandler {
-	return &fileExtFilteringHandler{
-		foundFiles: make([]string, 0),
-		filter:     filter,
+// newFileCollector creates new collector instance
+// filter - file extension to collect files that match it
+func newFileCollector(filter string) *fileCollector {
+	return &fileCollector{
+		files:  make([]string, 0),
+		filter: filter,
 	}
 }
 
-func newFolderIgnoreHandler() *folderIgnoreHandler {
-	return &folderIgnoreHandler{
+func newFoldersCollector() *ignoredFoldersCollector {
+	return &ignoredFoldersCollector{
 		folders: make(c9s.StringHashSet),
 	}
 }
 
 // Handler executed on each found file in a folder
-func (h *fileExtFilteringHandler) Handler(path string) {
+func (h *fileCollector) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
 	if strings.EqualFold(ext, h.filter) {
-		h.foundFiles = append(h.foundFiles, path)
+		h.files = append(h.files, path)
 	}
 }
 
 // Handler executed on each found file in a folder
-func (h *folderIgnoreHandler) Handler(path string) {
+func (h *ignoredFoldersCollector) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
 

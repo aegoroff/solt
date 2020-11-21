@@ -31,14 +31,14 @@ func newLostFiles() *cobra.Command {
 }
 
 func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
-	fext := newFileExtFilteringHandler(opts.filter)
-	fold := newFolderIgnoreHandler()
+	filecollect := newFileCollector(opts.filter)
+	foldcollect := newFoldersCollector()
 
-	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, fext, fold)
+	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, filecollect, foldcollect)
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	logic := newLostFilesLogic(opts.searchAll, fext.foundFiles, fold.folders, fs)
+	logic := newLostFilesLogic(opts.searchAll, filecollect.files, foldcollect.folders, fs)
 	logic.initialize(projects)
 
 	lostFiles, err := logic.find()
