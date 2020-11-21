@@ -73,7 +73,7 @@ func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string)
 	}
 }
 
-func (h *lostFilesLogic) findLostFiles() ([]string, error) {
+func (h *lostFilesLogic) find() ([]string, error) {
 	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return nil, err
@@ -92,6 +92,6 @@ func (h *lostFilesLogic) findLostFiles() ([]string, error) {
 	return result, err
 }
 
-func (h *lostFilesLogic) removeLostFiles(lostFiles []string) {
+func (h *lostFilesLogic) remove(lostFiles []string) {
 	h.filer.Remove(lostFiles)
 }

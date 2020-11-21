@@ -40,7 +40,7 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 	logic := newLostFilesLogic(opts.searchAll, ffh.foundFiles, ffh.foldersToIgnore, fs)
 	logic.initialize(projects)
 
-	lostFiles, err := logic.findLostFiles()
+	lostFiles, err := logic.find()
 
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 	}
 
 	if opts.removeLost {
-		logic.removeLostFiles(lostFiles)
+		logic.remove(lostFiles)
 	}
 
 	return nil
