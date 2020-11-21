@@ -2,7 +2,6 @@ package cmd
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
@@ -18,7 +17,7 @@ type lostFilesLogic struct {
 	filer               sys.Filer
 }
 
-func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, fs afero.Fs) *lostFilesLogic {
+func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, filer sys.Filer) *lostFilesLogic {
 	return &lostFilesLogic{
 		foundFiles:          foundFiles,
 		excludeFolders:      foldersToIgnore,
@@ -26,7 +25,7 @@ func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c
 		includedFiles:       make(c9s.StringHashSet),
 		subfoldersToExclude: []string{"obj"},
 		nonExistence:        nonExistence,
-		filer:               sys.NewFiler(fs, appPrinter.writer()),
+		filer:               filer,
 	}
 }
 

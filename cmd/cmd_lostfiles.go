@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"solt/internal/sys"
 	"solt/msvc"
 )
 
@@ -38,7 +39,8 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	logic := newLostFilesLogic(opts.searchAll, filecollect.files, foldcollect.folders, fs)
+	filer := sys.NewFiler(fs, appPrinter.writer())
+	logic := newLostFilesLogic(opts.searchAll, filecollect.files, foldcollect.folders, filer)
 	logic.initialize(projects)
 
 	lostFiles, err := logic.find()
