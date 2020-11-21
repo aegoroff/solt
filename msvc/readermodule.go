@@ -10,13 +10,10 @@ import (
 )
 
 func newReaderModules(fs afero.Fs) []readerModule {
-	var modules []readerModule
-
 	pack := readerPackagesConfig{fs}
 	msbuild := readerMsbuild{fs}
 	sol := readerSolution{fs}
-	modules = append(modules, &pack, &msbuild, &sol)
-	return modules
+	return []readerModule{&pack, &msbuild, &sol}
 }
 
 func newFolder(path string) *Folder {
