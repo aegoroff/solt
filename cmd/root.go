@@ -26,7 +26,7 @@ func newRoot() *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(args ...string) {
+func Execute(args ...string) error {
 	rootCmd := newRoot()
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
@@ -42,15 +42,15 @@ func Execute(args ...string) {
 	}
 
 	start := time.Now()
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+	err := rootCmd.Execute()
 	elapsed := time.Since(start)
 
 	if diag {
 		printMemUsage(appPrinter)
 		appPrinter.cprint("<gray>Working time:</> <green>%v</>\n", elapsed)
 	}
+
+	return err
 }
 
 func init() {
