@@ -3,12 +3,9 @@ package cmd
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"path/filepath"
+	"github.com/spf13/cobra"
 	"solt/internal/sys"
 	"solt/msvc"
-	"strings"
-
-	"github.com/spf13/cobra"
 )
 
 func newLostProjects() *cobra.Command {
@@ -122,17 +119,12 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutio
 func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) bool {
 	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
 
-	pdir := filepath.Dir(prj.Path)
-
 	for _, f := range projectFiles {
 		pfile := normalize(f)
-		if !allSolutionFiles.Contains(pfile) {
-			continue
-		}
-
-		if strings.HasPrefix(pfile, normalize(pdir)) {
+		if allSolutionFiles.Contains(pfile) {
 			return true
 		}
 	}
+
 	return false
 }

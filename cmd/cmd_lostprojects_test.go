@@ -58,6 +58,36 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 `, actual)
 }
 
+func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	memfs.MkdirAll(dir+"a/Properties", 0755)
+	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent3), 0644)
+	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	appPrinter = newMockPrn()
+	appFileSystem = memfs
+
+	// Act
+	Execute("lp", "-p", dir)
+
+	// Assert
+	actual := appPrinter.(*mockprn).String()
+	ass.Equal(`
+<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
+
+ a\a1\a1.csproj
+`, actual)
+}
+
 func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
