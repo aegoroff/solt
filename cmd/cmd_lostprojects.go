@@ -27,7 +27,7 @@ func newLostProjects() *cobra.Command {
 			for _, sln := range solutions {
 				links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
 				projectLinksBySolution[sln.Path] = links
-				// to create projectsInSolutions you shoud normalize path to build Matcher
+				// to create projectsInSolutions you should normalize path to build Matcher
 				for _, item := range links.ItemsDecorated(normalize) {
 					linkedProjects = append(linkedProjects, item)
 				}
