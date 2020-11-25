@@ -105,18 +105,16 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutio
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
-		includedIntoOther := hasFilesIncludedIntoActual(prj, allSolutionFiles)
-
-		if !includedIntoOther {
-			lost = append(lost, prj.Path)
-		} else {
+		if hasFilesIncludedIntoSolution(prj, allSolutionFiles) {
 			lostWithIncludes = append(lostWithIncludes, prj.Path)
+		} else {
+			lost = append(lost, prj.Path)
 		}
 	}
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoActual(prj *msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) bool {
+func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) bool {
 	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
 
 	for _, f := range projectFiles {
