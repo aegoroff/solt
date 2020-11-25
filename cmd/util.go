@@ -11,7 +11,18 @@ func normalize(s string) string {
 	return strings.ToUpper(s)
 }
 
-func outputSortedMap(p printer, itemsMap map[string][]string, keyPrefix string) {
+type screenerImpl struct {
+	p printer
+}
+
+func newScreener(p printer) screener {
+	s := screenerImpl{
+		p: p,
+	}
+	return &s
+}
+
+func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
 	for k := range itemsMap {
 		keys = append(keys, k)
@@ -20,15 +31,15 @@ func outputSortedMap(p printer, itemsMap map[string][]string, keyPrefix string) 
 	sortfold.Strings(keys)
 
 	for _, k := range keys {
-		p.cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
-		sortAndOutput(p, itemsMap[k])
+		s.p.cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
+		s.writeSlice(itemsMap[k])
 	}
 }
 
-func sortAndOutput(p printer, items []string) {
+func (s *screenerImpl) writeSlice(items []string) {
 	sortfold.Strings(items)
 	for _, item := range items {
-		p.cprint(" %s\n", item)
+		s.p.cprint(" %s\n", item)
 	}
 }
 

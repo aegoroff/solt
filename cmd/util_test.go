@@ -5,20 +5,21 @@ import (
 	"testing"
 )
 
-func Test_sortAndOutput(t *testing.T) {
+func Test_writeSlice(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	items := []string{"rr", "aa", "xy"}
 	mockp := newMockPrn()
+	s := newScreener(mockp)
 
 	// Act
-	sortAndOutput(mockp, items)
+	s.writeSlice(items)
 
 	// Assert
 	ass.Equal(" aa\n rr\n xy\n", mockp.(*mockprn).String())
 }
 
-func Test_outputSortedMap(t *testing.T) {
+func Test_writeMap(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	items1 := []string{"rr", "gt", "xy"}
@@ -26,9 +27,10 @@ func Test_outputSortedMap(t *testing.T) {
 
 	m := map[string][]string{"a": items1, "b": items2}
 	mockp := newMockPrn()
+	s := newScreener(mockp)
 
 	// Act
-	outputSortedMap(mockp, m, "SI")
+	s.writeMap(m, "SI")
 
 	// Assert
 	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.(*mockprn).String())

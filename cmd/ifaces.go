@@ -35,3 +35,8 @@ type printer interface {
 	// resetColor resets console color
 	resetColor()
 }
+
+type screener interface {
+	writeMap(m map[string][]string, keyPrefix string)
+	writeSlice(slice []string)
+}

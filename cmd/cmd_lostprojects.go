@@ -35,8 +35,9 @@ func newLostProjects() *cobra.Command {
 
 			lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
+			s := newScreener(appPrinter)
 			// Lost projects
-			sortAndOutput(appPrinter, lost)
+			s.writeSlice(lost)
 
 			if len(lostWithIncludes) > 0 {
 				m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
@@ -44,7 +45,7 @@ func newLostProjects() *cobra.Command {
 			}
 
 			// Lost projects that have includes files that used
-			sortAndOutput(appPrinter, lostWithIncludes)
+			s.writeSlice(lostWithIncludes)
 
 			unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
 
@@ -53,7 +54,7 @@ func newLostProjects() *cobra.Command {
 			}
 
 			// Included but not exist in FS
-			outputSortedMap(appPrinter, unexistProjects, "Solution")
+			s.writeMap(unexistProjects, "Solution")
 
 			return nil
 		},

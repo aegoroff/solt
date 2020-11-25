@@ -49,12 +49,13 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 		return err
 	}
 
-	sortAndOutput(appPrinter, lostFiles)
+	s := newScreener(appPrinter)
+	s.writeSlice(lostFiles)
 
 	if len(logic.unexistFiles) > 0 {
 		appPrinter.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
-		outputSortedMap(appPrinter, logic.unexistFiles, "Project")
+		s.writeMap(logic.unexistFiles, "Project")
 	}
 
 	if opts.removeLost {
