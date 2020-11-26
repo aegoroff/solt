@@ -51,6 +51,18 @@ func (r *prn) tprint(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
 }
 
+func (r *prn) cprint(format string, a ...interface{}) {
+	color.Fprintf(r.w, format, a...)
+}
+
+func (*prn) setColor(c color.Color) {
+	_, _ = color.Set(c)
+}
+
+func (*prn) resetColor() {
+	_, _ = color.Reset()
+}
+
 func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
 	for k := range itemsMap {
@@ -70,16 +82,4 @@ func (s *screenerImpl) writeSlice(items []string) {
 	for _, item := range items {
 		s.p.cprint(" %s\n", item)
 	}
-}
-
-func (r *prn) cprint(format string, a ...interface{}) {
-	color.Fprintf(r.w, format, a...)
-}
-
-func (*prn) setColor(c color.Color) {
-	_, _ = color.Set(c)
-}
-
-func (*prn) resetColor() {
-	_, _ = color.Reset()
 }
