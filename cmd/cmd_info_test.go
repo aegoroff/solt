@@ -77,8 +77,8 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	ass.Equal(` a\a.sln
   Header                            Microsoft Visual Studio Solution File, Format Version 12.00
   Product                           # Visual Studio Version 16
-  Visial Studion Version            16.0.30104.148
-  Minimum Visial Studion Version    10.0.40219.1
+  Visual Studio Version            16.0.30104.148
+  Minimum Visual Studio Version    10.0.40219.1
   Project type    Count
   ------------    -----
   C#              1

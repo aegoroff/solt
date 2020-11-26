@@ -33,8 +33,8 @@ func newInfo() *cobra.Command {
 
 				t.AddLine("  Header", sln.Header)
 				t.AddLine("  Product", sln.Comment)
-				t.AddLine("  Visial Studion Version", sln.VisualStudioVersion)
-				t.AddLine("  Minimum Visial Studion Version", sln.MinimumVisualStudioVersion)
+				t.AddLine("  Visual Studio Version", sln.VisualStudioVersion)
+				t.AddLine("  Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
 
 				t.Print()
 
