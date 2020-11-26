@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/akutz/sortfold"
 	"github.com/dustin/go-humanize"
 	"runtime"
 	"strings"
@@ -9,38 +8,6 @@ import (
 
 func normalize(s string) string {
 	return strings.ToUpper(s)
-}
-
-type screenerImpl struct {
-	p printer
-}
-
-func newScreener(p printer) screener {
-	s := screenerImpl{
-		p: p,
-	}
-	return &s
-}
-
-func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) {
-	var keys []string
-	for k := range itemsMap {
-		keys = append(keys, k)
-	}
-
-	sortfold.Strings(keys)
-
-	for _, k := range keys {
-		s.p.cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
-		s.writeSlice(itemsMap[k])
-	}
-}
-
-func (s *screenerImpl) writeSlice(items []string) {
-	sortfold.Strings(items)
-	for _, item := range items {
-		s.p.cprint(" %s\n", item)
-	}
 }
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number

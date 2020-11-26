@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
 	"io"
 	"text/tabwriter"
@@ -10,6 +11,17 @@ import (
 type prn struct {
 	tw *tabwriter.Writer
 	w  io.Writer
+}
+
+type screenerImpl struct {
+	p printer
+}
+
+func newScreener(p printer) screener {
+	s := screenerImpl{
+		p: p,
+	}
+	return &s
 }
 
 // newPrinter creates new printer interface instance
@@ -37,6 +49,27 @@ func (r *prn) flush() {
 
 func (r *prn) tprint(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
+}
+
+func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) {
+	var keys []string
+	for k := range itemsMap {
+		keys = append(keys, k)
+	}
+
+	sortfold.Strings(keys)
+
+	for _, k := range keys {
+		s.p.cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
+		s.writeSlice(itemsMap[k])
+	}
+}
+
+func (s *screenerImpl) writeSlice(items []string) {
+	sortfold.Strings(items)
+	for _, item := range items {
+		s.p.cprint(" %s\n", item)
+	}
 }
 
 func (r *prn) cprint(format string, a ...interface{}) {
