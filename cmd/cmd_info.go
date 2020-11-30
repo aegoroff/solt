@@ -7,6 +7,7 @@ import (
 	"github.com/cheynewallace/tabby"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
+	"gonum.org/v1/gonum/graph/simple"
 	"solt/msvc"
 	"solt/solution"
 	"strings"
@@ -42,6 +43,16 @@ func newInfo() *cobra.Command {
 
 				showProjectsInfo(sln.Projects)
 				showSectionsInfo(sln.GlobalSections)
+
+				g := simple.NewDirectedGraph()
+				ids := make(map[string]int64)
+				ix := int64(1)
+				for _, prj := range sln.Projects {
+					ids[prj.Path] = ix
+					n := simple.Node(ix)
+					ix++
+					g.AddNode(n)
+				}
 			}
 
 			return nil
