@@ -21,7 +21,7 @@ func Test_Version(t *testing.T) {
 		appPrinter = newMockPrn()
 
 		// Act
-		Execute(test.cmd)
+		_ = Execute(test.cmd)
 
 		// Assert
 		ass.Equal(fmt.Sprintf("solt v%s\n", Version), appPrinter.(*mockprn).String())
