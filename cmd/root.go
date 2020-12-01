@@ -36,6 +36,7 @@ func Execute(args ...string) error {
 	rootCmd.AddCommand(newLostProjects())
 	rootCmd.AddCommand(newNuget())
 	rootCmd.AddCommand(newVersion())
+	rootCmd.AddCommand(newValidate())
 
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)
