@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"gonum.org/v1/gonum/graph/flow"
 	"gonum.org/v1/gonum/graph/simple"
+	"gonum.org/v1/gonum/graph/topo"
 	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
@@ -55,18 +57,26 @@ func newValidate() *cobra.Command {
 
 				var roots []*projectNode
 				for _, to := range nodes {
-					roots = append(roots, to)
-					dir := filepath.Dir(to.project.Path)
+					if to.project.Project.ProjectReferences == nil {
+						roots = append(roots, to)
+					} else {
+						dir := filepath.Dir(to.project.Path)
 
-					for _, pref := range to.project.Project.ProjectReferences {
-						full := filepath.Join(dir, pref.Path)
-						from, ok := nodes[normalize(full)]
-						if ok {
-							roots = roots[:len(roots)-1]
-							e := g.NewEdge(from, to)
-							g.SetEdge(e)
+						for _, pref := range to.project.Project.ProjectReferences {
+							full := filepath.Join(dir, pref.Path)
+							from, ok := nodes[normalize(full)]
+							if ok {
+								e := g.NewEdge(from, to)
+								g.SetEdge(e)
+							}
 						}
 					}
+				}
+				//cycles := topo.DirectedCyclesIn(g)
+				sorted, _ := topo.Sort(g)
+				for _, n := range sorted {
+					dominators := flow.DominatorsSLT(n, g)
+					dominators.Root()
 				}
 			}
 
