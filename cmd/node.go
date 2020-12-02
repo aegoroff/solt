@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"gonum.org/v1/gonum/graph"
 	"solt/msvc"
 )
 
@@ -10,7 +9,7 @@ type projectNode struct {
 	project *msvc.MsbuildProject
 }
 
-func newProjectNode(id int64, prj *msvc.MsbuildProject) graph.Node {
+func newProjectNode(id int64, prj *msvc.MsbuildProject) *projectNode {
 	n := projectNode{
 		id:      id,
 		project: prj,

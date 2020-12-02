@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
 	"solt/msvc"
@@ -33,25 +32,38 @@ func newValidate() *cobra.Command {
 				solutionPath := filepath.Dir(sol.Path)
 
 				g := simple.NewDirectedGraph()
-				ids := make(map[string]graph.Node)
+				nodes := make(map[string]*projectNode)
 				ix := int64(1)
 				for _, prj := range sln.Projects {
 					if prj.TypeID == solution.IDSolutionFolder {
 						continue
 					}
 
-					fullProjectPath := filepath.Join(solutionPath, prj.Path)
+					fullProjectPath := normalize(filepath.Join(solutionPath, prj.Path))
 
 					var msbuild *msvc.MsbuildProject
-					msbuild, ok := prjMap[normalize(fullProjectPath)]
+					msbuild, ok := prjMap[fullProjectPath]
 					if !ok {
 						continue
 					}
 
 					n := newProjectNode(ix, msbuild)
-					ids[prj.Path] = n
+					nodes[fullProjectPath] = n
 					ix++
 					g.AddNode(n)
+				}
+
+				for _, to := range nodes {
+					dir := filepath.Dir(to.project.Path)
+
+					for _, pref := range to.project.Project.ProjectReferences {
+						full := filepath.Join(dir, pref.Path)
+						from, ok := nodes[normalize(full)]
+						if ok {
+							e := g.NewEdge(from, to)
+							g.SetEdge(e)
+						}
+					}
 				}
 			}
 
