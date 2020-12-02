@@ -53,13 +53,16 @@ func newValidate() *cobra.Command {
 					g.AddNode(n)
 				}
 
+				var roots []*projectNode
 				for _, to := range nodes {
+					roots = append(roots, to)
 					dir := filepath.Dir(to.project.Path)
 
 					for _, pref := range to.project.Project.ProjectReferences {
 						full := filepath.Join(dir, pref.Path)
 						from, ok := nodes[normalize(full)]
 						if ok {
+							roots = roots[:len(roots)-1]
 							e := g.NewEdge(from, to)
 							g.SetEdge(e)
 						}
