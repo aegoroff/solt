@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/simple"
+	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
 )
@@ -18,8 +19,18 @@ func newValidate() *cobra.Command {
 
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
+			prjMap := make(map[string]*msvc.MsbuildProject)
+
+			for _, project := range allProjects {
+				if !project.Project.IsSdkProject() {
+					continue
+				}
+				prjMap[normalize(project.Path)] = project
+			}
+
 			for _, sol := range solutions {
 				sln := sol.Solution
+				solutionPath := filepath.Dir(sol.Path)
 
 				g := simple.NewDirectedGraph()
 				ids := make(map[string]graph.Node)
@@ -29,10 +40,10 @@ func newValidate() *cobra.Command {
 						continue
 					}
 
-					for _, project := range allProjects {
-						if prj.Path == project.Path {
+					fullProjectPath := filepath.Join(solutionPath, prj.Path)
 
-						}
+					if _, ok := prjMap[normalize(fullProjectPath)]; !ok {
+						continue
 					}
 
 					n := newProjectNode(ix, prj.Path)
