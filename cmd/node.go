@@ -1,16 +1,19 @@
 package cmd
 
-import "gonum.org/v1/gonum/graph"
+import (
+	"gonum.org/v1/gonum/graph"
+	"solt/msvc"
+)
 
 type projectNode struct {
-	id   int64
-	path string
+	id      int64
+	project *msvc.MsbuildProject
 }
 
-func newProjectNode(id int64, path string) graph.Node {
+func newProjectNode(id int64, prj *msvc.MsbuildProject) graph.Node {
 	n := projectNode{
-		id:   id,
-		path: path,
+		id:      id,
+		project: prj,
 	}
 	return &n
 }

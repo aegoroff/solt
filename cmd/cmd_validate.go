@@ -42,11 +42,13 @@ func newValidate() *cobra.Command {
 
 					fullProjectPath := filepath.Join(solutionPath, prj.Path)
 
-					if _, ok := prjMap[normalize(fullProjectPath)]; !ok {
+					var msbuild *msvc.MsbuildProject
+					msbuild, ok := prjMap[normalize(fullProjectPath)]
+					if !ok {
 						continue
 					}
 
-					n := newProjectNode(ix, prj.Path)
+					n := newProjectNode(ix, msbuild)
 					ids[prj.Path] = n
 					ix++
 					g.AddNode(n)
