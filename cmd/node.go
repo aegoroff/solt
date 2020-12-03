@@ -20,3 +20,7 @@ func newProjectNode(id int64, prj *msvc.MsbuildProject) *projectNode {
 func (n *projectNode) ID() int64 {
 	return n.id
 }
+
+func (n *projectNode) String() string {
+	return n.project.Path
+}

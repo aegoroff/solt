@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"gonum.org/v1/gonum/graph/flow"
+	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
-	"gonum.org/v1/gonum/graph/topo"
 	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
@@ -72,12 +71,24 @@ func newValidate() *cobra.Command {
 						}
 					}
 				}
-				//cycles := topo.DirectedCyclesIn(g)
-				sorted, _ := topo.Sort(g)
-				for _, n := range sorted {
-					dominators := flow.DominatorsSLT(n, g)
-					dominators.Root()
+				ap := path.DijkstraAllPaths(g)
+				for _, root := range roots {
+					for _, to := range nodes {
+						paths, _ := ap.AllBetween(root.ID(), to.ID())
+						if paths != nil && len(paths) > 1 && root.ID() != to.ID() {
+							appPrinter.cprint("from: %s to %s\n", root, to)
+							for _, p := range paths {
+								appPrinter.cprint("  %s\n", p)
+							}
+						}
+					}
 				}
+				////cycles := topo.DirectedCyclesIn(g)
+				//sorted, _ := topo.Sort(g)
+				//for _, n := range sorted {
+				//	dominators := flow.DominatorsSLT(n, g)
+				//	dominators.Root()
+				//}
 			}
 
 			return nil
