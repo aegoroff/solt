@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
+	"gonum.org/v1/gonum/graph/flow"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
+	"gonum.org/v1/gonum/graph/topo"
 	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
@@ -59,15 +62,10 @@ func newValidate() *cobra.Command {
 					if to.project.Project.ProjectReferences == nil {
 						roots = append(roots, to)
 					} else {
-						dir := filepath.Dir(to.project.Path)
-
-						for _, pref := range to.project.Project.ProjectReferences {
-							full := filepath.Join(dir, pref.Path)
-							from, ok := nodes[normalize(full)]
-							if ok {
-								e := g.NewEdge(from, to)
-								g.SetEdge(e)
-							}
+						refs := getReferences(to, nodes)
+						for _, ref := range refs {
+							e := g.NewEdge(ref, to)
+							g.SetEdge(e)
 						}
 					}
 				}
@@ -77,22 +75,50 @@ func newValidate() *cobra.Command {
 						paths, _ := ap.AllBetween(root.ID(), to.ID())
 						if paths != nil && len(paths) > 1 && root.ID() != to.ID() {
 							appPrinter.cprint("from: %s to %s\n", root, to)
+
 							for _, p := range paths {
 								appPrinter.cprint("  %s\n", p)
+							}
+
+							refs := getReferences(to, nodes)
+							uniqueIds := make(c9s.IntHashSet)
+
+							for _, pp := range paths {
+								for _, node := range pp {
+									uniqueIds.Add(int(node.ID()))
+								}
+							}
+							for _, ref := range refs {
+								if !uniqueIds.Contains(int(ref.ID())) {
+									appPrinter.cprint("    %s\n", ref)
+								}
 							}
 						}
 					}
 				}
-				////cycles := topo.DirectedCyclesIn(g)
-				//sorted, _ := topo.Sort(g)
-				//for _, n := range sorted {
-				//	dominators := flow.DominatorsSLT(n, g)
-				//	dominators.Root()
-				//}
+				sorted, _ := topo.Sort(g)
+				for _, n := range sorted {
+					dominators := flow.DominatorsSLT(n, g)
+					dominators.Root()
+				}
 			}
 
 			return nil
 		},
 	}
 	return cmd
+}
+
+func getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
+	dir := filepath.Dir(to.project.Path)
+
+	var result []*projectNode
+	for _, pref := range to.project.Project.ProjectReferences {
+		full := filepath.Join(dir, pref.Path)
+		from, ok := nodes[normalize(full)]
+		if ok {
+			result = append(result, from)
+		}
+	}
+	return result
 }
