@@ -14,7 +14,7 @@ func newValidate() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "va",
 		Aliases: []string{"validate"},
-		Short:   "Validates `SDK projects within solotion(s)",
+		Short:   "Validates `SDK projects within solution(s)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
