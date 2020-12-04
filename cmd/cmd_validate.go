@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
-	"gonum.org/v1/gonum/graph/flow"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
-	"gonum.org/v1/gonum/graph/topo"
 	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
@@ -69,37 +66,23 @@ func newValidate() *cobra.Command {
 						}
 					}
 				}
+
 				ap := path.DijkstraAllPaths(g)
-				for _, root := range roots {
-					for _, to := range nodes {
-						paths, _ := ap.AllBetween(root.ID(), to.ID())
-						if paths != nil && len(paths) > 1 && root.ID() != to.ID() {
-							appPrinter.cprint("from: %s to %s\n", root, to)
+				for _, node := range nodes {
+					refs := getReferences(node, nodes)
 
-							for _, p := range paths {
-								appPrinter.cprint("  %s\n", p)
+					for _, from := range refs {
+						for _, to := range refs {
+							if from.ID() == to.ID() {
+								continue
 							}
-
-							refs := getReferences(to, nodes)
-							uniqueIds := make(c9s.IntHashSet)
-
-							for _, pp := range paths {
-								for _, node := range pp {
-									uniqueIds.Add(int(node.ID()))
-								}
-							}
-							for _, ref := range refs {
-								if !uniqueIds.Contains(int(ref.ID())) {
-									appPrinter.cprint("    %s\n", ref)
-								}
+							paths, _ := ap.AllBetween(from.ID(), to.ID())
+							if paths != nil && len(paths) > 0 {
+								appPrinter.cprint("project: %s has redundant reference\n", node)
+								appPrinter.cprint("    %s\n", to)
 							}
 						}
 					}
-				}
-				sorted, _ := topo.Sort(g)
-				for _, n := range sorted {
-					dominators := flow.DominatorsSLT(n, g)
-					dominators.Root()
 				}
 			}
 
