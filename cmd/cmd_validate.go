@@ -14,7 +14,7 @@ func newValidate() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "va",
 		Aliases: []string{"validate"},
-		Short:   "Validates `SDK projects within solution(s)",
+		Short:   "Validates SDK projects within solution(s)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
 
@@ -29,9 +29,11 @@ func newValidate() *cobra.Command {
 				prjMap[normalize(project.Path)] = project
 			}
 
+			var currentSolution string
 			for _, sol := range solutions {
 				sln := sol.Solution
 				solutionPath := filepath.Dir(sol.Path)
+				currentSolution = sol.Path
 
 				g := simple.NewDirectedGraph()
 				nodes := make(map[string]*projectNode)
@@ -55,11 +57,8 @@ func newValidate() *cobra.Command {
 					g.AddNode(n)
 				}
 
-				var roots []*projectNode
 				for _, to := range nodes {
-					if to.project.Project.ProjectReferences == nil {
-						roots = append(roots, to)
-					} else {
+					if to.project.Project.ProjectReferences != nil {
 						refs := getReferences(to, nodes)
 						for _, ref := range refs {
 							e := g.NewEdge(ref, to)
@@ -68,7 +67,7 @@ func newValidate() *cobra.Command {
 					}
 				}
 
-				ap := path.DijkstraAllPaths(g)
+				allPaths := path.DijkstraAllPaths(g)
 				for _, node := range nodes {
 					refs := getReferences(node, nodes)
 
@@ -79,7 +78,7 @@ func newValidate() *cobra.Command {
 							if from.ID() == to.ID() {
 								continue
 							}
-							paths, _ := ap.AllBetween(from.ID(), to.ID())
+							paths, _ := allPaths.AllBetween(from.ID(), to.ID())
 							if paths != nil && len(paths) > 0 {
 								rrs.Add(from.String())
 							}
@@ -87,9 +86,13 @@ func newValidate() *cobra.Command {
 					}
 
 					if rrs.Count() > 0 {
-						appPrinter.cprint("project: %s has redundant references\n", node)
+						if currentSolution != "" {
+							appPrinter.cprint(" Solution: <green>%s</>\n", currentSolution)
+							currentSolution = ""
+						}
+						appPrinter.cprint("   project: <bold>%s</> has redundant references\n", node)
 						for s := range rrs {
-							appPrinter.cprint("    %s\n", s)
+							appPrinter.cprint("    <gray>%s</>\n", s)
 						}
 					}
 				}
