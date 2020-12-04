@@ -29,7 +29,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	actual := appPrinter.(*mockprn).String()
 	ass.Equal(` Solution: <green>a\a.sln</>
    project: <bold>a\a\a.csproj</> has redundant references
-    <gray>a\b\b.csproj</>
+     <gray>a\b\b.csproj</>
 `, actual)
 }
 

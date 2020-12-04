@@ -60,7 +60,7 @@ func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*p
 			}
 			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", node)
 			for s := range rrs {
-				appPrinter.cprint("    <gray>%s</>\n", s)
+				appPrinter.cprint("     <gray>%s</>\n", s)
 			}
 		}
 	}
