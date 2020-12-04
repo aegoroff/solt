@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
@@ -71,6 +72,8 @@ func newValidate() *cobra.Command {
 				for _, node := range nodes {
 					refs := getReferences(node, nodes)
 
+					rrs := make(c9s.StringHashSet)
+
 					for _, from := range refs {
 						for _, to := range refs {
 							if from.ID() == to.ID() {
@@ -78,9 +81,15 @@ func newValidate() *cobra.Command {
 							}
 							paths, _ := ap.AllBetween(from.ID(), to.ID())
 							if paths != nil && len(paths) > 0 {
-								appPrinter.cprint("project: %s has redundant reference\n", node)
-								appPrinter.cprint("    %s\n", from)
+								rrs.Add(from.String())
 							}
+						}
+					}
+
+					if rrs.Count() > 0 {
+						appPrinter.cprint("project: %s has redundant references\n", node)
+						for s := range rrs {
+							appPrinter.cprint("    %s\n", s)
 						}
 					}
 				}
