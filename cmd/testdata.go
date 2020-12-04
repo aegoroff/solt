@@ -269,3 +269,79 @@ const packagesConfingContent = `<?xml version="1.0" encoding="utf-8"?>
   <package id="CmdLine" version="1.0.7.509" targetFramework="net472" />
   <package id="Newtonsoft.Json" version="12.0.1" targetFramework="net472" />
 </packages>`
+
+const coreSolutionContent = `
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "a", "a\a.csproj", "{836F0FC6-D6A9-4EA1-8818-35C9BD545249}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "b", "b\b.csproj", "{295171B4-8CD0-4929-A66A-1752395121BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "c", "c\c.csproj", "{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{836F0FC6-D6A9-4EA1-8818-35C9BD545249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836F0FC6-D6A9-4EA1-8818-35C9BD545249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836F0FC6-D6A9-4EA1-8818-35C9BD545249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836F0FC6-D6A9-4EA1-8818-35C9BD545249}.Release|Any CPU.Build.0 = Release|Any CPU
+		{295171B4-8CD0-4929-A66A-1752395121BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{295171B4-8CD0-4929-A66A-1752395121BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{295171B4-8CD0-4929-A66A-1752395121BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{295171B4-8CD0-4929-A66A-1752395121BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31AA0C31-1842-4E8E-ADE9-FFE92FD1C22F}
+	EndGlobalSection
+EndGlobal
+`
+
+const aSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\b\b.csproj" />
+    <ProjectReference Include="..\c\c.csproj" />
+  </ItemGroup>
+
+</Project>
+`
+
+const bSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>
+`
+
+const cSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\b\b.csproj" />
+  </ItemGroup>
+
+</Project>
+`
