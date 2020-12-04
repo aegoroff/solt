@@ -79,7 +79,7 @@ func newValidate() *cobra.Command {
 							paths, _ := ap.AllBetween(from.ID(), to.ID())
 							if paths != nil && len(paths) > 0 {
 								appPrinter.cprint("project: %s has redundant reference\n", node)
-								appPrinter.cprint("    %s\n", to)
+								appPrinter.cprint("    %s\n", from)
 							}
 						}
 					}
