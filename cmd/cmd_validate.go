@@ -20,52 +20,12 @@ func newValidate() *cobra.Command {
 
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
-			prjMap := make(map[string]*msvc.MsbuildProject)
-
-			for _, project := range allProjects {
-				if !project.Project.IsSdkProject() {
-					continue
-				}
-				prjMap[normalize(project.Path)] = project
-			}
+			prjMap := newSdkProjects(allProjects)
 
 			var currentSolution string
 			for _, sol := range solutions {
-				sln := sol.Solution
-				solutionPath := filepath.Dir(sol.Path)
 				currentSolution = sol.Path
-
-				g := simple.NewDirectedGraph()
-				nodes := make(map[string]*projectNode)
-				ix := int64(1)
-				for _, prj := range sln.Projects {
-					if prj.TypeID == solution.IDSolutionFolder {
-						continue
-					}
-
-					fullProjectPath := normalize(filepath.Join(solutionPath, prj.Path))
-
-					var msbuild *msvc.MsbuildProject
-					msbuild, ok := prjMap[fullProjectPath]
-					if !ok {
-						continue
-					}
-
-					n := newProjectNode(ix, msbuild)
-					nodes[fullProjectPath] = n
-					ix++
-					g.AddNode(n)
-				}
-
-				for _, to := range nodes {
-					if to.project.Project.ProjectReferences != nil {
-						refs := getReferences(to, nodes)
-						for _, ref := range refs {
-							e := g.NewEdge(ref, to)
-							g.SetEdge(e)
-						}
-					}
-				}
+				g, nodes := newSolutionGraph(sol, prjMap)
 
 				allPaths := path.DijkstraAllPaths(g)
 				for _, node := range nodes {
@@ -102,6 +62,54 @@ func newValidate() *cobra.Command {
 		},
 	}
 	return cmd
+}
+
+func newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
+	prjMap := make(map[string]*msvc.MsbuildProject)
+
+	for _, project := range allProjects {
+		if !project.Project.IsSdkProject() {
+			continue
+		}
+		prjMap[normalize(project.Path)] = project
+	}
+	return prjMap
+}
+
+func newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.MsbuildProject) (*simple.DirectedGraph, map[string]*projectNode) {
+	solutionPath := filepath.Dir(sln.Path)
+	g := simple.NewDirectedGraph()
+	nodes := make(map[string]*projectNode)
+	ix := int64(1)
+	for _, prj := range sln.Solution.Projects {
+		if prj.TypeID == solution.IDSolutionFolder {
+			continue
+		}
+
+		fullProjectPath := normalize(filepath.Join(solutionPath, prj.Path))
+
+		var msbuild *msvc.MsbuildProject
+		msbuild, ok := prjMap[fullProjectPath]
+		if !ok {
+			continue
+		}
+
+		n := newProjectNode(ix, msbuild)
+		nodes[fullProjectPath] = n
+		ix++
+		g.AddNode(n)
+	}
+
+	for _, to := range nodes {
+		if to.project.Project.ProjectReferences != nil {
+			refs := getReferences(to, nodes)
+			for _, ref := range refs {
+				e := g.NewEdge(ref, to)
+				g.SetEdge(e)
+			}
+		}
+	}
+	return g, nodes
 }
 
 func getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
