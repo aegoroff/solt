@@ -323,6 +323,10 @@ const aSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\b\b.csproj" />
     <ProjectReference Include="..\c\c.csproj" />
   </ItemGroup>
