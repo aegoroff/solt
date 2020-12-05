@@ -25,6 +25,7 @@ Available Commands:
   lf          Find lost files in the folder specified
   lp          Find projects that not included into any solution
   nu          Get nuget packages information within solutions, projects or find Nuget mismatches in solution
+  va          Validates SDK projects within solution(s)
   ver         Print the version number of solt
 
 Flags:
