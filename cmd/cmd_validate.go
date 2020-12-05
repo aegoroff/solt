@@ -103,18 +103,20 @@ func newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.Ms
 	}
 
 	for _, to := range nodes {
-		if to.project.Project.ProjectReferences != nil {
-			refs := getReferences(to, nodes)
-			for _, ref := range refs {
-				e := g.NewEdge(ref, to)
-				g.SetEdge(e)
-			}
+		refs := getReferences(to, nodes)
+		for _, ref := range refs {
+			e := g.NewEdge(ref, to)
+			g.SetEdge(e)
 		}
 	}
 	return g, nodes
 }
 
 func getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
+	if to.project.Project.ProjectReferences == nil {
+		return []*projectNode{}
+	}
+
 	dir := filepath.Dir(to.project.Path)
 
 	var result []*projectNode
