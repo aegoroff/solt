@@ -34,38 +34,6 @@ func newValidate() *cobra.Command {
 	return cmd
 }
 
-func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode, solutionPath string) {
-	allPaths := path.DijkstraAllPaths(g)
-	for _, node := range nodes {
-		refs := getReferences(node, nodes)
-
-		rrs := make(c9s.StringHashSet)
-
-		for _, from := range refs {
-			for _, to := range refs {
-				if from.ID() == to.ID() {
-					continue
-				}
-				paths, _ := allPaths.AllBetween(from.ID(), to.ID())
-				if paths != nil && len(paths) > 0 {
-					rrs.Add(from.String())
-				}
-			}
-		}
-
-		if rrs.Count() > 0 {
-			if solutionPath != "" {
-				appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
-				solutionPath = ""
-			}
-			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", node)
-			for s := range rrs {
-				appPrinter.cprint("     <gray>%s</>\n", s)
-			}
-		}
-	}
-}
-
 func newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
 	prjMap := make(map[string]*msvc.MsbuildProject)
 
@@ -110,6 +78,38 @@ func newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.Ms
 		}
 	}
 	return g, nodes
+}
+
+func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode, solutionPath string) {
+	allPaths := path.DijkstraAllPaths(g)
+	for _, node := range nodes {
+		refs := getReferences(node, nodes)
+
+		rrs := make(c9s.StringHashSet)
+
+		for _, from := range refs {
+			for _, to := range refs {
+				if from.ID() == to.ID() {
+					continue
+				}
+				paths, _ := allPaths.AllBetween(from.ID(), to.ID())
+				if paths != nil && len(paths) > 0 {
+					rrs.Add(from.String())
+				}
+			}
+		}
+
+		if rrs.Count() > 0 {
+			if solutionPath != "" {
+				appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
+				solutionPath = ""
+			}
+			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", node)
+			for s := range rrs {
+				appPrinter.cprint("     <gray>%s</>\n", s)
+			}
+		}
+	}
 }
 
 func getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {

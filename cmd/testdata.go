@@ -275,11 +275,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "a", "a\a.csproj", "{836F0FC6-D6A9-4EA1-8818-35C9BD545249}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "a", "a\a.csproj", "{836F0FC6-D6A9-4EA1-8818-35C9BD545249}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "b", "b\b.csproj", "{295171B4-8CD0-4929-A66A-1752395121BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "b", "b\b.csproj", "{295171B4-8CD0-4929-A66A-1752395121BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "c", "c\c.csproj", "{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "c", "c\c.csproj", "{9C13E797-65B5-4CDA-BA15-AE260AAA23C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "f", "f", "{97E04FD2-B904-46BE-930A-B270D264E83C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -302,6 +304,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{295171B4-8CD0-4929-A66A-1752395121BA} = {97E04FD2-B904-46BE-930A-B270D264E83C}
+		{9C13E797-65B5-4CDA-BA15-AE260AAA23C6} = {97E04FD2-B904-46BE-930A-B270D264E83C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31AA0C31-1842-4E8E-ADE9-FFE92FD1C22F}
