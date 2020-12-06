@@ -37,7 +37,7 @@ func (w *walkSol) onFolder(f *Folder) {
 }
 
 func walk(foldersTree rbtree.RbTree, walkers ...walker) {
-	rbtree.NewAscend(foldersTree).Iterate(func(n rbtree.Node) bool {
+	rbtree.NewWalkInorder(foldersTree).Iterate(func(n rbtree.Node) bool {
 		fold := n.Key().(*Folder)
 		for _, w := range walkers {
 			w.onFolder(fold)
