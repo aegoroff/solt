@@ -3,7 +3,6 @@ package msvc
 import (
 	"encoding/xml"
 	"github.com/akutz/sortfold"
-	"github.com/google/btree"
 	"solt/solution"
 )
 
@@ -57,13 +56,19 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 // StringDecorator defines string decorating function
 type StringDecorator func(s string) string
 
-// Less tests whether the current item is less than the given argument.
-//
-// This must provide a strict weak ordering.
-// If !a.Less(b) && !b.Less(a), we treat this to mean a == b (i.e. we can only
-// hold one of either a or b in the tree).
-func (x *Folder) Less(y btree.Item) bool {
+// LessThan implements rbtree.Comparable interface
+func (x *Folder) LessThan(y interface{}) bool {
 	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
+}
+
+// EqualTo implements rbtree.Comparable interface
+func (x *Folder) EqualTo(y interface{}) bool {
+	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) == 0
+}
+
+// String implements rbtree.Comparable interface
+func (x *Folder) String() string {
+	return x.Path
 }
 
 type packages struct {

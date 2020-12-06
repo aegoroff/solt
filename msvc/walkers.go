@@ -1,7 +1,7 @@
 package msvc
 
 import (
-	"github.com/google/btree"
+	"github.com/aegoroff/godatastruct/rbtree"
 )
 
 type walkPrj struct {
@@ -36,9 +36,9 @@ func (w *walkSol) onFolder(f *Folder) {
 	}
 }
 
-func walk(foldersTree *btree.BTree, walkers ...walker) {
-	foldersTree.Ascend(func(n btree.Item) bool {
-		fold := n.(*Folder)
+func walk(foldersTree rbtree.RbTree, walkers ...walker) {
+	rbtree.NewAscend(foldersTree).Iterate(func(n rbtree.Node) bool {
+		fold := n.Key().(*Folder)
 		for _, w := range walkers {
 			w.onFolder(fold)
 		}

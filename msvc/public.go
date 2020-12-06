@@ -2,7 +2,7 @@ package msvc
 
 import (
 	"github.com/aegoroff/godatastruct/collections"
-	"github.com/google/btree"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"path/filepath"
 	"solt/solution"
 )
@@ -42,7 +42,7 @@ func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
 }
 
 // SelectProjects gets all Visual Studion solutions found in a directory
-func SelectProjects(foldersTree *btree.BTree) []*MsbuildProject {
+func SelectProjects(foldersTree rbtree.RbTree) []*MsbuildProject {
 	var projects []*MsbuildProject
 
 	WalkProjectFolders(foldersTree, func(project *MsbuildProject, folder *Folder) {
@@ -53,14 +53,14 @@ func SelectProjects(foldersTree *btree.BTree) []*MsbuildProject {
 }
 
 // SelectSolutions gets all Visual Studion solutions found in a directory
-func SelectSolutions(foldersTree *btree.BTree) []*VisualStudioSolution {
+func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
 	w := walkSol{solutions: make([]*VisualStudioSolution, 0)}
 	walk(foldersTree, &w)
 	return w.solutions
 }
 
 // SelectSolutionsAndProjects gets all Visual Studion solutions and projects found in a directory
-func SelectSolutionsAndProjects(foldersTree *btree.BTree) ([]*VisualStudioSolution, []*MsbuildProject) {
+func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolution, []*MsbuildProject) {
 	ws := walkSol{solutions: make([]*VisualStudioSolution, 0)}
 	var projects []*MsbuildProject
 
@@ -73,7 +73,7 @@ func SelectSolutionsAndProjects(foldersTree *btree.BTree) ([]*VisualStudioSoluti
 }
 
 // WalkProjectFolders traverse all projects found in solution(s) folder
-func WalkProjectFolders(foldersTree *btree.BTree, action ProjectHandler) {
+func WalkProjectFolders(foldersTree rbtree.RbTree, action ProjectHandler) {
 	w := &walkPrj{handler: action}
 	walk(foldersTree, w)
 }

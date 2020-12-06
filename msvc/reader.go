@@ -1,7 +1,7 @@
 package msvc
 
 import (
-	"github.com/google/btree"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"solt/internal/sys"
 	"sync"
@@ -10,8 +10,8 @@ import (
 // ReadSolutionDir reads filesystem directory and all its childs to get information
 // about all solutions and projects in this tree.
 // It returns tree
-func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) *btree.BTree {
-	result := btree.New(16)
+func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rbtree.RbTree {
+	result := rbtree.NewRbTree()
 
 	aggregateChannel := make(chan *Folder, 4)
 	fileChannel := make(chan string, 16)
@@ -22,13 +22,13 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) *b
 	go func() {
 		defer wg.Done()
 		for f := range aggregateChannel {
-			current := result.Get(f)
-			if current == nil {
+			current, ok := result.Search(f)
+			if !ok {
 				// Create new node
-				result.ReplaceOrInsert(f)
+				result.Insert(f)
 			} else {
 				// Update folder node that has already been created before
-				merge(current.(*Folder), f)
+				merge(current.Key().(*Folder), f)
 			}
 		}
 	}()
