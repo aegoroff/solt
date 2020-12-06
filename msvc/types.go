@@ -2,6 +2,7 @@ package msvc
 
 import (
 	"encoding/xml"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/solution"
 )
@@ -58,12 +59,16 @@ type StringDecorator func(s string) string
 
 // LessThan implements rbtree.Comparable interface
 func (x *Folder) LessThan(y interface{}) bool {
-	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) < 0
+	return x.compare(y.(rbtree.Comparable)) < 0
 }
 
 // EqualTo implements rbtree.Comparable interface
 func (x *Folder) EqualTo(y interface{}) bool {
-	return sortfold.CompareFold(x.Path, (y.(*Folder)).Path) == 0
+	return x.compare(y.(rbtree.Comparable)) == 0
+}
+
+func (x *Folder) compare(y rbtree.Comparable) int {
+	return sortfold.CompareFold(x.String(), y.String())
 }
 
 // String implements rbtree.Comparable interface
