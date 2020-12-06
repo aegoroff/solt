@@ -1,5 +1,5 @@
 ﻿# version format
-version: 0.9.{build}
+version: 0.9.1.{build}
 
 clone_folder: c:\gopath\src\solt
 
@@ -28,7 +28,7 @@ stack: go ^1.15
 image: Visual Studio 2019
 
 build_script:
-  - go build -ldflags "-X solt/cmd.Version=%APPVEYOR_BUILD_VERSION%" solt
+  - go build -ldflags "-s -w -X solt/cmd.Version=%APPVEYOR_BUILD_VERSION%" solt
 
 test_script:
   - go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/solution -covermode=atomic solt/...
