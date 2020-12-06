@@ -20,6 +20,8 @@ github.com/aegoroff/godatastruct v0.4.2 h1:4dCX9Mh/rkyquioFsdR1FICm/kWjNBCN9h/0d
 github.com/aegoroff/godatastruct v0.4.2/go.mod h1:hVGalr6+WdLvop5iu+D1PxHMdpvDUFnC7Ynr96FwR9c=
 github.com/aegoroff/godatastruct v0.4.3 h1:zDUSf477d8TMAaOyVQV2Yu/hkdK7//WyroHx9RCBxtE=
 github.com/aegoroff/godatastruct v0.4.3/go.mod h1:M7t8WlKk+RNn/Wa4fDqQnltY8XAcKLuo+xk5nRk3LCc=
+github.com/aegoroff/godatastruct v0.5.0 h1:1mjvg+mEKkqKmBIDa0sXnoGTM+C8CvJHbvZQ7EjT6ZU=
+github.com/aegoroff/godatastruct v0.5.0/go.mod h1:M7t8WlKk+RNn/Wa4fDqQnltY8XAcKLuo+xk5nRk3LCc=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
 github.com/akutz/sortfold v0.2.1 h1:u9x3FC6oM+6gZKEVNRnmVafJgappwrv9YqpELQCYViI=
 github.com/akutz/sortfold v0.2.1/go.mod h1:m1NArmessx+/3z2N8MiiTjq79A3WwZwDDiZ7eeD4jHA=
