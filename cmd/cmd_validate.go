@@ -2,14 +2,12 @@ package cmd
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/akutz/sortfold"
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
 	"solt/msvc"
 	"solt/solution"
-	"sort"
 )
 
 func newValidate() *cobra.Command {
@@ -23,10 +21,6 @@ func newValidate() *cobra.Command {
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
 			prjMap := newSdkProjects(allProjects)
-
-			sort.Slice(solutions, func(i, j int) bool {
-				return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
-			})
 
 			for _, sol := range solutions {
 				g, nodes := newSolutionGraph(sol, prjMap)

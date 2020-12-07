@@ -131,6 +131,15 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
+	dir = "a1/"
+	afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
@@ -145,5 +154,40 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
   -------            -------
   CmdLine            1.0.7.509
   Newtonsoft.Json    12.0.1
+`, actual)
+}
+
+func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	memfs.MkdirAll(dir+"a/Properties", 0755)
+	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	appPrinter = newMockPrn()
+	appFileSystem = memfs
+
+	// Act
+	Execute("nu", "-p", dir)
+
+	// Assert
+	actual := appPrinter.(*mockprn).String()
+	ass.Equal(`
+ a\a.sln
+  Package            Version
+  -------            -------
+  CmdLine            1.0.7.509
+  Newtonsoft.Json    12.0.1
+
+ a1\a.sln
+  Package              Version
+  -------              -------
+  CommandLineParser    2.8.0
 `, actual)
 }

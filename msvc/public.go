@@ -3,8 +3,10 @@ package msvc
 import (
 	"github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/akutz/sortfold"
 	"path/filepath"
 	"solt/solution"
+	"sort"
 )
 
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
@@ -56,6 +58,7 @@ func SelectProjects(foldersTree rbtree.RbTree) []*MsbuildProject {
 func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
 	w := walkSol{solutions: make([]*VisualStudioSolution, 0)}
 	walk(foldersTree, &w)
+	sortSolutions(w.solutions)
 	return w.solutions
 }
 
@@ -69,6 +72,7 @@ func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolut
 	}}
 
 	walk(foldersTree, &ws, &wp)
+	sortSolutions(ws.solutions)
 	return ws.solutions, projects
 }
 
@@ -107,4 +111,10 @@ func createPathsFromIncludes(paths []include, basePath string) []string {
 	}
 
 	return result
+}
+
+func sortSolutions(solutions []*VisualStudioSolution) {
+	sort.Slice(solutions, func(i, j int) bool {
+		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
+	})
 }
