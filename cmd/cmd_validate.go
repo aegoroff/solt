@@ -3,6 +3,7 @@ package cmd
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
+	"github.com/yourbasic/radix"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
@@ -21,6 +22,8 @@ func newValidate() *cobra.Command {
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
 			prjMap := newSdkProjects(allProjects)
+
+			radix.SortSlice(solutions, func(i int) string { return solutions[i].Path })
 
 			for _, sol := range solutions {
 				g, nodes := newSolutionGraph(sol, prjMap)
