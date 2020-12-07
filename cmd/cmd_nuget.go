@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/akutz/sortfold"
 	"github.com/spf13/cobra"
+	"github.com/yourbasic/radix"
 	"solt/msvc"
-	"sort"
 )
 
 type nugetCmd struct {
@@ -90,9 +89,7 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 		appPrinter.cprint(" <red>Different nuget package's versions in the same solution found:</>")
 	}
 
-	sort.Slice(solutions, func(i, j int) bool {
-		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
-	})
+	radix.SortSlice(solutions, func(i int) string { return solutions[i].Path })
 
 	prn := newNugetPrinter(appPrinter)
 	for _, sln := range solutions {

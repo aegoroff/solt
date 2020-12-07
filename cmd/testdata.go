@@ -343,6 +343,19 @@ const bSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
 </Project>
 `
 
+const bSdkProjectWithNugetContent = `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.7.0" />
+  </ItemGroup>
+
+</Project>
+`
+
 const cSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
