@@ -13,6 +13,5 @@ require (
 	github.com/spf13/afero v1.4.1
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.6.1
-	github.com/yourbasic/radix v0.0.0-20180308122924-cbe1cc82e907
 	gonum.org/v1/gonum v0.8.2
 )
