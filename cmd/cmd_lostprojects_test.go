@@ -11,18 +11,18 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lp", "-p", dir)
+	_ = Execute("lp", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -34,20 +34,20 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a1.csproj", []byte(testProjectContent2), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a1.csproj", []byte(testProjectContent2), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lp", "-p", dir)
+	_ = Execute("lp", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -63,21 +63,21 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent3), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent3), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lp", "-p", dir)
+	_ = Execute("lp", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -93,20 +93,20 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent2), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent2), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lp", "-p", dir)
+	_ = Execute("lp", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -119,18 +119,18 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lp", "-p", dir)
+	_ = Execute("lp", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()

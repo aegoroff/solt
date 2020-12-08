@@ -11,19 +11,19 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir)
+	_ = Execute("lf", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -43,22 +43,22 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		ass := assert.New(t)
 		dir := "a/"
 		memfs := afero.NewMemMapFs()
-		memfs.MkdirAll(dir+"a/Properties", 0755)
-		memfs.MkdirAll(dir+"packages", 0755)
-		memfs.MkdirAll(dir+"a/packages", 0755)
-		afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-		afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-		afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-		afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-		afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-		afero.WriteFile(memfs, dir+tst.path, []byte(codeFileContent), 0644)
-		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+		_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+		_ = memfs.MkdirAll(dir+"packages", 0755)
+		_ = memfs.MkdirAll(dir+"a/packages", 0755)
+		_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+		_ = afero.WriteFile(memfs, dir+tst.path, []byte(codeFileContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 		appPrinter = newMockPrn()
 		appFileSystem = memfs
 
 		// Act
-		Execute("lf", "-p", dir)
+		_ = Execute("lf", "-p", dir)
 
 		// Assert
 		actual := appPrinter.(*mockprn).String()
@@ -71,20 +71,20 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir)
+	_ = Execute("lf", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -104,20 +104,20 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		ass := assert.New(t)
 		dir := "a/"
 		memfs := afero.NewMemMapFs()
-		memfs.MkdirAll(dir+"a/Properties", 0755)
-		afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-		afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-		afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-		afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-		afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
-		afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+		_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+		_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 		appPrinter = newMockPrn()
 		appFileSystem = memfs
 
 		// Act
-		Execute("lf", "-p", dir, "-f", tst.filter)
+		_ = Execute("lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
 		actual := appPrinter.(*mockprn).String()
@@ -130,20 +130,20 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir, "-r")
+	_ = Execute("lf", "-p", dir, "-r")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -157,20 +157,20 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = afero.NewReadOnlyFs(memfs)
 
 	// Act
-	Execute("lf", "-p", dir, "-r")
+	_ = Execute("lf", "-p", dir, "-r")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -184,18 +184,18 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir, "-a")
+	_ = Execute("lf", "-p", dir, "-a")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -207,18 +207,18 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("lf", "-p", dir)
+	_ = Execute("lf", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()

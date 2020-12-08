@@ -11,19 +11,19 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", dir, "-r")
+	_ = Execute("nu", "-p", dir, "-r")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -41,19 +41,19 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", dir, "-r")
+	_ = Execute("nu", "-p", dir, "-r")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -70,19 +70,19 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", dir, "-m")
+	_ = Execute("nu", "-p", dir, "-m")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -94,19 +94,19 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectWithNugetContent), 0644)
-	afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectWithNugetContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", dir, "-m")
+	_ = Execute("nu", "-p", dir, "-m")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -123,19 +123,19 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", dir)
+	_ = Execute("nu", "-p", dir)
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
@@ -153,28 +153,28 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	ass := assert.New(t)
 	dir := "d/a/"
 	memfs := afero.NewMemMapFs()
-	memfs.MkdirAll(dir+"a/Properties", 0755)
-	afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
-	afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	dir = "d/a1/"
-	afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
-	afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
-	afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
-	afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	appPrinter = newMockPrn()
 	appFileSystem = memfs
 
 	// Act
-	Execute("nu", "-p", "d/")
+	_ = Execute("nu", "-p", "d/")
 
 	// Assert
 	actual := appPrinter.(*mockprn).String()
