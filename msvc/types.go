@@ -58,13 +58,13 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 type StringDecorator func(s string) string
 
 // LessThan implements rbtree.Comparable interface
-func (x *Folder) LessThan(y interface{}) bool {
-	return x.compare(y.(rbtree.Comparable)) < 0
+func (x *Folder) LessThan(y rbtree.Comparable) bool {
+	return x.compare(y) < 0
 }
 
 // EqualTo implements rbtree.Comparable interface
-func (x *Folder) EqualTo(y interface{}) bool {
-	return x.compare(y.(rbtree.Comparable)) == 0
+func (x *Folder) EqualTo(y rbtree.Comparable) bool {
+	return x.compare(y) == 0
 }
 
 func (x *Folder) compare(y rbtree.Comparable) int {
