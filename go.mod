@@ -9,7 +9,7 @@ require (
 	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/cheynewallace/tabby v1.1.0
 	github.com/dustin/go-humanize v1.0.0
-	github.com/gookit/color v1.3.3
+	github.com/gookit/color v1.3.5
 	github.com/spf13/afero v1.5.1
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.6.1
