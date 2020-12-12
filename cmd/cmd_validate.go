@@ -82,8 +82,9 @@ func newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.Ms
 
 func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode, solutionPath string) {
 	allPaths := path.DijkstraAllPaths(g)
-	for _, node := range nodes {
-		refs := getReferences(node, nodes)
+	solutionPrinted := false
+	for _, project := range nodes {
+		refs := getReferences(project, nodes)
 
 		rrs := make(c9s.StringHashSet)
 
@@ -100,11 +101,11 @@ func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*p
 		}
 
 		if rrs.Count() > 0 {
-			if solutionPath != "" {
+			if !solutionPrinted {
 				appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
-				solutionPath = ""
+				solutionPrinted = true
 			}
-			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", node)
+			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", project)
 			for s := range rrs {
 				appPrinter.cprint("     <gray>%s</>\n", s)
 			}
