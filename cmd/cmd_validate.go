@@ -2,6 +2,7 @@ package cmd
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/akutz/sortfold"
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
@@ -25,7 +26,8 @@ func newValidate() *cobra.Command {
 			for _, sol := range solutions {
 				g, nodes := newSolutionGraph(sol, prjMap)
 
-				findRedundantProjectReferences(g, nodes, sol.Path)
+				refs := findRedundantProjectReferences(g, nodes)
+				printRedundantRefs(sol.Path, refs)
 			}
 
 			return nil
@@ -80,9 +82,9 @@ func newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.Ms
 	return g, nodes
 }
 
-func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode, solutionPath string) {
+func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
-	solutionPrinted := false
+	result := make(map[string]c9s.StringHashSet)
 	for _, project := range nodes {
 		refs := getReferences(project, nodes)
 
@@ -101,14 +103,33 @@ func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*p
 		}
 
 		if rrs.Count() > 0 {
-			if !solutionPrinted {
-				appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
-				solutionPrinted = true
-			}
-			appPrinter.cprint("   project: <bold>%s</> has redundant references\n", project)
-			for s := range rrs {
-				appPrinter.cprint("     <gray>%s</>\n", s)
-			}
+			result[project.String()] = rrs
+		}
+	}
+
+	return result
+}
+
+func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet) {
+	if len(refs) == 0 {
+		return
+	}
+	appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
+
+	projects := make([]string, 0, len(refs))
+	for s := range refs {
+		projects = append(projects, s)
+	}
+
+	sortfold.Strings(projects)
+
+	for _, project := range projects {
+		appPrinter.cprint("   project: <bold>%s</> has redundant references\n", project)
+		rrs := refs[project]
+		items := rrs.Items()
+		sortfold.Strings(items)
+		for s := range items {
+			appPrinter.cprint("     <gray>%s</>\n", s)
 		}
 	}
 }
