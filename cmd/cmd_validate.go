@@ -128,7 +128,7 @@ func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet) 
 		rrs := refs[project]
 		items := rrs.Items()
 		sortfold.Strings(items)
-		for s := range items {
+		for _, s := range items {
 			appPrinter.cprint("     <gray>%s</>\n", s)
 		}
 	}
