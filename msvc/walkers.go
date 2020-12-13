@@ -37,11 +37,10 @@ func (w *walkSol) onFolder(f *Folder) {
 }
 
 func walk(foldersTree rbtree.RbTree, walkers ...walker) {
-	rbtree.NewWalkInorder(foldersTree).Foreach(func(n rbtree.Node) bool {
+	rbtree.NewWalkInorder(foldersTree).Foreach(func(n rbtree.Node) {
 		fold := n.Key().(*Folder)
 		for _, w := range walkers {
 			w.onFolder(fold)
 		}
-		return true
 	})
 }
