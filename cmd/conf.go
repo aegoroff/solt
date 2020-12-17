@@ -4,15 +4,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-type conf interface {
-	// fs defines app file system abstraction
-	fs() afero.Fs
-
-	prn() printer
-
-	sourcesPath() *string
-}
-
 type appConf struct {
 	filesystem afero.Fs
 	p          printer

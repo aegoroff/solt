@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/gookit/color"
+	"github.com/spf13/afero"
 	"io"
 	"text/tabwriter"
 )
@@ -39,4 +40,17 @@ type printer interface {
 type screener interface {
 	writeMap(m map[string][]string, keyPrefix string)
 	writeSlice(slice []string)
+}
+
+type conf interface {
+	// fs defines app file system abstraction
+	fs() afero.Fs
+
+	prn() printer
+
+	sourcesPath() *string
+}
+
+type command interface {
+	execute() error
 }

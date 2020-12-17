@@ -5,10 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type command interface {
-	execute() error
-}
-
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
 
 type baseCommand struct {
