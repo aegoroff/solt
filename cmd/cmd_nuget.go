@@ -34,6 +34,7 @@ func newNuget(c conf) *cobra.Command {
 
 	return cmd
 }
+
 func (c *nugetCommand) execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
 
