@@ -12,42 +12,52 @@ import (
 	"strings"
 )
 
+type infoCommand struct {
+	baseCommand
+}
+
 func newInfo(c conf) *cobra.Command {
-	var cmd = &cobra.Command{
-		Use:     "in",
-		Aliases: []string{"info"},
-		Short:   "Get information about found solutions",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
-
-			solutions := msvc.SelectSolutions(foldersTree)
-
-			for _, sol := range solutions {
-				sln := sol.Solution
-
-				c.prn().setColor(color.FgGray)
-				c.prn().cprint(" %s\n", sol.Path)
-				c.prn().resetColor()
-
-				t := tabby.NewCustom(c.prn().twriter())
-
-				t.AddLine("  Header", sln.Header)
-				t.AddLine("  Product", sln.Comment)
-				t.AddLine("  Visual Studio Version", sln.VisualStudioVersion)
-				t.AddLine("  Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
-
-				t.Print()
-
-				fmt.Println()
-
-				showProjectsInfo(sln.Projects, c.prn())
-				showSectionsInfo(sln.GlobalSections, c.prn())
+	cc := cobraCreator{
+		createCmd: func() command {
+			ic := infoCommand{
+				newBaseCmd(c),
 			}
-
-			return nil
+			return &ic
 		},
 	}
+
+	cmd := cc.newCobraCommand("in", "info", "Get information about found solutions")
 	return cmd
+}
+
+func (c *infoCommand) execute() error {
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+
+	solutions := msvc.SelectSolutions(foldersTree)
+
+	for _, sol := range solutions {
+		sln := sol.Solution
+
+		c.prn.setColor(color.FgGray)
+		c.prn.cprint(" %s\n", sol.Path)
+		c.prn.resetColor()
+
+		t := tabby.NewCustom(c.prn.twriter())
+
+		t.AddLine("  Header", sln.Header)
+		t.AddLine("  Product", sln.Comment)
+		t.AddLine("  Visual Studio Version", sln.VisualStudioVersion)
+		t.AddLine("  Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
+
+		t.Print()
+
+		fmt.Println()
+
+		showProjectsInfo(sln.Projects, c.prn)
+		showSectionsInfo(sln.GlobalSections, c.prn)
+	}
+
+	return nil
 }
 
 func showProjectsInfo(projects []*solution.Project, p printer) {
