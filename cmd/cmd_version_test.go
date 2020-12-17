@@ -9,22 +9,26 @@ import (
 
 func Test_Version(t *testing.T) {
 	var tests = []struct {
-		cmd string
+		name string
+		cmd  []string
 	}{
-		{"version"},
-		{"ver"},
+		{"version", []string{"version"}},
+		{"ver", []string{"ver"}},
+		{"ver -d", []string{"ver", "-d"}},
 	}
 
 	for _, test := range tests {
-		// Arrange
-		ass := assert.New(t)
-		memfs := afero.NewMemMapFs()
-		p := newMockPrn()
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			memfs := afero.NewMemMapFs()
+			p := newMockPrn()
 
-		// Act
-		_ = Execute(memfs, p.w, test.cmd)
+			// Act
+			_ = Execute(memfs, p.w, test.cmd...)
 
-		// Assert
-		ass.Equal(fmt.Sprintf("solt v%s\n", Version), p.w.String())
+			// Assert
+			ass.Contains(p.w.String(), fmt.Sprintf("solt v%s\n", Version))
+		})
 	}
 }
