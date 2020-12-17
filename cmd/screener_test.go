@@ -16,7 +16,7 @@ func Test_writeSlice(t *testing.T) {
 	s.writeSlice(items)
 
 	// Assert
-	ass.Equal(" aa\n rr\n xy\n", mockp.(*mockprn).String())
+	ass.Equal(" aa\n rr\n xy\n", mockp.w.String())
 }
 
 func Test_writeMap(t *testing.T) {
@@ -33,5 +33,5 @@ func Test_writeMap(t *testing.T) {
 	s.writeMap(m, "SI")
 
 	// Assert
-	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.(*mockprn).String())
+	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", mockp.w.String())
 }

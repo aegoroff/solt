@@ -20,7 +20,7 @@ func (m *mockprn) String() string {
 	return m.w.String()
 }
 
-func newMockPrn() printer {
+func newMockPrn() *mockprn {
 	w := bytes.NewBufferString("")
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
@@ -65,15 +65,13 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("in", "-p", dir)
+	_ = Execute(memfs, p.w, "in", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(` a\a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16

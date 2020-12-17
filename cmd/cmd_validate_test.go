@@ -19,14 +19,13 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("va", "-p", dir)
+	_ = Execute(memfs, p.w, "va", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(` Solution: <green>a\a.sln</>
    project: <bold>a\a\a.csproj</> has redundant references
      <gray>a\b\b.csproj</>
@@ -46,13 +45,12 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("va", "-p", dir)
+	_ = Execute(memfs, p.w, "va", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal("", actual)
 }

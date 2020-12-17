@@ -2,19 +2,18 @@ package cmd
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"solt/internal/sys"
 	"solt/msvc"
 )
 
-func newLostProjects() *cobra.Command {
+func newLostProjects(c conf) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "lp",
 		Aliases: []string{"lostprojects"},
 		Short:   "Find projects that not included into any solution",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
 
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
@@ -35,22 +34,22 @@ func newLostProjects() *cobra.Command {
 
 			lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
-			s := newScreener(appPrinter)
+			s := newScreener(c.prn())
 			// Lost projects
 			s.writeSlice(lost)
 
 			if len(lostWithIncludes) > 0 {
 				m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
-				appPrinter.cprint(m)
+				c.prn().cprint(m)
 			}
 
 			// Lost projects that have includes files that used
 			s.writeSlice(lostWithIncludes)
 
-			unexistProjects := getUnexistProjects(projectLinksBySolution, appFileSystem)
+			unexistProjects := getUnexistProjects(projectLinksBySolution, c)
 
 			if len(unexistProjects) > 0 {
-				appPrinter.cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
+				c.prn().cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
 			}
 
 			// Included but not exist in FS
@@ -63,10 +62,10 @@ func newLostProjects() *cobra.Command {
 	return cmd
 }
 
-func getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet, fs afero.Fs) map[string][]string {
+func getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet, c conf) map[string][]string {
 	var result = make(map[string][]string)
 
-	filer := sys.NewFiler(fs, appPrinter.writer())
+	filer := sys.NewFiler(c.fs(), c.prn().writer())
 	for spath, projects := range projectsInSolutions {
 		nonexist := filer.CheckExistence(projects.Items())
 

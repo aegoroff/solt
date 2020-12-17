@@ -8,19 +8,22 @@ import (
 )
 
 type lostFilesOpts struct {
-	removeLost bool
-	searchAll  bool
-	filter     string
+	removeLost  bool
+	searchAll   bool
+	filter      string
+	sourcesPath string
+	p           printer
 }
 
-func newLostFiles() *cobra.Command {
-	opts := lostFilesOpts{}
+func newLostFiles(c conf) *cobra.Command {
+	opts := lostFilesOpts{p: c.prn()}
 	var cmd = &cobra.Command{
 		Use:     "lf",
 		Aliases: []string{"lostfiles"},
 		Short:   "Find lost files in the folder specified",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return executeLostFilesCommand(opts, appFileSystem)
+			opts.sourcesPath = *c.globals().sourcesPath
+			return executeLostFilesCommand(opts, c.fs())
 		},
 	}
 
@@ -35,11 +38,11 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 	filecollect := newFileCollector(opts.filter)
 	foldcollect := newFoldersCollector()
 
-	foldersTree := msvc.ReadSolutionDir(sourcesPath, fs, filecollect, foldcollect)
+	foldersTree := msvc.ReadSolutionDir(opts.sourcesPath, fs, filecollect, foldcollect)
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	filer := sys.NewFiler(fs, appPrinter.writer())
+	filer := sys.NewFiler(fs, opts.p.writer())
 	logic := newLostFilesLogic(opts.searchAll, filecollect.files, foldcollect.folders, filer)
 	logic.initialize(projects)
 
@@ -49,11 +52,11 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 		return err
 	}
 
-	s := newScreener(appPrinter)
+	s := newScreener(opts.p)
 	s.writeSlice(lostFiles)
 
 	if len(logic.unexistFiles) > 0 {
-		appPrinter.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
+		opts.p.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
 		s.writeMap(logic.unexistFiles, "Project")
 	}

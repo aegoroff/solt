@@ -11,13 +11,13 @@ import (
 	"solt/solution"
 )
 
-func newValidate() *cobra.Command {
+func newValidate(c conf) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "va",
 		Aliases: []string{"validate"},
 		Short:   "Validates SDK projects within solution(s)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
 
 			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
@@ -27,7 +27,7 @@ func newValidate() *cobra.Command {
 				g, nodes := newSolutionGraph(sol, prjMap)
 
 				refs := findRedundantProjectReferences(g, nodes)
-				printRedundantRefs(sol.Path, refs)
+				printRedundantRefs(sol.Path, refs, c.prn())
 			}
 
 			return nil
@@ -110,11 +110,11 @@ func findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*p
 	return result
 }
 
-func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet) {
+func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet, p printer) {
 	if len(refs) == 0 {
 		return
 	}
-	appPrinter.cprint(" Solution: <green>%s</>\n", solutionPath)
+	p.cprint(" Solution: <green>%s</>\n", solutionPath)
 
 	projects := make([]string, 0, len(refs))
 	for s := range refs {
@@ -124,12 +124,12 @@ func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet) 
 	sortfold.Strings(projects)
 
 	for _, project := range projects {
-		appPrinter.cprint("   project: <bold>%s</> has redundant references\n", project)
+		p.cprint("   project: <bold>%s</> has redundant references\n", project)
 		rrs := refs[project]
 		items := rrs.Items()
 		sortfold.Strings(items)
 		for _, s := range items {
-			appPrinter.cprint("     <gray>%s</>\n", s)
+			p.cprint("     <gray>%s</>\n", s)
 		}
 	}
 }

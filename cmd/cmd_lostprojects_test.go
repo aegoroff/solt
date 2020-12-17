@@ -18,14 +18,13 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("lp", "-p", dir)
+	_ = Execute(memfs, p.w, "lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(``, actual)
 }
 
@@ -43,14 +42,13 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("lp", "-p", dir)
+	_ = Execute(memfs, p.w, "lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
 <red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
@@ -73,14 +71,13 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("lp", "-p", dir)
+	_ = Execute(memfs, p.w, "lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
 <red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
@@ -102,14 +99,13 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("lp", "-p", dir)
+	_ = Execute(memfs, p.w, "lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(` a\a1\a1.csproj
 `, actual)
 }
@@ -126,14 +122,13 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("lp", "-p", dir)
+	_ = Execute(memfs, p.w, "lp", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
 <red>These projects are included into a solution but not found in the file system:</>
 

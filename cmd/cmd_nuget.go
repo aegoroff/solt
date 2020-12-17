@@ -11,19 +11,19 @@ type nugetCmd struct {
 	byProject bool
 }
 
-func newNuget() *cobra.Command {
+func newNuget(c conf) *cobra.Command {
 	opts := nugetCmd{}
 	var cmd = &cobra.Command{
 		Use:     "nu",
 		Aliases: []string{"nuget"},
 		Short:   "Get nuget packages information within solutions, projects or find Nuget mismatches in solution",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
 
 			if opts.mismatch || !opts.byProject {
-				nugetBySolutions(foldersTree, opts.mismatch)
+				nugetBySolutions(foldersTree, opts.mismatch, c.prn())
 			} else {
-				nugetByProjects(foldersTree)
+				nugetByProjects(foldersTree, c.prn())
 			}
 
 			return nil
@@ -36,8 +36,8 @@ func newNuget() *cobra.Command {
 	return cmd
 }
 
-func nugetByProjects(foldersTree rbtree.RbTree) {
-	prn := newNugetPrinter(appPrinter)
+func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
+	prn := newNugetPrinter(p)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
 		pchan := make(chan *msvc.NugetPackage, 4)
@@ -58,7 +58,7 @@ func nugetByProjects(foldersTree rbtree.RbTree) {
 	})
 }
 
-func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
+func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	var allProjectFolders = make(map[string]*msvc.FolderContent, foldersTree.Len())
@@ -76,19 +76,19 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool) {
 
 	packs := getNugetPacks(allSolutionPaths, allProjectFolders, onlyMismatch)
 
-	printNugetBySolutions(solutions, packs, onlyMismatch)
+	printNugetBySolutions(solutions, packs, onlyMismatch, p)
 }
 
-func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[string][]*pack, onlyMismatch bool) {
+func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[string][]*pack, onlyMismatch bool, p printer) {
 	if len(packs) == 0 {
 		return
 	}
 
 	if onlyMismatch {
-		appPrinter.cprint(" <red>Different nuget package's versions in the same solution found:</>")
+		p.cprint(" <red>Different nuget package's versions in the same solution found:</>")
 	}
 
-	prn := newNugetPrinter(appPrinter)
+	prn := newNugetPrinter(p)
 	for _, sln := range solutions {
 		if pks, ok := packs[sln.Path]; ok {
 			prn.print(sln.Path, pks)

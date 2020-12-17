@@ -12,24 +12,24 @@ import (
 	"strings"
 )
 
-func newInfo() *cobra.Command {
+func newInfo(c conf) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "in",
 		Aliases: []string{"info"},
 		Short:   "Get information about found solutions",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(sourcesPath, appFileSystem)
+			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
 
 			solutions := msvc.SelectSolutions(foldersTree)
 
 			for _, sol := range solutions {
 				sln := sol.Solution
 
-				appPrinter.setColor(color.FgGray)
-				appPrinter.cprint(" %s\n", sol.Path)
-				appPrinter.resetColor()
+				c.prn().setColor(color.FgGray)
+				c.prn().cprint(" %s\n", sol.Path)
+				c.prn().resetColor()
 
-				t := tabby.NewCustom(appPrinter.twriter())
+				t := tabby.NewCustom(c.prn().twriter())
 
 				t.AddLine("  Header", sln.Header)
 				t.AddLine("  Product", sln.Comment)
@@ -40,8 +40,8 @@ func newInfo() *cobra.Command {
 
 				fmt.Println()
 
-				showProjectsInfo(sln.Projects)
-				showSectionsInfo(sln.GlobalSections)
+				showProjectsInfo(sln.Projects, c.prn())
+				showSectionsInfo(sln.GlobalSections, c.prn())
 			}
 
 			return nil
@@ -50,7 +50,7 @@ func newInfo() *cobra.Command {
 	return cmd
 }
 
-func showProjectsInfo(projects []*solution.Project) {
+func showProjectsInfo(projects []*solution.Project, p printer) {
 	var byType = make(map[string]int)
 
 	for _, p := range projects {
@@ -59,17 +59,17 @@ func showProjectsInfo(projects []*solution.Project) {
 
 	const format = "  %v\t%v\n"
 
-	appPrinter.tprint(format, "Project type", "Count")
-	appPrinter.tprint(format, "------------", "-----")
+	p.tprint(format, "Project type", "Count")
+	p.tprint(format, "------------", "-----")
 
 	for k, v := range byType {
-		appPrinter.tprint(format, k, v)
+		p.tprint(format, k, v)
 	}
-	appPrinter.flush()
+	p.flush()
 	fmt.Println()
 }
 
-func showSectionsInfo(sections []*solution.Section) {
+func showSectionsInfo(sections []*solution.Section, p printer) {
 	var configurations = make(c9s.StringHashSet)
 	var platforms = make(c9s.StringHashSet)
 
@@ -88,27 +88,27 @@ func showSectionsInfo(sections []*solution.Section) {
 
 	const format = "  %v\n"
 
-	appPrinter.tprint(format, "Configuration")
-	appPrinter.tprint(format, "------------")
+	p.tprint(format, "Configuration")
+	p.tprint(format, "------------")
 
 	sortedConfigurations := configurations.Items()
 	sortfold.Strings(sortedConfigurations)
 
 	for _, k := range sortedConfigurations {
-		appPrinter.tprint(format, k)
+		p.tprint(format, k)
 	}
-	appPrinter.flush()
+	p.flush()
 	fmt.Println()
 
-	appPrinter.tprint(format, "Platform")
-	appPrinter.tprint(format, "--------")
+	p.tprint(format, "Platform")
+	p.tprint(format, "--------")
 
 	sortedPlatforms := platforms.Items()
 	sortfold.Strings(sortedPlatforms)
 
 	for _, k := range sortedPlatforms {
-		appPrinter.tprint(format, k)
+		p.tprint(format, k)
 	}
-	appPrinter.flush()
-	appPrinter.cprint("\n")
+	p.flush()
+	p.cprint("\n")
 }

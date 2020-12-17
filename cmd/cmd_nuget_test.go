@@ -19,14 +19,13 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", dir, "-r")
+	_ = Execute(memfs, p.w, "nu", "-p", dir, "-r")
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
  a\a
   Package            Version
@@ -49,14 +48,13 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", dir, "-r")
+	_ = Execute(memfs, p.w, "nu", "-p", dir, "-r")
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
  a\a
   Package              Version
@@ -78,14 +76,13 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", dir, "-m")
+	_ = Execute(memfs, p.w, "nu", "-p", dir, "-m")
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal("", actual)
 }
 
@@ -102,14 +99,13 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", dir, "-m")
+	_ = Execute(memfs, p.w, "nu", "-p", dir, "-m")
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(` <red>Different nuget package's versions in the same solution found:</>
  a\a.sln
   Package              Version
@@ -131,14 +127,13 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", dir)
+	_ = Execute(memfs, p.w, "nu", "-p", dir)
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
  a\a.sln
   Package            Version
@@ -170,14 +165,13 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	appPrinter = newMockPrn()
-	appFileSystem = memfs
+	p := newMockPrn()
 
 	// Act
-	_ = Execute("nu", "-p", "d/")
+	_ = Execute(memfs, p.w, "nu", "-p", "d/")
 
 	// Assert
-	actual := appPrinter.(*mockprn).String()
+	actual := p.w.String()
 	ass.Equal(`
  d\a1\a.sln
   Package              Version
