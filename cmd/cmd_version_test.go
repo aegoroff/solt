@@ -32,3 +32,17 @@ func Test_Version(t *testing.T) {
 		})
 	}
 }
+
+func Test_Help(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	p := newMockPrn()
+
+	// Act
+	_ = Execute(memfs, p.w, "")
+
+	// Assert
+	ass.Contains(p.w.String(), "")
+
+}
