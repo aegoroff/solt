@@ -6,34 +6,44 @@ import (
 	"solt/msvc"
 )
 
-type nugetCmd struct {
+type nugetCommand struct {
+	baseCommand
 	mismatch  bool
 	byProject bool
 }
 
 func newNuget(c conf) *cobra.Command {
-	opts := nugetCmd{}
-	var cmd = &cobra.Command{
-		Use:     "nu",
-		Aliases: []string{"nuget"},
-		Short:   "Get nuget packages information within solutions, projects or find Nuget mismatches in solution",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
+	var mismatch bool
+	var byProject bool
 
-			if opts.mismatch || !opts.byProject {
-				nugetBySolutions(foldersTree, opts.mismatch, c.prn())
-			} else {
-				nugetByProjects(foldersTree, c.prn())
+	cc := cobraCreator{
+		createCmd: func() command {
+			nc := nugetCommand{
+				baseCommand: newBaseCmd(c),
+				mismatch:    mismatch,
+				byProject:   byProject,
 			}
-
-			return nil
+			return &nc
 		},
 	}
 
-	cmd.Flags().BoolVarP(&opts.mismatch, "mismatch", "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
-	cmd.Flags().BoolVarP(&opts.byProject, "project", "r", false, "Show packages by projects instead")
+	cmd := cc.newCobraCommand("nu", "nuget", "Get nuget packages information within solutions, projects or find Nuget mismatches in solution")
+
+	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
+	cmd.Flags().BoolVarP(&byProject, "project", "r", false, "Show packages by projects instead")
 
 	return cmd
+}
+func (c *nugetCommand) execute() error {
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+
+	if c.mismatch || !c.byProject {
+		nugetBySolutions(foldersTree, c.mismatch, c.prn)
+	} else {
+		nugetByProjects(foldersTree, c.prn)
+	}
+
+	return nil
 }
 
 func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
