@@ -7,65 +7,76 @@ import (
 	"solt/msvc"
 )
 
+type lostProjectsCommand struct {
+	baseCommand
+}
+
 func newLostProjects(c conf) *cobra.Command {
-	var cmd = &cobra.Command{
-		Use:     "lp",
-		Aliases: []string{"lostprojects"},
-		Short:   "Find projects that not included into any solution",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
 
-			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
-
-			// linked from any solution projects list
-			// so these projects are not considered lost
-			var linkedProjects []string
-
-			projectLinksBySolution := make(map[string]c9s.StringHashSet)
-			// Each found solution
-			for _, sln := range solutions {
-				links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
-				projectLinksBySolution[sln.Path] = links
-				// to create projectsInSolutions you should normalize path to build Matcher
-				for _, item := range links.ItemsDecorated(normalize) {
-					linkedProjects = append(linkedProjects, item)
-				}
+	cc := cobraCreator{
+		createCmd: func() command {
+			lpc := lostProjectsCommand{
+				baseCommand: newBaseCmd(c),
 			}
-
-			lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
-
-			s := newScreener(c.prn())
-			// Lost projects
-			s.writeSlice(lost)
-
-			if len(lostWithIncludes) > 0 {
-				m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
-				c.prn().cprint(m)
-			}
-
-			// Lost projects that have includes files that used
-			s.writeSlice(lostWithIncludes)
-
-			unexistProjects := getUnexistProjects(projectLinksBySolution, c)
-
-			if len(unexistProjects) > 0 {
-				c.prn().cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
-			}
-
-			// Included but not exist in FS
-			s.writeMap(unexistProjects, "Solution")
-
-			return nil
+			return &lpc
 		},
 	}
+
+	cmd := cc.newCobraCommand("lp", "lostprojects", "Find projects that not included into any solution")
 
 	return cmd
 }
 
-func getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet, c conf) map[string][]string {
+func (c *lostProjectsCommand) execute() error {
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+
+	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+
+	// linked from any solution projects list
+	// so these projects are not considered lost
+	var linkedProjects []string
+
+	projectLinksBySolution := make(map[string]c9s.StringHashSet)
+	// Each found solution
+	for _, sln := range solutions {
+		links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
+		projectLinksBySolution[sln.Path] = links
+		// to create projectsInSolutions you should normalize path to build Matcher
+		for _, item := range links.ItemsDecorated(normalize) {
+			linkedProjects = append(linkedProjects, item)
+		}
+	}
+
+	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
+
+	s := newScreener(c.prn)
+	// Lost projects
+	s.writeSlice(lost)
+
+	if len(lostWithIncludes) > 0 {
+		m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
+		c.prn.cprint(m)
+	}
+
+	// Lost projects that have includes files that used
+	s.writeSlice(lostWithIncludes)
+
+	unexistProjects := c.getUnexistProjects(projectLinksBySolution)
+
+	if len(unexistProjects) > 0 {
+		c.prn.cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
+	}
+
+	// Included but not exist in FS
+	s.writeMap(unexistProjects, "Solution")
+
+	return nil
+}
+
+func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet) map[string][]string {
 	var result = make(map[string][]string)
 
-	filer := sys.NewFiler(c.fs(), c.prn().writer())
+	filer := sys.NewFiler(c.fs, c.prn.writer())
 	for spath, projects := range projectsInSolutions {
 		nonexist := filer.CheckExistence(projects.Items())
 

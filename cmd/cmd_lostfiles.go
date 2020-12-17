@@ -20,13 +20,13 @@ func newLostFiles(c conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			ic := lostFilesCommand{
+			lfc := lostFilesCommand{
 				baseCommand: newBaseCmd(c),
 				removeLost:  removeLost,
 				searchAll:   searchAll,
 				filter:      filter,
 			}
-			return &ic
+			return &lfc
 		},
 	}
 
