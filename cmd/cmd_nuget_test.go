@@ -22,7 +22,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", dir, "-r")
+	_ = execute(memfs, p, "nu", "-p", dir, "-r")
 
 	// Assert
 	actual := p.w.String()
@@ -51,7 +51,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", dir, "-r")
+	_ = execute(memfs, p, "nu", "-p", dir, "-r")
 
 	// Assert
 	actual := p.w.String()
@@ -79,7 +79,7 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", dir, "-m")
+	_ = execute(memfs, p, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := p.w.String()
@@ -102,7 +102,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", dir, "-m")
+	_ = execute(memfs, p, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := p.w.String()
@@ -130,7 +130,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", dir)
+	_ = execute(memfs, p, "nu", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -168,7 +168,7 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "nu", "-p", "d/")
+	_ = execute(memfs, p, "nu", "-p", "d/")
 
 	// Assert
 	actual := p.w.String()

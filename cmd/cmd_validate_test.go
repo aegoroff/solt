@@ -22,7 +22,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "va", "-p", dir)
+	_ = execute(memfs, p, "va", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -48,7 +48,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "va", "-p", dir)
+	_ = execute(memfs, p, "va", "-p", dir)
 
 	// Assert
 	actual := p.w.String()

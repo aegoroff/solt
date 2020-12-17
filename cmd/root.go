@@ -21,6 +21,11 @@ func newRoot() *cobra.Command {
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute(fs afero.Fs, w io.Writer, args ...string) error {
+	p := newPrinter(w)
+	return execute(fs, p, args...)
+}
+
+func execute(fs afero.Fs, p printer, args ...string) error {
 	rootCmd := newRoot()
 
 	var sourcesPath string
@@ -33,7 +38,8 @@ func Execute(fs afero.Fs, w io.Writer, args ...string) error {
 		sourcesPath: &sourcesPath,
 		diag:        &diag,
 	}
-	conf := newAppConf(fs, w, &g)
+
+	conf := newAppConf(fs, p, &g)
 
 	rootCmd.AddCommand(newInfo(conf))
 	rootCmd.AddCommand(newLostFiles(conf))

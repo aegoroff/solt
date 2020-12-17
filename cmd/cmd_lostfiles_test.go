@@ -56,7 +56,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		p := newMockPrn()
 
 		// Act
-		_ = Execute(memfs, p.w, "lf", "-p", dir)
+		_ = execute(memfs, p, "lf", "-p", dir)
 
 		// Assert
 		actual := p.w.String()
@@ -81,7 +81,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lf", "-p", dir)
+	_ = execute(memfs, p, "lf", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -113,7 +113,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		p := newMockPrn()
 
 		// Act
-		_ = Execute(memfs, p.w, "lf", "-p", dir, "-f", tst.filter)
+		_ = execute(memfs, p, "lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
 		actual := p.w.String()
@@ -138,7 +138,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lf", "-p", dir, "-r")
+	_ = execute(memfs, p, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := p.w.String()
@@ -164,7 +164,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lf", "-p", dir, "-r")
+	_ = execute(memfs, p, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := p.w.String()
@@ -188,7 +188,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lf", "-p", dir, "-a")
+	_ = execute(memfs, p, "lf", "-p", dir, "-a")
 
 	// Assert
 	actual := p.w.String()
@@ -210,7 +210,7 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lf", "-p", dir)
+	_ = execute(memfs, p, "lf", "-p", dir)
 
 	// Assert
 	actual := p.w.String()

@@ -68,7 +68,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "in", "-p", dir)
+	_ = execute(memfs, p, "in", "-p", dir)
 
 	// Assert
 	actual := p.w.String()

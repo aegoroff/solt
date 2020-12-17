@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/afero"
-	"io"
 )
 
 type conf interface {
@@ -37,10 +36,10 @@ func (a *appConf) globals() *globals {
 	return a.g
 }
 
-func newAppConf(fs afero.Fs, w io.Writer, g *globals) conf {
+func newAppConf(fs afero.Fs, p printer, g *globals) conf {
 	c := appConf{
 		filesystem: fs,
-		p:          newPrinter(w),
+		p:          p,
 		g:          g,
 	}
 	return &c

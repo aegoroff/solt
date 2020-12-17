@@ -21,7 +21,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lp", "-p", dir)
+	_ = execute(memfs, p, "lp", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -45,7 +45,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lp", "-p", dir)
+	_ = execute(memfs, p, "lp", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -74,7 +74,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lp", "-p", dir)
+	_ = execute(memfs, p, "lp", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -102,7 +102,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lp", "-p", dir)
+	_ = execute(memfs, p, "lp", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
@@ -125,7 +125,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = Execute(memfs, p.w, "lp", "-p", dir)
+	_ = execute(memfs, p, "lp", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
