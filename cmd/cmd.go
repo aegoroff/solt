@@ -20,7 +20,7 @@ type baseCommand struct {
 func newBaseCmd(c conf) baseCommand {
 	return baseCommand{
 		prn:         c.prn(),
-		sourcesPath: *c.globals().sourcesPath,
+		sourcesPath: *c.sourcesPath(),
 		fs:          c.fs(),
 	}
 }

@@ -10,18 +10,13 @@ type conf interface {
 
 	prn() printer
 
-	globals() *globals
+	sourcesPath() *string
 }
 
 type appConf struct {
 	filesystem afero.Fs
 	p          printer
-	g          *globals
-}
-
-type globals struct {
-	sourcesPath *string
-	diag        *bool
+	sp         *string
 }
 
 func (a *appConf) fs() afero.Fs {
@@ -32,15 +27,15 @@ func (a *appConf) prn() printer {
 	return a.p
 }
 
-func (a *appConf) globals() *globals {
-	return a.g
+func (a *appConf) sourcesPath() *string {
+	return a.sp
 }
 
-func newAppConf(fs afero.Fs, p printer, g *globals) conf {
+func newAppConf(fs afero.Fs, p printer, sourcesPath *string) conf {
 	c := appConf{
 		filesystem: fs,
 		p:          p,
-		g:          g,
+		sp:         sourcesPath,
 	}
 	return &c
 }

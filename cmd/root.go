@@ -34,12 +34,7 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	g := globals{
-		sourcesPath: &sourcesPath,
-		diag:        &diag,
-	}
-
-	conf := newAppConf(fs, p, &g)
+	conf := newAppConf(fs, p, &sourcesPath)
 
 	rootCmd.AddCommand(newInfo(conf))
 	rootCmd.AddCommand(newLostFiles(conf))
