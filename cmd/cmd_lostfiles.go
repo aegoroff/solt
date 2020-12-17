@@ -1,49 +1,54 @@
 package cmd
 
 import (
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"solt/internal/sys"
 	"solt/msvc"
 )
 
-type lostFilesOpts struct {
-	removeLost  bool
-	searchAll   bool
-	filter      string
-	sourcesPath string
-	p           printer
+type lostFilesCommand struct {
+	baseCommand
+	removeLost bool
+	searchAll  bool
+	filter     string
 }
 
 func newLostFiles(c conf) *cobra.Command {
-	opts := lostFilesOpts{p: c.prn()}
-	var cmd = &cobra.Command{
-		Use:     "lf",
-		Aliases: []string{"lostfiles"},
-		Short:   "Find lost files in the folder specified",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			opts.sourcesPath = *c.globals().sourcesPath
-			return executeLostFilesCommand(opts, c.fs())
+	var removeLost bool
+	var searchAll bool
+	var filter string
+
+	cc := cobraCreator{
+		createCmd: func() command {
+			ic := lostFilesCommand{
+				baseCommand: newBaseCmd(c),
+				removeLost:  removeLost,
+				searchAll:   searchAll,
+				filter:      filter,
+			}
+			return &ic
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.filter, "file", "f", ".cs", "Lost files filter extension. If not set .cs extension used")
-	cmd.Flags().BoolVarP(&opts.removeLost, "remove", "r", false, "Remove lost files")
-	cmd.Flags().BoolVarP(&opts.searchAll, "all", "a", false, "Search all lost files including that have links to but not exists in file system")
+	cmd := cc.newCobraCommand("lf", "lostfiles", "Find lost files in the folder specified")
+
+	cmd.Flags().StringVarP(&filter, "file", "f", ".cs", "Lost files filter extension. If not set .cs extension used")
+	cmd.Flags().BoolVarP(&removeLost, "remove", "r", false, "Remove lost files")
+	cmd.Flags().BoolVarP(&searchAll, "all", "a", false, "Search all lost files including that have links to but not exists in file system")
 
 	return cmd
 }
 
-func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
-	filecollect := newFileCollector(opts.filter)
+func (c *lostFilesCommand) execute() error {
+	filecollect := newFileCollector(c.filter)
 	foldcollect := newFoldersCollector()
 
-	foldersTree := msvc.ReadSolutionDir(opts.sourcesPath, fs, filecollect, foldcollect)
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs, filecollect, foldcollect)
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	filer := sys.NewFiler(fs, opts.p.writer())
-	logic := newLostFilesLogic(opts.searchAll, filecollect.files, foldcollect.folders, filer)
+	filer := sys.NewFiler(c.fs, c.prn.writer())
+	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, filer)
 	logic.initialize(projects)
 
 	lostFiles, err := logic.find()
@@ -52,16 +57,16 @@ func executeLostFilesCommand(opts lostFilesOpts, fs afero.Fs) error {
 		return err
 	}
 
-	s := newScreener(opts.p)
+	s := newScreener(c.prn)
 	s.writeSlice(lostFiles)
 
 	if len(logic.unexistFiles) > 0 {
-		opts.p.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
+		c.prn.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
 		s.writeMap(logic.unexistFiles, "Project")
 	}
 
-	if opts.removeLost {
+	if c.removeLost {
 		logic.remove(lostFiles)
 	}
 
