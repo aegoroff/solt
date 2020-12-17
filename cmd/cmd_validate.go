@@ -11,29 +11,40 @@ import (
 	"solt/solution"
 )
 
+type validateCommand struct {
+	baseCommand
+}
+
 func newValidate(c conf) *cobra.Command {
-	var cmd = &cobra.Command{
-		Use:     "va",
-		Aliases: []string{"validate"},
-		Short:   "Validates SDK projects within solution(s)",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			foldersTree := msvc.ReadSolutionDir(*c.globals().sourcesPath, c.fs())
-
-			solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
-
-			prjMap := newSdkProjects(allProjects)
-
-			for _, sol := range solutions {
-				g, nodes := newSolutionGraph(sol, prjMap)
-
-				refs := findRedundantProjectReferences(g, nodes)
-				printRedundantRefs(sol.Path, refs, c.prn())
+	cc := cobraCreator{
+		createCmd: func() command {
+			vac := validateCommand{
+				baseCommand: newBaseCmd(c),
 			}
-
-			return nil
+			return &vac
 		},
 	}
+
+	cmd := cc.newCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
+
 	return cmd
+}
+
+func (c *validateCommand) execute() error {
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+
+	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+
+	prjMap := newSdkProjects(allProjects)
+
+	for _, sol := range solutions {
+		g, nodes := newSolutionGraph(sol, prjMap)
+
+		refs := findRedundantProjectReferences(g, nodes)
+		printRedundantRefs(sol.Path, refs, c.prn)
+	}
+
+	return nil
 }
 
 func newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
