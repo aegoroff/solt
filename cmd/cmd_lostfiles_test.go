@@ -161,15 +161,16 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
+	fs := afero.NewReadOnlyFs(memfs)
 	p := newMockPrn()
 
 	// Act
-	_ = execute(memfs, p, "lf", "-p", dir, "-r")
+	_ = execute(fs, p, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := p.w.String()
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
-	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
+	_, err := fs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
 }
 
