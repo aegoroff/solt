@@ -25,18 +25,22 @@ func newsdkProjectsFixer(p printer, fs afero.Fs) sdkModuleHandler {
 	}
 }
 
-func (f *sdkProjectsFixer) handle(_ string, refs map[string]c9s.StringHashSet) {
+func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
 
 	filer := sys.NewFiler(f.fs, f.prn.writer())
 
+	invalidRefsCount := 0
 	for project, rrs := range refs {
+		invalidRefsCount += rrs.Count()
 		ends := f.getElementsEnds(project, rrs)
 		newContent := f.removeRedundantRefsFromProject(project, ends)
 		filer.Write(project, newContent)
 	}
+
+	f.prn.cprint("Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n", invalidRefsCount, len(refs), solution)
 }
 
 func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {

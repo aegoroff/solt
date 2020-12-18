@@ -52,7 +52,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal("", actual)
+	ass.Equal("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n", actual)
 }
 
 func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
