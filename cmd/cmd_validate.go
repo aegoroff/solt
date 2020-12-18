@@ -1,31 +1,47 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/xml"
+	"fmt"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
+	"io"
+	"log"
+	"os"
 	"path/filepath"
+	"solt/internal/sys"
 	"solt/msvc"
 	"solt/solution"
+	"unicode/utf8"
 )
 
 type validateCommand struct {
 	baseCommand
+	remove bool
+}
+
+type sdkProjectReference struct {
+	Path string `xml:"Include,attr"`
 }
 
 func newValidate(c conf) *cobra.Command {
+	var remove bool
+
 	cc := cobraCreator{
 		createCmd: func() command {
-			vac := validateCommand{
+			return &validateCommand{
 				baseCommand: newBaseCmd(c),
+				remove:      remove,
 			}
-			return &vac
 		},
 	}
 
 	cmd := cc.newCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
+	cmd.Flags().BoolVarP(&remove, "remove", "r", false, "Remove redundant project references from projects")
 
 	return cmd
 }
@@ -42,6 +58,10 @@ func (c *validateCommand) execute() error {
 
 		refs := findRedundantProjectReferences(g, nodes)
 		printRedundantRefs(sol.Path, refs, c.prn)
+
+		if c.remove {
+			updateProjects(refs)
+		}
 	}
 
 	return nil
@@ -137,12 +157,120 @@ func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet, 
 	for _, project := range projects {
 		p.cprint("   project: <bold>%s</> has redundant references\n", project)
 		rrs := refs[project]
+
 		items := rrs.Items()
 		sortfold.Strings(items)
 		for _, s := range items {
 			p.cprint("     <gray>%s</>\n", s)
 		}
 	}
+}
+
+func updateProjects(refs map[string]c9s.StringHashSet) {
+	if len(refs) == 0 {
+		return
+	}
+
+	for project, rrs := range refs {
+		ends := getElementsEnds(project, rrs)
+		newContent := newXmlBytes(project, ends)
+		writeNewFile(project, newContent)
+	}
+}
+
+func writeNewFile(project string, bytes []byte) {
+	f, err := os.Create(filepath.Clean(project))
+	defer sys.Close(f)
+	if err != nil {
+		return
+	}
+	_, err = f.Write(bytes)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
+	f, err := os.Open(filepath.Clean(project))
+	defer sys.Close(f)
+	if err != nil {
+		return nil
+	}
+
+	decoder := xml.NewDecoder(f)
+	pdir := filepath.Dir(project)
+
+	ends := make([]int64, 0)
+	for {
+		t, err := decoder.Token()
+		if t == nil {
+			if err != nil && err != io.EOF {
+				fmt.Println(err)
+			}
+			break
+		}
+
+		off := decoder.InputOffset()
+
+		switch v := t.(type) {
+		case xml.StartElement:
+			// If we just read a StartElement token
+			if v.Name.Local == "ProjectReference" {
+				var prj sdkProjectReference
+				// decode a whole chunk of following XML into the variable
+				err = decoder.DecodeElement(&prj, &v)
+				if err != nil {
+					log.Println(err)
+				} else {
+					referenceFullPath := filepath.Join(pdir, prj.Path)
+					if toRemove.Contains(referenceFullPath) {
+						ends = append(ends, off)
+					}
+				}
+			}
+		}
+	}
+
+	return ends
+}
+
+func newXmlBytes(project string, ends []int64) []byte {
+	f, err := os.Open(filepath.Clean(project))
+	defer sys.Close(f)
+	if err != nil {
+		return nil
+	}
+
+	buf := bytes.NewBuffer(nil)
+	written, err := io.Copy(buf, f)
+
+	if err != nil {
+		return nil
+	}
+
+	result := make([]byte, 0, written)
+	start := 0
+	for _, end := range ends {
+		n := int(end) - start
+		start = int(end)
+
+		portion := buf.Next(n)
+		l := len(portion)
+		for i := len(portion) - 2; i >= 0; i-- {
+			r, _ := utf8.DecodeRune([]byte{portion[i]})
+			if r == '>' || r == '\n' {
+				l = i
+				break
+			}
+		}
+
+		portion = portion[:l]
+		result = append(result, portion...)
+	}
+
+	result = append(result, buf.Next(buf.Len())...)
+
+	return result
 }
 
 func getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
