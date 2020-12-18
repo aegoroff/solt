@@ -59,13 +59,13 @@ func (f *filer) Remove(files []string) {
 	}
 }
 
-func (f *filer) Write(path string, bytes []byte) {
+func (f *filer) Write(path string, content []byte) {
 	fi, err := f.fs.Create(filepath.Clean(path))
 	defer Close(fi)
-	if err != nil || bytes == nil {
+	if err != nil || content == nil {
 		return
 	}
-	_, err = fi.Write(bytes)
+	_, err = fi.Write(content)
 	if err != nil {
 		_, _ = fmt.Fprintf(f.w, "%v\n", err)
 	}
