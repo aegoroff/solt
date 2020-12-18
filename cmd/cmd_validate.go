@@ -173,7 +173,7 @@ func updateProjects(refs map[string]c9s.StringHashSet) {
 
 	for project, rrs := range refs {
 		ends := getElementsEnds(project, rrs)
-		newContent := newXmlBytes(project, ends)
+		newContent := removeRedundantRefencesFromProject(project, ends)
 		writeNewFile(project, newContent)
 	}
 }
@@ -181,7 +181,7 @@ func updateProjects(refs map[string]c9s.StringHashSet) {
 func writeNewFile(project string, bytes []byte) {
 	f, err := os.Create(filepath.Clean(project))
 	defer sys.Close(f)
-	if err != nil {
+	if err != nil || bytes == nil {
 		return
 	}
 	_, err = f.Write(bytes)
@@ -234,7 +234,7 @@ func getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
 	return ends
 }
 
-func newXmlBytes(project string, ends []int64) []byte {
+func removeRedundantRefencesFromProject(project string, ends []int64) []byte {
 	f, err := os.Open(filepath.Clean(project))
 	defer sys.Close(f)
 	if err != nil {
