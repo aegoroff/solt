@@ -32,7 +32,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 `, actual)
 }
 
-func Test_ValidateSdkSolutionCmdWithRefsRemove_RedundantReferencesFound(t *testing.T) {
+func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	dir := "a/"
@@ -48,14 +48,11 @@ func Test_ValidateSdkSolutionCmdWithRefsRemove_RedundantReferencesFound(t *testi
 	p := newMockPrn()
 
 	// Act
-	_ = execute(memfs, p, "va", "-p", dir, "-r")
+	_ = execute(memfs, p, "fr", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(` Solution: <green>a\a.sln</>
-   project: <bold>a\a\a.csproj</> has redundant references
-     <gray>a\b\b.csproj</>
-`, actual)
+	ass.Equal("", actual)
 }
 
 func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
@@ -81,7 +78,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	ass.Equal("", actual)
 }
 
-func Test_ValidateOldSolutionCmdWithRemove_RedundantReferencesNotFound(t *testing.T) {
+func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	dir := "a/"
@@ -97,7 +94,7 @@ func Test_ValidateOldSolutionCmdWithRemove_RedundantReferencesNotFound(t *testin
 	p := newMockPrn()
 
 	// Act
-	_ = execute(memfs, p, "va", "-p", dir, "-r")
+	_ = execute(memfs, p, "fr", "-p", dir)
 
 	// Assert
 	actual := p.w.String()

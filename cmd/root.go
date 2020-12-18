@@ -42,6 +42,7 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 	rootCmd.AddCommand(newNuget(conf))
 	rootCmd.AddCommand(newVersion(conf))
 	rootCmd.AddCommand(newValidate(conf))
+	rootCmd.AddCommand(newFix(conf))
 
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)
