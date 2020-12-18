@@ -11,7 +11,6 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 	"io"
 	"log"
-	"os"
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
@@ -60,7 +59,7 @@ func (c *validateCommand) execute() error {
 		printRedundantRefs(sol.Path, refs, c.prn)
 
 		if c.remove {
-			updateProjects(refs)
+			c.updateProjects(refs)
 		}
 	}
 
@@ -166,20 +165,20 @@ func printRedundantRefs(solutionPath string, refs map[string]c9s.StringHashSet, 
 	}
 }
 
-func updateProjects(refs map[string]c9s.StringHashSet) {
+func (c *validateCommand) updateProjects(refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
 
 	for project, rrs := range refs {
-		ends := getElementsEnds(project, rrs)
-		newContent := removeRedundantRefencesFromProject(project, ends)
-		writeNewFile(project, newContent)
+		ends := c.getElementsEnds(project, rrs)
+		newContent := c.removeRedundantRefencesFromProject(project, ends)
+		c.writeNewFile(project, newContent)
 	}
 }
 
-func writeNewFile(project string, bytes []byte) {
-	f, err := os.Create(filepath.Clean(project))
+func (c *validateCommand) writeNewFile(project string, bytes []byte) {
+	f, err := c.fs.Create(filepath.Clean(project))
 	defer sys.Close(f)
 	if err != nil || bytes == nil {
 		return
@@ -190,8 +189,8 @@ func writeNewFile(project string, bytes []byte) {
 	}
 }
 
-func getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
-	f, err := os.Open(filepath.Clean(project))
+func (c *validateCommand) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
+	f, err := c.fs.Open(filepath.Clean(project))
 	defer sys.Close(f)
 	if err != nil {
 		return nil
@@ -234,8 +233,8 @@ func getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
 	return ends
 }
 
-func removeRedundantRefencesFromProject(project string, ends []int64) []byte {
-	f, err := os.Open(filepath.Clean(project))
+func (c *validateCommand) removeRedundantRefencesFromProject(project string, ends []int64) []byte {
+	f, err := c.fs.Open(filepath.Clean(project))
 	defer sys.Close(f)
 	if err != nil {
 		return nil
