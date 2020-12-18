@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 // Filer defines module that works with files
@@ -16,6 +17,9 @@ type Filer interface {
 
 	// Remove removes files from file system
 	Remove(files []string)
+
+	// Write writes new file content
+	Write(path string, bytes []byte)
 }
 
 // NewFiler creates new Filer instance
@@ -52,5 +56,17 @@ func (f *filer) Remove(files []string) {
 		} else {
 			_, _ = fmt.Fprintf(f.w, "File: %s removed successfully.\n", file)
 		}
+	}
+}
+
+func (f *filer) Write(path string, bytes []byte) {
+	fi, err := f.fs.Create(filepath.Clean(path))
+	defer Close(fi)
+	if err != nil || bytes == nil {
+		return
+	}
+	_, err = fi.Write(bytes)
+	if err != nil {
+		_, _ = fmt.Fprintf(f.w, "%v\n", err)
 	}
 }

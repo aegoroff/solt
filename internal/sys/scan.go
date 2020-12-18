@@ -209,6 +209,9 @@ func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
 
 // Close wraps io.Closer Close func with error habdling
 func Close(c io.Closer) {
+	if c == nil {
+		return
+	}
 	err := c.Close()
 	if err != nil {
 		log.Println(err)

@@ -170,22 +170,12 @@ func (c *validateCommand) updateProjects(refs map[string]c9s.StringHashSet) {
 		return
 	}
 
+	filer := sys.NewFiler(c.fs, c.prn.writer())
+
 	for project, rrs := range refs {
 		ends := c.getElementsEnds(project, rrs)
 		newContent := c.removeRedundantRefencesFromProject(project, ends)
-		c.writeNewFile(project, newContent)
-	}
-}
-
-func (c *validateCommand) writeNewFile(project string, bytes []byte) {
-	f, err := c.fs.Create(filepath.Clean(project))
-	defer sys.Close(f)
-	if err != nil || bytes == nil {
-		return
-	}
-	_, err = f.Write(bytes)
-	if err != nil {
-		fmt.Println(err)
+		filer.Write(project, newContent)
 	}
 }
 
