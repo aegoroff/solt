@@ -111,8 +111,12 @@ func (f *sdkProjectsFixer) removeRedundantRefsFromProject(project string, ends [
 		l := len(portion)
 		for i := len(portion) - 2; i >= 0; i-- {
 			r, _ := utf8.DecodeRune([]byte{portion[i]})
-			if r == '>' || r == '\n' {
+			if r == '>' {
 				l = i
+				break
+			}
+			if r == '\n' {
+				l = i - 1
 				break
 			}
 		}
