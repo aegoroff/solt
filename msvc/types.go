@@ -68,12 +68,7 @@ func (x *Folder) EqualTo(y rbtree.Comparable) bool {
 }
 
 func (x *Folder) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(x.String(), y.String())
-}
-
-// String implements rbtree.Comparable interface
-func (x *Folder) String() string {
-	return x.Path
+	return sortfold.CompareFold(x.Path, y.(*Folder).Path)
 }
 
 type packages struct {
