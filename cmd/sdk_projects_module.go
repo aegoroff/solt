@@ -21,11 +21,11 @@ type sdkModuleHandler interface {
 	handle(sol string, refs map[string]c9s.StringHashSet)
 }
 
-func newSdkProjectsModule(fs afero.Fs, p printer, path string, h sdkModuleHandler) *sdkProjectsModule {
+func newSdkProjectsModule(fs afero.Fs, p printer, sourcesPath string, h sdkModuleHandler) *sdkProjectsModule {
 	return &sdkProjectsModule{
 		prn:         p,
 		fs:          fs,
-		sourcesPath: path,
+		sourcesPath: sourcesPath,
 		h:           h,
 	}
 }
@@ -46,7 +46,7 @@ func (m *sdkProjectsModule) execute() {
 	}
 }
 
-func (m *sdkProjectsModule) newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
+func (*sdkProjectsModule) newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
 	prjMap := make(map[string]*msvc.MsbuildProject)
 
 	for _, project := range allProjects {
