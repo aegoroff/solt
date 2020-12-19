@@ -111,13 +111,9 @@ func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byt
 		portion := buf.Next(n)
 		l := len(portion)
 		for i := len(portion) - 2; i >= 0; i-- {
-			r, _ := utf8.DecodeRune([]byte{portion[i]})
-			if r == '>' {
-				l = i
-				break
-			}
-			if r == '\n' {
-				l = i - 1
+			nl, ok := stopFallback(portion, i)
+			if ok {
+				l = nl
 				break
 			}
 		}
@@ -129,4 +125,20 @@ func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byt
 	result = append(result, buf.Next(buf.Len())...)
 
 	return result
+}
+
+func stopFallback(data []byte, current int) (int, bool) {
+	r, _ := utf8.DecodeRune([]byte{data[current]})
+	stop := r == '>' || r == '\n'
+	l := -1
+	if stop {
+		l = current
+	}
+
+	// remove \n so as not to have empty line in file
+	if r == '\n' {
+		l = current - 1
+	}
+
+	return l, stop
 }
