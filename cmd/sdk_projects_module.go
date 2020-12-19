@@ -120,7 +120,7 @@ func (m *sdkProjectsModule) findRedundantProjectReferences(g *simple.DirectedGra
 	return result
 }
 
-func (m *sdkProjectsModule) getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
+func (*sdkProjectsModule) getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
 	if to.project.Project.ProjectReferences == nil {
 		return []*projectNode{}
 	}
