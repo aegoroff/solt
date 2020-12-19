@@ -2,6 +2,7 @@ package solution
 
 import (
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -19,6 +20,7 @@ func Test_ParseSolution_ParsedSolution(t *testing.T) {
 		expectedProjectType  string
 	}{
 		{Vs2017, "# Visual Studio 15", "Microsoft Visual Studio Solution File, Format Version 12.00", "15.0.26403.0", "10.0.40219.1", 10, 3, "WiX (Windows Installer XML)"},
+		{unix2Win(Vs2017), "# Visual Studio 15", "Microsoft Visual Studio Solution File, Format Version 12.00", "15.0.26403.0", "10.0.40219.1", 10, 3, "WiX (Windows Installer XML)"},
 		{Vs2013, "# Visual Studio 2013", "Microsoft Visual Studio Solution File, Format Version 12.00", "12.0.31101.0", "10.0.40219.1", 1, 3, "C#"},
 		{Vs2010, "# Visual Studio 2010", "Microsoft Visual Studio Solution File, Format Version 11.00", "", "", 1, 3, "C#"},
 		{Vs2008, "# Visual Studio 2008", "Microsoft Visual Studio Solution File, Format Version 10.00", "", "", 1, 3, "C#"},
@@ -29,16 +31,18 @@ func Test_ParseSolution_ParsedSolution(t *testing.T) {
 
 	// Act
 	for _, test := range tests {
-		sol := parse(test.input, false)
+		t.Run(test.expectedComment, func(t *testing.T) {
+			sol := parse(test.input, false)
 
-		// Assert
-		ass.Equal(test.expectedComment, sol.Comment)
-		ass.Equal(test.expectedHead, sol.Header)
-		ass.Equal(test.expectedVer, sol.VisualStudioVersion)
-		ass.Equal(test.expectedMinVer, sol.MinimumVisualStudioVersion)
-		ass.Equal(test.expectedProjectCount, len(sol.Projects))
-		ass.Equal(test.expectedGsCount, len(sol.GlobalSections))
-		ass.Equal(test.expectedProjectType, sol.Projects[0].Type)
+			// Assert
+			ass.Equal(test.expectedComment, sol.Comment)
+			ass.Equal(test.expectedHead, sol.Header)
+			ass.Equal(test.expectedVer, sol.VisualStudioVersion)
+			ass.Equal(test.expectedMinVer, sol.MinimumVisualStudioVersion)
+			ass.Equal(test.expectedProjectCount, len(sol.Projects))
+			ass.Equal(test.expectedGsCount, len(sol.GlobalSections))
+			ass.Equal(test.expectedProjectType, sol.Projects[0].Type)
+		})
 	}
 }
 
@@ -51,6 +55,10 @@ func Test_ParseInvalidSolution_NoCrashHeadExtracted(t *testing.T) {
 
 	// Assert
 	ass.Equal("# Visual Studio 2013", sol.Comment)
+}
+
+func unix2Win(s string) string {
+	return strings.ReplaceAll(s, "\n", "\r\n")
 }
 
 const Vs2013 = `
