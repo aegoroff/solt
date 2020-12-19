@@ -92,3 +92,26 @@ Global Flags:
   -d, --diag          Show application diagnostic after run
   -p, --path string   REQUIRED. Path to the sources folder
 ```
+### Validate SDK projects syntax:
+```
+Validates SDK projects within solution(s)
+
+Usage:
+  solt va [flags]
+  solt va [command]
+
+Aliases:
+  va, validate
+
+Available Commands:
+  fix         Fixes redundant SDK projects references
+
+Flags:
+  -h, --help   help for va
+
+Global Flags:
+  -d, --diag          Show application diagnostic after run
+  -p, --path string   REQUIRED. Path to the sources folder
+
+Use "solt va [command] --help" for more information about a command.
+```
