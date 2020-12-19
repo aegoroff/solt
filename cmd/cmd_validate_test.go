@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"strings"
 	"testing"
 )
 
@@ -35,30 +36,47 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 }
 
 func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	dir := "a/"
-	memfs := afero.NewMemMapFs()
-	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
-	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+	var tests = []struct {
+		name      string
+		redundant string
+		expect    string
+	}{
+		{"unix", aSdkProjectContent, aSdkProjectContentWithoutRedundantRefs},
+		{"windows", unix2Win(aSdkProjectContent), unix2Win(aSdkProjectContentWithoutRedundantRefs)},
+	}
+	for _, tst := range tests {
+		t.Run(tst.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			dir := "a/"
+			memfs := afero.NewMemMapFs()
 
-	p := newMockPrn()
+			_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(tst.redundant), 0644)
+			_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	// Act
-	_ = execute(memfs, p, "fr", "-p", dir)
+			p := newMockPrn()
 
-	// Assert
-	actual := p.w.String()
-	ass.Equal("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n", actual)
-	fa, _ := memfs.Open(dir + "a/a.csproj")
-	buf := bytes.NewBuffer(nil)
-	_, _ = io.Copy(buf, fa)
-	ass.Equal(aSdkProjectContentWithoutRedundantRefs, string(buf.Bytes()))
+			// Act
+			_ = execute(memfs, p, "fr", "-p", dir)
+
+			// Assert
+			actual := p.w.String()
+			ass.Equal("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n", actual)
+			fa, _ := memfs.Open(dir + "a/a.csproj")
+			buf := bytes.NewBuffer(nil)
+			_, _ = io.Copy(buf, fa)
+			ass.Equal(tst.expect, string(buf.Bytes()))
+		})
+	}
+}
+
+func unix2Win(s string) string {
+	return strings.ReplaceAll(s, "\n", "\r\n")
 }
 
 func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
