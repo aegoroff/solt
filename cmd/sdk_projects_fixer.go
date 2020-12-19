@@ -130,25 +130,29 @@ func fallback(data []byte) int {
 
 func stopFallback(data []byte, current int) (int, bool) {
 	r := getRune(data, current)
-	stop := r == '>' || r == '\n'
-	l := -1
-	if stop {
-		l = current
-	}
 
-	// remove \n so as not to have empty line in file
-	if r == '\n' && current > 0 {
-		prev := getRune(data, current-1)
-		if prev == '\r' || prev == '\n' {
-			l = current - 1
+	ix := len(data)
+	ok := false
+
+	switch r {
+	case '>':
+		ix = current + 1
+		ok = true
+		break
+	case '\n':
+		ix = current
+		ok = true
+		if current > 0 {
+			// remove \n so as not to have empty line in file
+			prev := getRune(data, current-1)
+			if prev == '\r' || prev == '\n' {
+				ix = current - 1
+			}
 		}
+		break
 	}
 
-	if r == '>' {
-		l = current + 1
-	}
-
-	return l, stop
+	return ix, ok
 }
 
 func getRune(data []byte, current int) rune {
