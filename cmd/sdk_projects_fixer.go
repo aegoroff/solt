@@ -143,7 +143,7 @@ func stopFallback(data []byte, current int) (int, bool) {
 	if r == '\n' {
 		if current > 0 {
 			r = getRune(data, current-1)
-			if r == '\r' {
+			if r == '\r' || r == '\n' {
 				l = current - 1
 			} else {
 				l = current
