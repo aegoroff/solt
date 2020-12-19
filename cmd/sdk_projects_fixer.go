@@ -40,7 +40,8 @@ func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHas
 		filer.Write(project, newContent)
 	}
 
-	f.prn.cprint("Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n", invalidRefsCount, len(refs), solution)
+	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
+	f.prn.cprint(mf, invalidRefsCount, len(refs), solution)
 }
 
 func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
