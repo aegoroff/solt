@@ -132,7 +132,7 @@ func fallback(data []byte) int {
 }
 
 func stopFallback(data []byte, current int) (int, bool) {
-	r, _ := utf8.DecodeRune([]byte{data[current]})
+	r := getRune(data, current)
 	stop := r == '>' || r == '\n'
 	l := -1
 	if stop {
@@ -141,8 +141,22 @@ func stopFallback(data []byte, current int) (int, bool) {
 
 	// remove \n so as not to have empty line in file
 	if r == '\n' {
-		l = current - 1
+		if current > 0 {
+			r = getRune(data, current-1)
+			if r == '\r' {
+				l = current - 1
+			} else {
+				l = current
+			}
+		} else {
+			l = current
+		}
 	}
 
 	return l, stop
+}
+
+func getRune(data []byte, current int) rune {
+	r, _ := utf8.DecodeRune([]byte{data[current]})
+	return r
 }
