@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"testing"
 )
 
@@ -53,6 +55,10 @@ func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	// Assert
 	actual := p.w.String()
 	ass.Equal("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n", actual)
+	fa, _ := memfs.Open(dir + "a/a.csproj")
+	buf := bytes.NewBuffer(nil)
+	_, _ = io.Copy(buf, fa)
+	ass.Equal(aSdkProjectContentWithoutRedundantRefs, string(buf.Bytes()))
 }
 
 func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {

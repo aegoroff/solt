@@ -334,6 +334,24 @@ const aSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
 </Project>
 `
 
+const aSdkProjectContentWithoutRedundantRefs = `<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\c\c.csproj" />
+  </ItemGroup>
+
+</Project>
+`
+
 const bSdkProjectContent = `<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
