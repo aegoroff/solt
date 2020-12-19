@@ -36,7 +36,7 @@ func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHas
 	for project, rrs := range refs {
 		invalidRefsCount += rrs.Count()
 		ends := f.getElementsEnds(project, rrs)
-		newContent := f.removeRedundantRefsFromProject(project, ends)
+		newContent := f.getNewFileContent(project, ends)
 		filer.Write(project, newContent)
 	}
 
@@ -46,10 +46,10 @@ func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHas
 
 func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
 	file, err := f.fs.Open(filepath.Clean(project))
-	defer sys.Close(file)
 	if err != nil {
 		return nil
 	}
+	defer sys.Close(file)
 
 	decoder := xml.NewDecoder(file)
 	pdir := filepath.Dir(project)
@@ -88,12 +88,12 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 	return ends
 }
 
-func (f *sdkProjectsFixer) removeRedundantRefsFromProject(project string, ends []int64) []byte {
+func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byte {
 	file, err := f.fs.Open(filepath.Clean(project))
-	defer sys.Close(file)
 	if err != nil {
 		return nil
 	}
+	defer sys.Close(file)
 
 	buf := bytes.NewBuffer(nil)
 	written, err := io.Copy(buf, file)
