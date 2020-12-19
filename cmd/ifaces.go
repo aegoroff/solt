@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/gookit/color"
 	"github.com/spf13/afero"
 	"io"
@@ -53,4 +54,8 @@ type conf interface {
 
 type command interface {
 	execute() error
+}
+
+type sdkModuleHandler interface {
+	handle(sol string, refs map[string]c9s.StringHashSet)
 }

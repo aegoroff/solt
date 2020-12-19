@@ -17,10 +17,6 @@ type sdkProjectsModule struct {
 	h           sdkModuleHandler
 }
 
-type sdkModuleHandler interface {
-	handle(sol string, refs map[string]c9s.StringHashSet)
-}
-
 func newSdkProjectsModule(fs afero.Fs, p printer, sourcesPath string, h sdkModuleHandler) *sdkProjectsModule {
 	return &sdkProjectsModule{
 		prn:         p,
