@@ -109,14 +109,7 @@ func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byt
 		start = int(end)
 
 		portion := buf.Next(n)
-		l := len(portion)
-		for i := len(portion) - 2; i >= 0; i-- {
-			nl, ok := stopFallback(portion, i)
-			if ok {
-				l = nl
-				break
-			}
-		}
+		l := fallback(portion)
 
 		portion = portion[:l]
 		result = append(result, portion...)
@@ -125,6 +118,17 @@ func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byt
 	result = append(result, buf.Next(buf.Len())...)
 
 	return result
+}
+
+func fallback(data []byte) int {
+	l := len(data)
+	for i := len(data) - 2; i >= 0; i-- {
+		nl, ok := stopFallback(data, i)
+		if ok {
+			return nl
+		}
+	}
+	return l
 }
 
 func stopFallback(data []byte, current int) (int, bool) {
