@@ -31,7 +31,7 @@ func (m *sdkProjectsModule) execute() {
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
-	prjMap := m.newSdkProjects(allProjects)
+	prjMap := m.filterSdkProjects(allProjects)
 
 	for _, sol := range solutions {
 		g, nodes := m.newSolutionGraph(sol, prjMap)
@@ -42,7 +42,7 @@ func (m *sdkProjectsModule) execute() {
 	}
 }
 
-func (*sdkProjectsModule) newSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
+func (*sdkProjectsModule) filterSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
 	prjMap := make(map[string]*msvc.MsbuildProject)
 
 	for _, project := range allProjects {
