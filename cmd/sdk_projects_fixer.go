@@ -7,7 +7,6 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"io"
-	"log"
 	"path/filepath"
 	"solt/internal/sys"
 	"unicode/utf8"
@@ -68,17 +67,16 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 
 		switch v := t.(type) {
 		case xml.StartElement:
-			// If we just read a StartElement token
 			if v.Name.Local == "ProjectReference" {
 				var prj sdkProjectReference
 				// decode a whole chunk of following XML into the variable
-				err = decoder.DecodeElement(&prj, &v)
-				if err != nil {
-					log.Println(err)
-				} else {
-					referenceFullPath := filepath.Join(pdir, prj.Path)
-					if toRemove.Contains(referenceFullPath) {
-						ends = append(ends, off)
+				_ = decoder.DecodeElement(&prj, &v)
+				offAfter := decoder.InputOffset()
+				referenceFullPath := filepath.Join(pdir, prj.Path)
+				if toRemove.Contains(referenceFullPath) {
+					ends = append(ends, off)
+					if offAfter > off {
+						ends = append(ends, offAfter)
 					}
 				}
 			}
@@ -121,14 +119,13 @@ func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byt
 }
 
 func fallback(data []byte) int {
-	l := len(data)
 	for i := len(data) - 2; i >= 0; i-- {
-		nl, ok := stopFallback(data, i)
+		l, ok := stopFallback(data, i)
 		if ok {
-			return nl
+			return l
 		}
 	}
-	return l
+	return 0
 }
 
 func stopFallback(data []byte, current int) (int, bool) {

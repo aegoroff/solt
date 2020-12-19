@@ -42,7 +42,9 @@ func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 		expect    string
 	}{
 		{"unix", aSdkProjectContent, aSdkProjectContentWithoutRedundantRefs},
+		{"unix full tags", aSdkProjectContentFullTags, aSdkProjectContentFullTagsNoRedundant},
 		{"windows", unix2Win(aSdkProjectContent), unix2Win(aSdkProjectContentWithoutRedundantRefs)},
+		{"windows full tags", unix2Win(aSdkProjectContentFullTags), unix2Win(aSdkProjectContentFullTagsNoRedundant)},
 	}
 	for _, tst := range tests {
 		t.Run(tst.name, func(t *testing.T) {

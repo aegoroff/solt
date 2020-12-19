@@ -11,14 +11,14 @@ func Test_fallback(t *testing.T) {
 		expect int
 	}{
 		{"", 0},
-		{"<x y=\"z\"/>", 10},
+		{"<x y=\"z\"/>", 0},
 		{"\n<x y=\"z\"/>", 0},
 		{"\n\n<x y=\"z\"/>", 0},
 		{">\n\n<x y=\"z\"/>", 1},
 		{"\r\n<x y=\"z\"/>", 0},
 		{">\r\n<x y=\"z\"/>", 1},
 		{"><x y=\"z\"/>", 1},
-		{"    <x y=\"z\"/>", 14},
+		{"    <x y=\"z\"/>", 0},
 	}
 	for _, tst := range tests {
 		t.Run(tst.in, func(t *testing.T) {
