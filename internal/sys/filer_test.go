@@ -62,3 +62,16 @@ func TestFiler_Write_Error(t *testing.T) {
 	ass.Error(err)
 	ass.Nil(content)
 }
+
+func TestClose(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	f, err := memfs.Open("some")
+
+	// Act
+	Close(f)
+
+	// Assert
+	ass.Error(err)
+}

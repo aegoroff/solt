@@ -60,11 +60,16 @@ func (f *filer) Remove(files []string) {
 }
 
 func (f *filer) Write(path string, content []byte) {
-	fi, err := f.fs.Create(filepath.Clean(path))
-	defer Close(fi)
-	if err != nil || content == nil {
+	if content == nil {
 		return
 	}
+
+	fi, err := f.fs.Create(filepath.Clean(path))
+	if err != nil {
+		return
+	}
+	defer Close(fi)
+
 	_, err = fi.Write(content)
 	if err != nil {
 		_, _ = fmt.Fprintf(f.w, "%v\n", err)
