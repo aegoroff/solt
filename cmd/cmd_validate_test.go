@@ -64,7 +64,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 			p := newMockPrn()
 
 			// Act
-			_ = execute(memfs, p, "fr", "-p", dir)
+			_ = execute(memfs, p, "va", "fix", "-p", dir)
 
 			// Assert
 			actual := p.w.String()

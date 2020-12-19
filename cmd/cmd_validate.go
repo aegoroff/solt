@@ -19,6 +19,8 @@ func newValidate(c conf) *cobra.Command {
 
 	cmd := cc.newCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
 
+	cmd.AddCommand(newFix(c))
+
 	return cmd
 }
 

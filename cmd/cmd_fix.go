@@ -19,7 +19,7 @@ func newFix(c conf) *cobra.Command {
 		},
 	}
 
-	cmd := cc.newCobraCommand("fr", "fixrefs", "Fixes redundant SDK projects references")
+	cmd := cc.newCobraCommand("fix", "fixprojects", "Fixes redundant SDK projects references")
 
 	return cmd
 }
