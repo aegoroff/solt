@@ -1,7 +1,7 @@
 package msvc
 
 import (
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"path/filepath"
@@ -10,9 +10,9 @@ import (
 )
 
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
-func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator StringDecorator) collections.StringHashSet {
+func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator StringDecorator) c9s.StringHashSet {
 	solutionPath := filepath.Dir(sln.Path)
-	var paths = make(collections.StringHashSet, len(sln.Solution.Projects))
+	var paths = make(c9s.StringHashSet, len(sln.Solution.Projects))
 	for _, sp := range sln.Solution.Projects {
 		if sp.TypeID == solution.IDSolutionFolder {
 			continue

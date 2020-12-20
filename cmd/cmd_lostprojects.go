@@ -87,28 +87,24 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	// Create projects matching machine
 	projectMatch := NewExactMatchS(linkedProjects, normalize)
 	var projectsOutsideSolution []*msvc.MsbuildProject
-	var allSolutionFiles = make(c9s.StringHashSet)
+	var allSolutionFiles []string
 
 	for _, prj := range allProjects {
 		// Path in upper registry is the project's key
 		projectKey := normalize(prj.Path)
 
 		ok := projectMatch.Match(projectKey)
-		if !ok {
-			projectsOutsideSolution = append(projectsOutsideSolution, prj)
+		if ok {
+			allSolutionFiles = append(allSolutionFiles, prj.Files()...)
 		} else {
-			filesIncluded := prj.Files()
-
-			for _, f := range filesIncluded {
-				allSolutionFiles.Add(normalize(f))
-			}
+			projectsOutsideSolution = append(projectsOutsideSolution, prj)
 		}
 	}
 
 	return separateProjects(projectsOutsideSolution, allSolutionFiles)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
@@ -121,12 +117,13 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutio
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) bool {
+func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles []string) bool {
+	matcher := NewExactMatchS(allSolutionFiles, normalize)
 	projectFiles := prj.Files()
 
 	for _, f := range projectFiles {
 		pfile := normalize(f)
-		if allSolutionFiles.Contains(pfile) {
+		if matcher.Match(pfile) {
 			return true
 		}
 	}
