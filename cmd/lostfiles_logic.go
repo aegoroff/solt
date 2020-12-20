@@ -51,7 +51,7 @@ func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
 		}
 
 		// Add compiles, contents and nones into included files map
-		includes := msvc.GetFilesIncludedIntoProject(prj)
+		includes := prj.Files()
 		for _, f := range includes {
 			h.includedFiles.Add(normalize(f))
 		}

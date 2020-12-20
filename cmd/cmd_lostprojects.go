@@ -100,7 +100,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 		if !ok {
 			projectsOutsideSolution = append(projectsOutsideSolution, prj)
 		} else {
-			filesIncluded := msvc.GetFilesIncludedIntoProject(prj)
+			filesIncluded := prj.Files()
 
 			for _, f := range filesIncluded {
 				allSolutionFiles.Add(normalize(f))
@@ -125,7 +125,7 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutio
 }
 
 func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles c9s.StringHashSet) bool {
-	projectFiles := msvc.GetFilesIncludedIntoProject(prj)
+	projectFiles := prj.Files()
 
 	for _, f := range projectFiles {
 		pfile := normalize(f)

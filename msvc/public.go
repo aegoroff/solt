@@ -23,8 +23,8 @@ func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator Stri
 	return paths
 }
 
-// GetFilesIncludedIntoProject gets all files included into MSBuild project
-func GetFilesIncludedIntoProject(prj *MsbuildProject) []string {
+// Files gets all files included into MSBuild project
+func (prj *MsbuildProject) Files() []string {
 	var result []string
 	folderPath := filepath.Dir(prj.Path)
 
