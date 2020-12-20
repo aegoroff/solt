@@ -143,7 +143,8 @@ func stopFallback(data []byte, current int) (int, bool) {
 		ix = current
 		ok = true
 		if current > 0 {
-			// remove \n so as not to have empty line in file
+			// windows case (\r\n as line ending) - remove \r
+			// too to keep correctness
 			prev := getRune(data, current-1)
 			if prev == '\r' {
 				ix = current - 1
