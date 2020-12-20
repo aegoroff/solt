@@ -20,13 +20,12 @@ func newLostFiles(c *conf) *cobra.Command {
 
 	cc := cobraCreator{
 		createCmd: func() command {
-			lfc := lostFilesCommand{
+			return &lostFilesCommand{
 				baseCommand: newBaseCmd(c),
 				removeLost:  removeLost,
 				searchAll:   searchAll,
 				filter:      filter,
 			}
-			return &lfc
 		},
 	}
 
@@ -49,13 +48,13 @@ func (c *lostFilesCommand) execute() error {
 
 	filer := sys.NewFiler(c.fs, c.prn.writer())
 	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, filer)
-	logic.initialize(projects)
-
-	lostFiles, err := logic.find()
+	err := logic.initialize(projects)
 
 	if err != nil {
 		return err
 	}
+
+	lostFiles := logic.find()
 
 	s := newScreener(c.prn)
 	s.writeSlice(lostFiles)

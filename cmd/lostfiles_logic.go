@@ -14,6 +14,7 @@ type lostFilesLogic struct {
 	includedFiles  c9s.StringHashSet
 	nonExistence   bool
 	filer          sys.Filer
+	lostMatcher    Matcher
 }
 
 func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, filer sys.Filer) *lostFilesLogic {
@@ -28,7 +29,7 @@ func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c
 }
 
 // initialize fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
-func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
+func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 	subfoldersToExclude := []string{"obj"}
 
 	for _, prj := range projects {
@@ -58,6 +59,8 @@ func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
 
 		h.addToUnexistIfNeeded(prj.Path, includes)
 	}
+
+	return h.initializeLostMatcher()
 }
 
 func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string) {
@@ -72,24 +75,28 @@ func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string)
 	}
 }
 
-func (h *lostFilesLogic) find() ([]string, error) {
+func (h lostFilesLogic) initializeLostMatcher() error {
 	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	includes := NewExactMatchHS(&h.includedFiles)
 
-	lostMatch := NewLostItemMatcher(includes, excludes, normalize)
+	h.lostMatcher = NewLostItemMatcher(includes, excludes, normalize)
 
+	return nil
+}
+
+func (h *lostFilesLogic) find() []string {
 	var result []string
 	for _, file := range h.foundFiles {
-		if lostMatch.Match(file) {
+		if h.lostMatcher.Match(file) {
 			result = append(result, file)
 		}
 	}
 
-	return result, err
+	return result
 }
 
 func (h *lostFilesLogic) remove(lostFiles []string) {
