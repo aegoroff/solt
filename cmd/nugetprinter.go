@@ -13,7 +13,7 @@ type pack struct {
 	versions []string
 }
 
-func newNugetPrinter(p printer) nugetprinter {
+func newNugetPrinter(p printer) *nugetprint {
 	np := nugetprint{
 		p: p,
 	}

@@ -14,10 +14,6 @@ type Matcher interface {
 	Match(s string) bool
 }
 
-type nugetprinter interface {
-	print(parent string, packs []*pack)
-}
-
 type printer interface {
 	writer() io.Writer
 
@@ -36,11 +32,6 @@ type printer interface {
 
 	// resetColor resets console color
 	resetColor()
-}
-
-type screener interface {
-	writeMap(m map[string][]string, keyPrefix string)
-	writeSlice(slice []string)
 }
 
 type conf interface {

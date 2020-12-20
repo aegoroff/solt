@@ -13,12 +13,12 @@ type prn struct {
 	w  io.Writer
 }
 
-type screenerImpl struct {
+type screener struct {
 	p printer
 }
 
-func newScreener(p printer) screener {
-	s := screenerImpl{
+func newScreener(p printer) *screener {
+	s := screener{
 		p: p,
 	}
 	return &s
@@ -63,7 +63,7 @@ func (*prn) resetColor() {
 	_, _ = color.Reset()
 }
 
-func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) {
+func (s *screener) writeMap(itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
 	for k := range itemsMap {
 		keys = append(keys, k)
@@ -77,7 +77,7 @@ func (s *screenerImpl) writeMap(itemsMap map[string][]string, keyPrefix string) 
 	}
 }
 
-func (s *screenerImpl) writeSlice(items []string) {
+func (s *screener) writeSlice(items []string) {
 	sortfold.Strings(items)
 	for _, item := range items {
 		s.p.cprint(" %s\n", item)
