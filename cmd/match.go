@@ -16,18 +16,6 @@ type matchE struct {
 	hashset c9s.StringHashSet
 }
 
-type matchNormilized struct {
-	m Matcher
-}
-
-func (m *matchNormilized) Match(s string) bool {
-	return m.m.Match(normalize(s))
-}
-
-func NewNormalizedMatcher(matcher Matcher) Matcher {
-	return &matchNormilized{m: matcher}
-}
-
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string

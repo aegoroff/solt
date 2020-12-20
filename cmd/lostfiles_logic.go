@@ -73,17 +73,17 @@ func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string)
 }
 
 func (h *lostFilesLogic) find() ([]string, error) {
-	partial, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
+	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return nil, err
 	}
 
-	excludes := NewNormalizedMatcher(partial)
-	includes := NewNormalizedMatcher(NewExactMatchHS(&h.includedFiles))
+	includes := NewExactMatchHS(&h.includedFiles)
 
 	var result []string
 	for _, file := range h.foundFiles {
-		if !includes.Match(file) && !excludes.Match(file) {
+		normalized := normalize(file)
+		if !includes.Match(normalized) && !excludes.Match(normalized) {
 			result = append(result, file)
 		}
 	}
