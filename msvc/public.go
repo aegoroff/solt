@@ -10,10 +10,10 @@ import (
 )
 
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
-func SelectAllSolutionProjectPaths(sln *VisualStudioSolution, pathDecorator StringDecorator) c9s.StringHashSet {
-	solutionPath := filepath.Dir(sln.Path)
-	var paths = make(c9s.StringHashSet, len(sln.Solution.Projects))
-	for _, sp := range sln.Solution.Projects {
+func (s *VisualStudioSolution) AllProjectPaths(pathDecorator StringDecorator) c9s.StringHashSet {
+	solutionPath := filepath.Dir(s.Path)
+	var paths = make(c9s.StringHashSet, len(s.Solution.Projects))
+	for _, sp := range s.Solution.Projects {
 		if sp.TypeID == solution.IDSolutionFolder {
 			continue
 		}

@@ -38,7 +38,7 @@ func (c *lostProjectsCommand) execute() error {
 	projectLinksBySolution := make(map[string]c9s.StringHashSet)
 	// Each found solution
 	for _, sln := range solutions {
-		links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
+		links := sln.AllProjectPaths(func(s string) string { return s })
 		projectLinksBySolution[sln.Path] = links
 		linkedProjects = append(linkedProjects, links.Items()...)
 	}
@@ -93,8 +93,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 		// Path in upper registry is the project's key
 		projectKey := normalize(prj.Path)
 
-		ok := projectMatch.Match(projectKey)
-		if ok {
+		if projectMatch.Match(projectKey) {
 			allSolutionFiles = append(allSolutionFiles, prj.Files()...)
 		} else {
 			projectsOutsideSolution = append(projectsOutsideSolution, prj)
