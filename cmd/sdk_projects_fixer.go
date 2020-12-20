@@ -136,6 +136,7 @@ func stopFallback(data []byte, current int) (int, bool) {
 
 	switch r {
 	case '>':
+		// Keep > so as not to break xml syntax
 		ix = current + 1
 		ok = true
 		break
