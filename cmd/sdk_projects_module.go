@@ -96,17 +96,12 @@ func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes map[str
 
 		rrs := make(c9s.StringHashSet)
 
-		for _, from := range refs {
-			for _, to := range refs {
-				if from.ID() == to.ID() {
-					continue
-				}
-				paths, _ := allPaths.AllBetween(from.ID(), to.ID())
-				if paths != nil && len(paths) > 0 {
-					rrs.Add(from.String())
-				}
+		allCrossings(refs, func(from *projectNode, to *projectNode) {
+			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
+			if paths != nil && len(paths) > 0 {
+				rrs.Add(from.String())
 			}
-		}
+		})
 
 		if rrs.Count() > 0 {
 			result[project.String()] = rrs
@@ -114,6 +109,17 @@ func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes map[str
 	}
 
 	return result
+}
+
+func allCrossings(refs []*projectNode, action func(*projectNode, *projectNode)) {
+	for _, from := range refs {
+		for _, to := range refs {
+			if from.ID() == to.ID() {
+				continue
+			}
+			action(from, to)
+		}
+	}
 }
 
 func (*sdkProjectsModule) getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
