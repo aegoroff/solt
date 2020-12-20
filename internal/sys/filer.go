@@ -20,7 +20,7 @@ type Filer interface {
 	Remove(files []string)
 
 	// Write writes new file content
-	Write(path string, bytes []byte)
+	Write(path string, content []byte)
 
 	// Read reads file content
 	Read(path string) *bytes.Buffer
