@@ -89,6 +89,10 @@ func (h lostFilesLogic) initializeLostMatcher() error {
 }
 
 func (h *lostFilesLogic) find() []string {
+	if h.lostMatcher == nil {
+		return []string{}
+	}
+
 	var result []string
 	for _, file := range h.foundFiles {
 		if h.lostMatcher.Match(file) {
