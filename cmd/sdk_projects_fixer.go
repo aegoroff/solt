@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 	c9s "github.com/aegoroff/godatastruct/collections"
@@ -35,7 +34,7 @@ func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHas
 	for project, rrs := range refs {
 		invalidRefsCount += rrs.Count()
 		ends := f.getElementsEnds(project, rrs)
-		newContent := f.getNewFileContent(project, ends)
+		newContent := f.getNewFileContent(filer, project, ends)
 		filer.Write(project, newContent)
 	}
 
@@ -86,21 +85,14 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 	return ends
 }
 
-func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byte {
-	file, err := f.fs.Open(filepath.Clean(project))
-	if err != nil {
-		return nil
-	}
-	defer sys.Close(file)
+func (f *sdkProjectsFixer) getNewFileContent(filer sys.Filer, project string, ends []int64) []byte {
+	buf := filer.Read(project)
 
-	buf := bytes.NewBuffer(nil)
-	written, err := io.Copy(buf, file)
-
-	if err != nil {
+	if buf == nil {
 		return nil
 	}
 
-	result := make([]byte, 0, written)
+	result := make([]byte, 0, buf.Len())
 	start := 0
 	for _, end := range ends {
 		n := int(end) - start

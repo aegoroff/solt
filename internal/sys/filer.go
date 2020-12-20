@@ -1,6 +1,7 @@
 package sys
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/spf13/afero"
 	"io"
@@ -20,6 +21,9 @@ type Filer interface {
 
 	// Write writes new file content
 	Write(path string, bytes []byte)
+
+	// Read reads file content
+	Read(path string) *bytes.Buffer
 }
 
 // NewFiler creates new Filer instance
@@ -74,4 +78,21 @@ func (f *filer) Write(path string, content []byte) {
 	if err != nil {
 		_, _ = fmt.Fprintf(f.w, "%v\n", err)
 	}
+}
+
+func (f *filer) Read(path string) *bytes.Buffer {
+	file, err := f.fs.Open(filepath.Clean(path))
+	if err != nil {
+		return nil
+	}
+	defer Close(file)
+
+	buf := bytes.NewBuffer(nil)
+	_, err = io.Copy(buf, file)
+
+	if err != nil {
+		return nil
+	}
+
+	return buf
 }

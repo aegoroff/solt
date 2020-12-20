@@ -30,6 +30,36 @@ func TestCheckExistence(t *testing.T) {
 	}
 }
 
+func TestFiler_Read(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	path := "a.txt"
+	_ = afero.WriteFile(memfs, path, []byte("a"), 0644)
+	f := NewFiler(memfs, bytes.NewBufferString(""))
+
+	// Act
+	buf := f.Read(path)
+
+	// Assert
+	ass.NotNil(buf)
+	ass.Equal("a", string(buf.Bytes()))
+}
+
+func TestFiler_Read_NotExist(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	path := "a.txt"
+	f := NewFiler(memfs, bytes.NewBufferString(""))
+
+	// Act
+	buf := f.Read(path)
+
+	// Assert
+	ass.Nil(buf)
+}
+
 func TestFiler_Write(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
