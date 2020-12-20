@@ -101,10 +101,11 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 		}
 	}
 
-	return separateProjects(projectsOutsideSolution, allSolutionFiles)
+	matcher := NewExactMatchS(allSolutionFiles, normalize)
+	return separateProjects(projectsOutsideSolution, matcher)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles Matcher) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
@@ -117,13 +118,12 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutio
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles []string) bool {
-	matcher := NewExactMatchS(allSolutionFiles, normalize)
+func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, allSolutionFiles Matcher) bool {
 	projectFiles := prj.Files()
 
 	for _, f := range projectFiles {
 		pfile := normalize(f)
-		if matcher.Match(pfile) {
+		if allSolutionFiles.Match(pfile) {
 			return true
 		}
 	}
