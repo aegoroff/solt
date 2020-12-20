@@ -135,13 +135,9 @@ func stopFallback(data []byte, current int) (int, bool) {
 	case '\n':
 		ix = current
 		ok = true
-		if current > 0 {
-			// windows case (\r\n as line ending) - remove \r
-			// too to keep correctness
-			prev := getRune(data, current-1)
-			if prev == '\r' {
-				ix = current - 1
-			}
+		if current > 0 && getRune(data, current-1) == '\r' {
+			// windows case (\r\n as line ending) - remove \r to keep correctness
+			ix = current - 1
 		}
 		break
 	}
