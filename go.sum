@@ -38,6 +38,8 @@ github.com/aegoroff/godatastruct v0.9.6-0.20201220081601-7ee3bd47ff71 h1:YKxGfnQ
 github.com/aegoroff/godatastruct v0.9.6-0.20201220081601-7ee3bd47ff71/go.mod h1:M7t8WlKk+RNn/Wa4fDqQnltY8XAcKLuo+xk5nRk3LCc=
 github.com/aegoroff/godatastruct v0.9.6 h1:LblPAmBYrNbuvqEnHeHnDjMgQjPGEcmcD0hqMO4wprg=
 github.com/aegoroff/godatastruct v0.9.6/go.mod h1:M7t8WlKk+RNn/Wa4fDqQnltY8XAcKLuo+xk5nRk3LCc=
+github.com/aegoroff/godatastruct v0.9.7 h1:plDjSBAZiJ25vgb79SVvcti0qBYlJ7VE5fI0gvLZRXQ=
+github.com/aegoroff/godatastruct v0.9.7/go.mod h1:M7t8WlKk+RNn/Wa4fDqQnltY8XAcKLuo+xk5nRk3LCc=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
 github.com/akutz/sortfold v0.2.1 h1:u9x3FC6oM+6gZKEVNRnmVafJgappwrv9YqpELQCYViI=
 github.com/akutz/sortfold v0.2.1/go.mod h1:m1NArmessx+/3z2N8MiiTjq79A3WwZwDDiZ7eeD4jHA=
