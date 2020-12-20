@@ -40,10 +40,7 @@ func (c *lostProjectsCommand) execute() error {
 	for _, sln := range solutions {
 		links := msvc.SelectAllSolutionProjectPaths(sln, func(s string) string { return s })
 		projectLinksBySolution[sln.Path] = links
-		// to create projectsInSolutions you should normalize path to build Matcher
-		for _, item := range links.ItemsDecorated(normalize) {
-			linkedProjects = append(linkedProjects, item)
-		}
+		linkedProjects = append(linkedProjects, links.Items()...)
 	}
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
@@ -88,7 +85,7 @@ func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	projectMatch := NewExactMatchS(linkedProjects)
+	projectMatch := NewExactMatchS(linkedProjects, normalize)
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var allSolutionFiles = make(c9s.StringHashSet)
 

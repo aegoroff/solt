@@ -47,7 +47,7 @@ func Test_MatchOneOfPatterns_Exact(t *testing.T) {
 
 	for _, test := range tests {
 		// Act
-		m := NewExactMatchS(test.patterns)
+		m := NewExactMatchS(test.patterns, func(s string) string { return s })
 		result := m.Match(test.input)
 
 		// Assert

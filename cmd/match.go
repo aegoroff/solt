@@ -52,10 +52,10 @@ func NewPartialMatcher(matches []string) (Matcher, error) {
 
 // NewExactMatchS creates exacth matcher from strings slice
 // Exact means that string must exactly match one of the matcher's strings
-func NewExactMatchS(matches []string) Matcher {
+func NewExactMatchS(matches []string, decorator msvc.StringDecorator) Matcher {
 	h := make(c9s.StringHashSet, len(matches))
 	for _, s := range matches {
-		h.Add(s)
+		h.Add(decorator(s))
 	}
 
 	return NewExactMatchHS(&h)
