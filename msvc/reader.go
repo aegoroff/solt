@@ -21,14 +21,14 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	// Aggregating goroutine
 	go func() {
 		defer wg.Done()
-		for f := range aggregateChannel {
-			current, ok := result.Search(f)
+		for folder := range aggregateChannel {
+			current, ok := result.Search(folder)
 			if !ok {
 				// Create new node
-				result.Insert(f)
+				result.Insert(folder)
 			} else {
-				// Update folder node that has already been created before
-				merge(current.Key().(*Folder), f)
+				// Update current, that has already been created before
+				folder.copyContent(current.Key().(*Folder))
 			}
 		}
 	}()
@@ -69,15 +69,4 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	wg.Wait()
 
 	return result
-}
-
-func merge(to, from *Folder) {
-	toC := to.Content
-	fromC := from.Content
-	if fromC.Packages != nil {
-		toC.Packages = fromC.Packages
-	} else {
-		toC.Projects = append(toC.Projects, fromC.Projects...)
-		toC.Solutions = append(toC.Solutions, fromC.Solutions...)
-	}
 }

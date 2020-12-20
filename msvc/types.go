@@ -71,6 +71,17 @@ func (x *Folder) compare(y rbtree.Comparable) int {
 	return sortfold.CompareFold(x.Path, y.(*Folder).Path)
 }
 
+func (x *Folder) copyContent(to *Folder) {
+	toC := to.Content
+	fromC := x.Content
+	if fromC.Packages != nil {
+		toC.Packages = fromC.Packages
+	} else {
+		toC.Projects = append(toC.Projects, fromC.Projects...)
+		toC.Solutions = append(toC.Solutions, fromC.Solutions...)
+	}
+}
+
 type packages struct {
 	XMLName  xml.Name       `xml:"packages"`
 	Packages []nugetPackage `xml:"package"`
