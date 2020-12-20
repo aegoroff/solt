@@ -11,7 +11,7 @@ import (
 // SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
 func (s *VisualStudioSolution) AllProjectPaths() []string {
 	solutionPath := filepath.Dir(s.Path)
-	var paths = make([]string, len(s.Solution.Projects))
+	var paths = make([]string, 0, len(s.Solution.Projects))
 	for _, sp := range s.Solution.Projects {
 		if sp.TypeID == solution.IDSolutionFolder {
 			continue
