@@ -171,7 +171,7 @@ func (lx *lexer) errorf(format string, values ...interface{}) stateFn {
 	return nil
 }
 
-// lexTop consumes elements at the top level of TOML data.
+// lexTop consumes elements at the top level of Solution
 func lexTop(lx *lexer) stateFn {
 	r := lx.next()
 	if isWhitespace(r) || isNL(r) {
