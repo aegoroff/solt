@@ -4,6 +4,7 @@ import (
 	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/anknown/ahocorasick"
+	"solt/msvc"
 )
 
 // matchP defines partial matching
@@ -14,6 +15,21 @@ type matchP struct {
 // matchP defines exact matching
 type matchE struct {
 	hashset c9s.StringHashSet
+}
+
+type matchL struct {
+	include   Matcher
+	exclude   Matcher
+	decorator msvc.StringDecorator
+}
+
+// NewLostItemMatcher creates new Matcher instance that detects lost item
+func NewLostItemMatcher(incl Matcher, excl Matcher, decorator msvc.StringDecorator) Matcher {
+	return &matchL{
+		include:   incl,
+		exclude:   excl,
+		decorator: decorator,
+	}
 }
 
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
@@ -61,4 +77,9 @@ func (a *matchP) Match(s string) bool {
 // Match do string matching to several patterns
 func (h *matchE) Match(s string) bool {
 	return h.hashset.Contains(s)
+}
+
+func (m *matchL) Match(s string) bool {
+	decorated := m.decorator(s)
+	return !m.include.Match(decorated) && !m.exclude.Match(decorated)
 }

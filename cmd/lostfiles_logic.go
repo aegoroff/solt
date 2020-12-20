@@ -80,10 +80,11 @@ func (h *lostFilesLogic) find() ([]string, error) {
 
 	includes := NewExactMatchHS(&h.includedFiles)
 
+	lostMatch := NewLostItemMatcher(includes, excludes, normalize)
+
 	var result []string
 	for _, file := range h.foundFiles {
-		normalized := normalize(file)
-		if !includes.Match(normalized) && !excludes.Match(normalized) {
+		if lostMatch.Match(file) {
 			result = append(result, file)
 		}
 	}
