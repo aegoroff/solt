@@ -13,7 +13,7 @@ type lostFilesCommand struct {
 	filter     string
 }
 
-func newLostFiles(c conf) *cobra.Command {
+func newLostFiles(c *conf) *cobra.Command {
 	var removeLost bool
 	var searchAll bool
 	var filter string

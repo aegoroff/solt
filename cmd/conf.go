@@ -4,26 +4,26 @@ import (
 	"github.com/spf13/afero"
 )
 
-type appConf struct {
+type conf struct {
 	filesystem afero.Fs
 	p          printer
 	sp         *string
 }
 
-func (a *appConf) fs() afero.Fs {
+func (a *conf) fs() afero.Fs {
 	return a.filesystem
 }
 
-func (a *appConf) prn() printer {
+func (a *conf) prn() printer {
 	return a.p
 }
 
-func (a *appConf) sourcesPath() *string {
+func (a *conf) sourcesPath() *string {
 	return a.sp
 }
 
-func newAppConf(fs afero.Fs, p printer, sourcesPath *string) conf {
-	c := appConf{
+func newAppConf(fs afero.Fs, p printer, sourcesPath *string) *conf {
+	c := conf{
 		filesystem: fs,
 		p:          p,
 		sp:         sourcesPath,

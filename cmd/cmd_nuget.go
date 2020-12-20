@@ -12,7 +12,7 @@ type nugetCommand struct {
 	byProject bool
 }
 
-func newNuget(c conf) *cobra.Command {
+func newNuget(c *conf) *cobra.Command {
 	var mismatch bool
 	var byProject bool
 

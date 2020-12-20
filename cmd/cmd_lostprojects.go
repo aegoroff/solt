@@ -11,7 +11,7 @@ type lostProjectsCommand struct {
 	baseCommand
 }
 
-func newLostProjects(c conf) *cobra.Command {
+func newLostProjects(c *conf) *cobra.Command {
 	cc := cobraCreator{
 		createCmd: func() command {
 			lpc := lostProjectsCommand{

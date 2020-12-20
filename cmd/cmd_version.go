@@ -11,7 +11,7 @@ type versionCommand struct {
 	baseCommand
 }
 
-func newVersion(c conf) *cobra.Command {
+func newVersion(c *conf) *cobra.Command {
 	cc := cobraCreator{
 		createCmd: func() command {
 			vac := versionCommand{

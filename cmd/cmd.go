@@ -13,7 +13,7 @@ type baseCommand struct {
 	sourcesPath string
 }
 
-func newBaseCmd(c conf) baseCommand {
+func newBaseCmd(c *conf) baseCommand {
 	return baseCommand{
 		prn:         c.prn(),
 		sourcesPath: *c.sourcesPath(),

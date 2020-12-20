@@ -3,7 +3,6 @@ package cmd
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/gookit/color"
-	"github.com/spf13/afero"
 	"io"
 	"text/tabwriter"
 )
@@ -32,15 +31,6 @@ type printer interface {
 
 	// resetColor resets console color
 	resetColor()
-}
-
-type conf interface {
-	// fs defines app file system abstraction
-	fs() afero.Fs
-
-	prn() printer
-
-	sourcesPath() *string
 }
 
 type command interface {

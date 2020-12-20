@@ -10,7 +10,7 @@ type sdkProjectReference struct {
 	Path string `xml:"Include,attr"`
 }
 
-func newFix(c conf) *cobra.Command {
+func newFix(c *conf) *cobra.Command {
 	cc := cobraCreator{
 		createCmd: func() command {
 			return &fixCommand{

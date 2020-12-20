@@ -16,7 +16,7 @@ type infoCommand struct {
 	baseCommand
 }
 
-func newInfo(c conf) *cobra.Command {
+func newInfo(c *conf) *cobra.Command {
 	cc := cobraCreator{
 		createCmd: func() command {
 			ic := infoCommand{
