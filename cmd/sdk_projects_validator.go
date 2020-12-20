@@ -15,7 +15,7 @@ func newsdkProjectsValidator(p printer) sdkModuleHandler {
 	}
 }
 
-func (v *sdkProjectsValidator) handle(sol string, refs map[string]c9s.StringHashSet) {
+func (v *sdkProjectsValidator) onRedundantRefs(sol string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}

@@ -31,18 +31,18 @@ func (m *sdkProjectsModule) execute() {
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
-	prjMap := m.filterSdkProjects(allProjects)
+	sdkProjects := m.onlySdkProjects(allProjects)
 
 	for _, sol := range solutions {
-		g, nodes := m.newSolutionGraph(sol, prjMap)
+		g, nodes := m.newSolutionGraph(sol, sdkProjects)
 
-		refs := m.findRedundantProjectReferences(g, nodes)
+		refs := m.redundantRefs(g, nodes)
 
-		m.h.handle(sol.Path, refs)
+		m.h.onRedundantRefs(sol.Path, refs)
 	}
 }
 
-func (*sdkProjectsModule) filterSdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
+func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
 	prjMap := make(map[string]*msvc.MsbuildProject)
 
 	for _, project := range allProjects {
@@ -88,7 +88,7 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 	return g, nodes
 }
 
-func (m *sdkProjectsModule) findRedundantProjectReferences(g *simple.DirectedGraph, nodes map[string]*projectNode) map[string]c9s.StringHashSet {
+func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes map[string]*projectNode) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 	for _, project := range nodes {

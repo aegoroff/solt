@@ -25,7 +25,7 @@ func newsdkProjectsFixer(p printer, fs afero.Fs) sdkModuleHandler {
 	}
 }
 
-func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHashSet) {
+func (f *sdkProjectsFixer) onRedundantRefs(solution string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}

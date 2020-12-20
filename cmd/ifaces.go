@@ -57,5 +57,5 @@ type command interface {
 }
 
 type sdkModuleHandler interface {
-	handle(sol string, refs map[string]c9s.StringHashSet)
+	onRedundantRefs(sol string, refs map[string]c9s.StringHashSet)
 }
