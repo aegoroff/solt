@@ -44,11 +44,16 @@ type filer struct {
 func (f *filer) CheckExistence(files []string) []string {
 	result := make([]string, 0)
 	for _, file := range files {
-		if _, err := f.fs.Stat(file); os.IsNotExist(err) {
+		if f.fileNotExists(file) {
 			result = append(result, file)
 		}
 	}
 	return result
+}
+
+func (f *filer) fileNotExists(path string) bool {
+	_, err := f.fs.Stat(path)
+	return os.IsNotExist(err)
 }
 
 // Remove removes files from file system
