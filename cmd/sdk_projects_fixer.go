@@ -145,7 +145,7 @@ func stopFallback(data []byte, current int) (int, bool) {
 		if current > 0 {
 			// remove \n so as not to have empty line in file
 			prev := getRune(data, current-1)
-			if prev == '\r' || prev == '\n' {
+			if prev == '\r' {
 				ix = current - 1
 			}
 		}
