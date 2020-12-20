@@ -75,7 +75,7 @@ func (h *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string)
 	}
 }
 
-func (h lostFilesLogic) initializeLostMatcher() error {
+func (h *lostFilesLogic) initializeLostMatcher() error {
 	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
 	if err != nil {
 		return err
