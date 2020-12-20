@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
 	"solt/internal/sys"
 	"solt/msvc"
@@ -35,12 +34,12 @@ func (c *lostProjectsCommand) execute() error {
 	// so these projects are not considered lost
 	var linkedProjects []string
 
-	projectLinksBySolution := make(map[string]c9s.StringHashSet)
+	projectLinksBySolution := make(map[string][]string)
 	// Each found solution
 	for _, sln := range solutions {
-		links := sln.AllProjectPaths(func(s string) string { return s })
+		links := sln.AllProjectPaths()
 		projectLinksBySolution[sln.Path] = links
-		linkedProjects = append(linkedProjects, links.Items()...)
+		linkedProjects = append(linkedProjects, links...)
 	}
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
@@ -69,12 +68,12 @@ func (c *lostProjectsCommand) execute() error {
 	return nil
 }
 
-func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]c9s.StringHashSet) map[string][]string {
+func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {
 	var result = make(map[string][]string)
 
 	filer := sys.NewFiler(c.fs, c.prn.writer())
 	for spath, projects := range projectsInSolutions {
-		nonexist := filer.CheckExistence(projects.Items())
+		nonexist := filer.CheckExistence(projects)
 
 		if len(nonexist) > 0 {
 			result[spath] = append(result[spath], nonexist...)
@@ -85,7 +84,7 @@ func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	projectMatch := NewExactMatchS(linkedProjects, normalize)
+	projectMatch := NewExactMatch(linkedProjects, normalize)
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var allSolutionFiles []string
 
@@ -100,7 +99,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 		}
 	}
 
-	matcher := NewExactMatchS(allSolutionFiles, normalize)
+	matcher := NewExactMatch(allSolutionFiles, normalize)
 	return separateProjects(projectsOutsideSolution, matcher)
 }
 

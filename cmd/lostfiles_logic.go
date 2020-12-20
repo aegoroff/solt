@@ -76,7 +76,7 @@ func (h *lostFilesLogic) initializeLostMatcher() error {
 		return err
 	}
 
-	includes := NewExactMatchS(h.includedFiles, normalize)
+	includes := NewExactMatch(h.includedFiles, normalize)
 
 	h.lostMatcher = NewLostItemMatcher(includes, excludes, normalize)
 
