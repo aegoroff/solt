@@ -12,14 +12,16 @@ import (
 )
 
 type sdkProjectsFixer struct {
-	prn printer
-	fs  afero.Fs
+	prn   printer
+	fs    afero.Fs
+	filer sys.Filer
 }
 
 func newsdkProjectsFixer(p printer, fs afero.Fs) sdkModuleHandler {
 	return &sdkProjectsFixer{
-		prn: p,
-		fs:  fs,
+		prn:   p,
+		fs:    fs,
+		filer: sys.NewFiler(fs, p.writer()),
 	}
 }
 
@@ -28,14 +30,12 @@ func (f *sdkProjectsFixer) handle(solution string, refs map[string]c9s.StringHas
 		return
 	}
 
-	filer := sys.NewFiler(f.fs, f.prn.writer())
-
 	invalidRefsCount := 0
 	for project, rrs := range refs {
 		invalidRefsCount += rrs.Count()
 		ends := f.getElementsEnds(project, rrs)
-		newContent := f.getNewFileContent(filer, project, ends)
-		filer.Write(project, newContent)
+		newContent := f.getNewFileContent(project, ends)
+		f.filer.Write(project, newContent)
 	}
 
 	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
@@ -85,8 +85,8 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 	return ends
 }
 
-func (f *sdkProjectsFixer) getNewFileContent(filer sys.Filer, project string, ends []int64) []byte {
-	buf := filer.Read(project)
+func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byte {
+	buf := f.filer.Read(project)
 
 	if buf == nil {
 		return nil
