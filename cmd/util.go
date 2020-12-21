@@ -3,12 +3,7 @@ package cmd
 import (
 	"github.com/dustin/go-humanize"
 	"runtime"
-	"strings"
 )
-
-func normalize(s string) string {
-	return strings.ToUpper(s)
-}
 
 // printMemUsage outputs the current, total and OS memory being used. As well as the number
 // of garage collection cycles completed.

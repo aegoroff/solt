@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
+	"strings"
 )
 
 type lostFilesLogic struct {
@@ -71,7 +72,7 @@ func (lf *lostFilesLogic) addToUnexistIfNeeded(project string) {
 }
 
 func (lf *lostFilesLogic) initializeLostMatcher() error {
-	excludes, err := NewPartialMatcher(lf.excludeFolders.Items(), normalize)
+	excludes, err := NewPartialMatcher(lf.excludeFolders.Items(), strings.ToUpper)
 	if err != nil {
 		return err
 	}

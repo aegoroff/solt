@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
 			// Act
-			m, _ := NewPartialMatcher(test.patterns, normalize)
+			m, _ := NewPartialMatcher(test.patterns, strings.ToUpper)
 			result := m.Match(test.input)
 
 			// Assert
