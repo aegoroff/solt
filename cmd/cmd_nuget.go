@@ -51,11 +51,10 @@ func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 	prn := newNugetPrinter(p)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
-		pchan := make(chan *msvc.NugetPackage, 4)
-		go readNugetPackages(content, pchan)
+		packages := getNugetPackages(content)
 
 		var packs []*pack
-		for np := range pchan {
+		for _, np := range packages {
 			p := pack{
 				pkg:      np.ID,
 				versions: []string{np.Version},
@@ -186,26 +185,29 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 			continue
 		}
 
-		var packagesMap map[string]string
-		packagesMap = make(map[string]string)
+		packagesMap := make(map[string]string)
 		packagesByProject[ppath] = packagesMap
 
-		pchan := make(chan *msvc.NugetPackage, 4)
+		packages := getNugetPackages(content)
 
-		go readNugetPackages(content, pchan)
-
-		for pkg := range pchan {
+		for _, pkg := range packages {
 			packagesMap[pkg.ID] = pkg.Version
 		}
 	}
 	return packagesByProject
 }
 
-func readNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPackage) {
+func getNugetPackages(content *msvc.FolderContent) []*msvc.NugetPackage {
+	result := make([]*msvc.NugetPackage, 0)
+
+	add := func(pkg *msvc.NugetPackage) {
+		result = append(result, pkg)
+	}
+
 	if content.Packages != nil {
 		// old style projects (nuget packages references in separate files)
 		for _, p := range content.Packages.Packages {
-			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
+			add(&msvc.NugetPackage{ID: p.ID, Version: p.Version})
 		}
 	}
 	for _, prj := range content.Projects {
@@ -215,8 +217,8 @@ func readNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPack
 
 		// If SDK project nuget packages included into project file
 		for _, p := range prj.Project.PackageReferences {
-			pchan <- &msvc.NugetPackage{ID: p.ID, Version: p.Version}
+			add(&msvc.NugetPackage{ID: p.ID, Version: p.Version})
 		}
 	}
-	close(pchan)
+	return result
 }
