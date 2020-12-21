@@ -130,9 +130,9 @@ func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes 
 	return result
 }
 
-func allCrossings(refs []*projectNode, action func(*projectNode, *projectNode)) {
-	for _, from := range refs {
-		for _, to := range refs {
+func allCrossings(nodes []*projectNode, action func(*projectNode, *projectNode)) {
+	for _, from := range nodes {
+		for _, to := range nodes {
 			if from.ID() == to.ID() {
 				continue
 			}
