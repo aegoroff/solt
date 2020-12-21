@@ -3,21 +3,20 @@ package cmd
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
-	"path/filepath"
 	"solt/msvc"
 )
 
 type projectNode struct {
 	id       int64
 	project  *msvc.MsbuildProject
-	fullPath string
+	fullPath *string
 }
 
-func newProjectNode(id int64, prj *msvc.MsbuildProject, basePath string) *projectNode {
+func newProjectNode(id int64, prj *msvc.MsbuildProject) *projectNode {
 	n := projectNode{
 		id:       id,
 		project:  prj,
-		fullPath: filepath.Join(basePath, prj.Path),
+		fullPath: &prj.Path,
 	}
 	return &n
 }
@@ -27,7 +26,7 @@ func (n *projectNode) ID() int64 {
 }
 
 func (n *projectNode) String() string {
-	return n.project.Path
+	return *n.fullPath
 }
 
 func (n *projectNode) LessThan(y rbtree.Comparable) bool {
@@ -39,5 +38,5 @@ func (n *projectNode) EqualTo(y rbtree.Comparable) bool {
 }
 
 func (x *projectNode) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(x.fullPath, y.(*projectNode).fullPath)
+	return sortfold.CompareFold(x.String(), y.(*projectNode).String())
 }

@@ -73,7 +73,7 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 			continue
 		}
 
-		n := newProjectNode(ix, msbuild, solutionPath)
+		n := newProjectNode(ix, msbuild)
 		nodes.Insert(n)
 		ix++
 		g.AddNode(n)
@@ -137,10 +137,8 @@ func (*sdkProjectsModule) getReferences(to *projectNode, nodes rbtree.RbTree) []
 
 	var result []*projectNode
 	for _, pref := range to.project.Project.ProjectReferences {
-		p, _ := filepath.Abs(filepath.Join(dir, pref.Path))
-		n := &projectNode{
-			fullPath: p,
-		}
+		p := filepath.Join(dir, pref.Path)
+		n := &projectNode{fullPath: &p}
 		from, ok := nodes.Search(n)
 		if ok {
 			result = append(result, from.Key().(*projectNode))
