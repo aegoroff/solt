@@ -37,6 +37,6 @@ func (n *projectNode) EqualTo(y rbtree.Comparable) bool {
 	return n.compare(y) == 0
 }
 
-func (x *projectNode) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(x.String(), y.(*projectNode).String())
+func (n *projectNode) compare(y rbtree.Comparable) int {
+	return sortfold.CompareFold(n.String(), y.(*projectNode).String())
 }
