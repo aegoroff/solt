@@ -88,6 +88,42 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
 }
 
+func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	root := "root/"
+	memfs := afero.NewMemMapFs()
+
+	dir1 := root + "a/"
+	_ = memfs.MkdirAll(dir1+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir1+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir1+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+
+	dir2 := root + "b/"
+	_ = memfs.MkdirAll(dir2+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir2+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
+
+	p := newMockPrn()
+
+	// Act
+	_ = execute(memfs, p, "lf", "-p", root)
+
+	// Assert
+	actual := p.w.String()
+	ass.Equal(" root\\a\\a\\Properties\\AssemblyInfo1.cs\n root\\b\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+}
+
 func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
