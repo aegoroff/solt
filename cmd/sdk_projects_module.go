@@ -44,15 +44,15 @@ func (m *sdkProjectsModule) execute() {
 }
 
 func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
-	prjMap := rbtree.NewRbTree()
+	tree := rbtree.NewRbTree()
 
 	for _, project := range allProjects {
 		if !project.Project.IsSdkProject() {
 			continue
 		}
-		prjMap.Insert(project)
+		tree.Insert(project)
 	}
-	return prjMap
+	return tree
 }
 
 func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
