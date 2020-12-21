@@ -115,7 +115,7 @@ func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes 
 
 		rrs := make(c9s.StringHashSet)
 
-		allCrossings(refs, func(from *projectNode, to *projectNode) {
+		allPairs(refs, func(from *projectNode, to *projectNode) {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
 			if paths != nil && len(paths) > 0 {
 				rrs.Add(from.String())
@@ -130,7 +130,7 @@ func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes 
 	return result
 }
 
-func allCrossings(nodes []*projectNode, action func(*projectNode, *projectNode)) {
+func allPairs(nodes []*projectNode, action func(*projectNode, *projectNode)) {
 	for _, from := range nodes {
 		for _, to := range nodes {
 			if from.ID() == to.ID() {
