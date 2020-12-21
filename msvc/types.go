@@ -41,6 +41,18 @@ type MsbuildProject struct {
 	Path    string
 }
 
+func (prj *MsbuildProject) LessThan(y rbtree.Comparable) bool {
+	return prj.compare(y) < 0
+}
+
+func (prj *MsbuildProject) EqualTo(y rbtree.Comparable) bool {
+	return prj.compare(y) == 0
+}
+
+func (prj *MsbuildProject) compare(y rbtree.Comparable) int {
+	return sortfold.CompareFold(prj.Path, y.(*MsbuildProject).Path)
+}
+
 // VisualStudioSolution defines VS solution that contains *solution.Solution
 // and it's path
 type VisualStudioSolution struct {

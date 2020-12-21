@@ -43,19 +43,19 @@ func (m *sdkProjectsModule) execute() {
 	}
 }
 
-func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) map[string]*msvc.MsbuildProject {
-	prjMap := make(map[string]*msvc.MsbuildProject)
+func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
+	prjMap := rbtree.NewRbTree()
 
 	for _, project := range allProjects {
 		if !project.Project.IsSdkProject() {
 			continue
 		}
-		prjMap[normalize(project.Path)] = project
+		prjMap.Insert(project)
 	}
 	return prjMap
 }
 
-func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.MsbuildProject) (*simple.DirectedGraph, rbtree.RbTree) {
+func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path)
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.NewRbTree()
@@ -65,15 +65,16 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 			continue
 		}
 
-		fullProjectPath := normalize(filepath.Join(solutionPath, prj.Path))
+		p := &msvc.MsbuildProject{
+			Path: filepath.Join(solutionPath, prj.Path),
+		}
 
-		var msbuild *msvc.MsbuildProject
-		msbuild, ok := prjMap[fullProjectPath]
+		msbuild, ok := sdkTree.Search(p)
 		if !ok {
 			continue
 		}
 
-		n := newProjectNode(ix, msbuild)
+		n := newProjectNode(ix, msbuild.Key().(*msvc.MsbuildProject))
 		nodes.Insert(n)
 		ix++
 		g.AddNode(n)
