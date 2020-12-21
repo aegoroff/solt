@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 // Filer defines module that works with files
@@ -42,12 +43,28 @@ type filer struct {
 // CheckExistence validates files passed to be present in file system
 // The list of non exist files returned
 func (f *filer) CheckExistence(files []string) []string {
+	var mu sync.RWMutex
 	result := make([]string, 0)
+	var restrict = make(chan struct{}, 32)
+	defer close(restrict)
+
+	var wg sync.WaitGroup
+	wg.Add(len(files))
 	for _, file := range files {
-		if f.fileNotExists(file) {
-			result = append(result, file)
-		}
+		go func(file string, restrict chan struct{}) {
+			defer wg.Done()
+			restrict <- struct{}{}
+			defer func() { <-restrict }()
+
+			if f.fileNotExists(file) {
+				mu.Lock()
+				result = append(result, file)
+				mu.Unlock()
+			}
+		}(file, restrict)
 	}
+
+	wg.Wait()
 	return result
 }
 
