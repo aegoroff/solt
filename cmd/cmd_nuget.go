@@ -143,7 +143,7 @@ func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack, o
 }
 
 func reducePackages(result map[string][]*pack, spath string) []*pack {
-	reduced := make([]*pack, len(result[spath]))
+	reduced := make([]*pack, 0, len(result[spath]))
 	m := make(map[string]*pack)
 	for _, p := range result[spath] {
 		exist, ok := m[p.pkg]
