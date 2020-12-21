@@ -8,7 +8,7 @@ import (
 	"sort"
 )
 
-// SelectAllSolutionProjectPaths gets all possible projects' paths defined in solution
+// AllProjectPaths gets all possible projects' paths defined in solution
 func (s *VisualStudioSolution) AllProjectPaths() []string {
 	solutionPath := filepath.Dir(s.Path)
 	var paths = make([]string, 0, len(s.Solution.Projects))
