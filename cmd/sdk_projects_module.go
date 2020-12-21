@@ -137,8 +137,9 @@ func (*sdkProjectsModule) getReferences(to *projectNode, nodes rbtree.RbTree) []
 
 	var result []*projectNode
 	for _, pref := range to.project.Project.ProjectReferences {
+		p, _ := filepath.Abs(filepath.Join(dir, pref.Path))
 		n := &projectNode{
-			fullPath: filepath.Clean(filepath.Join(dir, pref.Path)),
+			fullPath: p,
 		}
 		from, ok := nodes.Search(n)
 		if ok {
