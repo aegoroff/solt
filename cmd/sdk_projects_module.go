@@ -35,9 +35,9 @@ func (m *sdkProjectsModule) execute() {
 	sdkProjects := m.onlySdkProjects(allProjects)
 
 	for _, sol := range solutions {
-		g, nodes := m.newSolutionGraph(sol, sdkProjects)
+		g, allNodes := m.newSolutionGraph(sol, sdkProjects)
 
-		refs := m.redundantRefs(g, nodes)
+		refs := m.redundantRefs(g, allNodes)
 
 		m.h.onRedundantRefs(sol.Path, refs)
 	}
@@ -79,9 +79,10 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 		g.AddNode(n)
 	}
 
-	it := rbtree.NewWalkInorder(nodes).Iterator()
-	for it.Next() {
-		to := it.Current().Key().(*projectNode)
+	gn := g.Nodes()
+
+	for gn.Next() {
+		to := gn.Node().(*projectNode)
 		refs := m.getReferences(to, nodes)
 		for _, ref := range refs {
 			e := g.NewEdge(ref, to)
@@ -91,14 +92,16 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 	return g, nodes
 }
 
-func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes rbtree.RbTree) map[string]c9s.StringHashSet {
+func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
-	it := rbtree.NewWalkInorder(nodes).Iterator()
-	for it.Next() {
-		project := it.Current().Key().(*projectNode)
-		refs := m.getReferences(project, nodes)
+	gn := g.Nodes()
+
+	for gn.Next() {
+		project := gn.Node().(*projectNode)
+
+		refs := m.getReferences(project, allNodes)
 
 		rrs := make(c9s.StringHashSet)
 
@@ -128,7 +131,7 @@ func allCrossings(refs []*projectNode, action func(*projectNode, *projectNode)) 
 	}
 }
 
-func (*sdkProjectsModule) getReferences(to *projectNode, nodes rbtree.RbTree) []*projectNode {
+func (*sdkProjectsModule) getReferences(to *projectNode, allNodes rbtree.RbTree) []*projectNode {
 	if to.project.Project.ProjectReferences == nil {
 		return []*projectNode{}
 	}
@@ -136,10 +139,10 @@ func (*sdkProjectsModule) getReferences(to *projectNode, nodes rbtree.RbTree) []
 	dir := filepath.Dir(to.project.Path)
 
 	var result []*projectNode
-	for _, pref := range to.project.Project.ProjectReferences {
-		p := filepath.Join(dir, pref.Path)
+	for _, ref := range to.project.Project.ProjectReferences {
+		p := filepath.Join(dir, ref.Path)
 		n := &projectNode{fullPath: &p}
-		from, ok := nodes.Search(n)
+		from, ok := allNodes.Search(n)
 		if ok {
 			result = append(result, from.Key().(*projectNode))
 		}
