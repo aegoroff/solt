@@ -52,7 +52,7 @@ func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		content := fold.Content
 		pchan := make(chan *msvc.NugetPackage, 4)
-		go getNugetPackages(content, pchan)
+		go readNugetPackages(content, pchan)
 
 		var packs []*pack
 		for np := range pchan {
@@ -192,7 +192,7 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 
 		pchan := make(chan *msvc.NugetPackage, 4)
 
-		go getNugetPackages(content, pchan)
+		go readNugetPackages(content, pchan)
 
 		for pkg := range pchan {
 			packagesMap[pkg.ID] = pkg.Version
@@ -201,7 +201,7 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 	return packagesByProject
 }
 
-func getNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPackage) {
+func readNugetPackages(content *msvc.FolderContent, pchan chan<- *msvc.NugetPackage) {
 	if content.Packages != nil {
 		// old style projects (nuget packages references in separate files)
 		for _, p := range content.Packages.Packages {

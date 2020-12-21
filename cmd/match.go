@@ -50,7 +50,7 @@ func NewPartialMatcher(matches []string) (Matcher, error) {
 	return &aho, nil
 }
 
-// NewExactMatchS creates exacth matcher from strings slice
+// NewExactMatch creates exacth matcher from strings slice
 func NewExactMatch(matches []string, decorator msvc.StringDecorator) Matcher {
 	h := make(c9s.StringHashSet, len(matches))
 	for _, s := range matches {
