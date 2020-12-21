@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
+	"path/filepath"
 	"solt/msvc"
 )
 
@@ -48,44 +50,61 @@ func (c *nugetCommand) execute() error {
 }
 
 func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
+	nugets := getFolderNugetPacks(foldersTree)
+
 	prn := newNugetPrinter(p)
+	for s, packs := range nugets {
+		prn.print(s, packs)
+	}
+}
+
+func getFolderNugetPacks(foldersTree rbtree.RbTree) map[string][]*pack {
+	result := make(map[string][]*pack)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages := fold.Content.NugetPackages()
 
 		var packs []*pack
 		for _, np := range packages {
+			versions := make(c9s.StringHashSet)
+			versions.Add(np.Version)
 			p := pack{
 				pkg:      np.ID,
-				versions: []string{np.Version},
+				versions: versions,
 			}
 			packs = append(packs, &p)
 		}
 
 		if len(packs) > 0 {
-			prn.print(fold.Path, packs)
+			result[fold.Path] = packs
 		}
 	})
+
+	return result
 }
 
 func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	solutions := msvc.SelectSolutions(foldersTree)
 
-	var allProjectFolders = make(map[string]*msvc.FolderContent, foldersTree.Len())
-
 	// Each found solution
-	allSolutionPaths := make(map[string]Matcher, len(solutions))
+	allSolutionPaths := make(map[string][]string, len(solutions))
 	for _, sln := range solutions {
 		projects := sln.AllProjectPaths()
-		allSolutionPaths[sln.Path] = NewExactMatch(projects)
+		allSolutionPaths[sln.Path] = getDirectories(projects)
 	}
 
-	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		allProjectFolders[prj.Path] = fold.Content
-	})
+	nugets := getFolderNugetPacks(foldersTree)
 
-	packs := getNugetPacks(allSolutionPaths, allProjectFolders, onlyMismatch)
+	packs := getNugetPacks(allSolutionPaths, nugets, onlyMismatch)
 
 	printNugetBySolutions(solutions, packs, onlyMismatch, p)
+}
+
+func getDirectories(paths []string) []string {
+	result := make([]string, 0, len(paths))
+	for _, path := range paths {
+		result = append(result, filepath.Dir(path))
+	}
+	return result
 }
 
 func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[string][]*pack, onlyMismatch bool, p printer) {
@@ -105,93 +124,40 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 	}
 }
 
-func getNugetPacks(allSolPaths map[string]Matcher, allPrjFolders map[string]*msvc.FolderContent, onlyMismatch bool) map[string][]*pack {
-	allPkg := mapAllPackages(allPrjFolders)
-
+func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack, onlyMismatch bool) map[string][]*pack {
 	var result = make(map[string][]*pack, len(allSolPaths))
 
-	// Reduce packages
-	for spath, match := range allSolPaths {
-		packagesVers := mapPackagesInSolution(allPkg, match)
-
-		// Reduce packages in solution
-		packs := reducePacks(packagesVers, onlyMismatch)
-		if len(packs) > 0 {
-			result[spath] = packs
-		}
-	}
-
-	return result
-}
-
-func reducePacks(packagesVers map[string][]string, onlyMismatch bool) []*pack {
-	var result []*pack
-	for pkg, vers := range packagesVers {
-		// If one version it's OK (no mismatches)
-		if onlyMismatch && len(vers) < 2 {
-			continue
-		}
-
-		m := pack{
-			pkg:      pkg,
-			versions: vers,
-		}
-
-		result = append(result, &m)
-	}
-	return result
-}
-
-func mapPackagesInSolution(packagesByProject map[string]map[string]string, match Matcher) map[string][]string {
-	packagesVers := make(map[string][]string)
-
-	for ppath, pkg := range packagesByProject {
-		if !match.Match(ppath) {
-			continue
-		}
-
-		for pkg, ver := range pkg {
-			if v, ok := packagesVers[pkg]; !ok {
-				packagesVers[pkg] = []string{ver}
-			} else {
-				// Only unique versions added
-				if contains(v, ver) {
-					continue
-				}
-
-				packagesVers[pkg] = append(v, ver)
+	for spath, paths := range allSolPaths {
+		for _, path := range paths {
+			npacks, ok := nugets[path]
+			if ok {
+				result[spath] = append(result[spath], npacks...)
 			}
 		}
+
+		reduced := reducePackages(result, spath)
+		result[spath] = reduced
 	}
 
-	return packagesVers
+	return result
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
+func reducePackages(result map[string][]*pack, spath string) []*pack {
+	reduced := make([]*pack, len(result[spath]))
+	m := make(map[string]*pack)
+	for _, p := range result[spath] {
+		exist, ok := m[p.pkg]
+		if ok {
+			for _, v := range p.versions.Items() {
+				exist.versions.Add(v)
+			}
+		} else {
+			m[p.pkg] = p
 		}
 	}
-	return false
-}
 
-func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map[string]string {
-	var packagesByProject = make(map[string]map[string]string, len(allPrjFolders))
-
-	for ppath, content := range allPrjFolders {
-		if len(content.Projects) == 0 {
-			continue
-		}
-
-		packagesMap := make(map[string]string)
-		packagesByProject[ppath] = packagesMap
-
-		packages := content.NugetPackages()
-
-		for _, pkg := range packages {
-			packagesMap[pkg.ID] = pkg.Version
-		}
+	for _, p := range m {
+		reduced = append(reduced, p)
 	}
-	return packagesByProject
+	return reduced
 }

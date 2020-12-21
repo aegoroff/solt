@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
 	"sort"
@@ -10,7 +11,7 @@ import (
 // pack defines nuget package descriptor
 type pack struct {
 	pkg      string
-	versions []string
+	versions c9s.StringHashSet
 }
 
 func newNugetPrinter(p printer) *nugetprint {
@@ -38,8 +39,9 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	})
 
 	for _, item := range packs {
-		sortfold.Strings(item.versions)
-		n.p.tprint(format, item.pkg, strings.Join(item.versions, ", "))
+		versions := item.versions.Items()
+		sortfold.Strings(versions)
+		n.p.tprint(format, item.pkg, strings.Join(versions, ", "))
 	}
 	n.p.flush()
 }
