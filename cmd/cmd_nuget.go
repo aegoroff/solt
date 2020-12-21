@@ -135,14 +135,18 @@ func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack, o
 			}
 		}
 
-		reduced := reducePackages(result, spath)
-		result[spath] = reduced
+		reduced := reducePackages(result, spath, onlyMismatch)
+		if len(reduced) == 0 {
+			delete(result, spath)
+		} else {
+			result[spath] = reduced
+		}
 	}
 
 	return result
 }
 
-func reducePackages(result map[string][]*pack, spath string) []*pack {
+func reducePackages(result map[string][]*pack, spath string, onlyMismatch bool) []*pack {
 	reduced := make([]*pack, 0, len(result[spath]))
 	m := make(map[string]*pack)
 	for _, p := range result[spath] {
@@ -157,7 +161,9 @@ func reducePackages(result map[string][]*pack, spath string) []*pack {
 	}
 
 	for _, p := range m {
-		reduced = append(reduced, p)
+		if onlyMismatch && p.versions.Count() > 1 || !onlyMismatch {
+			reduced = append(reduced, p)
+		}
 	}
 	return reduced
 }
