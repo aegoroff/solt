@@ -33,26 +33,38 @@ type FolderContent struct {
 func (c *FolderContent) NugetPackages() []*NugetPackage {
 	result := make([]*NugetPackage, 0)
 
-	add := func(pkg *NugetPackage) {
-		result = append(result, pkg)
-	}
-
 	if c.Packages != nil {
 		// old style projects (nuget packages references in separate files)
-		for _, p := range c.Packages.Packages {
-			add(&NugetPackage{ID: p.ID, Version: p.Version})
-		}
+		result = append(result, c.Packages.nugetPackages()...)
 	}
 	for _, prj := range c.Projects {
-		if prj.Project.PackageReferences == nil {
-			continue
-		}
-
-		// If SDK project nuget packages included into project file
-		for _, p := range prj.Project.PackageReferences {
-			add(&NugetPackage{ID: p.ID, Version: p.Version})
-		}
+		result = append(result, prj.Project.nugetPackages()...)
 	}
+	return result
+}
+
+func (p *packages) nugetPackages() []*NugetPackage {
+	result := make([]*NugetPackage, 0, len(p.Packages))
+
+	for _, pkg := range p.Packages {
+		result = append(result, &NugetPackage{ID: pkg.ID, Version: pkg.Version})
+	}
+
+	return result
+}
+
+func (p *msbuildProject) nugetPackages() []*NugetPackage {
+	result := make([]*NugetPackage, 0, len(p.PackageReferences))
+
+	if p.PackageReferences == nil {
+		return result
+	}
+
+	// If SDK project nuget packages included into project file
+	for _, pkg := range p.PackageReferences {
+		result = append(result, &NugetPackage{ID: pkg.ID, Version: pkg.Version})
+	}
+
 	return result
 }
 
