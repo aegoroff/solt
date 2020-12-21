@@ -41,10 +41,12 @@ type MsbuildProject struct {
 	Path    string
 }
 
+// LessThan implements rbtree.Comparable interface
 func (prj *MsbuildProject) LessThan(y rbtree.Comparable) bool {
 	return prj.compare(y) < 0
 }
 
+// EqualTo implements rbtree.Comparable interface
 func (prj *MsbuildProject) EqualTo(y rbtree.Comparable) bool {
 	return prj.compare(y) == 0
 }
