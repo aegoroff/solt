@@ -50,7 +50,7 @@ func (h *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 			h.excludeFolders.Add(pdir)
 		}
 
-		h.includedFiles = prj.Files()
+		h.includedFiles = append(h.includedFiles, prj.Files()...)
 
 		h.addToUnexistIfNeeded(prj.Path)
 	}
