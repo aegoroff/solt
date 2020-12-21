@@ -2,6 +2,7 @@ package cmd
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
@@ -54,10 +55,10 @@ func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) ma
 	return prjMap
 }
 
-func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.MsbuildProject) (*simple.DirectedGraph, map[string]*projectNode) {
+func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prjMap map[string]*msvc.MsbuildProject) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path)
 	g := simple.NewDirectedGraph()
-	nodes := make(map[string]*projectNode)
+	nodes := rbtree.NewRbTree()
 	ix := int64(1)
 	for _, prj := range sln.Solution.Projects {
 		if prj.TypeID == solution.IDSolutionFolder {
@@ -72,13 +73,15 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 			continue
 		}
 
-		n := newProjectNode(ix, msbuild)
-		nodes[fullProjectPath] = n
+		n := newProjectNode(ix, msbuild, solutionPath)
+		nodes.Insert(n)
 		ix++
 		g.AddNode(n)
 	}
 
-	for _, to := range nodes {
+	it := rbtree.NewWalkInorder(nodes).Iterator()
+	for it.Next() {
+		to := it.Current().Key().(*projectNode)
 		refs := m.getReferences(to, nodes)
 		for _, ref := range refs {
 			e := g.NewEdge(ref, to)
@@ -88,10 +91,13 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, prj
 	return g, nodes
 }
 
-func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes map[string]*projectNode) map[string]c9s.StringHashSet {
+func (m *sdkProjectsModule) redundantRefs(g *simple.DirectedGraph, nodes rbtree.RbTree) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
-	for _, project := range nodes {
+
+	it := rbtree.NewWalkInorder(nodes).Iterator()
+	for it.Next() {
+		project := it.Current().Key().(*projectNode)
 		refs := m.getReferences(project, nodes)
 
 		rrs := make(c9s.StringHashSet)
@@ -122,7 +128,7 @@ func allCrossings(refs []*projectNode, action func(*projectNode, *projectNode)) 
 	}
 }
 
-func (*sdkProjectsModule) getReferences(to *projectNode, nodes map[string]*projectNode) []*projectNode {
+func (*sdkProjectsModule) getReferences(to *projectNode, nodes rbtree.RbTree) []*projectNode {
 	if to.project.Project.ProjectReferences == nil {
 		return []*projectNode{}
 	}
@@ -131,10 +137,11 @@ func (*sdkProjectsModule) getReferences(to *projectNode, nodes map[string]*proje
 
 	var result []*projectNode
 	for _, pref := range to.project.Project.ProjectReferences {
-		full := filepath.Join(dir, pref.Path)
-		from, ok := nodes[normalize(full)]
+		from, ok := nodes.Search(&projectNode{
+			fullPath: filepath.Join(dir, pref.Path),
+		})
 		if ok {
-			result = append(result, from)
+			result = append(result, from.Key().(*projectNode))
 		}
 	}
 	return result
