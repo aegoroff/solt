@@ -78,7 +78,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	allSolutionPaths := make(map[string]Matcher, len(solutions))
 	for _, sln := range solutions {
 		projects := sln.AllProjectPaths()
-		allSolutionPaths[sln.Path] = NewExactTreeMatch(projects)
+		allSolutionPaths[sln.Path] = NewExactMatch(projects)
 	}
 
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {

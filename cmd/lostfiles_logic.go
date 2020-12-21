@@ -71,14 +71,14 @@ func (h *lostFilesLogic) addToUnexistIfNeeded(project string) {
 }
 
 func (h *lostFilesLogic) initializeLostMatcher() error {
-	excludes, err := NewPartialMatcher(h.excludeFolders.ItemsDecorated(normalize))
+	excludes, err := NewPartialMatcher(h.excludeFolders.Items(), normalize)
 	if err != nil {
 		return err
 	}
 
-	includes := NewExactMatch(h.includedFiles, normalize)
+	includes := NewExactMatch(h.includedFiles)
 
-	h.lostMatcher = NewLostItemMatcher(includes, excludes, normalize)
+	h.lostMatcher = NewLostItemMatcher(includes, excludes)
 
 	return nil
 }

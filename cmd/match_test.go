@@ -14,6 +14,7 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 		result   bool
 	}{
 		{[]string{"xxx", "yyy", "zzz"}, "yyyyy", true},
+		{[]string{"xxx", "yyy", "zzz"}, "YYYYY", true},
 		{[]string{"xxx", "yyy", "zzz"}, "yyy", true},
 		{[]string{"xxx", "yyy", "zzz"}, "yyyzzz", true},
 		{[]string{"xxx", "yyy", "zzz"}, "cccyyybbb", true},
@@ -21,12 +22,14 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// Act
-		m, _ := NewPartialMatcher(test.patterns)
-		result := m.Match(test.input)
+		t.Run(test.input, func(t *testing.T) {
+			// Act
+			m, _ := NewPartialMatcher(test.patterns, normalize)
+			result := m.Match(test.input)
 
-		// Assert
-		ass.Equal(test.result, result)
+			// Assert
+			ass.Equal(test.result, result)
+		})
 	}
 }
 
@@ -46,11 +49,13 @@ func Test_MatchOneOfPatterns_Exact(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// Act
-		m := NewExactMatch(test.patterns, func(s string) string { return s })
-		result := m.Match(test.input)
+		t.Run(test.input, func(t *testing.T) {
+			// Act
+			m := NewExactMatch(test.patterns)
+			result := m.Match(test.input)
 
-		// Assert
-		ass.Equal(test.result, result)
+			// Assert
+			ass.Equal(test.result, result)
+		})
 	}
 }

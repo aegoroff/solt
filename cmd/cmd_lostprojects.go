@@ -84,22 +84,19 @@ func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	projectMatch := NewExactMatch(linkedProjects, normalize)
+	projectMatch := NewExactMatch(linkedProjects)
 	var projectsOutsideSolution []*msvc.MsbuildProject
 	var allSolutionFiles []string
 
 	for _, prj := range allProjects {
-		// Path in upper registry is the project's key
-		projectKey := normalize(prj.Path)
-
-		if projectMatch.Match(projectKey) {
+		if projectMatch.Match(prj.Path) {
 			allSolutionFiles = append(allSolutionFiles, prj.Files()...)
 		} else {
 			projectsOutsideSolution = append(projectsOutsideSolution, prj)
 		}
 	}
 
-	anySolutionFile := NewExactMatch(allSolutionFiles, normalize)
+	anySolutionFile := NewExactMatch(allSolutionFiles)
 	return separateProjects(projectsOutsideSolution, anySolutionFile)
 }
 
@@ -120,8 +117,7 @@ func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, anySolutionFile Matc
 	projectFiles := prj.Files()
 
 	for _, f := range projectFiles {
-		pfile := normalize(f)
-		if anySolutionFile.Match(pfile) {
+		if anySolutionFile.Match(f) {
 			return true
 		}
 	}
