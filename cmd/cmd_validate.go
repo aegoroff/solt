@@ -10,7 +10,7 @@ type validateCommand struct {
 
 func newValidate(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func() executor {
 			return &validateCommand{
 				baseCommand: newBaseCmd(c),
 			}

@@ -33,7 +33,7 @@ type printer interface {
 	resetColor()
 }
 
-type command interface {
+type executor interface {
 	execute() error
 }
 

@@ -19,7 +19,7 @@ func newLostFiles(c *conf) *cobra.Command {
 	var filter string
 
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func() executor {
 			return &lostFilesCommand{
 				baseCommand: newBaseCmd(c),
 				removeLost:  removeLost,

@@ -22,7 +22,7 @@ func newBaseCmd(c *conf) baseCommand {
 }
 
 type cobraCreator struct {
-	createCmd func() command
+	createCmd func() executor
 }
 
 func (c *cobraCreator) runE() cobraRunSignature {

@@ -17,7 +17,7 @@ func newNuget(c *conf) *cobra.Command {
 	var byProject bool
 
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func() executor {
 			nc := nugetCommand{
 				baseCommand: newBaseCmd(c),
 				mismatch:    mismatch,

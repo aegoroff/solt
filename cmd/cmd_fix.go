@@ -12,7 +12,7 @@ type sdkProjectReference struct {
 
 func newFix(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() command {
+		createCmd: func() executor {
 			return &fixCommand{
 				baseCommand: newBaseCmd(c),
 			}
