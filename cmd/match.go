@@ -3,6 +3,8 @@ package cmd
 import (
 	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
 	"solt/msvc"
 )
@@ -12,9 +14,28 @@ type matchP struct {
 	machine *goahocorasick.Machine
 }
 
-// matchP defines exact matching
+// matchE defines exact matching
 type matchE struct {
 	hashset c9s.StringHashSet
+}
+
+// matchTree defines exact matching using rbtree.RbTree
+type matchTree struct {
+	tree rbtree.RbTree
+}
+
+type caseless string
+
+func (c *caseless) LessThan(y rbtree.Comparable) bool {
+	return c.compare(y) < 0
+}
+
+func (c *caseless) EqualTo(y rbtree.Comparable) bool {
+	return c.compare(y) == 0
+}
+
+func (c *caseless) compare(y rbtree.Comparable) int {
+	return sortfold.CompareFold(string(*c), string(*y.(*caseless)))
 }
 
 type matchL struct {
@@ -61,6 +82,18 @@ func NewExactMatch(matches []string, decorator msvc.StringDecorator) Matcher {
 	return &hs
 }
 
+// NewExactTreeMatch creates exacth matcher from strings slice
+func NewExactTreeMatch(matches []string) Matcher {
+	tree := rbtree.NewRbTree()
+	for _, s := range matches {
+		cs := caseless(s)
+		tree.Insert(&cs)
+	}
+
+	hs := matchTree{tree: tree}
+	return &hs
+}
+
 // Match do string matching to several patterns
 func (a *matchP) Match(s string) bool {
 	terms := a.machine.MultiPatternSearch([]rune(s), true)
@@ -75,4 +108,10 @@ func (h *matchE) Match(s string) bool {
 func (m *matchL) Match(s string) bool {
 	decorated := m.decorator(s)
 	return !m.include.Match(decorated) && !m.exclude.Match(decorated)
+}
+
+func (m *matchTree) Match(s string) bool {
+	cs := caseless(s)
+	_, ok := m.tree.Search(&cs)
+	return ok
 }
