@@ -12,5 +12,5 @@ type readerModule interface {
 }
 
 type walker interface {
-	onFolder(f *Folder)
+	walk(f *Folder)
 }

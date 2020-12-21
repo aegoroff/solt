@@ -8,7 +8,7 @@ type walkPrj struct {
 	handler ProjectHandler
 }
 
-func (w *walkPrj) onFolder(f *Folder) {
+func (w *walkPrj) walk(f *Folder) {
 	content := f.Content
 
 	if len(content.Projects) == 0 {
@@ -25,7 +25,7 @@ type walkSol struct {
 	solutions []*VisualStudioSolution
 }
 
-func (w *walkSol) onFolder(f *Folder) {
+func (w *walkSol) walk(f *Folder) {
 	content := f.Content
 	// Select only folders that contain solution(s)
 	if len(content.Solutions) == 0 {
@@ -40,7 +40,7 @@ func walk(foldersTree rbtree.RbTree, walkers ...walker) {
 	rbtree.NewWalkInorder(foldersTree).Foreach(func(n *rbtree.Node) {
 		fold := n.Key().(*Folder)
 		for _, w := range walkers {
-			w.onFolder(fold)
+			w.walk(fold)
 		}
 	})
 }
