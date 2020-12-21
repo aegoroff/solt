@@ -29,6 +29,33 @@ type FolderContent struct {
 	Solutions []*VisualStudioSolution
 }
 
+// NugetPackages gets all nuget packages found in a folder
+func (c *FolderContent) NugetPackages() []*NugetPackage {
+	result := make([]*NugetPackage, 0)
+
+	add := func(pkg *NugetPackage) {
+		result = append(result, pkg)
+	}
+
+	if c.Packages != nil {
+		// old style projects (nuget packages references in separate files)
+		for _, p := range c.Packages.Packages {
+			add(&NugetPackage{ID: p.ID, Version: p.Version})
+		}
+	}
+	for _, prj := range c.Projects {
+		if prj.Project.PackageReferences == nil {
+			continue
+		}
+
+		// If SDK project nuget packages included into project file
+		for _, p := range prj.Project.PackageReferences {
+			add(&NugetPackage{ID: p.ID, Version: p.Version})
+		}
+	}
+	return result
+}
+
 // Folder defines filesystem folder descriptor (path and content structure)
 type Folder struct {
 	Content *FolderContent

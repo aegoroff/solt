@@ -50,8 +50,7 @@ func (c *nugetCommand) execute() error {
 func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 	prn := newNugetPrinter(p)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		content := fold.Content
-		packages := getNugetPackages(content)
+		packages := fold.Content.NugetPackages()
 
 		var packs []*pack
 		for _, np := range packages {
@@ -188,37 +187,11 @@ func mapAllPackages(allPrjFolders map[string]*msvc.FolderContent) map[string]map
 		packagesMap := make(map[string]string)
 		packagesByProject[ppath] = packagesMap
 
-		packages := getNugetPackages(content)
+		packages := content.NugetPackages()
 
 		for _, pkg := range packages {
 			packagesMap[pkg.ID] = pkg.Version
 		}
 	}
 	return packagesByProject
-}
-
-func getNugetPackages(content *msvc.FolderContent) []*msvc.NugetPackage {
-	result := make([]*msvc.NugetPackage, 0)
-
-	add := func(pkg *msvc.NugetPackage) {
-		result = append(result, pkg)
-	}
-
-	if content.Packages != nil {
-		// old style projects (nuget packages references in separate files)
-		for _, p := range content.Packages.Packages {
-			add(&msvc.NugetPackage{ID: p.ID, Version: p.Version})
-		}
-	}
-	for _, prj := range content.Projects {
-		if prj.Project.PackageReferences == nil {
-			continue
-		}
-
-		// If SDK project nuget packages included into project file
-		for _, p := range prj.Project.PackageReferences {
-			add(&msvc.NugetPackage{ID: p.ID, Version: p.Version})
-		}
-	}
-	return result
 }
