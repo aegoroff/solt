@@ -36,7 +36,6 @@ func (m *sdkProjectsModule) execute() {
 
 	for _, sol := range solutions {
 		g, allNodes := m.newSolutionGraph(sol, sdkProjects)
-		m.createGraphEdges(g, allNodes)
 
 		refs := m.redundantRefs(g, allNodes)
 
@@ -57,6 +56,12 @@ func (*sdkProjectsModule) onlySdkProjects(allProjects []*msvc.MsbuildProject) rb
 }
 
 func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
+	g, nodes := m.createGraphNodes(sln, sdkTree)
+	m.createGraphEdges(g, nodes)
+	return g, nodes
+}
+
+func (m *sdkProjectsModule) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path)
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.NewRbTree()
