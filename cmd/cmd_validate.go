@@ -25,9 +25,9 @@ func newValidate(c *conf) *cobra.Command {
 }
 
 func (c *validateCommand) execute() error {
-	v := newsdkProjectsValidator(c.prn)
-	m := newSdkProjectsModule(c.fs, c.prn, c.sourcesPath, v)
+	projectsPrinter := newSdkProjectsPrinter(c.prn)
+	validator := newSdkProjectsValidator(c.fs, c.prn, c.sourcesPath, projectsPrinter)
 
-	m.execute()
+	validator.validate()
 	return nil
 }

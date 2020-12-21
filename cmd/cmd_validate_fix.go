@@ -6,10 +6,6 @@ type fixCommand struct {
 	baseCommand
 }
 
-type sdkProjectReference struct {
-	Path string `xml:"Include,attr"`
-}
-
 func newFix(c *conf) *cobra.Command {
 	cc := cobraCreator{
 		createCmd: func() executor {
@@ -25,9 +21,9 @@ func newFix(c *conf) *cobra.Command {
 }
 
 func (c *fixCommand) execute() error {
-	v := newsdkProjectsFixer(c.prn, c.fs)
-	m := newSdkProjectsModule(c.fs, c.prn, c.sourcesPath, v)
+	fixer := newSdkProjectsFixer(c.prn, c.fs)
+	validator := newSdkProjectsValidator(c.fs, c.prn, c.sourcesPath, fixer)
 
-	m.execute()
+	validator.validate()
 	return nil
 }

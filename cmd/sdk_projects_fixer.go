@@ -17,7 +17,11 @@ type sdkProjectsFixer struct {
 	filer sys.Filer
 }
 
-func newsdkProjectsFixer(p printer, fs afero.Fs) sdkModuleHandler {
+type sdkProjectReference struct {
+	Path string `xml:"Include,attr"`
+}
+
+func newSdkProjectsFixer(p printer, fs afero.Fs) sdkActioner {
 	return &sdkProjectsFixer{
 		prn:   p,
 		fs:    fs,
@@ -25,7 +29,7 @@ func newsdkProjectsFixer(p printer, fs afero.Fs) sdkModuleHandler {
 	}
 }
 
-func (f *sdkProjectsFixer) onRedundantRefs(solution string, refs map[string]c9s.StringHashSet) {
+func (f *sdkProjectsFixer) action(solution string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}

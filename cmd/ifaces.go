@@ -37,6 +37,6 @@ type executor interface {
 	execute() error
 }
 
-type sdkModuleHandler interface {
-	onRedundantRefs(sol string, refs map[string]c9s.StringHashSet)
+type sdkActioner interface {
+	action(solution string, items map[string]c9s.StringHashSet)
 }
