@@ -61,7 +61,7 @@ func (m *sdkProjectsModule) newSolutionGraph(sln *msvc.VisualStudioSolution, sdk
 	return g, nodes
 }
 
-func (m *sdkProjectsModule) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
+func (*sdkProjectsModule) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path)
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.NewRbTree()
