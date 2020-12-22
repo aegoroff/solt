@@ -94,7 +94,11 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 
 	nugets := getFolderNugetPacks(foldersTree)
 
-	packs := getNugetPacks(allSolutionPaths, nugets, onlyMismatch)
+	packs := getNugetPacks(allSolutionPaths, nugets)
+
+	if onlyMismatch {
+		filterOnlyMismatch(packs)
+	}
 
 	printNugetBySolutions(solutions, packs, onlyMismatch, p)
 }
@@ -124,7 +128,7 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 	}
 }
 
-func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack, onlyMismatch bool) map[string][]*pack {
+func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack) map[string][]*pack {
 	var result = make(map[string][]*pack, len(allSolPaths))
 
 	for spath, paths := range allSolPaths {
@@ -135,18 +139,14 @@ func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack, o
 			}
 		}
 
-		reduced := reducePackages(result, spath, onlyMismatch)
-		if len(reduced) == 0 {
-			delete(result, spath)
-		} else {
-			result[spath] = reduced
-		}
+		reduced := mergeNugetPacks(result, spath)
+		result[spath] = reduced
 	}
 
 	return result
 }
 
-func reducePackages(result map[string][]*pack, spath string, onlyMismatch bool) []*pack {
+func mergeNugetPacks(result map[string][]*pack, spath string) []*pack {
 	reduced := make([]*pack, 0, len(result[spath]))
 	m := make(map[string]*pack)
 	for _, p := range result[spath] {
@@ -161,9 +161,32 @@ func reducePackages(result map[string][]*pack, spath string, onlyMismatch bool) 
 	}
 
 	for _, p := range m {
-		if onlyMismatch && p.versions.Count() > 1 || !onlyMismatch {
-			reduced = append(reduced, p)
-		}
+		reduced = append(reduced, p)
 	}
 	return reduced
+}
+
+func filterOnlyMismatch(in map[string][]*pack) {
+	toRemove := make(c9s.StringHashSet)
+	for s, packs := range in {
+		filtered := onlyMismatch(packs)
+		if len(filtered) == 0 {
+			toRemove.Add(s)
+		} else {
+			in[s] = filtered
+		}
+	}
+	for s := range toRemove {
+		delete(in, s)
+	}
+}
+
+func onlyMismatch(packs []*pack) []*pack {
+	filtered := make([]*pack, 0)
+	for _, p := range packs {
+		if p.versions.Count() > 1 {
+			filtered = append(filtered, p)
+		}
+	}
+	return filtered
 }
