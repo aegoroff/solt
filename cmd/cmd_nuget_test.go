@@ -143,6 +143,28 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 `, actual)
 }
 
+func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	p := newMockPrn()
+
+	// Act
+	_ = execute(memfs, p, "nu", "-p", dir)
+
+	// Assert
+	actual := p.w.String()
+	ass.Equal(``, actual)
+}
+
 func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)

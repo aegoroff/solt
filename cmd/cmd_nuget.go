@@ -146,7 +146,9 @@ func getNugetPacks(allSolPaths map[string][]string, nugets rbtree.RbTree) map[st
 		}
 
 		reduced := mergeNugetPacks(result, spath)
-		result[spath] = reduced
+		if len(reduced) > 0 {
+			result[spath] = reduced
+		}
 	}
 
 	return result
