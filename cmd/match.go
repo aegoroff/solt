@@ -93,6 +93,6 @@ func (m *matchL) Match(s string) bool {
 
 func (m *matchE) Match(s string) bool {
 	cs := caseless(s)
-	_, ok := m.tree.Search(&cs)
+	_, ok := m.tree.SearchNode(&cs)
 	return ok
 }

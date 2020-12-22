@@ -28,7 +28,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 				result.Insert(folder)
 			} else {
 				// Update current, that has already been created before
-				folder.copyContent(current.Key().(*Folder))
+				folder.copyContent(current.(*Folder))
 			}
 		}
 	}()

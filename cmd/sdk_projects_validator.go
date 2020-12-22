@@ -80,7 +80,7 @@ func (*sdkProjectsValidator) createGraphNodes(sln *msvc.VisualStudioSolution, sd
 			continue
 		}
 
-		n := newProjectNode(ix, msbuild.Key().(*msvc.MsbuildProject))
+		n := newProjectNode(ix, msbuild.(*msvc.MsbuildProject))
 		nodes.Insert(n)
 		ix++
 		g.AddNode(n)
@@ -154,7 +154,7 @@ func (*sdkProjectsValidator) getReferences(to *projectNode, allNodes rbtree.RbTr
 		n := &projectNode{fullPath: &p}
 		from, ok := allNodes.Search(n)
 		if ok {
-			result = append(result, from.Key().(*projectNode))
+			result = append(result, from.(*projectNode))
 		}
 	}
 	return result

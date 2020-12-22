@@ -37,8 +37,8 @@ func (w *walkSol) walk(f *Folder) {
 }
 
 func walk(foldersTree rbtree.RbTree, walkers ...walker) {
-	rbtree.NewWalkInorder(foldersTree).Foreach(func(n *rbtree.Node) {
-		fold := n.Key().(*Folder)
+	rbtree.NewWalkInorder(foldersTree).Foreach(func(n rbtree.Comparable) {
+		fold := n.(*Folder)
 		for _, w := range walkers {
 			w.walk(fold)
 		}
