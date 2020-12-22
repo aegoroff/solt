@@ -101,7 +101,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	packs := getNugetPacks(allSolutionPaths, nugets)
 
 	if onlyMismatch {
-		filterOnlyMismatch(packs)
+		keepOnlyMismatch(packs)
 	}
 
 	printNugetBySolutions(solutions, packs, onlyMismatch, p)
@@ -145,7 +145,7 @@ func getNugetPacks(allSolPaths map[string][]string, nugets rbtree.RbTree) map[st
 			}
 		}
 
-		reduced := mergeNugetPacks(result, spath)
+		reduced := mergeNugetPacks(result[spath])
 		if len(reduced) > 0 {
 			result[spath] = reduced
 		}
@@ -154,34 +154,36 @@ func getNugetPacks(allSolPaths map[string][]string, nugets rbtree.RbTree) map[st
 	return result
 }
 
-func mergeNugetPacks(result map[string][]*pack, spath string) []*pack {
-	reduced := make([]*pack, 0, len(result[spath]))
-	m := make(map[string]*pack)
-	for _, p := range result[spath] {
-		exist, ok := m[p.pkg]
+func mergeNugetPacks(packs []*pack) []*pack {
+	reduced := make([]*pack, 0, len(packs))
+	unique := make(map[string]*pack)
+	for _, p := range packs {
+		exist, ok := unique[p.pkg]
 		if ok {
 			for _, v := range p.versions.Items() {
 				exist.versions.Add(v)
 			}
 		} else {
-			m[p.pkg] = p
+			unique[p.pkg] = p
 		}
 	}
 
-	for _, p := range m {
+	for _, p := range unique {
 		reduced = append(reduced, p)
 	}
 	return reduced
 }
 
-func filterOnlyMismatch(in map[string][]*pack) {
+// keepOnlyMismatch removes all packs but only those
+// which have more then one version on a nuget package
+func keepOnlyMismatch(in map[string][]*pack) {
 	toRemove := make(c9s.StringHashSet)
 	for s, packs := range in {
-		filtered := onlyMismatch(packs)
-		if len(filtered) == 0 {
+		mismatchOnly := onlyMismatches(packs)
+		if len(mismatchOnly) == 0 {
 			toRemove.Add(s)
 		} else {
-			in[s] = filtered
+			in[s] = mismatchOnly
 		}
 	}
 	for s := range toRemove {
@@ -189,7 +191,7 @@ func filterOnlyMismatch(in map[string][]*pack) {
 	}
 }
 
-func onlyMismatch(packs []*pack) []*pack {
+func onlyMismatches(packs []*pack) []*pack {
 	filtered := make([]*pack, 0)
 	for _, p := range packs {
 		if p.versions.Count() > 1 {
