@@ -53,13 +53,16 @@ func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 	nugets := getFolderNugetPacks(foldersTree)
 
 	prn := newNugetPrinter(p)
-	for s, packs := range nugets {
-		prn.print(s, packs)
-	}
+	it := rbtree.NewWalkInorder(nugets)
+
+	it.Foreach(func(n rbtree.Comparable) {
+		f := n.(*nugetFolder)
+		prn.print(f.path, f.packs)
+	})
 }
 
-func getFolderNugetPacks(foldersTree rbtree.RbTree) map[string][]*pack {
-	result := make(map[string][]*pack)
+func getFolderNugetPacks(foldersTree rbtree.RbTree) rbtree.RbTree {
+	result := rbtree.NewRbTree()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages := fold.Content.NugetPackages()
 
@@ -75,7 +78,8 @@ func getFolderNugetPacks(foldersTree rbtree.RbTree) map[string][]*pack {
 		}
 
 		if len(packs) > 0 {
-			result[fold.Path] = packs
+			n := newNugetFolder(fold.Path, packs)
+			result.Insert(n)
 		}
 	})
 
@@ -128,14 +132,16 @@ func printNugetBySolutions(solutions []*msvc.VisualStudioSolution, packs map[str
 	}
 }
 
-func getNugetPacks(allSolPaths map[string][]string, nugets map[string][]*pack) map[string][]*pack {
+func getNugetPacks(allSolPaths map[string][]string, nugets rbtree.RbTree) map[string][]*pack {
 	var result = make(map[string][]*pack, len(allSolPaths))
 
 	for spath, paths := range allSolPaths {
 		for _, path := range paths {
-			npacks, ok := nugets[path]
+			sv := newNugetFolder(path, nil)
+			folder, ok := nugets.Search(sv)
 			if ok {
-				result[spath] = append(result[spath], npacks...)
+				packs := folder.(*nugetFolder).packs
+				result[spath] = append(result[spath], packs...)
 			}
 		}
 
