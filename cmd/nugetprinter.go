@@ -23,6 +23,10 @@ func newPack(id string, versions ...string) *pack {
 	}
 }
 
+func copyPack(e *pack) *pack {
+	return newPack(e.pkg, e.versions.Items()...)
+}
+
 func newNugetPrinter(p printer) *nugetprint {
 	np := nugetprint{
 		p: p,

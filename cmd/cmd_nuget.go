@@ -154,11 +154,9 @@ func mergeNugetPacks(packs []*pack) []*pack {
 	for _, p := range packs {
 		exist, ok := unique[p.pkg]
 		if ok {
-			for _, v := range p.versions.Items() {
-				exist.versions.Add(v)
-			}
+			exist.versions.AddRange(p.versions.Items()...)
 		} else {
-			unique[p.pkg] = p
+			unique[p.pkg] = copyPack(p)
 		}
 	}
 
