@@ -117,18 +117,7 @@ func getNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree)
 	result := rbtree.NewRbTree()
 
 	for _, sol := range solutions {
-		paths := getDirectories(sol.AllProjectPaths())
-		spacks := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
-
-		for _, path := range paths {
-			sv := newNugetFolder(path, nil)
-			folder, ok := nugets.Search(sv)
-			if ok {
-				packs := folder.(*nugetFolder).packs
-				spacks = append(spacks, packs...)
-			}
-		}
-
+		spacks := selectSolutionPacks(sol, nugets)
 		reduced := mergeNugetPacks(spacks)
 
 		if len(reduced) > 0 {
@@ -137,6 +126,21 @@ func getNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree)
 		}
 	}
 
+	return result
+}
+
+func selectSolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*pack {
+	paths := getDirectories(sol.AllProjectPaths())
+	result := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
+
+	for _, path := range paths {
+		sv := newNugetFolder(path, nil)
+		folder, ok := nugets.Search(sv)
+		if ok {
+			packs := folder.(*nugetFolder).packs
+			result = append(result, packs...)
+		}
+	}
 	return result
 }
 
