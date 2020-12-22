@@ -51,20 +51,21 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 			lf.excludeFolders.Add(pdir)
 		}
 
-		lf.includedFiles = append(lf.includedFiles, prj.Files()...)
+		includes := prj.Files()
+		lf.includedFiles = append(lf.includedFiles, includes...)
 
-		lf.addToUnexistIfNeeded(prj.Path)
+		lf.addToUnexistIfNeeded(prj.Path, includes)
 	}
 
 	return lf.initializeLostMatcher()
 }
 
-func (lf *lostFilesLogic) addToUnexistIfNeeded(project string) {
+func (lf *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string) {
 	if !lf.nonExistence {
 		return
 	}
 
-	nonexist := lf.filer.CheckExistence(lf.includedFiles)
+	nonexist := lf.filer.CheckExistence(includes)
 
 	if len(nonexist) > 0 {
 		lf.unexistFiles[project] = append(lf.unexistFiles[project], nonexist...)
