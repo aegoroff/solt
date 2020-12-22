@@ -14,6 +14,15 @@ type pack struct {
 	versions c9s.StringHashSet
 }
 
+func newPack(id string, versions ...string) *pack {
+	vs := make(c9s.StringHashSet)
+	vs.AddRange(versions...)
+	return &pack{
+		pkg:      id,
+		versions: vs,
+	}
+}
+
 func newNugetPrinter(p printer) *nugetprint {
 	np := nugetprint{
 		p: p,
