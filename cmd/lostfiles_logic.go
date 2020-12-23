@@ -90,7 +90,7 @@ func (lf *lostFilesLogic) find() []string {
 		return []string{}
 	}
 
-	var result []string
+	result := lf.foundFiles[:0]
 	for _, file := range lf.foundFiles {
 		if lf.lost.Match(file) {
 			result = append(result, file)
