@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/dustin/go-humanize"
-	"os"
+	"log"
 	"runtime"
 	"runtime/pprof"
 	"time"
@@ -93,7 +93,7 @@ func (e *executorTimeMeasure) execute() error {
 
 func (e *executorCPUProfile) execute() error {
 	if *e.c.diag && *e.c.cpu != "" {
-		f, err := os.Create(*e.c.cpu)
+		f, err := e.c.fs().Create(*e.c.cpu)
 		if err != nil {
 			return err
 		}
@@ -107,13 +107,13 @@ func (e *executorCPUProfile) execute() error {
 func (e *executorMemoryProfile) execute() error {
 	err := e.wrapped.execute()
 	if *e.c.diag && *e.c.memory != "" {
-		f, err := os.Create(*e.c.memory)
+		f, err := e.c.fs().Create(*e.c.memory)
 		if err != nil {
 			return err
 		}
 		err = pprof.WriteHeapProfile(f)
 		if err != nil {
-			return err
+			log.Println(err)
 		}
 		err = f.Close()
 		if err != nil {

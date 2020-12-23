@@ -15,6 +15,8 @@ func Test_Version(t *testing.T) {
 		{"version", []string{"version"}},
 		{"ver", []string{"ver"}},
 		{"ver -d", []string{"ver", "-d"}},
+		{"ver -d --cpuprofile", []string{"ver", "-d", "--cpuprofile", "cpu"}},
+		{"ver -d --memprofile", []string{"ver", "-d", "--memprofile", "mem"}},
 	}
 
 	for _, test := range tests {
