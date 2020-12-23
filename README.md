@@ -29,10 +29,12 @@ Available Commands:
   ver         Print the version number of solt
 
 Flags:
-      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --cpuprofile string   Runs CPU profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -d, --diag                Show application diagnostic after run
   -h, --help                help for solt
-      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --memprofile string   Runs memory profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 
 Use "solt [command] --help" for more information about a command.
@@ -55,9 +57,11 @@ Flags:
   -r, --remove        Remove lost files
 
 Global Flags:
-      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --cpuprofile string   Runs CPU profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -d, --diag                Show application diagnostic after run
-      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --memprofile string   Runs memory profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
@@ -74,9 +78,11 @@ Flags:
   -h, --help   help for lp
 
 Global Flags:
-      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --cpuprofile string   Runs CPU profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -d, --diag                Show application diagnostic after run
-      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --memprofile string   Runs memory profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 
 ```
@@ -96,9 +102,11 @@ Flags:
   -r, --project    Show packages by projects' folders instead
 
 Global Flags:
-      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --cpuprofile string   Runs CPU profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -d, --diag                Show application diagnostic after run
-      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --memprofile string   Runs memory profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Validate SDK projects syntax:
@@ -119,8 +127,10 @@ Flags:
   -h, --help   help for va
 
 Global Flags:
-      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --cpuprofile string   Runs CPU profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -d, --diag                Show application diagnostic after run
-      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+      --memprofile string   Runs memory profiling if --diag option set.
+                            If not set profiling not started. Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 ```
