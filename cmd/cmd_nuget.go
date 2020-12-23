@@ -194,7 +194,7 @@ func keepOnlyMismatch(in rbtree.RbTree) {
 }
 
 func onlyMismatches(packs []*pack) []*pack {
-	filtered := make([]*pack, 0)
+	filtered := packs[:0]
 	for _, p := range packs {
 		if p.versions.Count() > 1 {
 			filtered = append(filtered, p)
