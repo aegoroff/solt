@@ -44,25 +44,25 @@ func (c *FolderContent) NugetPackages() []*NugetPackage {
 }
 
 func (p *packages) nugetPackages() []*NugetPackage {
-	result := make([]*NugetPackage, 0, len(p.Packages))
+	result := make([]*NugetPackage, len(p.Packages))
 
-	for _, pkg := range p.Packages {
-		result = append(result, &NugetPackage{ID: pkg.ID, Version: pkg.Version})
+	for i, pkg := range p.Packages {
+		result[i] = &NugetPackage{ID: pkg.ID, Version: pkg.Version}
 	}
 
 	return result
 }
 
 func (p *msbuildProject) nugetPackages() []*NugetPackage {
-	result := make([]*NugetPackage, 0, len(p.PackageReferences))
-
 	if p.PackageReferences == nil {
-		return result
+		return []*NugetPackage{}
 	}
 
+	result := make([]*NugetPackage, len(p.PackageReferences))
+
 	// If SDK project nuget packages included into project file
-	for _, pkg := range p.PackageReferences {
-		result = append(result, &NugetPackage{ID: pkg.ID, Version: pkg.Version})
+	for i, pkg := range p.PackageReferences {
+		result[i] = &NugetPackage{ID: pkg.ID, Version: pkg.Version}
 	}
 
 	return result

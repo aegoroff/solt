@@ -50,10 +50,10 @@ func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string
 func NewPartialMatcher(matches []string, decorator msvc.StringDecorator) (Matcher, error) {
-	runes := make([][]rune, 0, len(matches))
-	for _, s := range matches {
+	runes := make([][]rune, len(matches))
+	for i, s := range matches {
 		ds := decorator(s)
-		runes = append(runes, bytes.Runes([]byte(ds)))
+		runes[i] = bytes.Runes([]byte(ds))
 	}
 	machine := new(goahocorasick.Machine)
 	err := machine.Build(runes)
