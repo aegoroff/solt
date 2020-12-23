@@ -23,11 +23,21 @@ func newBaseCmd(c *conf) baseCommand {
 
 type cobraCreator struct {
 	createCmd func() executor
+	c         *conf
 }
 
 func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
-		return c.createCmd().execute()
+		// IMPORTANT: Excecutors initialization order defines output order
+		var e executor
+		{
+			e = c.createCmd()
+			e = newCpuProfileExecutor(e, c.c)
+			e = newMemUsageExecutor(e, c.c)
+			e = newTimeMeasureExecutor(e, c.c)
+		}
+
+		return e.execute()
 	}
 }
 

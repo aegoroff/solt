@@ -24,6 +24,7 @@ func newInfo(c *conf) *cobra.Command {
 			}
 			return &ic
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("in", "info", "Get information about found solutions")

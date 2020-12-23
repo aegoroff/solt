@@ -19,6 +19,7 @@ func newVersion(c *conf) *cobra.Command {
 			}
 			return &vac
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("ver", "version", "Print the version number of solt")

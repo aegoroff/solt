@@ -18,6 +18,7 @@ func newLostProjects(c *conf) *cobra.Command {
 			}
 			return &lpc
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("lp", "lostprojects", "Find projects that not included into any solution")

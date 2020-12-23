@@ -1,13 +1,9 @@
 package cmd
 
 import (
-	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
-	"io"
-	"runtime"
-	"time"
-
 	"github.com/spf13/cobra"
+	"io"
 )
 
 func newRoot() *cobra.Command {
@@ -31,48 +27,35 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 	rootCmd := newRoot()
 
 	var sourcesPath string
+	var cpuprofile string
 	var diag bool
 
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
+	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", "Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here")
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	conf := newAppConf(fs, p, &sourcesPath)
+	c := &conf{
+		filesystem: fs,
+		p:          p,
+		sp:         &sourcesPath,
+		cpu:        &cpuprofile,
+		diag:       &diag,
+	}
 
-	rootCmd.AddCommand(newInfo(conf))
-	rootCmd.AddCommand(newLostFiles(conf))
-	rootCmd.AddCommand(newLostProjects(conf))
-	rootCmd.AddCommand(newNuget(conf))
-	rootCmd.AddCommand(newVersion(conf))
-	rootCmd.AddCommand(newValidate(conf))
+	rootCmd.AddCommand(newInfo(c))
+	rootCmd.AddCommand(newLostFiles(c))
+	rootCmd.AddCommand(newLostProjects(c))
+	rootCmd.AddCommand(newNuget(c))
+	rootCmd.AddCommand(newVersion(c))
+	rootCmd.AddCommand(newValidate(c))
 
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)
 	}
 
-	start := time.Now()
-	err := rootCmd.Execute()
-	elapsed := time.Since(start)
-
-	if diag {
-		printMemUsage(conf.prn())
-		conf.prn().cprint("<gray>Working time:</> <green>%v</>\n", elapsed)
-	}
-
-	return err
+	return rootCmd.Execute()
 }
 
 func init() {
 	cobra.MousetrapHelpText = ""
-}
-
-// printMemUsage outputs the current, total and OS memory being used. As well as the number
-// of garage collection cycles completed.
-func printMemUsage(p printer) {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	p.cprint("\n<gray>Alloc =</> <green>%s</>", humanize.IBytes(m.Alloc))
-	p.cprint("\t<gray>TotalAlloc =</> <green>%s</>", humanize.IBytes(m.TotalAlloc))
-	p.cprint("\t<gray>Sys =</> <green>%s</>", humanize.IBytes(m.Sys))
-	p.cprint("\t<gray>NumGC =</> <green>%v</>\n", m.NumGC)
 }

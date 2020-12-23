@@ -27,6 +27,7 @@ func newLostFiles(c *conf) *cobra.Command {
 				filter:      filter,
 			}
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("lf", "lostfiles", "Find lost files in the folder specified")

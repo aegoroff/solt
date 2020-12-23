@@ -28,6 +28,7 @@ func newNuget(c *conf) *cobra.Command {
 			}
 			return &nc
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("nu", "nuget", "Get nuget packages information within solutions, projects or find Nuget mismatches in solution")

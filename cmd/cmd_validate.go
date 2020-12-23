@@ -14,6 +14,7 @@ func newValidate(c *conf) *cobra.Command {
 				baseCommand: newBaseCmd(c),
 			}
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
@@ -30,6 +31,7 @@ func newFix(c *conf) *cobra.Command {
 				baseCommand: newBaseCmd(c),
 			}
 		},
+		c: c,
 	}
 
 	cmd := cc.newCobraCommand("fix", "fixprojects", "Fixes redundant SDK projects references")

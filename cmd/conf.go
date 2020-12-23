@@ -8,6 +8,8 @@ type conf struct {
 	filesystem afero.Fs
 	p          printer
 	sp         *string
+	cpu        *string
+	diag       *bool
 }
 
 func (a *conf) fs() afero.Fs {
@@ -20,13 +22,4 @@ func (a *conf) prn() printer {
 
 func (a *conf) sourcesPath() *string {
 	return a.sp
-}
-
-func newAppConf(fs afero.Fs, p printer, sourcesPath *string) *conf {
-	c := conf{
-		filesystem: fs,
-		p:          p,
-		sp:         sourcesPath,
-	}
-	return &c
 }
