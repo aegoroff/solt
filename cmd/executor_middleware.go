@@ -5,6 +5,7 @@ import (
 	"log"
 	"runtime"
 	"runtime/pprof"
+	"solt/internal/sys"
 	"time"
 )
 
@@ -111,13 +112,11 @@ func (e *executorMemoryProfile) execute() error {
 		if err != nil {
 			return err
 		}
+		defer sys.Close(f)
+
 		err = pprof.WriteHeapProfile(f)
 		if err != nil {
 			log.Println(err)
-		}
-		err = f.Close()
-		if err != nil {
-			return err
 		}
 	}
 	return err
