@@ -28,11 +28,19 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 
 	var sourcesPath string
 	var cpuprofile string
+	var memprofile string
 	var diag bool
 
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
-	const cDescr = "Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here"
-	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", cDescr)
+
+	const profileTrail = "If not set profiling not started. Correct file path should be set here"
+
+	const cDescription = "Runs CPU profiling if --diag option set. " + profileTrail
+	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", cDescription)
+
+	const mDescription = "Runs memory profiling if --diag option set. " + profileTrail
+	rootCmd.PersistentFlags().StringVarP(&memprofile, "memprofile", "", "", mDescription)
+
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
 	c := &conf{
@@ -40,6 +48,7 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 		p:          p,
 		sp:         &sourcesPath,
 		cpu:        &cpuprofile,
+		memory:     &memprofile,
 		diag:       &diag,
 	}
 

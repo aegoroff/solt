@@ -24,6 +24,11 @@ type executorCPUProfile struct {
 	c       *conf
 }
 
+type executorMemoryProfile struct {
+	wrapped executor
+	c       *conf
+}
+
 func newMemUsageExecutor(e executor, c *conf) executor {
 	em := executorMemUsage{
 		wrapped: e,
@@ -43,6 +48,14 @@ func newTimeMeasureExecutor(e executor, c *conf) executor {
 
 func newCPUProfileExecutor(e executor, c *conf) executor {
 	em := executorCPUProfile{
+		wrapped: e,
+		c:       c,
+	}
+	return &em
+}
+
+func newMemoryProfileExecutor(e executor, c *conf) executor {
+	em := executorMemoryProfile{
 		wrapped: e,
 		c:       c,
 	}
@@ -89,4 +102,23 @@ func (e *executorCPUProfile) execute() error {
 	}
 
 	return e.wrapped.execute()
+}
+
+func (e *executorMemoryProfile) execute() error {
+	err := e.wrapped.execute()
+	if *e.c.diag && *e.c.memory != "" {
+		f, err := os.Create(*e.c.memory)
+		if err != nil {
+			return err
+		}
+		err = pprof.WriteHeapProfile(f)
+		if err != nil {
+			return err
+		}
+		err = f.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return err
 }

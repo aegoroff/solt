@@ -9,6 +9,7 @@ type conf struct {
 	p          printer
 	sp         *string
 	cpu        *string
+	memory     *string
 	diag       *bool
 }
 

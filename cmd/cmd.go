@@ -35,6 +35,7 @@ func (c *cobraCreator) runE() cobraRunSignature {
 			e = newCPUProfileExecutor(e, c.c)
 			e = newMemUsageExecutor(e, c.c)
 			e = newTimeMeasureExecutor(e, c.c)
+			e = newMemoryProfileExecutor(e, c.c)
 		}
 
 		return e.execute()
