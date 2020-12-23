@@ -29,9 +29,11 @@ Available Commands:
   ver         Print the version number of solt
 
 Flags:
-  -d, --diag          Show application diagnostic after run
-  -h, --help          help for solt
-  -p, --path string   REQUIRED. Path to the sources folder
+      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -d, --diag                Show application diagnostic after run
+  -h, --help                help for solt
+      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -p, --path string         REQUIRED. Path to the sources folder
 
 Use "solt [command] --help" for more information about a command.
 ```
@@ -53,8 +55,10 @@ Flags:
   -r, --remove        Remove lost files
 
 Global Flags:
-  -d, --diag          Show application diagnostic after run
-  -p, --path string   REQUIRED. Path to the sources folder
+      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -d, --diag                Show application diagnostic after run
+      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
 ```
@@ -70,8 +74,11 @@ Flags:
   -h, --help   help for lp
 
 Global Flags:
-  -d, --diag          Show application diagnostic after run
-  -p, --path string   REQUIRED. Path to the sources folder
+      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -d, --diag                Show application diagnostic after run
+      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -p, --path string         REQUIRED. Path to the sources folder
+
 ```
 ### Nuget information syntax:
 ```
@@ -86,11 +93,13 @@ Aliases:
 Flags:
   -h, --help       help for nu
   -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
-  -r, --project    Show packages by projects instead
+  -r, --project    Show packages by projects' folders instead
 
 Global Flags:
-  -d, --diag          Show application diagnostic after run
-  -p, --path string   REQUIRED. Path to the sources folder
+      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -d, --diag                Show application diagnostic after run
+      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Validate SDK projects syntax:
 ```
@@ -110,8 +119,8 @@ Flags:
   -h, --help   help for va
 
 Global Flags:
-  -d, --diag          Show application diagnostic after run
-  -p, --path string   REQUIRED. Path to the sources folder
-
-Use "solt va [command] --help" for more information about a command.
+      --cpuprofile string   Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -d, --diag                Show application diagnostic after run
+      --memprofile string   Runs memory profiling if --diag option set. If not set profiling not started. Correct file path should be set here
+  -p, --path string         REQUIRED. Path to the sources folder
 ```
