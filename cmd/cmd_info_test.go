@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"solt/solution"
 	"testing"
 	"text/tabwriter"
 )
@@ -72,7 +73,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(` a\a.sln
+	ass.Equal(solution.ToValidPath(` a\a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148
@@ -88,5 +89,5 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   --------
   Any CPU
 
-`, actual)
+`), actual)
 }

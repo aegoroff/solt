@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"solt/solution"
 	"strings"
 	"testing"
 )
@@ -29,13 +30,13 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(` Solution: <green>a\a.sln</>
+	ass.Equal(solution.ToValidPath(` Solution: <green>a\a.sln</>
    project: <bold>a\a\a.csproj</> has redundant references
      <gray>a\b\b.csproj</>
-`, actual)
+`), actual)
 }
 
-func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
+func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 	var tests = []struct {
 		name      string
 		redundant string
@@ -68,7 +69,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 
 			// Assert
 			actual := p.w.String()
-			ass.Equal("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n", actual)
+			ass.Equal(solution.ToValidPath("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n"), actual)
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)

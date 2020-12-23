@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"solt/solution"
 	"testing"
 )
 
@@ -49,11 +50,11 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
 <red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
  a\a\a1.csproj
-`, actual)
+`), actual)
 }
 
 func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *testing.T) {
@@ -78,11 +79,11 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
 <red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
  a\a1\a1.csproj
-`, actual)
+`), actual)
 }
 
 func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing.T) {
@@ -106,8 +107,8 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(` a\a1\a1.csproj
-`, actual)
+	ass.Equal(solution.ToValidPath(` a\a1\a1.csproj
+`), actual)
 }
 
 func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
@@ -129,10 +130,10 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
 <red>These projects are included into a solution but not found in the file system:</>
 
 <gray>Solution: a\a.sln</>
  a\a\a.csproj
-`, actual)
+`), actual)
 }

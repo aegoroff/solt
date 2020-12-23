@@ -8,6 +8,7 @@ import (
 	"io"
 	"path/filepath"
 	"solt/internal/sys"
+	"solt/solution"
 	"unicode/utf8"
 )
 
@@ -19,6 +20,10 @@ type sdkProjectsFixer struct {
 
 type sdkProjectReference struct {
 	Path string `xml:"Include,attr"`
+}
+
+func (r *sdkProjectReference) path() string {
+	return solution.ToValidPath(r.Path)
 }
 
 func newSdkProjectsFixer(p printer, fs afero.Fs) sdkActioner {
@@ -75,7 +80,7 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 				// decode a whole chunk of following XML into the variable
 				_ = decoder.DecodeElement(&prj, &v)
 				offAfter := decoder.InputOffset()
-				referenceFullPath := filepath.Join(pdir, prj.Path)
+				referenceFullPath := filepath.Join(pdir, prj.path())
 				if toRemove.Contains(referenceFullPath) {
 					ends = append(ends, off)
 					if offAfter > off {

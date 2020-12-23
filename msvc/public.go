@@ -106,7 +106,7 @@ func createPathsFromIncludes(paths []include, basePath string) []string {
 	result := make([]string, len(paths))
 
 	for i, c := range paths {
-		result[i] = filepath.Join(basePath, c.Path)
+		result[i] = filepath.Join(basePath, c.path())
 	}
 
 	return result

@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"solt/solution"
 	"testing"
 )
 
@@ -85,7 +86,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 }
 
 func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
@@ -121,7 +122,7 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(" root\\a\\a\\Properties\\AssemblyInfo1.cs\n root\\b\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+	ass.Equal(solution.ToValidPath(" root\\a\\a\\Properties\\AssemblyInfo1.cs\n root\\b\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 }
 
 func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
@@ -176,7 +177,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 
 		// Assert
 		actual := p.w.String()
-		ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+		ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 	}
 }
 
@@ -201,7 +202,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed successfully.\n", actual)
+	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed successfully.\n"), actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.Error(err)
 }
@@ -228,7 +229,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(" a\\a\\Properties\\AssemblyInfo1.cs\n", actual)
+	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 	_, err := fs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
 }
@@ -252,7 +253,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal("\n<red>These files included into projects but not exist in the file system.</>\n\n<gray>Project: a\\a\\a.csproj</>\n a\\a\\Properties\\AssemblyInfo.cs\n", actual)
+	ass.Equal(solution.ToValidPath("\n<red>These files included into projects but not exist in the file system.</>\n\n<gray>Project: a\\a\\a.csproj</>\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
 }
 
 func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T) {

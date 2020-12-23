@@ -166,7 +166,11 @@ type msbuildProject struct {
 }
 
 type include struct {
-	Path string `xml:"Include,attr"`
+	Include string `xml:"Include,attr"`
+}
+
+func (i *include) path() string {
+	return solution.ToValidPath(i.Include)
 }
 
 type reference struct {
@@ -175,9 +179,14 @@ type reference struct {
 }
 
 type projectReference struct {
-	Path        string `xml:"Include,attr"`
+	Include     string `xml:"Include,attr"`
 	ProjectGUID string `xml:"Project"`
 	Name        string `xml:"Name"`
+}
+
+// Path gets referenced project path
+func (r *projectReference) Path() string {
+	return solution.ToValidPath(r.Include)
 }
 
 type packageReference struct {

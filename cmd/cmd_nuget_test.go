@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"solt/solution"
 	"testing"
 )
 
@@ -26,13 +27,13 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
  a\a
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
   Newtonsoft.Json    12.0.1
-`, actual)
+`), actual)
 }
 
 func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
@@ -55,12 +56,12 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
  a\a
   Package              Version
   -------              -------
   CommandLineParser    2.8.0
-`, actual)
+`), actual)
 }
 
 func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
@@ -106,12 +107,12 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(` <red>Different nuget package's versions in the same solution found:</>
+	ass.Equal(solution.ToValidPath(` <red>Different nuget package's versions in the same solution found:</>
  a\a.sln
   Package              Version
   -------              -------
   CommandLineParser    2.7.0, 2.8.0
-`, actual)
+`), actual)
 }
 
 func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
@@ -134,13 +135,13 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
  a\a.sln
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
   Newtonsoft.Json    12.0.1
-`, actual)
+`), actual)
 }
 
 func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
@@ -194,7 +195,7 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(`
+	ass.Equal(solution.ToValidPath(`
  d\a1\a.sln
   Package              Version
   -------              -------
@@ -205,5 +206,5 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
   -------            -------
   CmdLine            1.0.7.509
   Newtonsoft.Json    12.0.1
-`, actual)
+`), actual)
 }

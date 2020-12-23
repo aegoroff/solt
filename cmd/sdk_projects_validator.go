@@ -150,7 +150,7 @@ func (*sdkProjectsValidator) getReferences(to *projectNode, allNodes rbtree.RbTr
 
 	var result []*projectNode
 	for _, ref := range to.project.Project.ProjectReferences {
-		p := filepath.Join(dir, ref.Path)
+		p := filepath.Join(dir, ref.Path())
 		n := &projectNode{fullPath: &p}
 		from, ok := allNodes.Search(n)
 		if ok {
