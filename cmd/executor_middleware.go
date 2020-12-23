@@ -19,7 +19,7 @@ type executorTimeMeasure struct {
 	start   time.Time
 }
 
-type executorCpuProfile struct {
+type executorCPUProfile struct {
 	wrapped executor
 	c       *conf
 }
@@ -41,8 +41,8 @@ func newTimeMeasureExecutor(e executor, c *conf) executor {
 	return &em
 }
 
-func newCpuProfileExecutor(e executor, c *conf) executor {
-	em := executorCpuProfile{
+func newCPUProfileExecutor(e executor, c *conf) executor {
+	em := executorCPUProfile{
 		wrapped: e,
 		c:       c,
 	}
@@ -78,7 +78,7 @@ func (e *executorTimeMeasure) execute() error {
 	return err
 }
 
-func (e *executorCpuProfile) execute() error {
+func (e *executorCPUProfile) execute() error {
 	if *e.c.diag && *e.c.cpu != "" {
 		f, err := os.Create(*e.c.cpu)
 		if err != nil {
