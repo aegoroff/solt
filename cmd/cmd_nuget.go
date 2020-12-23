@@ -81,17 +81,17 @@ func getFolderNugetPacks(foldersTree rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages := fold.Content.NugetPackages()
-
-		var packs []*pack
-		for _, np := range packages {
-			p := newPack(np.ID, np.Version)
-			packs = append(packs, p)
+		if len(packages) == 0 {
+			return
 		}
 
-		if len(packs) > 0 {
-			n := newNugetFolder(fold.Path, packs)
-			result.Insert(n)
+		packs := make([]*pack, len(packages))
+		for i, np := range packages {
+			packs[i] = newPack(np.ID, np.Version)
 		}
+
+		n := newNugetFolder(fold.Path, packs)
+		result.Insert(n)
 	})
 
 	return result
@@ -146,15 +146,14 @@ func selectSolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) [
 }
 
 func getDirectories(paths []string) []string {
-	result := make([]string, 0, len(paths))
-	for _, path := range paths {
-		result = append(result, filepath.Dir(path))
+	result := make([]string, len(paths))
+	for i, path := range paths {
+		result[i] = filepath.Dir(path)
 	}
 	return result
 }
 
 func mergeNugetPacks(packs []*pack) []*pack {
-	reduced := make([]*pack, 0, len(packs))
 	unique := make(map[string]*pack)
 	for _, p := range packs {
 		exist, ok := unique[p.pkg]
@@ -165,8 +164,11 @@ func mergeNugetPacks(packs []*pack) []*pack {
 		}
 	}
 
+	reduced := make([]*pack, len(unique))
+	i := 0
 	for _, p := range unique {
-		reduced = append(reduced, p)
+		reduced[i] = p
+		i++
 	}
 	return reduced
 }

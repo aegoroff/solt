@@ -24,7 +24,7 @@ func (s *VisualStudioSolution) AllProjectPaths() []string {
 
 // Files gets all files included into MSBuild project
 func (prj *MsbuildProject) Files() []string {
-	var result []string
+
 	folderPath := filepath.Dir(prj.Path)
 
 	msp := prj.Project
@@ -37,7 +37,8 @@ func (prj *MsbuildProject) Files() []string {
 	includes = append(includes, msp.CLInclude...)
 	includes = append(includes, msp.Compiles...)
 
-	result = append(result, createPathsFromIncludes(includes, folderPath)...)
+	result := make([]string, len(includes))
+	copy(result, createPathsFromIncludes(includes, folderPath))
 
 	return result
 }
@@ -102,11 +103,10 @@ func createPathsFromIncludes(paths []include, basePath string) []string {
 		return []string{}
 	}
 
-	result := make([]string, 0, len(paths))
+	result := make([]string, len(paths))
 
-	for _, c := range paths {
-		fp := filepath.Join(basePath, c.Path)
-		result = append(result, fp)
+	for i, c := range paths {
+		result[i] = filepath.Join(basePath, c.Path)
 	}
 
 	return result
