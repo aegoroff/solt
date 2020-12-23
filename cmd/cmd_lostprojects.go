@@ -86,7 +86,7 @@ func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string]
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
 	projectMatch := NewExactMatch(linkedProjects)
-	var projectsOutsideSolution []*msvc.MsbuildProject
+	projectsOutsideSolution := allProjects[:0]
 	var allSolutionFiles []string
 
 	for _, prj := range allProjects {
