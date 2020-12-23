@@ -195,16 +195,9 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := p.w.String()
-	ass.Equal(solution.ToValidPath(`
- d\a1\a.sln
-  Package              Version
-  -------              -------
-  CommandLineParser    2.8.0
-
- d\a\a.sln
-  Package            Version
-  -------            -------
-  CmdLine            1.0.7.509
-  Newtonsoft.Json    12.0.1
-`), actual)
+	ass.Contains(actual, solution.ToValidPath("d\\a1\\a.sln"))
+	ass.Contains(actual, solution.ToValidPath("d\\a\\a.sln"))
+	ass.Contains(actual, "CommandLineParser    2.8.0")
+	ass.Contains(actual, "CmdLine            1.0.7.509")
+	ass.Contains(actual, "Newtonsoft.Json    12.0.1")
 }
