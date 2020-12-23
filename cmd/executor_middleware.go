@@ -86,9 +86,7 @@ func (e *executorCpuProfile) execute() error {
 		}
 		err = pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
-		err = e.wrapped.execute()
-		return err
-	} else {
-		return e.wrapped.execute()
 	}
+
+	return e.wrapped.execute()
 }
