@@ -135,7 +135,6 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 func onXMLFile(path string, fs afero.Fs, result interface{}) error {
 	err := unmarshalXMLFrom(path, fs, result)
 	if err != nil {
-		log.Printf("%s: %v\n", path, err)
 		return err
 	}
 
