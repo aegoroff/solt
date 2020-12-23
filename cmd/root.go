@@ -31,7 +31,8 @@ func execute(fs afero.Fs, p printer, args ...string) error {
 	var diag bool
 
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
-	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", "Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here")
+	const cDescr = "Runs CPU profiling if --diag option set. If not set profiling not started. Correct file path should be set here"
+	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", cDescr)
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
 	c := &conf{
