@@ -117,7 +117,7 @@ func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes 
 
 		allPairs(refs, func(from *projectNode, to *projectNode) {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
-			if paths != nil && len(paths) > 0 {
+			if len(paths) > 0 {
 				rrs.Add(from.String())
 			}
 		})
