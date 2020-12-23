@@ -38,8 +38,10 @@ func (lx *lexer) Lex(lval *yySymType) int {
 	return int(lval.tok)
 }
 
-func (*lexer) Error(e string) {
-	log.Print(e)
+func (lx *lexer) Error(e string) {
+	if lx.debug {
+		log.Print(e)
+	}
 }
 
 // Parse parses visual studio solution file specified by io.Reader
