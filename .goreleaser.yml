@@ -1,0 +1,68 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: "x64"
+    binary: dirstat
+    ldflags: -s -w -X solt/cmd.Version={{ .Version }}
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+
+  - id: "386"
+    binary: solt
+    ldflags: -s -w -X solt/cmd.Version={{ .Version }}
+    goos:
+      - linux
+      - windows
+    goarch:
+      - 386
+
+  - id: "arm"
+    binary: solt
+    ldflags: -s -w -X solt/cmd.Version={{ .Version }}
+    goos:
+      - linux
+    goarch:
+      - arm
+      - arm64
+    goarm:
+      - 7
+
+archives:
+  - id: default
+    builds:
+      - x64
+      - arm
+      - 386
+
+brews:
+-
+    goarm: 7
+    tap:
+      owner: aegoroff
+      name: homebrew-tap
+    commit_author:
+      name: "Alexander Egorov"
+      email: "egoroff@gmail.com"
+    homepage: "https://github.com/aegoroff/solt"
+    description: "A small commandline app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects."
+
+signs:
+  - artifacts: checksum
+
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

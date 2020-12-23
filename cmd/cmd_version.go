@@ -5,7 +5,7 @@ import (
 )
 
 // Version defines program version
-var Version = "0.10.0"
+var Version = "0.11.0"
 
 type versionCommand struct {
 	baseCommand
