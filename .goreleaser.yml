@@ -5,7 +5,7 @@ before:
     - go mod download
 builds:
   - id: "x64"
-    binary: dirstat
+    binary: solt
     ldflags: -s -w -X solt/cmd.Version={{ .Version }}
     goos:
       - linux
