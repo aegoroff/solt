@@ -78,7 +78,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
-	packs := getNugetPacks(solutions, nugets)
+	packs := spreadNugetPacks(solutions, nugets)
 
 	if onlyMismatch {
 		keepOnlyMismatch(packs)
@@ -137,7 +137,8 @@ func printNugetBySolutions(packs rbtree.RbTree, onlyMismatch bool, p printer) {
 	})
 }
 
-func getNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree) rbtree.RbTree {
+// spreadNugetPacks binds all found nuget packages by solutions
+func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
 	for _, sol := range solutions {
