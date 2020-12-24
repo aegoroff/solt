@@ -56,8 +56,7 @@ Aliases:
 Flags:
   -a, --all           Search all lost files including that have 
                       links to but not exists in file system
-  -f, --file string   Lost files filter extension. 
-                      If not set .cs extension used (default ".cs")
+  -f, --file string   Lost files filter extension. (default ".cs")
   -h, --help          help for lf
   -r, --remove        Remove lost files
 
