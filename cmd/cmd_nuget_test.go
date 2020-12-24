@@ -28,7 +28,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	// Assert
 	actual := p.w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a (packages.config)
+ <bold>a\a</> (packages.config)
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
@@ -57,7 +57,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	// Assert
 	actual := p.w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a (a.csproj)
+ <bold>a\a</> (a.csproj)
   Package              Version
   -------              -------
   CommandLineParser    2.8.0
