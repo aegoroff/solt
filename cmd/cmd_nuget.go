@@ -170,9 +170,9 @@ func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*
 }
 
 func getDirectories(paths []string) []string {
-	result := make([]string, len(paths))
-	for i, path := range paths {
-		result[i] = filepath.Dir(path)
+	result := paths[:0]
+	for _, path := range paths {
+		result = append(result, filepath.Dir(path))
 	}
 	return result
 }
