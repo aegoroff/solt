@@ -1,53 +1,75 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
 	"path/filepath"
 	"solt/msvc"
+	"strings"
 )
 
 const empiricNugetPacksForEachProject = 16
 
 type nugetCommand struct {
 	baseCommand
-	mismatch  bool
-	byProject bool
+	mismatch bool
+}
+
+type nugetByProjectCommand struct {
+	baseCommand
 }
 
 func newNuget(c *conf) *cobra.Command {
 	var mismatch bool
-	var byProject bool
 
 	cc := cobraCreator{
 		createCmd: func() executor {
 			nc := nugetCommand{
 				baseCommand: newBaseCmd(c),
 				mismatch:    mismatch,
-				byProject:   byProject,
 			}
 			return &nc
 		},
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("nu", "nuget", "Get nuget packages information within solutions, projects or find Nuget mismatches in solution")
+	descr := "Get nuget packages information within solutions"
+	cmd := cc.newCobraCommand("nu", "nuget", descr)
 
-	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, "Find packages to consolidate i.e. packages with different versions in the same solution")
-	cmd.Flags().BoolVarP(&byProject, "project", "r", false, "Show packages by projects' folders instead")
+	mdescr := "Find packages to consolidate i.e. packages with different versions in the same solution"
+	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, mdescr)
+
+	cmd.AddCommand(newNugetByProject(c))
+
+	return cmd
+}
+
+func newNugetByProject(c *conf) *cobra.Command {
+	cc := cobraCreator{
+		createCmd: func() executor {
+			return &nugetByProjectCommand{
+				baseCommand: newBaseCmd(c),
+			}
+		},
+		c: c,
+	}
+
+	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
+	cmd := cc.newCobraCommand("p", "project", msg)
 
 	return cmd
 }
 
 func (c *nugetCommand) execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+	nugetBySolutions(foldersTree, c.mismatch, c.prn)
+	return nil
+}
 
-	if c.mismatch || !c.byProject {
-		nugetBySolutions(foldersTree, c.mismatch, c.prn)
-	} else {
-		nugetByProjects(foldersTree, c.prn)
-	}
-
+func (c *nugetByProjectCommand) execute() error {
+	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
+	nugetByProjects(foldersTree, c.prn)
 	return nil
 }
 
@@ -73,14 +95,15 @@ func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 
 	it.Foreach(func(n rbtree.Comparable) {
 		f := n.(*nugetFolder)
-		prn.print(f.path, f.packs)
+		src := strings.Join(f.sources, ", ")
+		prn.print(fmt.Sprintf("%s (%s)", f.path, src), f.packs)
 	})
 }
 
 func getFolderNugetPacks(foldersTree rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		packages := fold.Content.NugetPackages()
+		packages, sources := fold.Content.NugetPackages()
 		if len(packages) == 0 {
 			return
 		}
@@ -90,7 +113,7 @@ func getFolderNugetPacks(foldersTree rbtree.RbTree) rbtree.RbTree {
 			packs[i] = newPack(np.ID, np.Version)
 		}
 
-		n := newNugetFolder(fold.Path, packs)
+		n := newNugetFolder(fold.Path, packs, sources)
 		result.Insert(n)
 	})
 
@@ -122,7 +145,7 @@ func getNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree)
 		reduced := mergeNugetPacks(spacks)
 
 		if len(reduced) > 0 {
-			nf := newNugetFolder(sol.Path, reduced)
+			nf := newNugetFolder(sol.Path, reduced, nil)
 			result.Insert(nf)
 		}
 	}
@@ -135,7 +158,7 @@ func selectSolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) [
 	result := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
 
 	for _, path := range paths {
-		sv := newNugetFolder(path, nil)
+		sv := newNugetFolder(path, nil, nil)
 		folder, ok := nugets.Search(sv)
 		if ok {
 			packs := folder.(*nugetFolder).packs

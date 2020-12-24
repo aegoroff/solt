@@ -23,12 +23,12 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = execute(memfs, p, "nu", "-p", dir, "-r")
+	_ = execute(memfs, p, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a
+ a\a (packages.config)
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
@@ -52,12 +52,12 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	p := newMockPrn()
 
 	// Act
-	_ = execute(memfs, p, "nu", "-p", dir, "-r")
+	_ = execute(memfs, p, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := p.w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a
+ a\a (a.csproj)
   Package              Version
   -------              -------
   CommandLineParser    2.8.0

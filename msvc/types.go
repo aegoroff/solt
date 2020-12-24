@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"path/filepath"
 	"solt/solution"
 )
 
@@ -30,17 +31,25 @@ type FolderContent struct {
 }
 
 // NugetPackages gets all nuget packages found in a folder
-func (c *FolderContent) NugetPackages() []*NugetPackage {
+func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 	result := make([]*NugetPackage, 0)
+	var sources []string
 
 	if c.Packages != nil {
 		// old style projects (nuget packages references in separate files)
 		result = append(result, c.Packages.nugetPackages()...)
+		sources = append(sources, packagesConfigFile)
 	}
 	for _, prj := range c.Projects {
-		result = append(result, prj.Project.nugetPackages()...)
+		np := prj.Project.nugetPackages()
+		result = append(result, np...)
+		if len(np) == 0 {
+			continue
+		}
+		pp := solution.ToValidPath(prj.Path)
+		sources = append(sources, filepath.Base(pp))
 	}
-	return result
+	return result, sources
 }
 
 func (p *packages) nugetPackages() []*NugetPackage {
