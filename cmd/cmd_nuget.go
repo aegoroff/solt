@@ -142,8 +142,8 @@ func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTr
 	result := rbtree.NewRbTree()
 
 	for _, sol := range solutions {
-		spacks := selectSolutionPacks(sol, nugets)
-		reduced := mergeNugetPacks(spacks)
+		raw := onlySolutionPacks(sol, nugets)
+		reduced := mergeNugetPacks(raw)
 
 		if len(reduced) > 0 {
 			nf := newNugetFolder(sol.Path, reduced, nil)
@@ -154,7 +154,7 @@ func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTr
 	return result
 }
 
-func selectSolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*pack {
+func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*pack {
 	paths := getDirectories(sol.AllProjectPaths())
 	result := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
 
