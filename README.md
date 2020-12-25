@@ -96,27 +96,29 @@ Global Flags:
 ```
 ### Nuget information syntax:
 ```
-Get nuget packages information within solutions, projects or find Nuget mismatches in solution
+Get nuget packages information within solutions
 
 Usage:
   solt nu [flags]
+  solt nu [command]
 
 Aliases:
   nu, nuget
 
+Available Commands:
+  p           Get nuget packages information by projects' folders i.e. from packages.config or SDK project files
+
 Flags:
   -h, --help       help for nu
-  -m, --mismatch   Find packages to consolidate i.e. packages 
-                   with different versions in the same solution
-  -r, --project    Show packages by projects' folders instead
+  -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
 
 Global Flags:
       --cpuprofile string   Runs CPU profiling if --diag option set.
-                            If not set profiling not started.
+                            If not set profiling not started. 
                             Correct file path should be set here
   -d, --diag                Show application diagnostic after run
-      --memprofile string   Runs memory profiling if --diag option set.
-                            If not set profiling not started.
+      --memprofile string   Runs memory profiling if --diag option set. 
+                            If not set profiling not started. 
                             Correct file path should be set here
   -p, --path string         REQUIRED. Path to the sources folder
 ```
