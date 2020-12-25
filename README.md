@@ -106,11 +106,13 @@ Aliases:
   nu, nuget
 
 Available Commands:
-  p           Get nuget packages information by projects' folders i.e. from packages.config or SDK project files
+  p           Get nuget packages information by projects' folders 
+              i.e. from packages.config or SDK project files
 
 Flags:
   -h, --help       help for nu
-  -m, --mismatch   Find packages to consolidate i.e. packages with different versions in the same solution
+  -m, --mismatch   Find packages to consolidate i.e. packages 
+                   with different versions in the same solution
 
 Global Flags:
       --cpuprofile string   Runs CPU profiling if --diag option set.
