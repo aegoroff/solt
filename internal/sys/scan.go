@@ -2,8 +2,6 @@ package sys
 
 import (
 	"github.com/spf13/afero"
-	"io"
-	"log"
 	"path/filepath"
 )
 
@@ -113,7 +111,7 @@ func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) 
 	defer close(results)
 
 	bf := newWalker(fs, 32)
-	defer close(bf.restrictor)
+	defer bf.closeRestrict()
 
 	bf.push(path)
 
@@ -133,16 +131,5 @@ func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) 
 
 			ql = bf.len()
 		}
-	}
-}
-
-// Close wraps io.Closer Close func with error handling
-func Close(c io.Closer) {
-	if c == nil {
-		return
-	}
-	err := c.Close()
-	if err != nil {
-		log.Println(err)
 	}
 }
