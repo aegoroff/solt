@@ -27,11 +27,6 @@ func newFolder(path string) *Folder {
 	return &f
 }
 
-type reader struct {
-	modules    []readerModule
-	aggregator chan *Folder
-}
-
 type readerPackagesConfig struct {
 	fs afero.Fs
 }

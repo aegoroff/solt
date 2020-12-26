@@ -7,6 +7,15 @@ import (
 	"sync"
 )
 
+type reader struct {
+	modules    []readerModule
+	aggregator chan *Folder
+}
+
+type fileEventHanlder struct {
+	ch chan<- string
+}
+
 // ReadSolutionDir reads filesystem directory and all its childs to get information
 // about all solutions and projects in this tree.
 // It returns tree
@@ -51,22 +60,21 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 		}
 	}(fhandlers)
 
-	handlers := []sys.ScanHandler{func(evt *sys.ScanEvent) {
-		if evt.File == nil {
-			return
-		}
-		f := evt.File
-		fileChannel <- f.Path
-	}}
-
+	fh := &fileEventHanlder{ch: fileChannel}
 	// Start reading path
 	wg.Add(1)
 
-	sys.Scan(path, fs, handlers)
+	sys.Scan(path, fs, fh)
 
 	close(fileChannel)
 
 	wg.Wait()
 
 	return result
+}
+
+func (f *fileEventHanlder) Handle(evt *sys.ScanEvent) {
+	if evt.File != nil {
+		f.ch <- evt.File.Path
+	}
 }

@@ -5,8 +5,13 @@ import (
 	"io"
 	"log"
 	"path/filepath"
-	"sync"
 )
+
+// Handler defines scanning handler interface that handles filesystem events
+type Handler interface {
+	// Handle handles filesystem event
+	Handle(evt *ScanEvent)
+}
 
 // ScanEvent defines scanning event structure
 // that can contain file or folder event information
@@ -35,9 +40,6 @@ type FolderEntry struct {
 	Count int64
 }
 
-// ScanHandler defines function prototype that handles each file system event received
-type ScanHandler func(f *ScanEvent)
-
 type filesystemItem struct {
 	dir   string
 	name  string
@@ -61,152 +63,80 @@ const (
 
 // Scan do specified path scanning and executes folder handler on each folder
 // and all file handlers on each file
-func Scan(path string, fs afero.Fs, handlers []ScanHandler) {
-	filesystemCh := make(chan *filesystemItem, 1024)
-	go walkDirBreadthFirst(path, fs, filesystemCh)
+func Scan(path string, fs afero.Fs, handlers ...Handler) {
+	fsEvents := make(chan *filesystemItem, 1024)
+	go walkBreadthFirst(path, fs, fsEvents)
 
-	scanChan := make(chan *ScanEvent, 1024)
+	scanEvents := make(chan *ScanEvent, 1024)
 
-	// Reading filesystem events
-	go func() {
-		defer close(scanChan)
-		for item := range filesystemCh {
-			se := ScanEvent{}
-			if item.event == fsEventDir {
-				fe := FileEntry{
-					Size: item.size,
-					Path: item.dir,
-				}
-				se.Folder = &FolderEntry{
-					FileEntry: fe,
-					Count:     item.count,
-				}
-			} else {
-				se.File = &FileEntry{
-					Size: item.size,
-					Path: filepath.Join(item.dir, item.name),
-				}
-			}
-			scanChan <- &se
-		}
-	}()
+	go readFileSystemEvents(fsEvents, scanEvents)
 
 	// Read all files from channel
-	for file := range scanChan {
+	for file := range scanEvents {
 		for _, h := range handlers {
-			h(file)
+			h.Handle(file)
 		}
 	}
 }
 
-func walkDirBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
+func readFileSystemEvents(in <-chan *filesystemItem, out chan<- *ScanEvent) {
+	defer close(out)
+	for item := range in {
+		se := ScanEvent{}
+		if item.event == fsEventDir {
+			se.Folder = newFolderEntry(item)
+		} else {
+			se.File = newFileEntry(item)
+		}
+		out <- &se
+	}
+}
+
+func newFileEntry(item *filesystemItem) *FileEntry {
+	return &FileEntry{
+		Size: item.size,
+		Path: filepath.Join(item.dir, item.name),
+	}
+}
+
+func newFolderEntry(item *filesystemItem) *FolderEntry {
+	return &FolderEntry{
+		FileEntry: FileEntry{
+			Size: item.size,
+			Path: item.dir,
+		},
+		Count: item.count,
+	}
+}
+
+func walkBreadthFirst(path string, fs afero.Fs, results chan<- *filesystemItem) {
 	defer close(results)
-	var concurrencyRestrict = make(chan struct{}, 32)
-	defer close(concurrencyRestrict)
 
-	var wg sync.WaitGroup
-	var mu sync.RWMutex
-	queue := make([]string, 0)
+	bf := newWalker(fs, 32)
+	defer close(bf.restrictor)
 
-	queue = append(queue, path)
+	bf.push(path)
 
-	ql := len(queue)
+	ql := len(bf.queue)
 
 	for ql > 0 {
-		// Peek
-		mu.RLock()
-		currentDir := queue[0]
-		mu.RUnlock()
+		currentDir := bf.peek()
 
-		wg.Add(1)
-		go func(d string) {
-			defer wg.Done()
+		bf.wg.Add(1)
+		go bf.walk(currentDir, results)
 
-			entries := dirents(d, fs, concurrencyRestrict)
-
-			if entries == nil {
-				return
-			}
-
-			// Folder stat
-			var count int64
-			var size int64
-
-			for _, entry := range entries {
-				// Queue subdirs to walk in a queue
-				if entry.isDir {
-					subdir := filepath.Join(d, entry.name)
-
-					// Push
-					mu.Lock()
-					queue = append(queue, subdir)
-					mu.Unlock()
-				} else {
-					// Send to channel
-					fileEvent := filesystemItem{
-						dir:   d,
-						name:  entry.name,
-						event: fsEventFile,
-						count: 1,
-						size:  entry.size,
-					}
-					results <- &fileEvent
-
-					// update folder stat
-					count++
-					size += entry.size
-				}
-			}
-
-			dirEvent := filesystemItem{
-				dir:   d,
-				event: fsEventDir,
-				count: count,
-				size:  size,
-			}
-			results <- &dirEvent
-		}(currentDir)
-
-		// Pop
-		mu.Lock()
-		queue = queue[1:]
-		ql = len(queue)
-		mu.Unlock()
+		ql = bf.pop()
 
 		if ql == 0 {
 			// Waiting pending goroutines
-			wg.Wait()
+			bf.wait()
 
-			mu.RLock()
-			ql = len(queue)
-			mu.RUnlock()
+			ql = bf.len()
 		}
 	}
 }
 
-func dirents(path string, fs afero.Fs, restrict chan struct{}) []*filesysEntry {
-	restrict <- struct{}{}
-	defer func() { <-restrict }()
-	f, err := fs.Open(path)
-	if err != nil {
-		return nil
-	}
-	defer Close(f)
-
-	entries, err := f.Readdir(-1)
-	if err != nil {
-		return nil
-	}
-
-	result := make([]*filesysEntry, len(entries))
-	for i, e := range entries {
-		result[i] = &filesysEntry{name: e.Name(), size: e.Size(), isDir: e.IsDir()}
-	}
-
-	return result
-}
-
-// Close wraps io.Closer Close func with error habdling
+// Close wraps io.Closer Close func with error handling
 func Close(c io.Closer) {
 	if c == nil {
 		return
