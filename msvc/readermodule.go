@@ -60,7 +60,7 @@ func (*readerPackagesConfig) filter(path string) bool {
 func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 	pack := packages{}
 
-	err := onXMLFile(path, r.fs, &pack)
+	err := unmarshalXMLFrom(path, r.fs, &pack)
 	if err != nil {
 		return nil, false
 	}
@@ -82,7 +82,7 @@ func (*readerMsbuild) filter(path string) bool {
 func (r *readerMsbuild) read(path string) (*Folder, bool) {
 	project := msbuildProject{}
 
-	err := onXMLFile(path, r.fs, &project)
+	err := unmarshalXMLFrom(path, r.fs, &project)
 	if err != nil {
 		return nil, false
 	}
@@ -125,13 +125,4 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 	f.Content.Solutions = append(f.Content.Solutions, &s)
 
 	return f, true
-}
-
-func onXMLFile(path string, fs afero.Fs, result interface{}) error {
-	err := unmarshalXMLFrom(path, fs, result)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
