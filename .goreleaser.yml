@@ -50,6 +50,8 @@ brews:
     commit_author:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
+    test: |
+        system "#{bin}/dirstat ver"
     homepage: "https://github.com/aegoroff/solt"
     description: "A small commandline app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects."
     license: "MIT"
