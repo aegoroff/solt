@@ -27,6 +27,13 @@ Update solt if already installed:
 brew upgrade solt
 ```
 
+**scoop**:
+
+```sh
+scoop bucket add aegoroff https://github.com/aegoroff/scoop-bucket.git
+scoop install solt
+```
+
 **manually**:
 
 Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/solt/releases) and
