@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/dustin/go-humanize"
 	"log"
 	"runtime"
 	"runtime/pprof"
-	"solt/internal/sys"
 	"time"
 )
 
@@ -112,7 +112,7 @@ func (e *executorMemoryProfile) execute() error {
 		if err != nil {
 			return err
 		}
-		defer sys.Close(f)
+		defer scan.Close(f)
 
 		err = pprof.WriteHeapProfile(f)
 		if err != nil {

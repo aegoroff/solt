@@ -3,6 +3,7 @@ package sys
 import (
 	"bytes"
 	"fmt"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"io"
 	"log"
@@ -94,7 +95,7 @@ func (f *filer) Write(path string, content []byte) {
 	if err != nil {
 		return
 	}
-	defer Close(fi)
+	defer scan.Close(fi)
 
 	_, err = fi.Write(content)
 	if err != nil {
@@ -107,7 +108,7 @@ func (f *filer) Read(path string) *bytes.Buffer {
 	if err != nil {
 		return nil
 	}
-	defer Close(file)
+	defer scan.Close(file)
 
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, file)

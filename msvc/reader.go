@@ -1,9 +1,9 @@
 package msvc
 
 import (
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
-	"solt/internal/sys"
 	"sync"
 )
 
@@ -64,7 +64,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	// Start reading path
 	wg.Add(1)
 
-	sys.Scan(path, fs, fh)
+	scan.Scan(path, fs, fh)
 
 	close(fileChannel)
 
@@ -73,7 +73,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	return result
 }
 
-func (f *fileEventHanlder) Handle(evt *sys.ScanEvent) {
+func (f *fileEventHanlder) Handle(evt *scan.ScanEvent) {
 	if evt.File != nil {
 		f.ch <- evt.File.Path
 	}

@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/aegoroff/dirstat/scan"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"io"
@@ -56,7 +57,7 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 	if err != nil {
 		return nil
 	}
-	defer sys.Close(file)
+	defer scan.Close(file)
 
 	decoder := xml.NewDecoder(file)
 	pdir := filepath.Dir(project)

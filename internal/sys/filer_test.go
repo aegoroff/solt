@@ -2,6 +2,7 @@ package sys
 
 import (
 	"bytes"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -100,7 +101,7 @@ func TestClose(t *testing.T) {
 	f, err := memfs.Open("some")
 
 	// Act
-	Close(f)
+	scan.Close(f)
 
 	// Assert
 	ass.Error(err)

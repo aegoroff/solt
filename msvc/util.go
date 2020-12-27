@@ -3,11 +3,11 @@ package msvc
 import (
 	"bufio"
 	"encoding/xml"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"io"
 	"log"
 	"path/filepath"
-	"solt/internal/sys"
 )
 
 func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
@@ -16,7 +16,7 @@ func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
 		log.Print(err)
 		return err
 	}
-	defer sys.Close(f)
+	defer scan.Close(f)
 
 	return unmarshalXML(f, result)
 }
