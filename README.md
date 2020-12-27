@@ -10,6 +10,28 @@ The tool can find files that aren't included into any project and projects that
 are not included into any solution. Additionally the tool shows some useful
 solution statistic
 
+## Install the pre-compiled binary
+
+**homebrew** (only on macOS and Linux for now):
+
+Add my tap (do it once):
+```sh
+brew tap aegoroff/tap
+```
+And the install solt:
+```sh
+brew install solt
+```
+Update solt if already installed:
+```sh
+brew upgrade solt
+```
+
+**manually**:
+
+Download the pre-compiled binaries from the [releases](https://github.com/aegoroff/solt/releases) and
+copy to the desired location.
+
 Command line syntax:
 --------------------
 ```
