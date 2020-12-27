@@ -29,6 +29,6 @@ func newVersion(c *conf) *cobra.Command {
 }
 
 func (c *versionCommand) execute() error {
-	c.prn.cprint("solt v%s\n", Version)
+	c.prn.cprint("%s\n", Version)
 	return nil
 }

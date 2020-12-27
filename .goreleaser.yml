@@ -51,7 +51,7 @@ brews:
       name: "Alexander Egorov"
       email: "egoroff@gmail.com"
     test: |
-        system "#{bin}/solt ver"
+      assert_match version.to_s, shell_output("#{bin}/solt ver")
     homepage: "https://github.com/aegoroff/solt"
     description: "Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects"
     license: "MIT"

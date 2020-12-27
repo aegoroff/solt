@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -30,7 +29,7 @@ func Test_Version(t *testing.T) {
 			_ = Execute(memfs, p.w, test.cmd...)
 
 			// Assert
-			ass.Contains(p.w.String(), fmt.Sprintf("solt v%s\n", Version))
+			ass.Contains(p.w.String(), Version)
 		})
 	}
 }
