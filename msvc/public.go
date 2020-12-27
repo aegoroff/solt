@@ -9,7 +9,7 @@ import (
 )
 
 // AllProjectPaths gets all possible projects' paths defined in solution
-func (s *VisualStudioSolution) AllProjectPaths() []string {
+func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []string {
 	solutionPath := filepath.Dir(s.Path)
 	var paths = make([]string, 0, len(s.Solution.Projects))
 	for _, sp := range s.Solution.Projects {
@@ -17,7 +17,7 @@ func (s *VisualStudioSolution) AllProjectPaths() []string {
 			continue
 		}
 		fullProjectPath := filepath.Join(solutionPath, sp.Path)
-		paths = append(paths, fullProjectPath)
+		paths = append(paths, decorator(fullProjectPath))
 	}
 	return paths
 }

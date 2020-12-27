@@ -121,6 +121,12 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 // StringDecorator defines string decorating function
 type StringDecorator func(s string) string
 
+// PassThrough just return original string without modification
+// it can be used as non destructive decorator
+func PassThrough(s string) string {
+	return s
+}
+
 // LessThan implements rbtree.Comparable interface
 func (x *Folder) LessThan(y rbtree.Comparable) bool {
 	return x.compare(y) < 0

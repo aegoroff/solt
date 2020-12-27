@@ -74,7 +74,7 @@ func (c *nugetByProjectCommand) execute() error {
 }
 
 func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
-	nugets := getFolderNugetPacks(foldersTree)
+	nugets := nugetsByFolders(foldersTree)
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
@@ -88,7 +88,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 }
 
 func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
-	nugets := getFolderNugetPacks(foldersTree)
+	nugets := nugetsByFolders(foldersTree)
 
 	prn := newNugetPrinter(p)
 	it := rbtree.NewWalkInorder(nugets)
@@ -100,7 +100,7 @@ func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
 	})
 }
 
-func getFolderNugetPacks(foldersTree rbtree.RbTree) rbtree.RbTree {
+func nugetsByFolders(foldersTree rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
@@ -155,7 +155,7 @@ func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTr
 }
 
 func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*pack {
-	paths := getDirectories(sol.AllProjectPaths())
+	paths := sol.AllProjectPaths(filepath.Dir)
 	result := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
 
 	for _, path := range paths {
@@ -165,14 +165,6 @@ func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*
 			packs := folder.(*nugetFolder).packs
 			result = append(result, packs...)
 		}
-	}
-	return result
-}
-
-func getDirectories(paths []string) []string {
-	result := paths[:0]
-	for _, path := range paths {
-		result = append(result, filepath.Dir(path))
 	}
 	return result
 }
