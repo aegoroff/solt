@@ -18,7 +18,7 @@ Add my tap (do it once):
 ```sh
 brew tap aegoroff/tap
 ```
-And the install solt:
+And then install solt:
 ```sh
 brew install solt
 ```
