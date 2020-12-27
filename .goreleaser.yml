@@ -53,7 +53,7 @@ brews:
     test: |
         system "#{bin}/solt ver"
     homepage: "https://github.com/aegoroff/solt"
-    description: "A small commandline app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects."
+    description: "Small commandline app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects."
     license: "MIT"
 
 signs:
