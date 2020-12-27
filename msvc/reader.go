@@ -64,7 +64,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	// Start reading path
 	wg.Add(1)
 
-	scan.Scan(path, fs, fh)
+	scan.Scan(path, newFs(fs), fh)
 
 	close(fileChannel)
 

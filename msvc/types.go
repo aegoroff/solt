@@ -2,8 +2,10 @@ package msvc
 
 import (
 	"encoding/xml"
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/solution"
 )
@@ -206,4 +208,16 @@ type packageReference struct {
 type msbuildImport struct {
 	Project string `xml:"Project,attr"`
 	Sdk     string `xml:"Sdk,attr"`
+}
+
+type filesystem struct {
+	fs afero.Fs
+}
+
+func newFs(fs afero.Fs) scan.Filesystem {
+	return &filesystem{fs: fs}
+}
+
+func (f *filesystem) Open(path string) (scan.File, error) {
+	return f.fs.Open(path)
 }
