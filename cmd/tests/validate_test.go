@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"solt/cmd"
+	"solt/cmd/api"
 	"solt/solution"
 	"strings"
 	"testing"
@@ -25,15 +26,16 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "va", "-p", dir)
+	_ = cmd.Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` Solution: a\a.sln
-   project: a\a\a.csproj has redundant references
-     a\b\b.csproj
+	ass.Equal(solution.ToValidPath(` Solution: <green>a\a.sln</>
+   project: <bold>a\a\a.csproj</> has redundant references
+     <gray>a\b\b.csproj</>
 `), actual)
 }
 
@@ -64,13 +66,14 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 			w := bytes.NewBufferString("")
+			env := api.NewStringEnvironment(w)
 
 			// Act
-			_ = cmd.Execute(memfs, w, "va", "fix", "-p", dir)
+			_ = cmd.Execute(memfs, env, "va", "fix", "-p", dir)
 
 			// Assert
 			actual := w.String()
-			ass.Equal(solution.ToValidPath("Fixed 1 redundant project references in 1 projects within solution a\\a.sln\n"), actual)
+			ass.Equal(solution.ToValidPath("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n"), actual)
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)
@@ -97,9 +100,10 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "va", "-p", dir)
+	_ = cmd.Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -120,9 +124,10 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "fr", "-p", dir)
+	_ = cmd.Execute(memfs, env, "fr", "-p", dir)
 
 	// Assert
 	actual := w.String()

@@ -3,7 +3,6 @@ package nuget
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"github.com/gookit/color"
 	"solt/cmd/api"
 	"sort"
 	"strings"
@@ -40,9 +39,7 @@ type nugetprint struct {
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
-	n.p.SetColor(color.FgGray)
-	n.p.Cprint("\n %s\n", parent)
-	n.p.ResetColor()
+	n.p.Cprint("\n <gray>%s</>\n", parent)
 
 	const format = "  %v\t%v\n"
 	n.p.Tprint(format, "Package", "Version")

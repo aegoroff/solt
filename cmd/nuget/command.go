@@ -123,7 +123,7 @@ func nugetByProjects(foldersTree rbtree.RbTree, p api.Printer) {
 	it.Foreach(func(n rbtree.Comparable) {
 		f := n.(*nugetFolder)
 		src := strings.Join(f.sources, ", ")
-		prn.print(fmt.Sprintf("<bold>%s</> (%s)", f.path, src), f.packs)
+		prn.print(fmt.Sprintf("%s (%s)", f.path, src), f.packs)
 	})
 }
 

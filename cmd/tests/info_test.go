@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd"
+	"solt/cmd/api"
 	"solt/solution"
 	"testing"
 )
@@ -23,13 +24,14 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "in", "-p", dir)
+	_ = cmd.Execute(memfs, env, "in", "-p", dir)
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` a\a.sln
+	ass.Equal(solution.ToValidPath(` <gray>a\a.sln</>
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148

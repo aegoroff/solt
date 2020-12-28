@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd"
+	"solt/cmd/api"
 	"testing"
 )
 
@@ -26,9 +27,10 @@ func Test_Version(t *testing.T) {
 			ass := assert.New(t)
 			memfs := afero.NewMemMapFs()
 			w := bytes.NewBufferString("")
+			env := api.NewStringEnvironment(w)
 
 			// Act
-			_ = cmd.Execute(memfs, w, test.cmd...)
+			_ = cmd.Execute(memfs, env, test.cmd...)
 
 			// Assert
 			ass.Contains(w.String(), cmd.Version)
@@ -41,9 +43,10 @@ func Test_Help(t *testing.T) {
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "")
+	_ = cmd.Execute(memfs, env, "")
 
 	// Assert
 	ass.Contains(w.String(), "")

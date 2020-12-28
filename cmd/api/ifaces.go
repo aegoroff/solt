@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/gookit/color"
 	"io"
 	"text/tabwriter"
 )
@@ -24,12 +23,6 @@ type Printer interface {
 
 	// cprint prints data with suppport colorizing
 	Cprint(format string, a ...interface{})
-
-	// setColor sets console color
-	SetColor(c color.Color)
-
-	// resetColor resets console color
-	ResetColor()
 }
 
 type Executor interface {

@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd"
+	"solt/cmd/api"
 	"solt/solution"
 	"testing"
 )
@@ -23,9 +24,10 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -57,9 +59,10 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 		w := bytes.NewBufferString("")
+		env := api.NewStringEnvironment(w)
 
 		// Act
-		_ = cmd.Execute(memfs, w, "lf", "-p", dir)
+		_ = cmd.Execute(memfs, env, "lf", "-p", dir)
 
 		// Assert
 		actual := w.String()
@@ -82,9 +85,10 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -118,9 +122,10 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", root)
+	_ = cmd.Execute(memfs, env, "lf", "-p", root)
 
 	// Assert
 	actual := w.String()
@@ -141,9 +146,10 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -173,9 +179,10 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 		w := bytes.NewBufferString("")
+		env := api.NewStringEnvironment(w)
 
 		// Act
-		_ = cmd.Execute(memfs, w, "lf", "-p", dir, "-f", tst.filter)
+		_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
 		actual := w.String()
@@ -198,9 +205,10 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir, "-r")
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := w.String()
@@ -225,9 +233,10 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 
 	fs := afero.NewReadOnlyFs(memfs)
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(fs, w, "lf", "-p", dir, "-r")
+	_ = cmd.Execute(fs, env, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := w.String()
@@ -249,13 +258,14 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir, "-a")
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-a")
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath("\nThese files included into projects but not exist in the file system.\n\nProject: a\\a\\a.csproj\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
+	ass.Equal(solution.ToValidPath("\n<red>These files included into projects but not exist in the file system.</>\n\n<gray>Project: a\\a\\a.csproj</>\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
 }
 
 func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T) {
@@ -271,9 +281,10 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lf", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()

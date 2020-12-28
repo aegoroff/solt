@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd"
+	"solt/cmd/api"
 	"solt/solution"
 	"testing"
 )
@@ -14,7 +15,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	ass := assert.New(t)
 	dir := "a/"
 	memfs := afero.NewMemMapFs()
-	w := bytes.NewBufferString("")
+
 	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
 	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
@@ -22,8 +23,11 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
+	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
+
 	// Act
-	_ = cmd.Execute(memfs, w, "lp", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -45,14 +49,15 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lp", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
+<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
  a\a\a1.csproj
 `), actual)
@@ -74,14 +79,15 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lp", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
+<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>
 
  a\a1\a1.csproj
 `), actual)
@@ -102,9 +108,10 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lp", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -125,16 +132,17 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "lp", "-p", dir)
+	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-These projects are included into a solution but not found in the file system:
+<red>These projects are included into a solution but not found in the file system:</>
 
-Solution: a\a.sln
+<gray>Solution: a\a.sln</>
  a\a\a.csproj
 `), actual)
 }

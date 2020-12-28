@@ -11,7 +11,9 @@ func Test_writeSlice(t *testing.T) {
 	ass := assert.New(t)
 	items := []string{"rr", "aa", "xy"}
 	w := bytes.NewBufferString("")
-	p := NewPrinter(w)
+	env := NewStringEnvironment(w)
+
+	p := NewPrinter(env)
 	s := NewScreener(p)
 
 	// Act
@@ -29,12 +31,13 @@ func Test_writeMap(t *testing.T) {
 
 	m := map[string][]string{"a": items1, "b": items2}
 	w := bytes.NewBufferString("")
-	p := NewPrinter(w)
+	env := NewStringEnvironment(w)
+	p := NewPrinter(env)
 	s := NewScreener(p)
 
 	// Act
 	s.WriteMap(m, "SI")
 
 	// Assert
-	ass.Equal("\nSI: a\n gt\n rr\n xy\n\nSI: b\n ff\n lz\n xy\n", w.String())
+	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", w.String())
 }

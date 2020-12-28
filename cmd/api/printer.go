@@ -4,21 +4,29 @@ import (
 	"fmt"
 	"github.com/gookit/color"
 	"io"
+	"os"
 	"text/tabwriter"
 )
 
 type prn struct {
 	tw *tabwriter.Writer
 	w  io.Writer
+	pe PrintEnvironment
+}
+
+type PrintEnvironment interface {
+	PrintFunc(w io.Writer, format string, a ...interface{})
+	Writer() io.Writer
 }
 
 // NewPrinter creates new Printer interface instance
-func NewPrinter(w io.Writer) Printer {
-	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
+func NewPrinter(pe PrintEnvironment) Printer {
+	tw := new(tabwriter.Writer).Init(pe.Writer(), 0, 8, 4, ' ', 0)
 
 	p := prn{
 		tw: tw,
-		w:  w,
+		w:  pe.Writer(),
+		pe: pe,
 	}
 	return &p
 }
@@ -40,13 +48,35 @@ func (r *prn) Tprint(format string, a ...interface{}) {
 }
 
 func (r *prn) Cprint(format string, a ...interface{}) {
-	color.Fprintf(r.w, format, a...)
+	r.pe.PrintFunc(r.w, format, a...)
 }
 
-func (*prn) SetColor(c color.Color) {
-	_, _ = color.Set(c)
+type consoleEnvironment struct{}
+
+func NewConsoleEnvironment() PrintEnvironment {
+	return &consoleEnvironment{}
 }
 
-func (*prn) ResetColor() {
-	_, _ = color.Reset()
+func (c *consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+	color.Fprintf(w, format, a...)
+}
+
+func (c *consoleEnvironment) Writer() io.Writer {
+	return os.Stdout
+}
+
+type stringEnvironment struct{ w io.Writer }
+
+func NewStringEnvironment(w io.Writer) PrintEnvironment {
+	return &stringEnvironment{
+		w: w,
+	}
+}
+
+func (s *stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+	_, _ = fmt.Fprintf(w, format, a...)
+}
+
+func (s *stringEnvironment) Writer() io.Writer {
+	return s.w
 }

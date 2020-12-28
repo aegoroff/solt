@@ -5,7 +5,6 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/cheynewallace/tabby"
-	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"solt/cmd/api"
 	"solt/msvc"
@@ -37,9 +36,7 @@ func (c *infoCommand) Execute() error {
 	for _, sol := range solutions {
 		sln := sol.Solution
 
-		c.Prn().SetColor(color.FgGray)
-		c.Prn().Cprint(" %s\n", sol.Path)
-		c.Prn().ResetColor()
+		c.Prn().Cprint(" <gray>%s</>\n", sol.Path)
 
 		t := tabby.NewCustom(c.Prn().Twriter())
 

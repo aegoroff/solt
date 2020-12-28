@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd"
+	"solt/cmd/api"
 	"solt/solution"
 	"testing"
 )
@@ -23,14 +24,15 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "p", "-p", dir)
+	_ = cmd.Execute(memfs, env, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a (packages.config)
+ <gray>a\a (packages.config)</>
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
@@ -52,14 +54,15 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "p", "-p", dir)
+	_ = cmd.Execute(memfs, env, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a (a.csproj)
+ <gray>a\a (a.csproj)</>
   Package              Version
   -------              -------
   CommandLineParser    2.8.0
@@ -80,9 +83,10 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "-p", dir, "-m")
+	_ = cmd.Execute(memfs, env, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := w.String()
@@ -103,14 +107,15 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "-p", dir, "-m")
+	_ = cmd.Execute(memfs, env, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` Different nuget package's versions in the same solution found:
- a\a.sln
+	ass.Equal(solution.ToValidPath(` <red>Different nuget package's versions in the same solution found:</>
+ <gray>a\a.sln</>
   Package              Version
   -------              -------
   CommandLineParser    2.7.0, 2.8.0
@@ -131,14 +136,15 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "-p", dir)
+	_ = cmd.Execute(memfs, env, "nu", "-p", dir)
 
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
- a\a.sln
+ <gray>a\a.sln</>
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
@@ -159,9 +165,10 @@ func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "-p", dir)
+	_ = cmd.Execute(memfs, env, "nu", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -191,9 +198,10 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
 	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, w, "nu", "-p", "d/")
+	_ = cmd.Execute(memfs, env, "nu", "-p", "d/")
 
 	// Assert
 	actual := w.String()
