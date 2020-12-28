@@ -14,10 +14,8 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
-github.com/aegoroff/dirstat v0.10.9 h1:IM8v1eNyhvKifNUNMXh036FCM5tKaduJV0JZkJzjkp4=
-github.com/aegoroff/dirstat v0.10.9/go.mod h1:m2Rz4d9HO3hr9fB8iarpuxj5cMOglv+e5ACCK41stEY=
-github.com/aegoroff/dirstat v0.10.10 h1:SRWtoWl00C3F7WPHslFDP40r/uBUkIpWo6yVaOBvPUI=
-github.com/aegoroff/dirstat v0.10.10/go.mod h1:m2Rz4d9HO3hr9fB8iarpuxj5cMOglv+e5ACCK41stEY=
+github.com/aegoroff/dirstat v0.10.18 h1:XnqdjD68JxAKPXI+bDlcr2wrN3uljUVGSn8otLKwl/Q=
+github.com/aegoroff/dirstat v0.10.18/go.mod h1:m2Rz4d9HO3hr9fB8iarpuxj5cMOglv+e5ACCK41stEY=
 github.com/aegoroff/godatastruct v0.10.0 h1:FVCold2y79Bc8IQDBsVuYPNQ+Elcg40TPvwhvZkgaKo=
 github.com/aegoroff/godatastruct v0.10.0/go.mod h1:WT8eEbkOIhN5LahFJESs7EL5aNk2CVkgJ1jUyNM4LtQ=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
@@ -275,8 +273,6 @@ golang.org/x/sys v0.0.0-20190507160741-ecd444e8653b/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190606165138-5da285871e9c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0 h1:HyfiK1WMnHj5FXFXatD+Qs1A/xC2Run6RzeW1SyHxpc=
 golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20201223074533-0d417f636930 h1:vRgIt+nup/B/BwIS0g2oC0haq0iqbV3ZA+u6+0TlNCo=
-golang.org/x/sys v0.0.0-20201223074533-0d417f636930/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
