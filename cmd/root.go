@@ -5,6 +5,11 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"solt/cmd/api"
+	"solt/cmd/info"
+	"solt/cmd/lostfiles"
+	"solt/cmd/lostprojects"
+	"solt/cmd/nuget"
+	"solt/cmd/validate"
 )
 
 func newRoot() *cobra.Command {
@@ -44,21 +49,14 @@ func execute(fs afero.Fs, p api.Printer, args ...string) error {
 
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	c := &conf{
-		filesystem: fs,
-		p:          p,
-		sp:         &sourcesPath,
-		cpu:        &cpuprofile,
-		memory:     &memprofile,
-		diag:       &diag,
-	}
+	c := api.NewConf(fs, p, &sourcesPath, &cpuprofile, &memprofile, &diag)
 
-	rootCmd.AddCommand(newInfo(c))
-	rootCmd.AddCommand(newLostFiles(c))
-	rootCmd.AddCommand(newLostProjects(c))
-	rootCmd.AddCommand(newNuget(c))
+	rootCmd.AddCommand(info.New(c))
+	rootCmd.AddCommand(lostfiles.New(c))
+	rootCmd.AddCommand(lostprojects.New(c))
+	rootCmd.AddCommand(nuget.New(c))
 	rootCmd.AddCommand(newVersion(c))
-	rootCmd.AddCommand(newValidate(c))
+	rootCmd.AddCommand(validate.New(c))
 
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)
