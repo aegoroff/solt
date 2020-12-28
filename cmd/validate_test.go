@@ -1,11 +1,10 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"solt/cmd"
 	"solt/cmd/api"
 	"solt/solution"
 	"strings"
@@ -29,7 +28,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "va", "-p", dir)
+	_ = Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -69,7 +68,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			env := api.NewStringEnvironment(w)
 
 			// Act
-			_ = cmd.Execute(memfs, env, "va", "fix", "-p", dir)
+			_ = Execute(memfs, env, "va", "fix", "-p", dir)
 
 			// Assert
 			actual := w.String()
@@ -103,7 +102,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "va", "-p", dir)
+	_ = Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -127,7 +126,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "fr", "-p", dir)
+	_ = Execute(memfs, env, "fr", "-p", dir)
 
 	// Assert
 	actual := w.String()

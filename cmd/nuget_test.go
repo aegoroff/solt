@@ -1,10 +1,9 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd"
 	"solt/cmd/api"
 	"solt/solution"
 	"testing"
@@ -27,7 +26,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "p", "-p", dir)
+	_ = Execute(memfs, env, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -57,7 +56,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "p", "-p", dir)
+	_ = Execute(memfs, env, "nu", "p", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -86,7 +85,7 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "-p", dir, "-m")
+	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := w.String()
@@ -110,7 +109,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "-p", dir, "-m")
+	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
 
 	// Assert
 	actual := w.String()
@@ -139,7 +138,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "-p", dir)
+	_ = Execute(memfs, env, "nu", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -168,7 +167,7 @@ func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "-p", dir)
+	_ = Execute(memfs, env, "nu", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -201,7 +200,7 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "nu", "-p", "d/")
+	_ = Execute(memfs, env, "nu", "-p", "d/")
 
 	// Assert
 	actual := w.String()

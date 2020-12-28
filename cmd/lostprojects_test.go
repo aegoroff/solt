@@ -1,10 +1,9 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd"
 	"solt/cmd/api"
 	"solt/solution"
 	"testing"
@@ -27,7 +26,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -52,7 +51,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -82,7 +81,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -111,7 +110,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -135,7 +134,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir)
 
 	// Assert
 	actual := w.String()

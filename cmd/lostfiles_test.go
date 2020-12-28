@@ -1,10 +1,9 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd"
 	"solt/cmd/api"
 	"solt/solution"
 	"testing"
@@ -27,7 +26,7 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -62,7 +61,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		env := api.NewStringEnvironment(w)
 
 		// Act
-		_ = cmd.Execute(memfs, env, "lf", "-p", dir)
+		_ = Execute(memfs, env, "lf", "-p", dir)
 
 		// Assert
 		actual := w.String()
@@ -88,7 +87,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -125,7 +124,7 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", root)
+	_ = Execute(memfs, env, "lf", "-p", root)
 
 	// Assert
 	actual := w.String()
@@ -149,7 +148,7 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()
@@ -182,7 +181,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		env := api.NewStringEnvironment(w)
 
 		// Act
-		_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
+		_ = Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
 		actual := w.String()
@@ -208,7 +207,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-r")
+	_ = Execute(memfs, env, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := w.String()
@@ -236,7 +235,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(fs, env, "lf", "-p", dir, "-r")
+	_ = Execute(fs, env, "lf", "-p", dir, "-r")
 
 	// Assert
 	actual := w.String()
@@ -261,7 +260,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir, "-a")
+	_ = Execute(memfs, env, "lf", "-p", dir, "-a")
 
 	// Assert
 	actual := w.String()
@@ -284,7 +283,7 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
 	actual := w.String()

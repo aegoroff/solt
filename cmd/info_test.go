@@ -1,10 +1,9 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd"
 	"solt/cmd/api"
 	"solt/solution"
 	"testing"
@@ -27,7 +26,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "in", "-p", dir)
+	_ = Execute(memfs, env, "in", "-p", dir)
 
 	// Assert
 	actual := w.String()

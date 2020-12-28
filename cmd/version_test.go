@@ -1,10 +1,9 @@
-package tests
+package cmd
 
 import (
 	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd"
 	"solt/cmd/api"
 	"testing"
 )
@@ -30,10 +29,10 @@ func Test_Version(t *testing.T) {
 			env := api.NewStringEnvironment(w)
 
 			// Act
-			_ = cmd.Execute(memfs, env, test.cmd...)
+			_ = Execute(memfs, env, test.cmd...)
 
 			// Assert
-			ass.Contains(w.String(), cmd.Version)
+			ass.Contains(w.String(), Version)
 		})
 	}
 }
@@ -46,7 +45,7 @@ func Test_Help(t *testing.T) {
 	env := api.NewStringEnvironment(w)
 
 	// Act
-	_ = cmd.Execute(memfs, env, "")
+	_ = Execute(memfs, env, "")
 
 	// Assert
 	ass.Contains(w.String(), "")
