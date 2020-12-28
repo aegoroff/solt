@@ -73,34 +73,7 @@ func (c *nugetByProjectCommand) execute() error {
 	return nil
 }
 
-func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
-	nugets := nugetsByFolders(foldersTree)
-
-	solutions := msvc.SelectSolutions(foldersTree)
-
-	packs := spreadNugetPacks(solutions, nugets)
-
-	if onlyMismatch {
-		keepOnlyMismatch(packs)
-	}
-
-	printNugetBySolutions(packs, onlyMismatch, p)
-}
-
-func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
-	nugets := nugetsByFolders(foldersTree)
-
-	prn := newNugetPrinter(p)
-	it := rbtree.NewWalkInorder(nugets)
-
-	it.Foreach(func(n rbtree.Comparable) {
-		f := n.(*nugetFolder)
-		src := strings.Join(f.sources, ", ")
-		prn.print(fmt.Sprintf("<bold>%s</> (%s)", f.path, src), f.packs)
-	})
-}
-
-func nugetsByFolders(foldersTree rbtree.RbTree) rbtree.RbTree {
+func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
@@ -120,7 +93,17 @@ func nugetsByFolders(foldersTree rbtree.RbTree) rbtree.RbTree {
 	return result
 }
 
-func printNugetBySolutions(packs rbtree.RbTree, onlyMismatch bool, p printer) {
+func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
+	nugets := newNugetFoldersTree(foldersTree)
+
+	solutions := msvc.SelectSolutions(foldersTree)
+
+	packs := spreadNugetPacks(solutions, nugets)
+
+	if onlyMismatch {
+		keepOnlyMismatch(packs)
+	}
+
 	if packs.Len() == 0 {
 		return
 	}
@@ -137,16 +120,29 @@ func printNugetBySolutions(packs rbtree.RbTree, onlyMismatch bool, p printer) {
 	})
 }
 
+func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
+	nugets := newNugetFoldersTree(foldersTree)
+
+	prn := newNugetPrinter(p)
+	it := rbtree.NewWalkInorder(nugets)
+
+	it.Foreach(func(n rbtree.Comparable) {
+		f := n.(*nugetFolder)
+		src := strings.Join(f.sources, ", ")
+		prn.print(fmt.Sprintf("<bold>%s</> (%s)", f.path, src), f.packs)
+	})
+}
+
 // spreadNugetPacks binds all found nuget packages by solutions
 func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.NewRbTree()
 
 	for _, sol := range solutions {
-		raw := onlySolutionPacks(sol, nugets)
-		reduced := mergeNugetPacks(raw)
+		npacks, projectFolders := onlySolutionPacks(sol, nugets)
+		reduced := mergeNugetPacks(npacks)
 
 		if len(reduced) > 0 {
-			nf := newNugetFolder(sol.Path, reduced, nil)
+			nf := newNugetFolder(sol.Path, reduced, projectFolders)
 			result.Insert(nf)
 		}
 	}
@@ -154,19 +150,21 @@ func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTr
 	return result
 }
 
-func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) []*pack {
+func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) ([]*pack, []string) {
 	paths := sol.AllProjectPaths(filepath.Dir)
-	result := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
+	npacks := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
+	projectFolders := make([]string, 0, len(paths))
 
 	for _, path := range paths {
 		sv := newNugetFolder(path, nil, nil)
 		folder, ok := nugets.Search(sv)
 		if ok {
 			packs := folder.(*nugetFolder).packs
-			result = append(result, packs...)
+			npacks = append(npacks, packs...)
+			projectFolders = append(projectFolders, path)
 		}
 	}
-	return result
+	return npacks, projectFolders
 }
 
 func mergeNugetPacks(packs []*pack) []*pack {
