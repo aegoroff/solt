@@ -28,7 +28,7 @@ func newInfo(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.NewCobraCommand("in", "info", "Get information about found solutions")
+	cmd := cc.NewCommand("in", "info", "Get information about found solutions")
 	return cmd
 }
 

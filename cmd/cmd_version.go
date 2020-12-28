@@ -23,7 +23,7 @@ func newVersion(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.NewCobraCommand("ver", "version", "Print the version number of solt")
+	cmd := cc.NewCommand("ver", "version", "Print the version number of solt")
 	cmd.Long = `All software has versions. This is solt's`
 
 	return cmd

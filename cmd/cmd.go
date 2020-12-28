@@ -43,7 +43,7 @@ func (c *cobraCreator) runE() cobraRunSignature {
 	}
 }
 
-func (c *cobraCreator) NewCobraCommand(use, alias, short string) *cobra.Command {
+func (c *cobraCreator) NewCommand(use, alias, short string) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     use,
 		Aliases: []string{alias},

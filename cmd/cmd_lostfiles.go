@@ -31,7 +31,7 @@ func newLostFiles(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.NewCobraCommand("lf", "lostfiles", "Find lost files in the folder specified")
+	cmd := cc.NewCommand("lf", "lostfiles", "Find lost files in the folder specified")
 
 	cmd.Flags().StringVarP(&filter, "file", "f", ".cs", "Lost files filter extension.")
 	cmd.Flags().BoolVarP(&removeLost, "remove", "r", false, "Remove lost files")

@@ -36,7 +36,7 @@ func newNuget(c *conf) *cobra.Command {
 	}
 
 	descr := "Get nuget packages information within solutions"
-	cmd := cc.NewCobraCommand("nu", "nuget", descr)
+	cmd := cc.NewCommand("nu", "nuget", descr)
 
 	mdescr := "Find packages to consolidate i.e. packages with different versions in the same solution"
 	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, mdescr)
@@ -57,7 +57,7 @@ func newNugetByProject(c *conf) *cobra.Command {
 	}
 
 	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
-	cmd := cc.NewCobraCommand("p", "project", msg)
+	cmd := cc.NewCommand("p", "project", msg)
 
 	return cmd
 }
