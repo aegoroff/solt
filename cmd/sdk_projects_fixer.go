@@ -8,13 +8,14 @@ import (
 	"github.com/spf13/afero"
 	"io"
 	"path/filepath"
+	"solt/cmd/api"
 	"solt/internal/sys"
 	"solt/solution"
 	"unicode/utf8"
 )
 
 type sdkProjectsFixer struct {
-	prn   printer
+	prn   api.Printer
 	fs    afero.Fs
 	filer sys.Filer
 }
@@ -27,11 +28,11 @@ func (r *sdkProjectReference) path() string {
 	return solution.ToValidPath(r.Path)
 }
 
-func newSdkProjectsFixer(p printer, fs afero.Fs) sdkActioner {
+func newSdkProjectsFixer(p api.Printer, fs afero.Fs) sdkActioner {
 	return &sdkProjectsFixer{
 		prn:   p,
 		fs:    fs,
-		filer: sys.NewFiler(fs, p.writer()),
+		filer: sys.NewFiler(fs, p.Writer()),
 	}
 }
 
@@ -49,7 +50,7 @@ func (f *sdkProjectsFixer) action(sol string, refs map[string]c9s.StringHashSet)
 	}
 
 	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
-	f.prn.cprint(mf, invalidRefsCount, len(refs), sol)
+	f.prn.Cprint(mf, invalidRefsCount, len(refs), sol)
 }
 
 func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {

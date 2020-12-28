@@ -1,4 +1,4 @@
-package cmd
+package api
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ type prn struct {
 	w  io.Writer
 }
 
-// newPrinter creates new printer interface instance
-func newPrinter(w io.Writer) printer {
+// NewPrinter creates new Printer interface instance
+func NewPrinter(w io.Writer) Printer {
 	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
 	p := prn{
@@ -23,30 +23,30 @@ func newPrinter(w io.Writer) printer {
 	return &p
 }
 
-func (r *prn) writer() io.Writer {
+func (r *prn) Writer() io.Writer {
 	return r.w
 }
 
-func (r *prn) twriter() *tabwriter.Writer {
+func (r *prn) Twriter() *tabwriter.Writer {
 	return r.tw
 }
 
-func (r *prn) flush() {
+func (r *prn) Flush() {
 	_ = r.tw.Flush()
 }
 
-func (r *prn) tprint(format string, a ...interface{}) {
+func (r *prn) Tprint(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(r.tw, format, a...)
 }
 
-func (r *prn) cprint(format string, a ...interface{}) {
+func (r *prn) Cprint(format string, a ...interface{}) {
 	color.Fprintf(r.w, format, a...)
 }
 
-func (*prn) setColor(c color.Color) {
+func (*prn) SetColor(c color.Color) {
 	_, _ = color.Set(c)
 }
 
-func (*prn) resetColor() {
+func (*prn) ResetColor() {
 	_, _ = color.Reset()
 }

@@ -3,12 +3,13 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 )
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
 
 type baseCommand struct {
-	prn         printer
+	prn         api.Printer
 	fs          afero.Fs
 	sourcesPath string
 }
@@ -22,14 +23,14 @@ func newBaseCmd(c *conf) baseCommand {
 }
 
 type cobraCreator struct {
-	createCmd func() executor
+	createCmd func() api.Executor
 	c         *conf
 }
 
 func (c *cobraCreator) runE() cobraRunSignature {
 	return func(cmd *cobra.Command, args []string) error {
 		// IMPORTANT: Excecutors initialization order defines output order
-		var e executor
+		var e api.Executor
 		{
 			e = c.createCmd()
 			e = newCPUProfileExecutor(e, c.c)
@@ -38,11 +39,11 @@ func (c *cobraCreator) runE() cobraRunSignature {
 			e = newMemoryProfileExecutor(e, c.c)
 		}
 
-		return e.execute()
+		return e.Execute()
 	}
 }
 
-func (c *cobraCreator) newCobraCommand(use, alias, short string) *cobra.Command {
+func (c *cobraCreator) NewCobraCommand(use, alias, short string) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     use,
 		Aliases: []string{alias},

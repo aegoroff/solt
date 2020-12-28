@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"github.com/spf13/afero"
+	"solt/cmd/api"
 )
 
 type conf struct {
 	filesystem afero.Fs
-	p          printer
+	p          api.Printer
 	sp         *string
 	cpu        *string
 	memory     *string
@@ -17,7 +18,7 @@ func (a *conf) fs() afero.Fs {
 	return a.filesystem
 }
 
-func (a *conf) prn() printer {
+func (a *conf) prn() api.Printer {
 	return a.p
 }
 

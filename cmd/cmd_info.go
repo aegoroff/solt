@@ -7,6 +7,7 @@ import (
 	"github.com/cheynewallace/tabby"
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 	"solt/msvc"
 	"solt/solution"
 	"strings"
@@ -18,7 +19,7 @@ type infoCommand struct {
 
 func newInfo(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			ic := infoCommand{
 				newBaseCmd(c),
 			}
@@ -27,11 +28,11 @@ func newInfo(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("in", "info", "Get information about found solutions")
+	cmd := cc.NewCobraCommand("in", "info", "Get information about found solutions")
 	return cmd
 }
 
-func (c *infoCommand) execute() error {
+func (c *infoCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
 
 	solutions := msvc.SelectSolutions(foldersTree)
@@ -39,11 +40,11 @@ func (c *infoCommand) execute() error {
 	for _, sol := range solutions {
 		sln := sol.Solution
 
-		c.prn.setColor(color.FgGray)
-		c.prn.cprint(" %s\n", sol.Path)
-		c.prn.resetColor()
+		c.prn.SetColor(color.FgGray)
+		c.prn.Cprint(" %s\n", sol.Path)
+		c.prn.ResetColor()
 
-		t := tabby.NewCustom(c.prn.twriter())
+		t := tabby.NewCustom(c.prn.Twriter())
 
 		t.AddLine("  Header", sln.Header)
 		t.AddLine("  Product", sln.Comment)
@@ -61,7 +62,7 @@ func (c *infoCommand) execute() error {
 	return nil
 }
 
-func showProjectsInfo(projects []*solution.Project, p printer) {
+func showProjectsInfo(projects []*solution.Project, p api.Printer) {
 	var byType = make(map[string]int)
 
 	for _, p := range projects {
@@ -70,17 +71,17 @@ func showProjectsInfo(projects []*solution.Project, p printer) {
 
 	const format = "  %v\t%v\n"
 
-	p.tprint(format, "Project type", "Count")
-	p.tprint(format, "------------", "-----")
+	p.Tprint(format, "Project type", "Count")
+	p.Tprint(format, "------------", "-----")
 
 	for k, v := range byType {
-		p.tprint(format, k, v)
+		p.Tprint(format, k, v)
 	}
-	p.flush()
+	p.Flush()
 	fmt.Println()
 }
 
-func showSectionsInfo(sections []*solution.Section, p printer) {
+func showSectionsInfo(sections []*solution.Section, p api.Printer) {
 	var configurations = make(c9s.StringHashSet)
 	var platforms = make(c9s.StringHashSet)
 
@@ -99,27 +100,27 @@ func showSectionsInfo(sections []*solution.Section, p printer) {
 
 	const format = "  %v\n"
 
-	p.tprint(format, "Configuration")
-	p.tprint(format, "------------")
+	p.Tprint(format, "Configuration")
+	p.Tprint(format, "------------")
 
 	sortedConfigurations := configurations.Items()
 	sortfold.Strings(sortedConfigurations)
 
 	for _, k := range sortedConfigurations {
-		p.tprint(format, k)
+		p.Tprint(format, k)
 	}
-	p.flush()
+	p.Flush()
 	fmt.Println()
 
-	p.tprint(format, "Platform")
-	p.tprint(format, "--------")
+	p.Tprint(format, "Platform")
+	p.Tprint(format, "--------")
 
 	sortedPlatforms := platforms.Items()
 	sortfold.Strings(sortedPlatforms)
 
 	for _, k := range sortedPlatforms {
-		p.tprint(format, k)
+		p.Tprint(format, k)
 	}
-	p.flush()
-	p.cprint("\n")
+	p.Flush()
+	p.Cprint("\n")
 }

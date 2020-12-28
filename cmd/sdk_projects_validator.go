@@ -7,18 +7,23 @@ import (
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
+	"solt/cmd/api"
 	"solt/msvc"
 	"solt/solution"
 )
 
+type sdkActioner interface {
+	action(solution string, items map[string]c9s.StringHashSet)
+}
+
 type sdkProjectsValidator struct {
-	prn         printer
+	prn         api.Printer
 	fs          afero.Fs
 	sourcesPath string
 	actioner    sdkActioner
 }
 
-func newSdkProjectsValidator(fs afero.Fs, p printer, sourcesPath string, h sdkActioner) *sdkProjectsValidator {
+func newSdkProjectsValidator(fs afero.Fs, p api.Printer, sourcesPath string, h sdkActioner) *sdkProjectsValidator {
 	return &sdkProjectsValidator{
 		prn:         p,
 		fs:          fs,

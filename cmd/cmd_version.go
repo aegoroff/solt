@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 )
 
 // Version defines program version
@@ -13,7 +14,7 @@ type versionCommand struct {
 
 func newVersion(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			vac := versionCommand{
 				baseCommand: newBaseCmd(c),
 			}
@@ -22,13 +23,13 @@ func newVersion(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("ver", "version", "Print the version number of solt")
+	cmd := cc.NewCobraCommand("ver", "version", "Print the version number of solt")
 	cmd.Long = `All software has versions. This is solt's`
 
 	return cmd
 }
 
-func (c *versionCommand) execute() error {
-	c.prn.cprint("%s\n", Version)
+func (c *versionCommand) Execute() error {
+	c.prn.Cprint("%s\n", Version)
 	return nil
 }

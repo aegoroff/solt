@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 	"solt/internal/sys"
 	"solt/msvc"
 )
@@ -12,7 +13,7 @@ type lostProjectsCommand struct {
 
 func newLostProjects(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			lpc := lostProjectsCommand{
 				baseCommand: newBaseCmd(c),
 			}
@@ -21,12 +22,12 @@ func newLostProjects(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("lp", "lostprojects", "Find projects that not included into any solution")
+	cmd := cc.NewCobraCommand("lp", "lostprojects", "Find projects that not included into any solution")
 
 	return cmd
 }
 
-func (c *lostProjectsCommand) execute() error {
+func (c *lostProjectsCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
@@ -51,7 +52,7 @@ func (c *lostProjectsCommand) execute() error {
 
 	if len(lostWithIncludes) > 0 {
 		m := "\n<red>These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:</>\n\n"
-		c.prn.cprint(m)
+		c.prn.Cprint(m)
 	}
 
 	// Lost projects that have includes files that used
@@ -60,7 +61,7 @@ func (c *lostProjectsCommand) execute() error {
 	unexistProjects := c.getUnexistProjects(projectLinksBySolution)
 
 	if len(unexistProjects) > 0 {
-		c.prn.cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
+		c.prn.Cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
 	}
 
 	// Included but not exist in FS
@@ -72,7 +73,7 @@ func (c *lostProjectsCommand) execute() error {
 func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {
 	var result = make(map[string][]string)
 
-	filer := sys.NewFiler(c.fs, c.prn.writer())
+	filer := sys.NewFiler(c.fs, c.prn.Writer())
 	for spath, projects := range projectsInSolutions {
 		nonexist := filer.CheckExistence(projects)
 
@@ -101,7 +102,7 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	return separateProjects(projectsOutsideSolution, anySolutionFile)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, anySolutionFile Matcher) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, anySolutionFile api.Matcher) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
 	for _, prj := range projectsOutsideSolution {
@@ -114,7 +115,7 @@ func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, anySolutio
 	return lost, lostWithIncludes
 }
 
-func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, anySolutionFile Matcher) bool {
+func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, anySolutionFile api.Matcher) bool {
 	projectFiles := prj.Files()
 
 	for _, f := range projectFiles {

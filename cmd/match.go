@@ -5,6 +5,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
+	"solt/cmd/api"
 	"solt/msvc"
 )
 
@@ -34,12 +35,12 @@ func (c *caseless) compare(y rbtree.Comparable) int {
 }
 
 type matchL struct {
-	include Matcher
-	exclude Matcher
+	include api.Matcher
+	exclude api.Matcher
 }
 
 // NewLostItemMatcher creates new Matcher instance that detects lost item
-func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
+func NewLostItemMatcher(incl api.Matcher, excl api.Matcher) api.Matcher {
 	return &matchL{
 		include: incl,
 		exclude: excl,
@@ -49,7 +50,7 @@ func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string
-func NewPartialMatcher(matches []string, decorator msvc.StringDecorator) (Matcher, error) {
+func NewPartialMatcher(matches []string, decorator msvc.StringDecorator) (api.Matcher, error) {
 	runes := make([][]rune, len(matches))
 	for i, s := range matches {
 		ds := decorator(s)
@@ -69,7 +70,7 @@ func NewPartialMatcher(matches []string, decorator msvc.StringDecorator) (Matche
 }
 
 // NewExactMatch creates exact matcher from strings slice
-func NewExactMatch(matches []string) Matcher {
+func NewExactMatch(matches []string) api.Matcher {
 	tree := rbtree.NewRbTree()
 	for _, s := range matches {
 		cs := caseless(s)

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 	"solt/internal/sys"
 	"solt/msvc"
 )
@@ -19,7 +20,7 @@ func newLostFiles(c *conf) *cobra.Command {
 	var filter string
 
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			return &lostFilesCommand{
 				baseCommand: newBaseCmd(c),
 				removeLost:  removeLost,
@@ -30,7 +31,7 @@ func newLostFiles(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("lf", "lostfiles", "Find lost files in the folder specified")
+	cmd := cc.NewCobraCommand("lf", "lostfiles", "Find lost files in the folder specified")
 
 	cmd.Flags().StringVarP(&filter, "file", "f", ".cs", "Lost files filter extension.")
 	cmd.Flags().BoolVarP(&removeLost, "remove", "r", false, "Remove lost files")
@@ -39,7 +40,7 @@ func newLostFiles(c *conf) *cobra.Command {
 	return cmd
 }
 
-func (c *lostFilesCommand) execute() error {
+func (c *lostFilesCommand) Execute() error {
 	filecollect := newFileCollector(c.filter)
 	foldcollect := newFoldersCollector()
 
@@ -47,7 +48,7 @@ func (c *lostFilesCommand) execute() error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	filer := sys.NewFiler(c.fs, c.prn.writer())
+	filer := sys.NewFiler(c.fs, c.prn.Writer())
 	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, filer)
 	err := logic.initialize(projects)
 
@@ -61,7 +62,7 @@ func (c *lostFilesCommand) execute() error {
 	s.writeSlice(lostFiles)
 
 	if len(logic.unexistFiles) > 0 {
-		c.prn.cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
+		c.prn.Cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
 
 		s.writeMap(logic.unexistFiles, "Project")
 	}

@@ -3,13 +3,14 @@ package cmd
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
+	"solt/cmd/api"
 )
 
 type sdkProjectsPrinter struct {
-	prn printer
+	prn api.Printer
 }
 
-func newSdkProjectsPrinter(p printer) sdkActioner {
+func newSdkProjectsPrinter(p api.Printer) sdkActioner {
 	return &sdkProjectsPrinter{
 		prn: p,
 	}
@@ -19,7 +20,7 @@ func (v *sdkProjectsPrinter) action(sol string, refs map[string]c9s.StringHashSe
 	if len(refs) == 0 {
 		return
 	}
-	v.prn.cprint(" Solution: <green>%s</>\n", sol)
+	v.prn.Cprint(" Solution: <green>%s</>\n", sol)
 
 	projects := make([]string, 0, len(refs))
 	for s := range refs {
@@ -29,13 +30,13 @@ func (v *sdkProjectsPrinter) action(sol string, refs map[string]c9s.StringHashSe
 	sortfold.Strings(projects)
 
 	for _, project := range projects {
-		v.prn.cprint("   project: <bold>%s</> has redundant references\n", project)
+		v.prn.Cprint("   project: <bold>%s</> has redundant references\n", project)
 		rrs := refs[project]
 
 		items := rrs.Items()
 		sortfold.Strings(items)
 		for _, s := range items {
-			v.prn.cprint("     <gray>%s</>\n", s)
+			v.prn.Cprint("     <gray>%s</>\n", s)
 		}
 	}
 }

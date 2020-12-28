@@ -3,6 +3,7 @@ package cmd
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
+	"solt/cmd/api"
 	"solt/internal/sys"
 	"solt/msvc"
 	"strings"
@@ -15,7 +16,7 @@ type lostFilesLogic struct {
 	includedFiles  []string
 	nonExistence   bool
 	filer          sys.Filer
-	lost           Matcher
+	lost           api.Matcher
 }
 
 func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, filer sys.Filer) *lostFilesLogic {

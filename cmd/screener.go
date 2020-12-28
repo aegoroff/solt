@@ -1,12 +1,15 @@
 package cmd
 
-import "github.com/akutz/sortfold"
+import (
+	"github.com/akutz/sortfold"
+	"solt/cmd/api"
+)
 
 type screener struct {
-	p printer
+	p api.Printer
 }
 
-func newScreener(p printer) *screener {
+func newScreener(p api.Printer) *screener {
 	s := screener{
 		p: p,
 	}
@@ -22,7 +25,7 @@ func (s *screener) writeMap(itemsMap map[string][]string, keyPrefix string) {
 	sortfold.Strings(keys)
 
 	for _, k := range keys {
-		s.p.cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
+		s.p.Cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
 		s.writeSlice(itemsMap[k])
 	}
 }
@@ -30,6 +33,6 @@ func (s *screener) writeMap(itemsMap map[string][]string, keyPrefix string) {
 func (s *screener) writeSlice(items []string) {
 	sortfold.Strings(items)
 	for _, item := range items {
-		s.p.cprint(" %s\n", item)
+		s.p.Cprint(" %s\n", item)
 	}
 }

@@ -6,31 +6,32 @@ import (
 	"log"
 	"runtime"
 	"runtime/pprof"
+	"solt/cmd/api"
 	"time"
 )
 
 type executorMemUsage struct {
-	wrapped executor
+	wrapped api.Executor
 	c       *conf
 }
 
 type executorTimeMeasure struct {
-	wrapped executor
+	wrapped api.Executor
 	c       *conf
 	start   time.Time
 }
 
 type executorCPUProfile struct {
-	wrapped executor
+	wrapped api.Executor
 	c       *conf
 }
 
 type executorMemoryProfile struct {
-	wrapped executor
+	wrapped api.Executor
 	c       *conf
 }
 
-func newMemUsageExecutor(e executor, c *conf) executor {
+func newMemUsageExecutor(e api.Executor, c *conf) api.Executor {
 	em := executorMemUsage{
 		wrapped: e,
 		c:       c,
@@ -38,7 +39,7 @@ func newMemUsageExecutor(e executor, c *conf) executor {
 	return &em
 }
 
-func newTimeMeasureExecutor(e executor, c *conf) executor {
+func newTimeMeasureExecutor(e api.Executor, c *conf) api.Executor {
 	em := executorTimeMeasure{
 		wrapped: e,
 		c:       c,
@@ -47,7 +48,7 @@ func newTimeMeasureExecutor(e executor, c *conf) executor {
 	return &em
 }
 
-func newCPUProfileExecutor(e executor, c *conf) executor {
+func newCPUProfileExecutor(e api.Executor, c *conf) api.Executor {
 	em := executorCPUProfile{
 		wrapped: e,
 		c:       c,
@@ -55,7 +56,7 @@ func newCPUProfileExecutor(e executor, c *conf) executor {
 	return &em
 }
 
-func newMemoryProfileExecutor(e executor, c *conf) executor {
+func newMemoryProfileExecutor(e api.Executor, c *conf) api.Executor {
 	em := executorMemoryProfile{
 		wrapped: e,
 		c:       c,
@@ -63,8 +64,8 @@ func newMemoryProfileExecutor(e executor, c *conf) executor {
 	return &em
 }
 
-func (e *executorMemUsage) execute() error {
-	err := e.wrapped.execute()
+func (e *executorMemUsage) Execute() error {
+	err := e.wrapped.Execute()
 
 	if !*e.c.diag {
 		return err
@@ -73,26 +74,26 @@ func (e *executorMemUsage) execute() error {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
-	e.c.p.cprint("\n<gray>Alloc =</> <green>%s</>", humanize.IBytes(m.Alloc))
-	e.c.p.cprint("\t<gray>TotalAlloc =</> <green>%s</>", humanize.IBytes(m.TotalAlloc))
-	e.c.p.cprint("\t<gray>Sys =</> <green>%s</>", humanize.IBytes(m.Sys))
-	e.c.p.cprint("\t<gray>NumGC =</> <green>%v</>\n", m.NumGC)
+	e.c.p.Cprint("\n<gray>Alloc =</> <green>%s</>", humanize.IBytes(m.Alloc))
+	e.c.p.Cprint("\t<gray>TotalAlloc =</> <green>%s</>", humanize.IBytes(m.TotalAlloc))
+	e.c.p.Cprint("\t<gray>Sys =</> <green>%s</>", humanize.IBytes(m.Sys))
+	e.c.p.Cprint("\t<gray>NumGC =</> <green>%v</>\n", m.NumGC)
 	return err
 }
 
-func (e *executorTimeMeasure) execute() error {
-	err := e.wrapped.execute()
+func (e *executorTimeMeasure) Execute() error {
+	err := e.wrapped.Execute()
 
 	if !*e.c.diag {
 		return err
 	}
 
 	elapsed := time.Since(e.start)
-	e.c.p.cprint("<gray>Working time:</> <green>%v</>\n", elapsed)
+	e.c.p.Cprint("<gray>Working time:</> <green>%v</>\n", elapsed)
 	return err
 }
 
-func (e *executorCPUProfile) execute() error {
+func (e *executorCPUProfile) Execute() error {
 	if *e.c.diag && *e.c.cpu != "" {
 		f, err := e.c.fs().Create(*e.c.cpu)
 		if err != nil {
@@ -102,11 +103,11 @@ func (e *executorCPUProfile) execute() error {
 		defer pprof.StopCPUProfile()
 	}
 
-	return e.wrapped.execute()
+	return e.wrapped.Execute()
 }
 
-func (e *executorMemoryProfile) execute() error {
-	err := e.wrapped.execute()
+func (e *executorMemoryProfile) Execute() error {
+	err := e.wrapped.Execute()
 	if *e.c.diag && *e.c.memory != "" {
 		f, err := e.c.fs().Create(*e.c.memory)
 		if err != nil {

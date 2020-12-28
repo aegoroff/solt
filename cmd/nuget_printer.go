@@ -4,6 +4,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"github.com/gookit/color"
+	"solt/cmd/api"
 	"sort"
 	"strings"
 )
@@ -27,7 +28,7 @@ func copyPack(e *pack) *pack {
 	return newPack(e.pkg, e.versions.Items()...)
 }
 
-func newNugetPrinter(p printer) *nugetprint {
+func newNugetPrinter(p api.Printer) *nugetprint {
 	np := nugetprint{
 		p: p,
 	}
@@ -35,17 +36,17 @@ func newNugetPrinter(p printer) *nugetprint {
 }
 
 type nugetprint struct {
-	p printer
+	p api.Printer
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
-	n.p.setColor(color.FgGray)
-	n.p.cprint("\n %s\n", parent)
-	n.p.resetColor()
+	n.p.SetColor(color.FgGray)
+	n.p.Cprint("\n %s\n", parent)
+	n.p.ResetColor()
 
 	const format = "  %v\t%v\n"
-	n.p.tprint(format, "Package", "Version")
-	n.p.tprint(format, "-------", "-------")
+	n.p.Tprint(format, "Package", "Version")
+	n.p.Tprint(format, "-------", "-------")
 
 	sort.Slice(packs, func(i, j int) bool {
 		return sortfold.CompareFold(packs[i].pkg, packs[j].pkg) < 0
@@ -54,7 +55,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	for _, item := range packs {
 		versions := item.versions.Items()
 		sortfold.Strings(versions)
-		n.p.tprint(format, item.pkg, strings.Join(versions, ", "))
+		n.p.Tprint(format, item.pkg, strings.Join(versions, ", "))
 	}
-	n.p.flush()
+	n.p.Flush()
 }

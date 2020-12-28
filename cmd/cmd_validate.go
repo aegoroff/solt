@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"solt/cmd/api"
 )
 
 type validateCommand struct{ baseCommand }
@@ -9,7 +10,7 @@ type fixCommand struct{ baseCommand }
 
 func newValidate(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			return &validateCommand{
 				baseCommand: newBaseCmd(c),
 			}
@@ -17,7 +18,7 @@ func newValidate(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
+	cmd := cc.NewCobraCommand("va", "validate", "Validates SDK projects within solution(s)")
 
 	cmd.AddCommand(newFix(c))
 
@@ -26,7 +27,7 @@ func newValidate(c *conf) *cobra.Command {
 
 func newFix(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			return &fixCommand{
 				baseCommand: newBaseCmd(c),
 			}
@@ -34,12 +35,12 @@ func newFix(c *conf) *cobra.Command {
 		c: c,
 	}
 
-	cmd := cc.newCobraCommand("fix", "fixprojects", "Fixes redundant SDK projects references")
+	cmd := cc.NewCobraCommand("fix", "fixprojects", "Fixes redundant SDK projects references")
 
 	return cmd
 }
 
-func (c *validateCommand) execute() error {
+func (c *validateCommand) Execute() error {
 	projectsPrinter := newSdkProjectsPrinter(c.prn)
 	validator := newSdkProjectsValidator(c.fs, c.prn, c.sourcesPath, projectsPrinter)
 
@@ -47,7 +48,7 @@ func (c *validateCommand) execute() error {
 	return nil
 }
 
-func (c *fixCommand) execute() error {
+func (c *fixCommand) Execute() error {
 	fixer := newSdkProjectsFixer(c.prn, c.fs)
 	validator := newSdkProjectsValidator(c.fs, c.prn, c.sourcesPath, fixer)
 

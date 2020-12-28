@@ -32,24 +32,24 @@ func newMockPrn() *mockprn {
 	return &p
 }
 
-func (m *mockprn) tprint(format string, a ...interface{}) {
+func (m *mockprn) Tprint(format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(m.tw, format, a...)
 }
 
-func (m *mockprn) cprint(format string, a ...interface{}) {
+func (m *mockprn) Cprint(format string, a ...interface{}) {
 	str := fmt.Sprintf(format, a...)
 	_, _ = fmt.Fprintf(m.w, str)
 }
 
-func (m *mockprn) writer() io.Writer { return m.w }
+func (m *mockprn) Writer() io.Writer { return m.w }
 
-func (m *mockprn) twriter() *tabwriter.Writer { return m.tw }
+func (m *mockprn) Twriter() *tabwriter.Writer { return m.tw }
 
-func (*mockprn) setColor(_ color.Color) {}
+func (*mockprn) SetColor(_ color.Color) {}
 
-func (*mockprn) resetColor() {}
+func (*mockprn) ResetColor() {}
 
-func (m *mockprn) flush() {
+func (m *mockprn) Flush() {
 	_ = m.tw.Flush()
 }
 

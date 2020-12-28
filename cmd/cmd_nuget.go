@@ -5,6 +5,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
 	"path/filepath"
+	"solt/cmd/api"
 	"solt/msvc"
 	"strings"
 )
@@ -24,7 +25,7 @@ func newNuget(c *conf) *cobra.Command {
 	var mismatch bool
 
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			nc := nugetCommand{
 				baseCommand: newBaseCmd(c),
 				mismatch:    mismatch,
@@ -35,7 +36,7 @@ func newNuget(c *conf) *cobra.Command {
 	}
 
 	descr := "Get nuget packages information within solutions"
-	cmd := cc.newCobraCommand("nu", "nuget", descr)
+	cmd := cc.NewCobraCommand("nu", "nuget", descr)
 
 	mdescr := "Find packages to consolidate i.e. packages with different versions in the same solution"
 	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, mdescr)
@@ -47,7 +48,7 @@ func newNuget(c *conf) *cobra.Command {
 
 func newNugetByProject(c *conf) *cobra.Command {
 	cc := cobraCreator{
-		createCmd: func() executor {
+		createCmd: func() api.Executor {
 			return &nugetByProjectCommand{
 				baseCommand: newBaseCmd(c),
 			}
@@ -56,18 +57,18 @@ func newNugetByProject(c *conf) *cobra.Command {
 	}
 
 	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
-	cmd := cc.newCobraCommand("p", "project", msg)
+	cmd := cc.NewCobraCommand("p", "project", msg)
 
 	return cmd
 }
 
-func (c *nugetCommand) execute() error {
+func (c *nugetCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
 	nugetBySolutions(foldersTree, c.mismatch, c.prn)
 	return nil
 }
 
-func (c *nugetByProjectCommand) execute() error {
+func (c *nugetByProjectCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.sourcesPath, c.fs)
 	nugetByProjects(foldersTree, c.prn)
 	return nil
@@ -93,7 +94,7 @@ func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
 	return result
 }
 
-func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
+func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p api.Printer) {
 	nugets := newNugetFoldersTree(foldersTree)
 
 	solutions := msvc.SelectSolutions(foldersTree)
@@ -109,7 +110,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	}
 
 	if onlyMismatch {
-		p.cprint(" <red>Different nuget package's versions in the same solution found:</>")
+		p.Cprint(" <red>Different nuget package's versions in the same solution found:</>")
 	}
 
 	prn := newNugetPrinter(p)
@@ -120,7 +121,7 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p printer) {
 	})
 }
 
-func nugetByProjects(foldersTree rbtree.RbTree, p printer) {
+func nugetByProjects(foldersTree rbtree.RbTree, p api.Printer) {
 	nugets := newNugetFoldersTree(foldersTree)
 
 	prn := newNugetPrinter(p)
