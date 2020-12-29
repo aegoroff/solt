@@ -53,11 +53,11 @@ func NewConsoleEnvironment() PrintEnvironment {
 	return &consoleEnvironment{}
 }
 
-func (c *consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
 	color.Fprintf(w, format, a...)
 }
 
-func (c *consoleEnvironment) Writer() io.Writer {
+func (*consoleEnvironment) Writer() io.Writer {
 	return os.Stdout
 }
 
@@ -70,7 +70,7 @@ func NewStringEnvironment(w io.Writer) PrintEnvironment {
 	}
 }
 
-func (s *stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (*stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
 	_, _ = fmt.Fprintf(w, format, a...)
 }
 
