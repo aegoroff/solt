@@ -60,7 +60,7 @@ func Test_Write_File(t *testing.T) {
 	fp := "/f"
 
 	// Act
-	_ = Execute(memfs, env, "ver", "-f", fp)
+	_ = Execute(memfs, env, "ver", "-o", fp)
 
 	// Assert
 	ass.Equal("", w.String())
@@ -78,7 +78,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	ro := afero.NewReadOnlyFs(memfs)
 
 	// Act
-	_ = Execute(ro, env, "ver", "-f", fp)
+	_ = Execute(ro, env, "ver", "-o", fp)
 
 	// Assert
 	ass.Contains(w.String(), Version)

@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"io"
+	"log"
 	"solt/cmd/api"
 	"solt/cmd/info"
 	"solt/cmd/lostfiles"
@@ -45,7 +46,7 @@ func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
 	rootCmd.PersistentFlags().StringVarP(&memprofile, "memprofile", "", "", mDescription)
 
 	const fDescription = "Write results into file. Specify path to output file using this option"
-	rootCmd.PersistentFlags().StringVarP(&resultfile, "file", "f", "", fDescription)
+	rootCmd.PersistentFlags().StringVarP(&resultfile, "output", "o", "", fDescription)
 
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
@@ -106,6 +107,7 @@ func (e *fileEnvironment) NewPrinter() api.Printer {
 	}
 	err := e.create(e.path, e.fs)
 	if err != nil {
+		log.Println(err)
 		return e.pe.NewPrinter()
 	}
 	return api.NewPrinter(e)
