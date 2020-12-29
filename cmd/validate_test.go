@@ -32,9 +32,9 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` Solution: <green>a\a.sln</>
-   project: <bold>a\a\a.csproj</> has redundant references
-     <gray>a\b\b.csproj</>
+	ass.Equal(solution.ToValidPath(` Solution: a\a.sln
+   project: a\a\a.csproj has redundant references
+     a\b\b.csproj
 `), actual)
 }
 
@@ -72,7 +72,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 
 			// Assert
 			actual := w.String()
-			ass.Equal(solution.ToValidPath("Fixed <red>1</> redundant project references in <red>1</> projects within solution <red>a\\a.sln</>\n"), actual)
+			ass.Equal(solution.ToValidPath("Fixed 1 redundant project references in 1 projects within solution a\\a.sln\n"), actual)
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)

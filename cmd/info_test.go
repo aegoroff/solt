@@ -30,7 +30,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` <gray>a\a.sln</>
+	ass.Equal(solution.ToValidPath(` a\a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148

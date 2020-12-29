@@ -264,7 +264,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath("\n<red>These files included into projects but not exist in the file system.</>\n\n<gray>Project: a\\a\\a.csproj</>\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
+	ass.Equal(solution.ToValidPath("\nThese files included into projects but not exist in the file system.\n\nProject: a\\a\\a.csproj\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
 }
 
 func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T) {

@@ -31,7 +31,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-  <gray>a\a (packages.config)</>
+  a\a (packages.config)
   Package            Version
   -------            -------
   CmdLine            1.0.7.509
@@ -61,7 +61,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-  <gray>a\a (a.csproj)</>
+  a\a (a.csproj)
   Package              Version
   -------              -------
   CommandLineParser    2.8.0
@@ -113,9 +113,9 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` <red>Different nuget package's versions in the same solution found:</>
+	ass.Equal(solution.ToValidPath(` Different nuget package's versions in the same solution found:
 
-  <gray>a\a.sln</>
+  a\a.sln
   Package              Version
   -------              -------
   CommandLineParser    2.7.0, 2.8.0
@@ -143,14 +143,14 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := w.String()
-	ass.Equal(solution.ToValidPath(` <red>Different nuget package's versions in the same solution found:</>
+	ass.Equal(solution.ToValidPath(` Different nuget package's versions in the same solution found:
 
-  <gray>a\a.sln</>
+  a\a.sln
   Package              Version
   -------              -------
   CommandLineParser    2.7.0, 2.8.0
 
-     <gray>Package: CommandLineParser</>
+     Package: CommandLineParser
      Project    Version
      -------    -------
      a\a        2.8.0
@@ -180,7 +180,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	// Assert
 	actual := w.String()
 	ass.Equal(solution.ToValidPath(`
-  <gray>a\a.sln</>
+  a\a.sln
   Package            Version
   -------            -------
   CmdLine            1.0.7.509

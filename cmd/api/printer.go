@@ -2,9 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/gookit/color"
 	"io"
-	"os"
 	"text/tabwriter"
 )
 
@@ -44,36 +42,4 @@ func (r *prn) Tprint(format string, a ...interface{}) {
 
 func (r *prn) Cprint(format string, a ...interface{}) {
 	r.pe.PrintFunc(r.w, format, a...)
-}
-
-type consoleEnvironment struct{}
-
-// NewConsoleEnvironment creates mew console output environment
-func NewConsoleEnvironment() PrintEnvironment {
-	return &consoleEnvironment{}
-}
-
-func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
-	color.Fprintf(w, format, a...)
-}
-
-func (*consoleEnvironment) Writer() io.Writer {
-	return os.Stdout
-}
-
-type stringEnvironment struct{ w io.Writer }
-
-// NewStringEnvironment creates mew plain string output environment
-func NewStringEnvironment(w io.Writer) PrintEnvironment {
-	return &stringEnvironment{
-		w: w,
-	}
-}
-
-func (*stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
-	_, _ = fmt.Fprintf(w, format, a...)
-}
-
-func (s *stringEnvironment) Writer() io.Writer {
-	return s.w
 }

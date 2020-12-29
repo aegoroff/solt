@@ -39,5 +39,5 @@ func Test_writeMap(t *testing.T) {
 	s.WriteMap(m, "SI")
 
 	// Assert
-	ass.Equal("\n<gray>SI: a</>\n gt\n rr\n xy\n\n<gray>SI: b</>\n ff\n lz\n xy\n", w.String())
+	ass.Equal("\nSI: a\n gt\n rr\n xy\n\nSI: b\n ff\n lz\n xy\n", w.String())
 }
