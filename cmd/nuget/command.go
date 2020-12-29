@@ -41,7 +41,7 @@ func New(c *api.Conf) *cobra.Command {
 	mdescr := "Find packages to consolidate i.e. packages with different versions in the same solution"
 	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, mdescr)
 
-	vdescr := "Output all solution's projects with versions for each mismatch"
+	vdescr := "Output details about mismatched nuget packages"
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, vdescr)
 
 	cmd.AddCommand(newNugetByProject(c))
@@ -114,7 +114,6 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 	}
 
 	pSolution := newNugetPrinter(c.Prn(), "Package", 2)
-	pPack := newNugetPrinter(c.Prn(), "Project", 5)
 
 	it := rbtree.NewAscend(packs)
 	m := newMismatcher(nugets)
@@ -125,6 +124,7 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 		pSolution.print(f.path, f.packs)
 
 		if c.verbose {
+			pPack := newNugetPrinter(c.Prn(), "Project", 5)
 			mtree := m.mismatchedPacks(f.packs, f.sources)
 			pPack.printTree(mtree, func(nf *nugetFolder) string {
 				return fmt.Sprintf("Package: %s", nf.path)

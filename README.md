@@ -142,6 +142,7 @@ Flags:
   -h, --help       help for nu
   -m, --mismatch   Find packages to consolidate i.e. packages 
                    with different versions in the same solution
+  -v, --verbose    Output details about mismatched nuget packages
 
 Global Flags:
       --cpuprofile string   Runs CPU profiling if --diag option set.
