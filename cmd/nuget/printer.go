@@ -1,32 +1,12 @@
 package nuget
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/cmd/api"
 	"sort"
 	"strings"
 )
-
-// pack defines nuget package descriptor
-type pack struct {
-	pkg      string
-	versions c9s.StringHashSet
-}
-
-func newPack(id string, versions ...string) *pack {
-	vs := make(c9s.StringHashSet)
-	vs.AddRange(versions...)
-	return &pack{
-		pkg:      id,
-		versions: vs,
-	}
-}
-
-func copyPack(e *pack) *pack {
-	return newPack(e.pkg, e.versions.Items()...)
-}
 
 func newNugetPrinter(p api.Printer) *nugetprint {
 	np := nugetprint{
@@ -39,20 +19,20 @@ type nugetprint struct {
 	p api.Printer
 }
 
-func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
+func (n *nugetprint) printTree(tree rbtree.RbTree, col string, head func(nf *nugetFolder) string) {
 	it := rbtree.NewAscend(tree)
 
 	it.Foreach(func(c rbtree.Comparable) {
 		f := c.(*nugetFolder)
-		n.print(head(f), f.packs)
+		n.print(head(f), col, f.packs)
 	})
 }
 
-func (n *nugetprint) print(parent string, packs []*pack) {
+func (n *nugetprint) print(parent string, col string, packs []*pack) {
 	n.p.Cprint("\n <gray>%s</>\n", parent)
 
 	const format = "  %v\t%v\n"
-	n.p.Tprint(format, "Package", "Version")
+	n.p.Tprint(format, col, "Version")
 	n.p.Tprint(format, "-------", "-------")
 
 	sort.Slice(packs, func(i, j int) bool {

@@ -15,6 +15,7 @@ const empiricNugetPacksForEachProject = 16
 type nugetCommand struct {
 	api.BaseCommand
 	mismatch bool
+	verbose  bool
 }
 
 type nugetByProjectCommand struct {
@@ -24,11 +25,13 @@ type nugetByProjectCommand struct {
 // New creates new command that does nuget packages feature
 func New(c *api.Conf) *cobra.Command {
 	var mismatch bool
+	var verbose bool
 
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		return &nugetCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			mismatch:    mismatch,
+			verbose:     verbose,
 		}
 	})
 
@@ -37,6 +40,9 @@ func New(c *api.Conf) *cobra.Command {
 
 	mdescr := "Find packages to consolidate i.e. packages with different versions in the same solution"
 	cmd.Flags().BoolVarP(&mismatch, "mismatch", "m", false, mdescr)
+
+	vdescr := "Output all solution's projects with versions for each mismatch"
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, vdescr)
 
 	cmd.AddCommand(newNugetByProject(c))
 
@@ -58,13 +64,13 @@ func newNugetByProject(c *api.Conf) *cobra.Command {
 
 func (c *nugetCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	nugetBySolutions(foldersTree, c.mismatch, c.Prn())
+	c.execute(foldersTree)
 	return nil
 }
 
 func (c *nugetByProjectCommand) Execute() error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	nugetByProjects(foldersTree, c.Prn())
+	c.execute(foldersTree)
 	return nil
 }
 
@@ -88,14 +94,14 @@ func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
 	return result
 }
 
-func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p api.Printer) {
+func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 	nugets := newNugetFoldersTree(foldersTree)
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
 	packs := spreadNugetPacks(solutions, nugets)
 
-	if onlyMismatch {
+	if c.mismatch {
 		keepOnlyMismatch(packs)
 	}
 
@@ -103,23 +109,33 @@ func nugetBySolutions(foldersTree rbtree.RbTree, onlyMismatch bool, p api.Printe
 		return
 	}
 
-	if onlyMismatch {
-		p.Cprint(" <red>Different nuget package's versions in the same solution found:</>")
+	if c.mismatch {
+		c.Prn().Cprint(" <red>Different nuget package's versions in the same solution found:</>")
 	}
 
-	prn := newNugetPrinter(p)
+	prn := newNugetPrinter(c.Prn())
 
-	prn.printTree(packs, func(nf *nugetFolder) string {
-		return nf.path
+	it := rbtree.NewAscend(packs)
+	m := newMismatcher(nugets)
+
+	it.Foreach(func(n rbtree.Comparable) {
+		f := n.(*nugetFolder)
+		prn.print(f.path, "Package", f.packs)
+		if c.verbose {
+			mtree := m.mismatchedPacks(f.packs, f.sources)
+			prn.printTree(mtree, "Project", func(nf *nugetFolder) string {
+				return nf.path
+			})
+		}
 	})
 }
 
-func nugetByProjects(foldersTree rbtree.RbTree, p api.Printer) {
+func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
 	nugets := newNugetFoldersTree(foldersTree)
 
-	prn := newNugetPrinter(p)
+	prn := newNugetPrinter(c.Prn())
 
-	prn.printTree(nugets, func(nf *nugetFolder) string {
+	prn.printTree(nugets, "Package", func(nf *nugetFolder) string {
 		src := strings.Join(nf.sources, ", ")
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
@@ -166,7 +182,7 @@ func mergeNugetPacks(packs []*pack) []*pack {
 		if ok {
 			exist.versions.AddRange(p.versions.Items()...)
 		} else {
-			unique[p.pkg] = copyPack(p)
+			unique[p.pkg] = p.copy()
 		}
 	}
 

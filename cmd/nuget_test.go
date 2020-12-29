@@ -121,6 +121,41 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 `), actual)
 }
 
+func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectWithNugetContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+
+	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
+
+	// Act
+	_ = Execute(memfs, env, "nu", "-p", dir, "-m", "-v")
+
+	// Assert
+	actual := w.String()
+	ass.Equal(solution.ToValidPath(` <red>Different nuget package's versions in the same solution found:</>
+ <gray>a\a.sln</>
+  Package              Version
+  -------              -------
+  CommandLineParser    2.7.0, 2.8.0
+
+ <gray>CommandLineParser</>
+  Project    Version
+  -------    -------
+  a/a        2.8.0
+  a/b        2.7.0
+`), actual)
+}
+
 func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
