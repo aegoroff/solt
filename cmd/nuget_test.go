@@ -151,8 +151,8 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
  <gray>CommandLineParser</>
   Project    Version
   -------    -------
-  a/a        2.8.0
-  a/b        2.7.0
+  a\a        2.8.0
+  a\b        2.7.0
 `), actual)
 }
 
