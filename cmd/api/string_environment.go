@@ -24,6 +24,6 @@ func (e *stringEnvironment) PrintFunc(w io.Writer, format string, a ...interface
 	_, _ = fmt.Fprintf(w, e.re.ReplaceAllString(s, "$1"))
 }
 
-func (s *stringEnvironment) Writer() io.Writer {
-	return s.w
+func (e *stringEnvironment) Writer() io.Writer {
+	return e.w
 }
