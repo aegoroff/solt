@@ -48,6 +48,7 @@ func (r *prn) Cprint(format string, a ...interface{}) {
 
 type consoleEnvironment struct{}
 
+// NewConsoleEnvironment creates mew console output environment
 func NewConsoleEnvironment() PrintEnvironment {
 	return &consoleEnvironment{}
 }
@@ -62,6 +63,7 @@ func (c *consoleEnvironment) Writer() io.Writer {
 
 type stringEnvironment struct{ w io.Writer }
 
+// NewConsoleEnvironment creates mew plain string output environment
 func NewStringEnvironment(w io.Writer) PrintEnvironment {
 	return &stringEnvironment{
 		w: w,
