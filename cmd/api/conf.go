@@ -24,8 +24,8 @@ func (a *Conf) Diag() *bool {
 	return a.diag
 }
 
-// Cpu gets cpu profiling file path that will be created
-func (a *Conf) Cpu() *string {
+// CPU gets cpu profiling file path that will be created
+func (a *Conf) CPU() *string {
 	return a.cpu
 }
 

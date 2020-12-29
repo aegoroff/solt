@@ -93,8 +93,8 @@ func (e *executorTimeMeasure) Execute() error {
 }
 
 func (e *executorCPUProfile) Execute() error {
-	if *e.c.Diag() && *e.c.Cpu() != "" {
-		f, err := e.c.Fs().Create(*e.c.Cpu())
+	if *e.c.Diag() && *e.c.CPU() != "" {
+		f, err := e.c.Fs().Create(*e.c.CPU())
 		if err != nil {
 			return err
 		}
