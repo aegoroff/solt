@@ -2,6 +2,7 @@ package nuget
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/cmd/api"
 	"sort"
@@ -36,6 +37,15 @@ func newNugetPrinter(p api.Printer) *nugetprint {
 
 type nugetprint struct {
 	p api.Printer
+}
+
+func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
+	it := rbtree.NewAscend(tree)
+
+	it.Foreach(func(c rbtree.Comparable) {
+		f := c.(*nugetFolder)
+		n.print(head(f), f.packs)
+	})
 }
 
 func (n *nugetprint) print(parent string, packs []*pack) {
