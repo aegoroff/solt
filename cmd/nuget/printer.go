@@ -8,31 +8,36 @@ import (
 	"strings"
 )
 
-func newNugetPrinter(p api.Printer) *nugetprint {
+func newNugetPrinter(p api.Printer, column string, margin int) *nugetprint {
 	np := nugetprint{
-		p: p,
+		p:      p,
+		column: column,
+		margin: margin,
 	}
 	return &np
 }
 
 type nugetprint struct {
-	p api.Printer
+	p      api.Printer
+	column string
+	margin int
 }
 
-func (n *nugetprint) printTree(tree rbtree.RbTree, col string, head func(nf *nugetFolder) string) {
+func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
 	it := rbtree.NewAscend(tree)
 
 	it.Foreach(func(c rbtree.Comparable) {
 		f := c.(*nugetFolder)
-		n.print(head(f), col, f.packs)
+		n.print(head(f), f.packs)
 	})
 }
 
-func (n *nugetprint) print(parent string, col string, packs []*pack) {
-	n.p.Cprint("\n <gray>%s</>\n", parent)
+func (n *nugetprint) print(parent string, packs []*pack) {
+	n.p.Cprint("\n")
+	n.p.Cprint(n.newMargin("<gray>%s</>\n"), parent)
 
-	const format = "  %v\t%v\n"
-	n.p.Tprint(format, col, "Version")
+	format := n.newMargin("%v\t%v\n")
+	n.p.Tprint(format, n.column, "Version")
 	n.p.Tprint(format, "-------", "-------")
 
 	sort.Slice(packs, func(i, j int) bool {
@@ -45,4 +50,14 @@ func (n *nugetprint) print(parent string, col string, packs []*pack) {
 		n.p.Tprint(format, item.pkg, strings.Join(versions, ", "))
 	}
 	n.p.Flush()
+}
+
+func (n *nugetprint) newMargin(s string) string {
+	sb := strings.Builder{}
+	for i := 0; i < n.margin; i++ {
+		sb.WriteString(" ")
+	}
+	sb.WriteString(s)
+
+	return sb.String()
 }

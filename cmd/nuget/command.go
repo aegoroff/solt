@@ -110,21 +110,24 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 	}
 
 	if c.mismatch {
-		c.Prn().Cprint(" <red>Different nuget package's versions in the same solution found:</>")
+		c.Prn().Cprint(" <red>Different nuget package's versions in the same solution found:</>\n")
 	}
 
-	prn := newNugetPrinter(c.Prn())
+	pSolution := newNugetPrinter(c.Prn(), "Package", 2)
+	pPack := newNugetPrinter(c.Prn(), "Project", 5)
 
 	it := rbtree.NewAscend(packs)
 	m := newMismatcher(nugets)
 
 	it.Foreach(func(n rbtree.Comparable) {
 		f := n.(*nugetFolder)
-		prn.print(f.path, "Package", f.packs)
+
+		pSolution.print(f.path, f.packs)
+
 		if c.verbose {
 			mtree := m.mismatchedPacks(f.packs, f.sources)
-			prn.printTree(mtree, "Project", func(nf *nugetFolder) string {
-				return nf.path
+			pPack.printTree(mtree, func(nf *nugetFolder) string {
+				return fmt.Sprintf("Package: %s", nf.path)
 			})
 		}
 	})
@@ -133,9 +136,9 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
 	nugets := newNugetFoldersTree(foldersTree)
 
-	prn := newNugetPrinter(c.Prn())
+	prn := newNugetPrinter(c.Prn(), "Package", 2)
 
-	prn.printTree(nugets, "Package", func(nf *nugetFolder) string {
+	prn.printTree(nugets, func(nf *nugetFolder) string {
 		src := strings.Join(nf.sources, ", ")
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
