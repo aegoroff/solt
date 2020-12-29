@@ -63,7 +63,7 @@ func (c *consoleEnvironment) Writer() io.Writer {
 
 type stringEnvironment struct{ w io.Writer }
 
-// NewConsoleEnvironment creates mew plain string output environment
+// NewStringEnvironment creates mew plain string output environment
 func NewStringEnvironment(w io.Writer) PrintEnvironment {
 	return &stringEnvironment{
 		w: w,

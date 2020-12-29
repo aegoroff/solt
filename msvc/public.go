@@ -24,7 +24,6 @@ func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []stri
 
 // Files gets all files included into MSBuild project
 func (prj *MsbuildProject) Files() []string {
-
 	folderPath := filepath.Dir(prj.Path)
 
 	msp := prj.Project
