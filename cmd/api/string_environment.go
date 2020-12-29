@@ -11,6 +11,10 @@ type stringEnvironment struct {
 	re *regexp.Regexp
 }
 
+func (e *stringEnvironment) NewPrinter() Printer {
+	return NewPrinter(e)
+}
+
 // NewStringEnvironment creates mew plain string output environment
 func NewStringEnvironment(w io.Writer) PrintEnvironment {
 	return &stringEnvironment{

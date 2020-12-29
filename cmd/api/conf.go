@@ -8,6 +8,7 @@ import (
 type Conf struct {
 	filesystem afero.Fs
 	p          Printer
+	pe         PrintEnvironment
 	sp         *string
 	cpu        *string
 	memory     *string
@@ -15,8 +16,8 @@ type Conf struct {
 }
 
 // NewConf creates new *Conf instance
-func NewConf(fs afero.Fs, p Printer, sp *string, cpu *string, memory *string, diag *bool) *Conf {
-	return &Conf{filesystem: fs, p: p, sp: sp, cpu: cpu, memory: memory, diag: diag}
+func NewConf(fs afero.Fs, pe PrintEnvironment, sp *string, cpu *string, memory *string, diag *bool) *Conf {
+	return &Conf{filesystem: fs, pe: pe, sp: sp, cpu: cpu, memory: memory, diag: diag}
 }
 
 // Diag gets whether to enable diagnostic mode
@@ -47,4 +48,8 @@ func (a *Conf) Prn() Printer {
 // SourcesPath gets analyzable sources path
 func (a *Conf) SourcesPath() *string {
 	return a.sp
+}
+
+func (a *Conf) init() {
+	a.p = a.pe.NewPrinter()
 }

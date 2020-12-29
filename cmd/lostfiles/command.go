@@ -8,7 +8,7 @@ import (
 )
 
 type lostFilesCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 	removeLost bool
 	searchAll  bool
 	filter     string

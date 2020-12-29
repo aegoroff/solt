@@ -8,16 +8,15 @@ import (
 )
 
 type lostProjectsCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 }
 
 // New creates new command that does lost projects search
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		lpc := lostProjectsCommand{
+		return &lostProjectsCommand{
 			BaseCommand: api.NewBaseCmd(c),
 		}
-		return &lpc
 	})
 
 	cmd := cc.NewCommand("lp", "lostprojects", "Find projects that not included into any solution")

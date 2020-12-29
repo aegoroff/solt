@@ -10,7 +10,7 @@ type cobraRunSignature func(cmd *cobra.Command, args []string) error
 // BaseCommand contains common data that needed for every working command
 // and it must be included to them
 type BaseCommand struct {
-	prn         Printer
+	conf        *Conf
 	fs          afero.Fs
 	sourcesPath string
 }
@@ -27,27 +27,27 @@ func (b *BaseCommand) Fs() afero.Fs {
 
 // Prn gets printer to output data
 func (b *BaseCommand) Prn() Printer {
-	return b.prn
+	return b.conf.p
 }
 
 // NewBaseCmd creates new BaseCommand instance
-func NewBaseCmd(c *Conf) BaseCommand {
-	return BaseCommand{
-		prn:         c.Prn(),
+func NewBaseCmd(c *Conf) *BaseCommand {
+	return &BaseCommand{
 		sourcesPath: *c.SourcesPath(),
 		fs:          c.Fs(),
+		conf:        c,
 	}
 }
 
 // CobraCreator represents cobra command creation absraction
 type CobraCreator struct {
-	exe func() Executor
-	c   *Conf
+	exe  func() Executor
+	conf *Conf
 }
 
 // NewCobraCreator creates new CobraCreator instance
 func NewCobraCreator(c *Conf, exe func() Executor) *CobraCreator {
-	return &CobraCreator{exe: exe, c: c}
+	return &CobraCreator{exe: exe, conf: c}
 }
 
 func (c *CobraCreator) runE() cobraRunSignature {
@@ -56,11 +56,13 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		var e Executor
 		{
 			e = c.exe()
-			e = newCPUProfileExecutor(e, c.c)
-			e = newMemUsageExecutor(e, c.c)
-			e = newTimeMeasureExecutor(e, c.c)
-			e = newMemoryProfileExecutor(e, c.c)
+			e = newCPUProfileExecutor(e, c.conf)
+			e = newMemUsageExecutor(e, c.conf)
+			e = newTimeMeasureExecutor(e, c.conf)
+			e = newMemoryProfileExecutor(e, c.conf)
 		}
+
+		c.conf.init()
 
 		return e.Execute()
 	}

@@ -13,16 +13,15 @@ import (
 )
 
 type infoCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 }
 
 // New creates new command that shows information about solutions
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		ic := infoCommand{
+		return &infoCommand{
 			api.NewBaseCmd(c),
 		}
-		return &ic
 	})
 
 	cmd := cc.NewCommand("in", "info", "Get information about found solutions")

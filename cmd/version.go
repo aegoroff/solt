@@ -9,7 +9,7 @@ import (
 var Version = "0.11.0"
 
 type versionCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 }
 
 func newVersion(c *api.Conf) *cobra.Command {

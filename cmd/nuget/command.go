@@ -13,13 +13,13 @@ import (
 const empiricNugetPacksForEachProject = 16
 
 type nugetCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 	mismatch bool
 	verbose  bool
 }
 
 type nugetByProjectCommand struct {
-	api.BaseCommand
+	*api.BaseCommand
 }
 
 // New creates new command that does nuget packages feature

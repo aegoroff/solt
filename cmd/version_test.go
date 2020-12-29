@@ -49,5 +49,39 @@ func Test_Help(t *testing.T) {
 
 	// Assert
 	ass.Contains(w.String(), "")
+}
 
+func Test_Write_File(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
+	fp := "/f"
+
+	// Act
+	_ = Execute(memfs, env, "ver", "-f", fp)
+
+	// Assert
+	ass.Equal("", w.String())
+	_, err := memfs.Stat(fp)
+	ass.NoError(err)
+}
+
+func Test_Write_ReadonlyFile(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	w := bytes.NewBufferString("")
+	env := api.NewStringEnvironment(w)
+	fp := "/f"
+	ro := afero.NewReadOnlyFs(memfs)
+
+	// Act
+	_ = Execute(ro, env, "ver", "-f", fp)
+
+	// Assert
+	ass.Contains(w.String(), Version)
+	_, err := memfs.Stat(fp)
+	ass.Error(err)
 }

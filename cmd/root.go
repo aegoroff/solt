@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"io"
 	"solt/cmd/api"
 	"solt/cmd/info"
 	"solt/cmd/lostfiles"
@@ -24,13 +26,12 @@ func newRoot() *cobra.Command {
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
-	p := api.NewPrinter(pe)
-
 	rootCmd := newRoot()
 
 	var sourcesPath string
 	var cpuprofile string
 	var memprofile string
+	var resultfile string
 	var diag bool
 
 	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
@@ -43,9 +44,15 @@ func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
 	const mDescription = "Runs memory profiling if --diag option set. " + profileTrail
 	rootCmd.PersistentFlags().StringVarP(&memprofile, "memprofile", "", "", mDescription)
 
+	const fDescription = "Write results into file. Specify path to output file using this option"
+	rootCmd.PersistentFlags().StringVarP(&resultfile, "file", "f", "", fDescription)
+
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	c := api.NewConf(fs, p, &sourcesPath, &cpuprofile, &memprofile, &diag)
+	env := newWriteFileEnvironment(&resultfile, fs, pe)
+	defer env.close()
+
+	c := api.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
 
 	rootCmd.AddCommand(info.New(c))
 	rootCmd.AddCommand(lostfiles.New(c))
@@ -59,6 +66,57 @@ func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
 	}
 
 	return rootCmd.Execute()
+}
+
+type fileEnvironment struct {
+	path *string
+	fs   afero.Fs
+	pe   api.PrintEnvironment
+	file afero.File
+}
+
+func newWriteFileEnvironment(path *string, fs afero.Fs, defaultpe api.PrintEnvironment) *fileEnvironment {
+	pe := &fileEnvironment{
+		path: path,
+		fs:   fs,
+		pe:   defaultpe,
+	}
+	return pe
+}
+
+func (e *fileEnvironment) create(path *string, fs afero.Fs) error {
+	f, err := fs.Create(*path)
+	if err != nil {
+		return err
+	}
+
+	e.pe = api.NewStringEnvironment(f)
+	e.file = f
+
+	return nil
+}
+
+func (e *fileEnvironment) close() {
+	scan.Close(e.file)
+}
+
+func (e *fileEnvironment) NewPrinter() api.Printer {
+	if *e.path == "" {
+		return e.pe.NewPrinter()
+	}
+	err := e.create(e.path, e.fs)
+	if err != nil {
+		return e.pe.NewPrinter()
+	}
+	return api.NewPrinter(e)
+}
+
+func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+	e.pe.PrintFunc(w, format, a...)
+}
+
+func (e *fileEnvironment) Writer() io.Writer {
+	return e.pe.Writer()
 }
 
 func init() {

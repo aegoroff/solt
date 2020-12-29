@@ -9,56 +9,57 @@ import (
 	"time"
 )
 
-type executorMemUsage struct {
+type executorMiddleware struct {
 	wrapped Executor
 	c       *Conf
+}
+
+func newExecutorMiddleware(wrapped Executor, c *Conf) *executorMiddleware {
+	return &executorMiddleware{wrapped: wrapped, c: c}
+}
+
+type executorMemUsage struct {
+	*executorMiddleware
 }
 
 type executorTimeMeasure struct {
-	wrapped Executor
-	c       *Conf
-	start   time.Time
+	*executorMiddleware
+	start time.Time
 }
 
 type executorCPUProfile struct {
-	wrapped Executor
-	c       *Conf
+	*executorMiddleware
 }
 
 type executorMemoryProfile struct {
-	wrapped Executor
-	c       *Conf
+	*executorMiddleware
 }
 
 func newMemUsageExecutor(e Executor, c *Conf) Executor {
 	em := executorMemUsage{
-		wrapped: e,
-		c:       c,
+		newExecutorMiddleware(e, c),
 	}
 	return &em
 }
 
 func newTimeMeasureExecutor(e Executor, c *Conf) Executor {
 	em := executorTimeMeasure{
-		wrapped: e,
-		c:       c,
-		start:   time.Now(),
+		executorMiddleware: newExecutorMiddleware(e, c),
+		start:              time.Now(),
 	}
 	return &em
 }
 
 func newCPUProfileExecutor(e Executor, c *Conf) Executor {
 	em := executorCPUProfile{
-		wrapped: e,
-		c:       c,
+		newExecutorMiddleware(e, c),
 	}
 	return &em
 }
 
 func newMemoryProfileExecutor(e Executor, c *Conf) Executor {
 	em := executorMemoryProfile{
-		wrapped: e,
-		c:       c,
+		newExecutorMiddleware(e, c),
 	}
 	return &em
 }
