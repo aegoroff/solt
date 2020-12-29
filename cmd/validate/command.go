@@ -8,6 +8,7 @@ import (
 type validateCommand struct{ api.BaseCommand }
 type fixCommand struct{ api.BaseCommand }
 
+// New creates new command that does validates SDK projects
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		return &validateCommand{

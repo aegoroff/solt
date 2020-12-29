@@ -21,6 +21,7 @@ type nugetByProjectCommand struct {
 	api.BaseCommand
 }
 
+// New creates new command that does nuget packages feature
 func New(c *api.Conf) *cobra.Command {
 	var mismatch bool
 

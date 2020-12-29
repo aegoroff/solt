@@ -16,6 +16,7 @@ type infoCommand struct {
 	api.BaseCommand
 }
 
+// New creates new command that shows information about solutions
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		ic := infoCommand{

@@ -14,6 +14,7 @@ type lostFilesCommand struct {
 	filter     string
 }
 
+// New creates new command that does lost files search
 func New(c *api.Conf) *cobra.Command {
 	var removeLost bool
 	var searchAll bool

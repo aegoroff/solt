@@ -4,10 +4,12 @@ import (
 	"github.com/akutz/sortfold"
 )
 
+// Screener is an abstraction that does comples structures output
 type Screener struct {
 	p Printer
 }
 
+// NewScreener creates new Screener instance
 func NewScreener(p Printer) *Screener {
 	s := Screener{
 		p: p,
@@ -15,6 +17,7 @@ func NewScreener(p Printer) *Screener {
 	return &s
 }
 
+// WriteMap prints map[string][]string instance
 func (s *Screener) WriteMap(itemsMap map[string][]string, keyPrefix string) {
 	var keys []string
 	for k := range itemsMap {
@@ -29,6 +32,7 @@ func (s *Screener) WriteMap(itemsMap map[string][]string, keyPrefix string) {
 	}
 }
 
+// WriteSlice prints []string instance
 func (s *Screener) WriteSlice(items []string) {
 	sortfold.Strings(items)
 	for _, item := range items {

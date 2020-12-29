@@ -14,11 +14,6 @@ type prn struct {
 	pe PrintEnvironment
 }
 
-type PrintEnvironment interface {
-	PrintFunc(w io.Writer, format string, a ...interface{})
-	Writer() io.Writer
-}
-
 // NewPrinter creates new Printer interface instance
 func NewPrinter(pe PrintEnvironment) Printer {
 	tw := new(tabwriter.Writer).Init(pe.Writer(), 0, 8, 4, ' ', 0)

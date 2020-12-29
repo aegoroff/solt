@@ -11,6 +11,7 @@ type lostProjectsCommand struct {
 	api.BaseCommand
 }
 
+// New creates new command that does lost projects search
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		lpc := lostProjectsCommand{

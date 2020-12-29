@@ -11,20 +11,37 @@ type Matcher interface {
 	Match(s string) bool
 }
 
+// PrintEnvironment represents concrete printing environment abstraction
+type PrintEnvironment interface {
+	// PrintFunc represents printing function implementation
+	PrintFunc(w io.Writer, format string, a ...interface{})
+
+	// Writer gets underlying io.Writer
+	Writer() io.Writer
+}
+
+// Printer represents printing abstraction
 type Printer interface {
+
+	// Writer gets underlying io.Writer
 	Writer() io.Writer
 
+	// Twriter gets underlying  *tabwriter.Writer
+	// to output tabular data
 	Twriter() *tabwriter.Writer
 
+	// Flush flushes tabular writer that prints dato
 	Flush()
 
-	// tprint prints using tab writer
+	// Tprint prints using tab writer
 	Tprint(format string, a ...interface{})
 
-	// cprint prints data with suppport colorizing
+	// Cprint prints data with suppport colorizing
 	Cprint(format string, a ...interface{})
 }
 
+// Executor represent executable command interface
 type Executor interface {
+	// Execute starts execute command's code
 	Execute() error
 }
