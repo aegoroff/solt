@@ -7,7 +7,7 @@ import (
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
 
-// Base command contains common data that needed for every working command
+// BaseCommand contains common data that needed for every working command
 // and it must be included to them
 type BaseCommand struct {
 	prn         Printer
