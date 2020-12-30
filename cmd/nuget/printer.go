@@ -37,8 +37,13 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
 	format := n.m.Margin("%v\t%v\n")
-	n.p.Tprint(format, n.column, "Version")
-	n.p.Tprint(format, "-------", "-------")
+
+	const ver = "Version"
+	cunder := api.NewCustomMarginer(len(n.column), "-").Margin("")
+	vunder := api.NewCustomMarginer(len(ver), "-").Margin("")
+
+	n.p.Tprint(format, n.column, ver)
+	n.p.Tprint(format, cunder, vunder)
 
 	sort.Slice(packs, func(i, j int) bool {
 		return sortfold.CompareFold(packs[i].pkg, packs[j].pkg) < 0
