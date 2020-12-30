@@ -10,7 +10,6 @@ type fileEnvironment struct {
 	path *string
 	fs   afero.Fs
 	pe   PrintEnvironment
-	file afero.File
 }
 
 // NewWriteFileEnvironment creates new file output environment
@@ -30,7 +29,6 @@ func (e *fileEnvironment) create(path *string, fs afero.Fs) error {
 	}
 
 	e.pe = NewStringEnvironment(f)
-	e.file = f
 
 	return nil
 }
