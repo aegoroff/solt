@@ -27,9 +27,11 @@ func (v *sdkProjectsPrinter) action(name string, refs map[string]c9s.StringHashS
 	v.prn.Cprint("\n")
 	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), name)
 
-	projects := make([]string, 0, len(refs))
+	projects := make([]string, len(refs))
+	i := 0
 	for s := range refs {
-		projects = append(projects, s)
+		projects[i] = s
+		i++
 	}
 
 	sortfold.Strings(projects)
