@@ -67,6 +67,8 @@ Flags:
       --memprofile string   Runs memory profiling if --diag option set.
                             If not set profiling not started.
                             Correct file path should be set here
+  -o, --output string       Write results into file. Specify path to 
+                            output file using this option
   -p, --path string         REQUIRED. Path to the sources folder
 
 Use "solt [command] --help" for more information about a command.
@@ -97,6 +99,8 @@ Global Flags:
       --memprofile string   Runs memory profiling if --diag option set.
                             If not set profiling not started.
                             Correct file path should be set here
+  -o, --output string       Write results into file. Specify path to 
+                            output file using this option
   -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
@@ -120,6 +124,8 @@ Global Flags:
       --memprofile string   Runs memory profiling if --diag option set.
                             If not set profiling not started.
                             Correct file path should be set here
+  -o, --output string       Write results into file. Specify path to 
+                            output file using this option
   -p, --path string         REQUIRED. Path to the sources folder
 
 ```
@@ -152,6 +158,8 @@ Global Flags:
       --memprofile string   Runs memory profiling if --diag option set. 
                             If not set profiling not started. 
                             Correct file path should be set here
+  -o, --output string       Write results into file. Specify path to 
+                            output file using this option
   -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Validate SDK projects syntax:
@@ -179,5 +187,7 @@ Global Flags:
       --memprofile string   Runs memory profiling if --diag option set.
                             If not set profiling not started.
                             Correct file path should be set here
+  -o, --output string       Write results into file. Specify path to 
+                            output file using this option
   -p, --path string         REQUIRED. Path to the sources folder
 ```
