@@ -12,22 +12,25 @@ type fileEnvironment struct {
 }
 
 // NewWriteFileEnvironment creates new file output environment
-func NewWriteFileEnvironment(path *string, fs afero.Fs, defaultpe PrintEnvironment) PrintEnvironment {
+func NewWriteFileEnvironment(path *string, fs afero.Fs, base PrintEnvironment) PrintEnvironment {
 	return &fileEnvironment{
 		path: path,
 		fs:   fs,
-		base: defaultpe,
+		base: base,
 	}
 }
 
 func (e *fileEnvironment) NewPrinter() (Printer, error) {
+	// No path defined use base
 	if *e.path == "" {
 		return e.base.NewPrinter()
 	}
+
 	f, err := e.fs.Create(*e.path)
 	if err != nil {
 		return nil, err
 	}
+
 	e.base = NewStringEnvironment(f)
 	return NewPrinter(e), nil
 }
