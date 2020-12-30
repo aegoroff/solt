@@ -17,6 +17,10 @@ func (e *stringEnvironment) NewPrinter() Printer {
 
 // NewStringEnvironment creates new plain string output environment
 func NewStringEnvironment(w io.WriteCloser) PrintEnvironment {
+	return newStringEnvironment(w)
+}
+
+func newStringEnvironment(w io.WriteCloser) *stringEnvironment {
 	return &stringEnvironment{
 		w:  w,
 		re: regexp.MustCompile(`<[a-zA-Z_=,;]+>(.+?)</>`),

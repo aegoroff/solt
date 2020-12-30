@@ -2,12 +2,11 @@ package api
 
 import (
 	"bytes"
-	"io"
 )
 
 type memoryEnvironment struct {
+	*stringEnvironment
 	buffer *bufferClosable
-	pe     PrintEnvironment
 }
 
 type bufferClosable struct {
@@ -16,18 +15,6 @@ type bufferClosable struct {
 
 func (*bufferClosable) Close() error {
 	return nil
-}
-
-func (m *memoryEnvironment) Writer() io.WriteCloser {
-	return m.buffer
-}
-
-func (m *memoryEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
-	m.pe.PrintFunc(w, format, a...)
-}
-
-func (m *memoryEnvironment) NewPrinter() Printer {
-	return m.pe.NewPrinter()
 }
 
 func (m *memoryEnvironment) String() string {
@@ -39,6 +26,8 @@ func NewMemoryEnvironment() StringEnvironment {
 	buffer := &bufferClosable{
 		bytes.NewBufferString(""),
 	}
-	se := NewStringEnvironment(buffer)
-	return &memoryEnvironment{pe: se, buffer: buffer}
+	return &memoryEnvironment{
+		stringEnvironment: newStringEnvironment(buffer),
+		buffer:            buffer,
+	}
 }
