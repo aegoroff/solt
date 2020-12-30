@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/spf13/afero"
 	"io"
-	"log"
 )
 
 type fileEnvironment struct {
@@ -14,35 +13,23 @@ type fileEnvironment struct {
 
 // NewWriteFileEnvironment creates new file output environment
 func NewWriteFileEnvironment(path *string, fs afero.Fs, defaultpe PrintEnvironment) PrintEnvironment {
-	pe := &fileEnvironment{
+	return &fileEnvironment{
 		path: path,
 		fs:   fs,
 		pe:   defaultpe,
 	}
-	return pe
 }
 
-func (e *fileEnvironment) create(path *string, fs afero.Fs) error {
-	f, err := fs.Create(*path)
-	if err != nil {
-		return err
-	}
-
-	e.pe = NewStringEnvironment(f)
-
-	return nil
-}
-
-func (e *fileEnvironment) NewPrinter() Printer {
+func (e *fileEnvironment) NewPrinter() (Printer, error) {
 	if *e.path == "" {
 		return e.pe.NewPrinter()
 	}
-	err := e.create(e.path, e.fs)
+	f, err := e.fs.Create(*e.path)
 	if err != nil {
-		log.Println(err)
-		return e.pe.NewPrinter()
+		return nil, err
 	}
-	return NewPrinter(e)
+	e.pe = NewStringEnvironment(f)
+	return NewPrinter(e), nil
 }
 
 func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {

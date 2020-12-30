@@ -20,7 +20,7 @@ type PrintEnvironment interface {
 	PrintFunc(w io.Writer, format string, a ...interface{})
 
 	// NewPrinter creates new printer
-	NewPrinter() Printer
+	NewPrinter() (Printer, error)
 }
 
 // StringEnvironment defines in memory printing environment abstraction

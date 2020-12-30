@@ -11,8 +11,8 @@ type stringEnvironment struct {
 	re *regexp.Regexp
 }
 
-func (e *stringEnvironment) NewPrinter() Printer {
-	return NewPrinter(e)
+func (e *stringEnvironment) NewPrinter() (Printer, error) {
+	return NewPrinter(e), nil
 }
 
 // NewStringEnvironment creates new plain string output environment

@@ -21,8 +21,8 @@ func newConsoleEnvironment() api.PrintEnvironment {
 	return &consoleEnvironment{}
 }
 
-func (e *consoleEnvironment) NewPrinter() api.Printer {
-	return api.NewPrinter(e)
+func (e *consoleEnvironment) NewPrinter() (api.Printer, error) {
+	return api.NewPrinter(e), nil
 }
 
 func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {

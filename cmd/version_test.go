@@ -76,7 +76,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	_ = Execute(ro, env, "ver", "-o", fp)
 
 	// Assert
-	ass.Contains(env.String(), Version)
+	ass.Contains(env.String(), "")
 	_, err := memfs.Stat(fp)
 	ass.Error(err)
 }

@@ -50,6 +50,8 @@ func (c *Conf) SourcesPath() *string {
 	return c.sp
 }
 
-func (c *Conf) init() {
-	c.p = c.pe.NewPrinter()
+func (c *Conf) init() error {
+	p, err := c.pe.NewPrinter()
+	c.p = p
+	return err
 }

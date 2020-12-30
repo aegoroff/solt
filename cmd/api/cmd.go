@@ -63,7 +63,10 @@ func (c *CobraCreator) runE() cobraRunSignature {
 			e = newMemoryProfileExecutor(e, c.conf)
 		}
 
-		c.conf.init()
+		err := c.conf.init()
+		if err != nil {
+			return err
+		}
 		defer scan.Close(c.conf.Prn().Writer())
 
 		return e.Execute()
