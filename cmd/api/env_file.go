@@ -8,7 +8,7 @@ import (
 type fileEnvironment struct {
 	path *string
 	fs   afero.Fs
-	pe   PrintEnvironment
+	base PrintEnvironment
 }
 
 // NewWriteFileEnvironment creates new file output environment
@@ -16,26 +16,26 @@ func NewWriteFileEnvironment(path *string, fs afero.Fs, defaultpe PrintEnvironme
 	return &fileEnvironment{
 		path: path,
 		fs:   fs,
-		pe:   defaultpe,
+		base: defaultpe,
 	}
 }
 
 func (e *fileEnvironment) NewPrinter() (Printer, error) {
 	if *e.path == "" {
-		return e.pe.NewPrinter()
+		return e.base.NewPrinter()
 	}
 	f, err := e.fs.Create(*e.path)
 	if err != nil {
 		return nil, err
 	}
-	e.pe = NewStringEnvironment(f)
+	e.base = NewStringEnvironment(f)
 	return NewPrinter(e), nil
 }
 
 func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
-	e.pe.PrintFunc(w, format, a...)
+	e.base.PrintFunc(w, format, a...)
 }
 
 func (e *fileEnvironment) Writer() io.WriteCloser {
-	return e.pe.Writer()
+	return e.base.Writer()
 }
