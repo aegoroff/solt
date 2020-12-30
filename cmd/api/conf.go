@@ -21,35 +21,35 @@ func NewConf(fs afero.Fs, pe PrintEnvironment, sp *string, cpu *string, memory *
 }
 
 // Diag gets whether to enable diagnostic mode
-func (a *Conf) Diag() *bool {
-	return a.diag
+func (c *Conf) Diag() *bool {
+	return c.diag
 }
 
 // CPU gets cpu profiling file path that will be created
-func (a *Conf) CPU() *string {
-	return a.cpu
+func (c *Conf) CPU() *string {
+	return c.cpu
 }
 
 // Memory gets memory profiling file path that will be created
-func (a *Conf) Memory() *string {
-	return a.memory
+func (c *Conf) Memory() *string {
+	return c.memory
 }
 
 // Fs gets underlying file system abstraction
-func (a *Conf) Fs() afero.Fs {
-	return a.filesystem
+func (c *Conf) Fs() afero.Fs {
+	return c.filesystem
 }
 
 // Prn gets underlying Printer
-func (a *Conf) Prn() Printer {
-	return a.p
+func (c *Conf) Prn() Printer {
+	return c.p
 }
 
 // SourcesPath gets analyzable sources path
-func (a *Conf) SourcesPath() *string {
-	return a.sp
+func (c *Conf) SourcesPath() *string {
+	return c.sp
 }
 
-func (a *Conf) init() {
-	a.p = a.pe.NewPrinter()
+func (c *Conf) init() {
+	c.p = c.pe.NewPrinter()
 }
