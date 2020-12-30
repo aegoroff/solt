@@ -48,8 +48,6 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 		sortfold.Strings(versions)
 
 		tbl.AddLine(item.pkg, strings.Join(versions, ", "))
-
 	}
 	tbl.Print()
-
 }
