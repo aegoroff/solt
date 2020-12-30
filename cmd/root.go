@@ -47,8 +47,7 @@ func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
 
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	env := newWriteFileEnvironment(&resultfile, fs, pe)
-	defer env.close()
+	env := api.NewWriteFileEnvironment(&resultfile, fs, pe)
 
 	c := api.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
 

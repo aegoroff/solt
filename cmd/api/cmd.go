@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -63,6 +64,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		}
 
 		c.conf.init()
+		defer scan.Close(c.conf.Prn().Writer())
 
 		return e.Execute()
 	}

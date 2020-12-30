@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd/api"
@@ -22,14 +21,13 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(``, actual)
 }
 
@@ -57,14 +55,13 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+tst.path, []byte(codeFileContent), 0644)
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-		w := bytes.NewBufferString("")
-		env := api.NewStringEnvironment(w)
+		env := api.NewMemoryEnvironment()
 
 		// Act
 		_ = Execute(memfs, env, "lf", "-p", dir)
 
 		// Assert
-		actual := w.String()
+		actual := env.String()
 		ass.Equal(``, actual)
 	}
 }
@@ -83,14 +80,13 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 }
 
@@ -120,14 +116,13 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", root)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(" root\\a\\a\\Properties\\AssemblyInfo1.cs\n root\\b\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 }
 
@@ -144,14 +139,13 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal("", actual)
 }
 
@@ -177,14 +171,13 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-		w := bytes.NewBufferString("")
-		env := api.NewStringEnvironment(w)
+		env := api.NewMemoryEnvironment()
 
 		// Act
 		_ = Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
 
 		// Assert
-		actual := w.String()
+		actual := env.String()
 		ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 	}
 }
@@ -203,14 +196,13 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir, "-r")
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed successfully.\n"), actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.Error(err)
@@ -231,14 +223,13 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	fs := afero.NewReadOnlyFs(memfs)
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(fs, env, "lf", "-p", dir, "-r")
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(" a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 	_, err := fs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
@@ -256,14 +247,13 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir, "-a")
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath("\nThese files included into projects but not exist in the file system.\n\nProject: a\\a\\a.csproj\n a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
 }
 
@@ -279,13 +269,12 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal("", actual)
 }

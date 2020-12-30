@@ -1,21 +1,20 @@
-package cmd
+package api
 
 import (
-	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"io"
 	"log"
-	"solt/cmd/api"
 )
 
 type fileEnvironment struct {
 	path *string
 	fs   afero.Fs
-	pe   api.PrintEnvironment
+	pe   PrintEnvironment
 	file afero.File
 }
 
-func newWriteFileEnvironment(path *string, fs afero.Fs, defaultpe api.PrintEnvironment) *fileEnvironment {
+// NewWriteFileEnvironment creates new file output environment
+func NewWriteFileEnvironment(path *string, fs afero.Fs, defaultpe PrintEnvironment) PrintEnvironment {
 	pe := &fileEnvironment{
 		path: path,
 		fs:   fs,
@@ -30,17 +29,13 @@ func (e *fileEnvironment) create(path *string, fs afero.Fs) error {
 		return err
 	}
 
-	e.pe = api.NewStringEnvironment(f)
+	e.pe = NewStringEnvironment(f)
 	e.file = f
 
 	return nil
 }
 
-func (e *fileEnvironment) close() {
-	scan.Close(e.file)
-}
-
-func (e *fileEnvironment) NewPrinter() api.Printer {
+func (e *fileEnvironment) NewPrinter() Printer {
 	if *e.path == "" {
 		return e.pe.NewPrinter()
 	}
@@ -49,13 +44,13 @@ func (e *fileEnvironment) NewPrinter() api.Printer {
 		log.Println(err)
 		return e.pe.NewPrinter()
 	}
-	return api.NewPrinter(e)
+	return NewPrinter(e)
 }
 
 func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
 	e.pe.PrintFunc(w, format, a...)
 }
 
-func (e *fileEnvironment) Writer() io.Writer {
+func (e *fileEnvironment) Writer() io.WriteCloser {
 	return e.pe.Writer()
 }

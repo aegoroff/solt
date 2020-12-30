@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"io"
 	"text/tabwriter"
 )
@@ -20,6 +21,12 @@ type PrintEnvironment interface {
 
 	// NewPrinter creates new printer
 	NewPrinter() Printer
+}
+
+// StringEnvironment defines in memory printing environment abstraction
+type StringEnvironment interface {
+	PrintEnvironment
+	fmt.Stringer
 }
 
 // Printer represents printing abstraction
@@ -43,7 +50,7 @@ type Printer interface {
 // Writable represents io.Writer container
 type Writable interface {
 	// Writer gets underlying io.Writer
-	Writer() io.Writer
+	Writer() io.WriteCloser
 }
 
 // Executor represent executable command interface

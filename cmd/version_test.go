@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd/api"
@@ -25,14 +24,13 @@ func Test_Version(t *testing.T) {
 			// Arrange
 			ass := assert.New(t)
 			memfs := afero.NewMemMapFs()
-			w := bytes.NewBufferString("")
-			env := api.NewStringEnvironment(w)
+			env := api.NewMemoryEnvironment()
 
 			// Act
 			_ = Execute(memfs, env, test.cmd...)
 
 			// Assert
-			ass.Contains(w.String(), Version)
+			ass.Contains(env.String(), Version)
 		})
 	}
 }
@@ -41,29 +39,27 @@ func Test_Help(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "")
 
 	// Assert
-	ass.Contains(w.String(), "")
+	ass.Contains(env.String(), "")
 }
 
 func Test_Write_File(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 	fp := "/f"
 
 	// Act
 	_ = Execute(memfs, env, "ver", "-o", fp)
 
 	// Assert
-	ass.Equal("", w.String())
+	ass.Equal("", env.String())
 	_, err := memfs.Stat(fp)
 	ass.NoError(err)
 }
@@ -72,8 +68,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 	fp := "/f"
 	ro := afero.NewReadOnlyFs(memfs)
 
@@ -81,7 +76,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	_ = Execute(ro, env, "ver", "-o", fp)
 
 	// Assert
-	ass.Contains(w.String(), Version)
+	ass.Contains(env.String(), Version)
 	_, err := memfs.Stat(fp)
 	ass.Error(err)
 }

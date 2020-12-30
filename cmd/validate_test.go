@@ -24,14 +24,13 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(` Solution: a\a.sln
    project: a\a\a.csproj has redundant references
      a\b\b.csproj
@@ -64,14 +63,13 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 			_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-			w := bytes.NewBufferString("")
-			env := api.NewStringEnvironment(w)
+			env := api.NewMemoryEnvironment()
 
 			// Act
 			_ = Execute(memfs, env, "va", "fix", "-p", dir)
 
 			// Assert
-			actual := w.String()
+			actual := env.String()
 			ass.Equal(solution.ToValidPath("Fixed 1 redundant project references in 1 projects within solution a\\a.sln\n"), actual)
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
@@ -98,14 +96,13 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal("", actual)
 }
 
@@ -122,13 +119,12 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "fr", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal("", actual)
 }

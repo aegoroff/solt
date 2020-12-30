@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd/api"
@@ -22,14 +21,13 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	w := bytes.NewBufferString("")
-	env := api.NewStringEnvironment(w)
+	env := api.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "in", "-p", dir)
 
 	// Assert
-	actual := w.String()
+	actual := env.String()
 	ass.Equal(solution.ToValidPath(` a\a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16

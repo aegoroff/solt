@@ -8,7 +8,7 @@ import (
 
 type prn struct {
 	tw *tabwriter.Writer
-	w  io.Writer
+	w  io.WriteCloser
 	pe PrintEnvironment
 }
 
@@ -25,7 +25,7 @@ func NewPrinter(pe PrintEnvironment) Printer {
 	return &p
 }
 
-func (r *prn) Writer() io.Writer {
+func (r *prn) Writer() io.WriteCloser {
 	return r.w
 }
 
