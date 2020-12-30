@@ -14,11 +14,12 @@ type prn struct {
 
 // NewPrinter creates new Printer interface instance
 func NewPrinter(pe PrintEnvironment) Printer {
-	tw := new(tabwriter.Writer).Init(pe.Writer(), 0, 8, 4, ' ', 0)
+	w := pe.Writer()
+	tw := new(tabwriter.Writer).Init(w, 0, 8, 4, ' ', 0)
 
 	p := prn{
 		tw: tw,
-		w:  pe.Writer(),
+		w:  w,
 		pe: pe,
 	}
 	return &p
