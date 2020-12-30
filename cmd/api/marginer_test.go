@@ -33,3 +33,15 @@ func TestMarginer_Margin(t *testing.T) {
 		})
 	}
 }
+
+func TestNewCustomMarginer(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+
+	// Act
+	m := NewCustomMarginer(2, "-")
+	result := m.Margin("")
+
+	// Assert
+	ass.Equal("--", result)
+}

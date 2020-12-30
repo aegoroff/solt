@@ -1,9 +1,7 @@
 package info
 
 import (
-	"fmt"
 	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/akutz/sortfold"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"solt/cmd/api"
@@ -49,7 +47,7 @@ func (c *infoCommand) Execute() error {
 
 		t.Print()
 
-		fmt.Println()
+		c.Prn().Cprint("\n")
 
 		c.showProjectsInfo(sln.Projects, c.Prn())
 		c.showSectionsInfo(sln.GlobalSections, c.Prn())
@@ -74,7 +72,7 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project, p api.Print
 		p.Tprint(format, k, v)
 	}
 	p.Flush()
-	fmt.Println()
+	p.Cprint("\n")
 }
 
 func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Printer) {
@@ -94,29 +92,13 @@ func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Print
 		}
 	}
 
-	format := c.m.Margin("%v\n")
+	prn := newPrinter(c.m, p)
 
-	p.Tprint(format, "Configuration")
-	p.Tprint(format, "------------")
+	prn.print(configurations, "Configuration")
 
-	sortedConfigurations := configurations.Items()
-	sortfold.Strings(sortedConfigurations)
+	p.Cprint("\n")
 
-	for _, k := range sortedConfigurations {
-		p.Tprint(format, k)
-	}
-	p.Flush()
-	fmt.Println()
+	prn.print(platforms, "Platform")
 
-	p.Tprint(format, "Platform")
-	p.Tprint(format, "--------")
-
-	sortedPlatforms := platforms.Items()
-	sortfold.Strings(sortedPlatforms)
-
-	for _, k := range sortedPlatforms {
-		p.Tprint(format, k)
-	}
-	p.Flush()
 	p.Cprint("\n")
 }

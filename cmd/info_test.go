@@ -33,13 +33,16 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148
   Minimum Visual Studio Version    10.0.40219.1
+
   Project type    Count
   ------------    -----
   C#              1
+
   Configuration
-  ------------
+  -------------
   Debug
   Release
+
   Platform
   --------
   Any CPU
