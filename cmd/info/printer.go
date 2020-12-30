@@ -18,9 +18,9 @@ func newPrinter(m *api.Marginer, p api.Printer) *printer {
 func (p *printer) print(set c9s.StringHashSet, name string) {
 	format := p.m.Margin("%v\n")
 
-	cm := api.NewCustomMarginer(len(name), "-")
+	underline := api.NewCustomMarginer(len(name), "-").Margin("")
 	p.p.Tprint(format, name)
-	p.p.Tprint(format, cm.Margin(""))
+	p.p.Tprint(format, underline)
 
 	items := set.Items()
 	sortfold.Strings(items)
