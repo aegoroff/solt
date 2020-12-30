@@ -19,7 +19,7 @@ func newPrinter(m *api.Marginer, p api.Printer) *printer {
 func (p *printer) print(set c9s.StringHashSet, name string) {
 	t := tabby.NewCustom(p.p.Twriter())
 
-	underline := api.NewCustomMarginer(len(name), "-").Margin("")
+	underline := api.NewUnderline(name)
 
 	t.AddLine(p.m.Margin(name))
 	t.AddLine(p.m.Margin(underline))
