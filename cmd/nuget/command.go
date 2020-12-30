@@ -119,14 +119,14 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 	m := newMismatcher(nugets)
 
 	it.Foreach(func(n rbtree.Comparable) {
-		f := n.(*nugetFolder)
+		f := n.(*folder)
 
 		pSolution.print(f.path, f.packs)
 
 		if c.verbose {
 			pPack := newNugetPrinter(c.Prn(), "Project", 5)
 			mtree := m.mismatchedPacks(f.packs, f.sources)
-			pPack.printTree(mtree, func(nf *nugetFolder) string {
+			pPack.printTree(mtree, func(nf *folder) string {
 				return fmt.Sprintf("Package: %s", nf.path)
 			})
 		}
@@ -138,7 +138,7 @@ func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
 
 	prn := newNugetPrinter(c.Prn(), "Package", 2)
 
-	prn.printTree(nugets, func(nf *nugetFolder) string {
+	prn.printTree(nugets, func(nf *folder) string {
 		src := strings.Join(nf.sources, ", ")
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
@@ -168,9 +168,9 @@ func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) ([]
 
 	for _, path := range paths {
 		sv := newNugetFolder(path, nil, nil)
-		folder, ok := nugets.Search(sv)
+		val, ok := nugets.Search(sv)
 		if ok {
-			packs := folder.(*nugetFolder).packs
+			packs := val.(*folder).packs
 			npacks = append(npacks, packs...)
 			projectFolders = append(projectFolders, path)
 		}
@@ -201,10 +201,10 @@ func mergeNugetPacks(packs []*pack) []*pack {
 // keepOnlyMismatch removes all packs but only those
 // which have more then one version on a nuget package
 func keepOnlyMismatch(in rbtree.RbTree) {
-	empty := make([]*nugetFolder, 0)
+	empty := make([]*folder, 0)
 
 	rbtree.NewWalkInorder(in).Foreach(func(n rbtree.Comparable) {
-		nf := n.(*nugetFolder)
+		nf := n.(*folder)
 		mismatchOnly := onlyMismatches(nf.packs)
 		if len(mismatchOnly) == 0 {
 			empty = append(empty, nf)

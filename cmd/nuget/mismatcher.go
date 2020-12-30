@@ -31,7 +31,7 @@ func (m *mismatcher) filter(folderToSearch string, mismatch *pack) []*pack {
 	packs := make([]*pack, 0)
 
 	if ok {
-		nf := found.(*nugetFolder)
+		nf := found.(*folder)
 		for _, p := range nf.packs {
 			if mismatch.match(p) {
 				packs = append(packs, newPack(folderToSearch, p.versions.Items()...))

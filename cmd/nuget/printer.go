@@ -23,11 +23,11 @@ type nugetprint struct {
 	m      *api.Marginer
 }
 
-func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
+func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *folder) string) {
 	it := rbtree.NewAscend(tree)
 
 	it.Foreach(func(c rbtree.Comparable) {
-		f := c.(*nugetFolder)
+		f := c.(*folder)
 		n.print(head(f), f.packs)
 	})
 }
