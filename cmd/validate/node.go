@@ -6,14 +6,14 @@ import (
 	"solt/msvc"
 )
 
-type projectNode struct {
+type node struct {
 	id       int64
 	project  *msvc.MsbuildProject
 	fullPath *string
 }
 
-func newProjectNode(id int64, prj *msvc.MsbuildProject) *projectNode {
-	n := projectNode{
+func newNode(id int64, prj *msvc.MsbuildProject) *node {
+	n := node{
 		id:       id,
 		project:  prj,
 		fullPath: &prj.Path,
@@ -21,22 +21,22 @@ func newProjectNode(id int64, prj *msvc.MsbuildProject) *projectNode {
 	return &n
 }
 
-func (n *projectNode) ID() int64 {
+func (n *node) ID() int64 {
 	return n.id
 }
 
-func (n *projectNode) String() string {
+func (n *node) String() string {
 	return *n.fullPath
 }
 
-func (n *projectNode) LessThan(y rbtree.Comparable) bool {
+func (n *node) LessThan(y rbtree.Comparable) bool {
 	return n.compare(y) < 0
 }
 
-func (n *projectNode) EqualTo(y rbtree.Comparable) bool {
+func (n *node) EqualTo(y rbtree.Comparable) bool {
 	return n.compare(y) == 0
 }
 
-func (n *projectNode) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(n.String(), y.(*projectNode).String())
+func (n *node) compare(y rbtree.Comparable) int {
+	return sortfold.CompareFold(n.String(), y.(*node).String())
 }

@@ -36,17 +36,17 @@ func newFix(c *api.Conf) *cobra.Command {
 }
 
 func (c *validateCommand) Execute() error {
-	projectsPrinter := newSdkProjectsPrinter(c.Prn())
-	validator := newSdkProjectsValidator(c.Fs(), c.Prn(), c.SourcesPath(), projectsPrinter)
+	prn := newPrinter(c.Prn())
+	valid := newValidator(c.Fs(), c.Prn(), c.SourcesPath(), prn)
 
-	validator.validate()
+	valid.validate()
 	return nil
 }
 
 func (c *fixCommand) Execute() error {
-	fixer := newSdkProjectsFixer(c.Prn(), c.Fs())
-	validator := newSdkProjectsValidator(c.Fs(), c.Prn(), c.SourcesPath(), fixer)
+	fix := newFixer(c.Prn(), c.Fs())
+	valid := newValidator(c.Fs(), c.Prn(), c.SourcesPath(), fix)
 
-	validator.validate()
+	valid.validate()
 	return nil
 }

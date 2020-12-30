@@ -6,17 +6,17 @@ import (
 	"solt/cmd/api"
 )
 
-type sdkProjectsPrinter struct {
+type printer struct {
 	prn api.Printer
 }
 
-func newSdkProjectsPrinter(p api.Printer) sdkActioner {
-	return &sdkProjectsPrinter{
+func newPrinter(p api.Printer) actioner {
+	return &printer{
 		prn: p,
 	}
 }
 
-func (v *sdkProjectsPrinter) action(name string, refs map[string]c9s.StringHashSet) {
+func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
@@ -25,7 +25,7 @@ func (v *sdkProjectsPrinter) action(name string, refs map[string]c9s.StringHashS
 	rm := api.NewMarginer(5)
 
 	v.prn.Cprint("\n")
-	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), name)
+	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), path)
 
 	projects := make([]string, len(refs))
 	i := 0

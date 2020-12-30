@@ -12,27 +12,23 @@ import (
 	"solt/solution"
 )
 
-type sdkActioner interface {
-	action(name string, items map[string]c9s.StringHashSet)
-}
-
-type sdkProjectsValidator struct {
+type validator struct {
 	prn         api.Printer
 	fs          afero.Fs
 	sourcesPath string
-	actioner    sdkActioner
+	act         actioner
 }
 
-func newSdkProjectsValidator(fs afero.Fs, p api.Printer, sourcesPath string, h sdkActioner) *sdkProjectsValidator {
-	return &sdkProjectsValidator{
+func newValidator(fs afero.Fs, p api.Printer, sourcesPath string, act actioner) *validator {
+	return &validator{
 		prn:         p,
 		fs:          fs,
 		sourcesPath: sourcesPath,
-		actioner:    h,
+		act:         act,
 	}
 }
 
-func (m *sdkProjectsValidator) validate() {
+func (m *validator) validate() {
 	foldersTree := msvc.ReadSolutionDir(m.sourcesPath, m.fs)
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
@@ -44,11 +40,11 @@ func (m *sdkProjectsValidator) validate() {
 
 		redundants := m.findRedundants(g, allNodes)
 
-		m.actioner.action(sol.Path, redundants)
+		m.act.action(sol.Path, redundants)
 	}
 }
 
-func (*sdkProjectsValidator) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
+func (*validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
 	tree := rbtree.NewRbTree()
 
 	for _, project := range allProjects {
@@ -60,13 +56,13 @@ func (*sdkProjectsValidator) onlySdkProjects(allProjects []*msvc.MsbuildProject)
 	return tree
 }
 
-func (m *sdkProjectsValidator) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
+func (m *validator) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	g, nodes := m.createGraphNodes(sln, sdkTree)
 	m.createGraphEdges(g, nodes)
 	return g, nodes
 }
 
-func (*sdkProjectsValidator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
+func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path)
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.NewRbTree()
@@ -85,7 +81,7 @@ func (*sdkProjectsValidator) createGraphNodes(sln *msvc.VisualStudioSolution, sd
 			continue
 		}
 
-		n := newProjectNode(ix, msbuild.(*msvc.MsbuildProject))
+		n := newNode(ix, msbuild.(*msvc.MsbuildProject))
 		nodes.Insert(n)
 		ix++
 		g.AddNode(n)
@@ -94,11 +90,11 @@ func (*sdkProjectsValidator) createGraphNodes(sln *msvc.VisualStudioSolution, sd
 	return g, nodes
 }
 
-func (m *sdkProjectsValidator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
+func (m *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
 	gn := g.Nodes()
 
 	for gn.Next() {
-		to := gn.Node().(*projectNode)
+		to := gn.Node().(*node)
 		refs := m.getReferences(to, nodes)
 		for _, ref := range refs {
 			e := g.NewEdge(ref, to)
@@ -107,20 +103,20 @@ func (m *sdkProjectsValidator) createGraphEdges(g *simple.DirectedGraph, nodes r
 	}
 }
 
-func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
+func (m *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
 	gn := g.Nodes()
 
 	for gn.Next() {
-		project := gn.Node().(*projectNode)
+		project := gn.Node().(*node)
 
 		refs := m.getReferences(project, allNodes)
 
 		rrs := make(c9s.StringHashSet)
 
-		allPairs(refs, func(from *projectNode, to *projectNode) {
+		allPairs(refs, func(from *node, to *node) {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
 			if len(paths) > 0 {
 				rrs.Add(from.String())
@@ -135,7 +131,7 @@ func (m *sdkProjectsValidator) findRedundants(g *simple.DirectedGraph, allNodes 
 	return result
 }
 
-func allPairs(nodes []*projectNode, action func(*projectNode, *projectNode)) {
+func allPairs(nodes []*node, action func(*node, *node)) {
 	for _, from := range nodes {
 		for _, to := range nodes {
 			if from.ID() == to.ID() {
@@ -146,20 +142,20 @@ func allPairs(nodes []*projectNode, action func(*projectNode, *projectNode)) {
 	}
 }
 
-func (*sdkProjectsValidator) getReferences(to *projectNode, allNodes rbtree.RbTree) []*projectNode {
+func (*validator) getReferences(to *node, allNodes rbtree.RbTree) []*node {
 	if to.project.Project.ProjectReferences == nil {
-		return []*projectNode{}
+		return []*node{}
 	}
 
 	dir := filepath.Dir(to.project.Path)
 
-	var result []*projectNode
+	var result []*node
 	for _, ref := range to.project.Project.ProjectReferences {
 		p := filepath.Join(dir, ref.Path())
-		n := &projectNode{fullPath: &p}
+		n := &node{fullPath: &p}
 		from, ok := allNodes.Search(n)
 		if ok {
-			result = append(result, from.(*projectNode))
+			result = append(result, from.(*node))
 		}
 	}
 	return result

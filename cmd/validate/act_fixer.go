@@ -14,29 +14,29 @@ import (
 	"unicode/utf8"
 )
 
-type sdkProjectsFixer struct {
+type fixer struct {
 	prn   api.Printer
 	fs    afero.Fs
 	filer sys.Filer
 }
 
-type sdkProjectReference struct {
+type projectReference struct {
 	Path string `xml:"Include,attr"`
 }
 
-func (r *sdkProjectReference) path() string {
+func (r *projectReference) path() string {
 	return solution.ToValidPath(r.Path)
 }
 
-func newSdkProjectsFixer(p api.Printer, fs afero.Fs) sdkActioner {
-	return &sdkProjectsFixer{
+func newFixer(p api.Printer, fs afero.Fs) actioner {
+	return &fixer{
 		prn:   p,
 		fs:    fs,
 		filer: sys.NewFiler(fs, p.Writer()),
 	}
 }
 
-func (f *sdkProjectsFixer) action(name string, refs map[string]c9s.StringHashSet) {
+func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
@@ -50,10 +50,10 @@ func (f *sdkProjectsFixer) action(name string, refs map[string]c9s.StringHashSet
 	}
 
 	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
-	f.prn.Cprint(mf, invalidRefsCount, len(refs), name)
+	f.prn.Cprint(mf, invalidRefsCount, len(refs), path)
 }
 
-func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
+func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
 	file, err := f.fs.Open(filepath.Clean(project))
 	if err != nil {
 		return nil
@@ -78,7 +78,7 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 		switch v := t.(type) {
 		case xml.StartElement:
 			if v.Name.Local == "ProjectReference" {
-				var prj sdkProjectReference
+				var prj projectReference
 				// decode a whole chunk of following XML into the variable
 				_ = decoder.DecodeElement(&prj, &v)
 				offAfter := decoder.InputOffset()
@@ -96,7 +96,7 @@ func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHa
 	return ends
 }
 
-func (f *sdkProjectsFixer) getNewFileContent(project string, ends []int64) []byte {
+func (f *fixer) getNewFileContent(project string, ends []int64) []byte {
 	buf := f.filer.Read(project)
 
 	if buf == nil {
