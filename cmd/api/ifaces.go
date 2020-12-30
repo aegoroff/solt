@@ -37,12 +37,6 @@ type Printer interface {
 	// to output tabular data
 	Twriter() *tabwriter.Writer
 
-	// Flush flushes tabular writer that prints dato
-	Flush()
-
-	// Tprint prints using tab writer
-	Tprint(format string, a ...interface{})
-
 	// Cprint prints data with suppport colorizing
 	Cprint(format string, a ...interface{})
 }

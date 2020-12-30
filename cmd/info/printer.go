@@ -3,6 +3,7 @@ package info
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
+	"github.com/cheynewallace/tabby"
 	"solt/cmd/api"
 )
 
@@ -16,17 +17,18 @@ func newPrinter(m *api.Marginer, p api.Printer) *printer {
 }
 
 func (p *printer) print(set c9s.StringHashSet, name string) {
-	format := p.m.Margin("%v\n")
+	t := tabby.NewCustom(p.p.Twriter())
 
 	underline := api.NewCustomMarginer(len(name), "-").Margin("")
-	p.p.Tprint(format, name)
-	p.p.Tprint(format, underline)
+
+	t.AddLine(p.m.Margin(name))
+	t.AddLine(p.m.Margin(underline))
 
 	items := set.Items()
 	sortfold.Strings(items)
 
 	for _, k := range items {
-		p.p.Tprint(format, k)
+		t.AddLine(p.m.Margin(k))
 	}
-	p.p.Flush()
+	t.Print()
 }
