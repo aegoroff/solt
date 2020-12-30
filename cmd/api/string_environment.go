@@ -19,7 +19,7 @@ func (e *stringEnvironment) NewPrinter() Printer {
 func NewStringEnvironment(w io.Writer) PrintEnvironment {
 	return &stringEnvironment{
 		w:  w,
-		re: regexp.MustCompile(`<[a-zA-Z_]+>(.+?)</>`),
+		re: regexp.MustCompile(`<[a-zA-Z_=,;]+>(.+?)</>`),
 	}
 }
 
