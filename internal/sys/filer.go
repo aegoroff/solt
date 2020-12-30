@@ -52,9 +52,9 @@ func (f *filer) CheckExistence(files []string) []string {
 	var wg sync.WaitGroup
 	wg.Add(len(files))
 	for _, file := range files {
+		restrict <- struct{}{}
 		go func(file string, restrict chan struct{}) {
 			defer wg.Done()
-			restrict <- struct{}{}
 			defer func() { <-restrict }()
 
 			if f.fileNotExists(file) {
