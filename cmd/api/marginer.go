@@ -28,3 +28,9 @@ func (m *Marginer) Margin(s string) string {
 
 	return sb.String()
 }
+
+// NewUnderline creates new dashes string that can be used as underline
+// the length of the line is equal len of string specified
+func NewUnderline(s string) string {
+	return NewCustomMarginer(len(s), "-").Margin("")
+}

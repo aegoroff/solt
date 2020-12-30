@@ -3,6 +3,7 @@ package nuget
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
+	"github.com/cheynewallace/tabby"
 	"solt/cmd/api"
 	"sort"
 	"strings"
@@ -36,14 +37,14 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	format := n.m.Margin("%v\t%v\n")
+	t := tabby.NewCustom(n.p.Twriter())
 
 	const ver = "Version"
-	cunder := api.NewCustomMarginer(len(n.column), "-").Margin("")
-	vunder := api.NewCustomMarginer(len(ver), "-").Margin("")
+	cunder := api.NewUnderline(n.column)
+	vunder := api.NewUnderline(ver)
 
-	n.p.Tprint(format, n.column, ver)
-	n.p.Tprint(format, cunder, vunder)
+	t.AddLine(n.m.Margin(n.column), ver)
+	t.AddLine(n.m.Margin(cunder), vunder)
 
 	sort.Slice(packs, func(i, j int) bool {
 		return sortfold.CompareFold(packs[i].pkg, packs[j].pkg) < 0
@@ -52,7 +53,9 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	for _, item := range packs {
 		versions := item.versions.Items()
 		sortfold.Strings(versions)
-		n.p.Tprint(format, item.pkg, strings.Join(versions, ", "))
+
+		t.AddLine(n.m.Margin(item.pkg), strings.Join(versions, ", "))
 	}
-	n.p.Flush()
+
+	t.Print()
 }

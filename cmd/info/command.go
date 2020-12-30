@@ -63,15 +63,20 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project, p api.Print
 		byType[p.Type]++
 	}
 
-	format := c.m.Margin("%v\t%v\n")
+	t := tabby.NewCustom(c.Prn().Twriter())
 
-	p.Tprint(format, "Project type", "Count")
-	p.Tprint(format, "------------", "-----")
+	const firstCol = "Project type"
+	const secondCol = "Count"
+	t.AddLine(c.m.Margin(firstCol), secondCol)
+
+	firstUnderline := api.NewUnderline(firstCol)
+	secondUnderline := api.NewUnderline(secondCol)
+	t.AddLine(c.m.Margin(firstUnderline), secondUnderline)
 
 	for k, v := range byType {
-		p.Tprint(format, k, v)
+		t.AddLine(c.m.Margin(k), v)
 	}
-	p.Flush()
+	t.Print()
 	p.Cprint("\n")
 }
 
