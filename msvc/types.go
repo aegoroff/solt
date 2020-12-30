@@ -3,6 +3,7 @@ package msvc
 import (
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
+	"path/filepath"
 	"solt/solution"
 )
 
@@ -22,6 +23,20 @@ type VisualStudioSolution struct {
 
 	// filesystem path
 	Path string
+}
+
+// AllProjectPaths gets all possible projects' paths defined in solution
+func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []string {
+	solutionPath := filepath.Dir(s.Path)
+	var paths = make([]string, 0, len(s.Solution.Projects))
+	for _, sp := range s.Solution.Projects {
+		if sp.TypeID == solution.IDSolutionFolder {
+			continue
+		}
+		fullProjectPath := filepath.Join(solutionPath, sp.Path)
+		paths = append(paths, decorator(fullProjectPath))
+	}
+	return paths
 }
 
 // ProjectHandler defines project handler function prototype
