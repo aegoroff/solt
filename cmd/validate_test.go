@@ -34,6 +34,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	ass.Equal(solution.ToValidPath(` Solution: a\a.sln
    project: a\a\a.csproj has redundant references
      a\b\b.csproj
+
 `), actual)
 }
 

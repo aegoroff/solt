@@ -29,14 +29,17 @@ func (v *sdkProjectsPrinter) action(name string, refs map[string]c9s.StringHashS
 
 	sortfold.Strings(projects)
 
+	hm := api.NewMarginer(3)
+	rm := api.NewMarginer(5)
 	for _, project := range projects {
-		v.prn.Cprint("   project: <bold>%s</> has redundant references\n", project)
+		v.prn.Cprint(hm.Margin("project: <bold>%s</> has redundant references\n"), project)
 		rrs := refs[project]
 
 		items := rrs.Items()
 		sortfold.Strings(items)
 		for _, s := range items {
-			v.prn.Cprint("     <gray>%s</>\n", s)
+			v.prn.Cprint(rm.Margin("<gray>%s</>\n"), s)
 		}
+		v.prn.Cprint("\n")
 	}
 }

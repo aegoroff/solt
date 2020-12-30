@@ -14,13 +14,15 @@ import (
 
 type infoCommand struct {
 	*api.BaseCommand
+	m *api.Marginer
 }
 
 // New creates new command that shows information about solutions
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		return &infoCommand{
-			api.NewBaseCmd(c),
+			BaseCommand: api.NewBaseCmd(c),
+			m:           api.NewMarginer(2),
 		}
 	})
 
@@ -40,30 +42,30 @@ func (c *infoCommand) Execute() error {
 
 		t := tabby.NewCustom(c.Prn().Twriter())
 
-		t.AddLine("  Header", sln.Header)
-		t.AddLine("  Product", sln.Comment)
-		t.AddLine("  Visual Studio Version", sln.VisualStudioVersion)
-		t.AddLine("  Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
+		t.AddLine(c.m.Margin("Header"), sln.Header)
+		t.AddLine(c.m.Margin("Product"), sln.Comment)
+		t.AddLine(c.m.Margin("Visual Studio Version"), sln.VisualStudioVersion)
+		t.AddLine(c.m.Margin("Minimum Visual Studio Version"), sln.MinimumVisualStudioVersion)
 
 		t.Print()
 
 		fmt.Println()
 
-		showProjectsInfo(sln.Projects, c.Prn())
-		showSectionsInfo(sln.GlobalSections, c.Prn())
+		c.showProjectsInfo(sln.Projects, c.Prn())
+		c.showSectionsInfo(sln.GlobalSections, c.Prn())
 	}
 
 	return nil
 }
 
-func showProjectsInfo(projects []*solution.Project, p api.Printer) {
+func (c *infoCommand) showProjectsInfo(projects []*solution.Project, p api.Printer) {
 	var byType = make(map[string]int)
 
 	for _, p := range projects {
 		byType[p.Type]++
 	}
 
-	const format = "  %v\t%v\n"
+	format := c.m.Margin("%v\t%v\n")
 
 	p.Tprint(format, "Project type", "Count")
 	p.Tprint(format, "------------", "-----")
@@ -75,7 +77,7 @@ func showProjectsInfo(projects []*solution.Project, p api.Printer) {
 	fmt.Println()
 }
 
-func showSectionsInfo(sections []*solution.Section, p api.Printer) {
+func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Printer) {
 	var configurations = make(c9s.StringHashSet)
 	var platforms = make(c9s.StringHashSet)
 
@@ -92,7 +94,7 @@ func showSectionsInfo(sections []*solution.Section, p api.Printer) {
 		}
 	}
 
-	const format = "  %v\n"
+	format := c.m.Margin("%v\n")
 
 	p.Tprint(format, "Configuration")
 	p.Tprint(format, "------------")

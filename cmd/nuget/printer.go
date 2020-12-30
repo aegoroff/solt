@@ -12,7 +12,7 @@ func newNugetPrinter(p api.Printer, column string, margin int) *nugetprint {
 	np := nugetprint{
 		p:      p,
 		column: column,
-		margin: margin,
+		m:      api.NewMarginer(margin),
 	}
 	return &np
 }
@@ -20,7 +20,7 @@ func newNugetPrinter(p api.Printer, column string, margin int) *nugetprint {
 type nugetprint struct {
 	p      api.Printer
 	column string
-	margin int
+	m      *api.Marginer
 }
 
 func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
@@ -34,9 +34,9 @@ func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) st
 
 func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
-	n.p.Cprint(n.newMargin("<gray>%s</>\n"), parent)
+	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	format := n.newMargin("%v\t%v\n")
+	format := n.m.Margin("%v\t%v\n")
 	n.p.Tprint(format, n.column, "Version")
 	n.p.Tprint(format, "-------", "-------")
 
@@ -50,14 +50,4 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 		n.p.Tprint(format, item.pkg, strings.Join(versions, ", "))
 	}
 	n.p.Flush()
-}
-
-func (n *nugetprint) newMargin(s string) string {
-	sb := strings.Builder{}
-	for i := 0; i < n.margin; i++ {
-		sb.WriteString(" ")
-	}
-	sb.WriteString(s)
-
-	return sb.String()
 }
