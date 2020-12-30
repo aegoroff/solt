@@ -13,7 +13,7 @@ import (
 )
 
 type sdkActioner interface {
-	action(solution string, items map[string]c9s.StringHashSet)
+	action(name string, items map[string]c9s.StringHashSet)
 }
 
 type sdkProjectsValidator struct {

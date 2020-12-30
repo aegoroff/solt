@@ -18,7 +18,7 @@ func (m *memoryBufferClosable) Write(p []byte) (n int, err error) {
 	return m.buf.Write(p)
 }
 
-func (m *memoryBufferClosable) Close() error {
+func (*memoryBufferClosable) Close() error {
 	return nil
 }
 

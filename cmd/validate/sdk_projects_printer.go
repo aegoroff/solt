@@ -16,11 +16,11 @@ func newSdkProjectsPrinter(p api.Printer) sdkActioner {
 	}
 }
 
-func (v *sdkProjectsPrinter) action(sol string, refs map[string]c9s.StringHashSet) {
+func (v *sdkProjectsPrinter) action(name string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
-	v.prn.Cprint(" Solution: <green>%s</>\n", sol)
+	v.prn.Cprint(" Solution: <green>%s</>\n", name)
 
 	projects := make([]string, 0, len(refs))
 	for s := range refs {

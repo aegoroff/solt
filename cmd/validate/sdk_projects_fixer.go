@@ -36,7 +36,7 @@ func newSdkProjectsFixer(p api.Printer, fs afero.Fs) sdkActioner {
 	}
 }
 
-func (f *sdkProjectsFixer) action(sol string, refs map[string]c9s.StringHashSet) {
+func (f *sdkProjectsFixer) action(name string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
@@ -50,7 +50,7 @@ func (f *sdkProjectsFixer) action(sol string, refs map[string]c9s.StringHashSet)
 	}
 
 	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
-	f.prn.Cprint(mf, invalidRefsCount, len(refs), sol)
+	f.prn.Cprint(mf, invalidRefsCount, len(refs), name)
 }
 
 func (f *sdkProjectsFixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
