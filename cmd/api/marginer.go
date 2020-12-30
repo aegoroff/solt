@@ -8,6 +8,11 @@ type Marginer struct {
 	char  string
 }
 
+// Value gets margin value
+func (m *Marginer) Value() int {
+	return m.value
+}
+
 // NewMarginer creates new Marginer instance using margin value and space as margin char
 func NewMarginer(value int) *Marginer {
 	return NewCustomMarginer(value, " ")
@@ -27,10 +32,4 @@ func (m *Marginer) Margin(s string) string {
 	sb.WriteString(s)
 
 	return sb.String()
-}
-
-// NewUnderline creates new dashes string that can be used as underline
-// the length of the line is equal len of string specified
-func NewUnderline(s string) string {
-	return NewCustomMarginer(len(s), "-").Margin("")
 }

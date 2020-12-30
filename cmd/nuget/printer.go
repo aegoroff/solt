@@ -3,7 +3,6 @@ package nuget
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
-	"github.com/cheynewallace/tabby"
 	"solt/cmd/api"
 	"sort"
 	"strings"
@@ -37,14 +36,8 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	t := tabby.NewCustom(n.p.Twriter())
-
-	const ver = "Version"
-	cunder := api.NewUnderline(n.column)
-	vunder := api.NewUnderline(ver)
-
-	t.AddLine(n.m.Margin(n.column), ver)
-	t.AddLine(n.m.Margin(cunder), vunder)
+	tbl := api.NewTabler(n.p, n.m.Value())
+	tbl.AddHead(n.column, "Version")
 
 	sort.Slice(packs, func(i, j int) bool {
 		return sortfold.CompareFold(packs[i].pkg, packs[j].pkg) < 0
@@ -54,8 +47,9 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 		versions := item.versions.Items()
 		sortfold.Strings(versions)
 
-		t.AddLine(n.m.Margin(item.pkg), strings.Join(versions, ", "))
-	}
+		tbl.AddLine(item.pkg, strings.Join(versions, ", "))
 
-	t.Print()
+	}
+	tbl.Print()
+
 }

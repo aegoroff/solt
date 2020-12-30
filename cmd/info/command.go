@@ -2,17 +2,17 @@ package info
 
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"solt/cmd/api"
 	"solt/msvc"
 	"solt/solution"
+	"strconv"
 	"strings"
 )
 
 type infoCommand struct {
 	*api.BaseCommand
-	m *api.Marginer
+	margin int
 }
 
 // New creates new command that shows information about solutions
@@ -20,7 +20,7 @@ func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
 		return &infoCommand{
 			BaseCommand: api.NewBaseCmd(c),
-			m:           api.NewMarginer(2),
+			margin:      2,
 		}
 	})
 
@@ -38,14 +38,14 @@ func (c *infoCommand) Execute() error {
 
 		c.Prn().Cprint(" <gray>%s</>\n", sol.Path)
 
-		t := tabby.NewCustom(c.Prn().Twriter())
+		tbl := api.NewTabler(c.Prn(), c.margin)
 
-		t.AddLine(c.m.Margin("Header"), sln.Header)
-		t.AddLine(c.m.Margin("Product"), sln.Comment)
-		t.AddLine(c.m.Margin("Visual Studio Version"), sln.VisualStudioVersion)
-		t.AddLine(c.m.Margin("Minimum Visual Studio Version"), sln.MinimumVisualStudioVersion)
+		tbl.AddLine("Header", sln.Header)
+		tbl.AddLine("Product", sln.Comment)
+		tbl.AddLine("Visual Studio Version", sln.VisualStudioVersion)
+		tbl.AddLine("Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
 
-		t.Print()
+		tbl.Print()
 
 		c.Prn().Cprint("\n")
 
@@ -63,20 +63,13 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project, p api.Print
 		byType[p.Type]++
 	}
 
-	t := tabby.NewCustom(c.Prn().Twriter())
-
-	const firstCol = "Project type"
-	const secondCol = "Count"
-	t.AddLine(c.m.Margin(firstCol), secondCol)
-
-	firstUnderline := api.NewUnderline(firstCol)
-	secondUnderline := api.NewUnderline(secondCol)
-	t.AddLine(c.m.Margin(firstUnderline), secondUnderline)
+	tbl := api.NewTabler(c.Prn(), c.margin)
+	tbl.AddHead("Project type", "Count")
 
 	for k, v := range byType {
-		t.AddLine(c.m.Margin(k), v)
+		tbl.AddLine(k, strconv.Itoa(v))
 	}
-	t.Print()
+	tbl.Print()
 	p.Cprint("\n")
 }
 
@@ -97,7 +90,7 @@ func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Print
 		}
 	}
 
-	prn := newPrinter(c.m, p)
+	prn := newPrinter(c.margin, p)
 
 	prn.print(configurations, "Configuration")
 
