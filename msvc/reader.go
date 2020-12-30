@@ -12,10 +12,6 @@ type reader struct {
 	aggregator chan *Folder
 }
 
-type fileEventHanlder struct {
-	ch chan<- string
-}
-
 // ReadSolutionDir reads filesystem directory and all its childs to get information
 // about all solutions and projects in this tree.
 // It returns tree
@@ -71,6 +67,10 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	wg.Wait()
 
 	return result
+}
+
+type fileEventHanlder struct {
+	ch chan<- string
 }
 
 func (f *fileEventHanlder) Handle(evt *scan.ScanEvent) {

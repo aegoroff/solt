@@ -16,17 +16,6 @@ func newReaderModules(fs afero.Fs) []readerModule {
 	return []readerModule{&pack, &msbuild, &sol}
 }
 
-func newFolder(path string) *Folder {
-	f := Folder{
-		Content: &FolderContent{
-			Solutions: []*VisualStudioSolution{},
-			Projects:  []*MsbuildProject{},
-		},
-		Path: filepath.Dir(path),
-	}
-	return &f
-}
-
 type readerPackagesConfig struct {
 	fs afero.Fs
 }
@@ -104,14 +93,14 @@ func (*readerSolution) filter(path string) bool {
 }
 
 func (r *readerSolution) read(path string) (*Folder, bool) {
-	reader, err := r.fs.Open(filepath.Clean(path))
+	file, err := r.fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Println(err)
 		return nil, false
 	}
-	defer scan.Close(reader)
+	defer scan.Close(file)
 
-	sln, err := solution.Parse(reader)
+	sln, err := solution.Parse(file)
 
 	if err != nil {
 		log.Println(err)

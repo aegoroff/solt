@@ -63,6 +63,17 @@ func (x *Folder) compare(y rbtree.Comparable) int {
 	return sortfold.CompareFold(x.Path, y.(*Folder).Path)
 }
 
+func newFolder(path string) *Folder {
+	f := Folder{
+		Content: &FolderContent{
+			Solutions: []*VisualStudioSolution{},
+			Projects:  []*MsbuildProject{},
+		},
+		Path: filepath.Dir(path),
+	}
+	return &f
+}
+
 func (x *Folder) copyContent(to *Folder) {
 	toC := to.Content
 	fromC := x.Content
