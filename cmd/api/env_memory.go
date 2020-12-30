@@ -6,24 +6,20 @@ import (
 )
 
 type memoryEnvironment struct {
-	w  *memoryBufferClosable
-	pe PrintEnvironment
+	buffer *bufferClosable
+	pe     PrintEnvironment
 }
 
-type memoryBufferClosable struct {
-	buf *bytes.Buffer
+type bufferClosable struct {
+	*bytes.Buffer
 }
 
-func (m *memoryBufferClosable) Write(p []byte) (n int, err error) {
-	return m.buf.Write(p)
-}
-
-func (*memoryBufferClosable) Close() error {
+func (*bufferClosable) Close() error {
 	return nil
 }
 
 func (m *memoryEnvironment) Writer() io.WriteCloser {
-	return m.w
+	return m.buffer
 }
 
 func (m *memoryEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
@@ -35,14 +31,14 @@ func (m *memoryEnvironment) NewPrinter() Printer {
 }
 
 func (m *memoryEnvironment) String() string {
-	return m.w.buf.String()
+	return m.buffer.String()
 }
 
 // NewMemoryEnvironment creates new memory PrintEnvironment implementation
 func NewMemoryEnvironment() StringEnvironment {
-	bc := &memoryBufferClosable{
-		buf: bytes.NewBufferString(""),
+	buffer := &bufferClosable{
+		bytes.NewBufferString(""),
 	}
-	se := NewStringEnvironment(bc)
-	return &memoryEnvironment{pe: se, w: bc}
+	se := NewStringEnvironment(buffer)
+	return &memoryEnvironment{pe: se, buffer: buffer}
 }
