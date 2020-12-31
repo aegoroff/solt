@@ -5,13 +5,12 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
-	"solt/msvc"
 )
 
 // matchP defines partial matching
 type matchP struct {
 	machine   *goahocorasick.Machine
-	decorator msvc.StringDecorator
+	decorator func(s string) string
 }
 
 // matchE defines exact matching using rbtree.RbTree
@@ -49,7 +48,7 @@ func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string
-func NewPartialMatcher(matches []string, decorator msvc.StringDecorator) (Matcher, error) {
+func NewPartialMatcher(matches []string, decorator func(s string) string) (Matcher, error) {
 	runes := make([][]rune, len(matches))
 	for i, s := range matches {
 		ds := decorator(s)
