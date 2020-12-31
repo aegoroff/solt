@@ -37,15 +37,15 @@ func newFix(c *api.Conf) *cobra.Command {
 
 func (c *validateCommand) Execute() error {
 	prn := newPrinter(c.Prn())
-	valid := newValidator(c.Fs(), c.Prn(), c.SourcesPath(), prn)
+	valid := newValidator(c.Fs(), c.SourcesPath(), prn)
 
 	valid.validate()
 	return nil
 }
 
 func (c *fixCommand) Execute() error {
-	fix := newFixer(c.Prn(), c.Fs())
-	valid := newValidator(c.Fs(), c.Prn(), c.SourcesPath(), fix)
+	fix := newFixer(c.Prn(), c, c.Fs())
+	valid := newValidator(c.Fs(), c.SourcesPath(), fix)
 
 	valid.validate()
 	return nil

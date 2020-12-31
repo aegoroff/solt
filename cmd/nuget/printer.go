@@ -8,9 +8,10 @@ import (
 	"strings"
 )
 
-func newNugetPrinter(p api.Printer, column string, margin int) *nugetprint {
+func newNugetPrinter(p api.Printer, w api.Writable, column string, margin int) *nugetprint {
 	np := nugetprint{
 		p:      p,
+		w:      w,
 		column: column,
 		m:      api.NewMarginer(margin),
 	}
@@ -19,6 +20,7 @@ func newNugetPrinter(p api.Printer, column string, margin int) *nugetprint {
 
 type nugetprint struct {
 	p      api.Printer
+	w      api.Writable
 	column string
 	m      *api.Marginer
 }
@@ -36,7 +38,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	tbl := api.NewTabler(n.p, n.m.Value())
+	tbl := api.NewTabler(n.w, n.m.Value())
 	tbl.AddHead(n.column, "Version")
 
 	sort.Slice(packs, func(i, j int) bool {

@@ -8,15 +8,13 @@ import (
 // Tabler table drawing component
 type Tabler struct {
 	margin *Marginer
-	prn    Printer
 	tab    *tabby.Tabby
 }
 
 // NewTabler creates new Tabler instance
-func NewTabler(prn Printer, margin int) *Tabler {
-	tw := new(tabwriter.Writer).Init(prn.Writer(), 0, 8, 4, ' ', 0)
+func NewTabler(w Writable, margin int) *Tabler {
+	tw := new(tabwriter.Writer).Init(w.Writer(), 0, 8, 4, ' ', 0)
 	return &Tabler{
-		prn:    prn,
 		margin: NewMarginer(margin),
 		tab:    tabby.NewCustom(tw),
 	}

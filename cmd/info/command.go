@@ -38,7 +38,7 @@ func (c *infoCommand) Execute() error {
 
 		c.Prn().Cprint(" <gray>%s</>\n", sol.Path)
 
-		tbl := api.NewTabler(c.Prn(), c.margin)
+		tbl := api.NewTabler(c, c.margin)
 
 		tbl.AddLine("Header", sln.Header)
 		tbl.AddLine("Product", sln.Comment)
@@ -49,31 +49,31 @@ func (c *infoCommand) Execute() error {
 
 		c.Prn().Cprint("\n")
 
-		c.showProjectsInfo(sln.Projects, c.Prn())
-		c.showSectionsInfo(sln.GlobalSections, c.Prn())
+		c.showProjectsInfo(sln.Projects)
+		c.showSectionsInfo(sln.GlobalSections)
 	}
 
 	return nil
 }
 
-func (c *infoCommand) showProjectsInfo(projects []*solution.Project, p api.Printer) {
+func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {
 	var byType = make(map[string]int)
 
 	for _, p := range projects {
 		byType[p.Type]++
 	}
 
-	tbl := api.NewTabler(c.Prn(), c.margin)
+	tbl := api.NewTabler(c, c.margin)
 	tbl.AddHead("Project type", "Count")
 
 	for k, v := range byType {
 		tbl.AddLine(k, strconv.Itoa(v))
 	}
 	tbl.Print()
-	p.Cprint("\n")
+	c.Prn().Cprint("\n")
 }
 
-func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Printer) {
+func (c *infoCommand) showSectionsInfo(sections []*solution.Section) {
 	var configurations = make(c9s.StringHashSet)
 	var platforms = make(c9s.StringHashSet)
 
@@ -90,13 +90,13 @@ func (c *infoCommand) showSectionsInfo(sections []*solution.Section, p api.Print
 		}
 	}
 
-	prn := newPrinter(c.margin, p)
+	prn := newPrinter(c.margin, c)
 
 	prn.print(configurations, "Configuration")
 
-	p.Cprint("\n")
+	c.Prn().Cprint("\n")
 
 	prn.print(platforms, "Platform")
 
-	p.Cprint("\n")
+	c.Prn().Cprint("\n")
 }

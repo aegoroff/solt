@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/spf13/afero"
+	"io"
 )
 
 // Conf is app configuration container
@@ -43,6 +44,11 @@ func (c *Conf) Fs() afero.Fs {
 // Prn gets underlying Printer
 func (c *Conf) Prn() Printer {
 	return c.p
+}
+
+// Writer gets underlying Writer
+func (c *Conf) Writer() io.WriteCloser {
+	return c.pe.Writer()
 }
 
 // SourcesPath gets analyzable sources path

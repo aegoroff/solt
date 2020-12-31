@@ -7,21 +7,18 @@ import (
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
-	"solt/cmd/api"
 	"solt/msvc"
 	"solt/solution"
 )
 
 type validator struct {
-	prn         api.Printer
 	fs          afero.Fs
 	sourcesPath string
 	act         actioner
 }
 
-func newValidator(fs afero.Fs, p api.Printer, sourcesPath string, act actioner) *validator {
+func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 	return &validator{
-		prn:         p,
 		fs:          fs,
 		sourcesPath: sourcesPath,
 		act:         act,

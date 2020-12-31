@@ -28,11 +28,11 @@ func (r *projectReference) path() string {
 	return solution.ToValidPath(r.Path)
 }
 
-func newFixer(p api.Printer, fs afero.Fs) actioner {
+func newFixer(p api.Printer, w api.Writable, fs afero.Fs) actioner {
 	return &fixer{
 		prn:   p,
 		fs:    fs,
-		filer: sys.NewFiler(fs, p.Writer()),
+		filer: sys.NewFiler(fs, w.Writer()),
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"io"
 )
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
@@ -29,6 +30,11 @@ func (b *BaseCommand) Fs() afero.Fs {
 // Prn gets printer to output data
 func (b *BaseCommand) Prn() Printer {
 	return b.conf.p
+}
+
+// Writer gets underlying io.WriteCloser
+func (b *BaseCommand) Writer() io.WriteCloser {
+	return b.conf.Writer()
 }
 
 // NewBaseCmd creates new BaseCommand instance
@@ -67,7 +73,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		if err != nil {
 			return err
 		}
-		defer scan.Close(c.conf.Prn().Writer())
+		defer scan.Close(c.conf.Writer())
 
 		return e.Execute()
 	}

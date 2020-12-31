@@ -6,12 +6,12 @@ import (
 
 // Screener is an abstraction that does comples structures output
 type Screener struct {
-	p ColorPrinter
+	p Printer
 	m *Marginer
 }
 
 // NewScreener creates new Screener instance
-func NewScreener(p ColorPrinter) *Screener {
+func NewScreener(p Printer) *Screener {
 	s := Screener{
 		p: p,
 		m: NewMarginer(1),

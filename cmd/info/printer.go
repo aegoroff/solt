@@ -8,15 +8,15 @@ import (
 
 type printer struct {
 	margin int
-	p      api.Printer
+	w      api.Writable
 }
 
-func newPrinter(margin int, p api.Printer) *printer {
-	return &printer{margin: margin, p: p}
+func newPrinter(margin int, w api.Writable) *printer {
+	return &printer{margin: margin, w: w}
 }
 
 func (p *printer) print(set c9s.StringHashSet, name string) {
-	tbl := api.NewTabler(p.p, p.margin)
+	tbl := api.NewTabler(p.w, p.margin)
 	tbl.AddHead(name)
 
 	items := set.Items()

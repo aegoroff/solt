@@ -46,7 +46,7 @@ func (c *lostFilesCommand) Execute() error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	filer := sys.NewFiler(c.Fs(), c.Prn().Writer())
+	filer := sys.NewFiler(c.Fs(), c.Writer())
 	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, filer)
 	err := logic.initialize(projects)
 

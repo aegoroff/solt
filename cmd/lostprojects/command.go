@@ -70,7 +70,7 @@ func (c *lostProjectsCommand) Execute() error {
 func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {
 	var result = make(map[string][]string)
 
-	filer := sys.NewFiler(c.Fs(), c.Prn().Writer())
+	filer := sys.NewFiler(c.Fs(), c.Writer())
 	for spath, projects := range projectsInSolutions {
 		nonexist := filer.CheckExistence(projects)
 

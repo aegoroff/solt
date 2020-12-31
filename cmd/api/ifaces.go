@@ -28,14 +28,8 @@ type StringEnvironment interface {
 	fmt.Stringer
 }
 
-// Printer represents printing abstraction
+// Printer represents printing abstraction with colorizing support
 type Printer interface {
-	Writable
-	ColorPrinter
-}
-
-// ColorPrinter represents printing abstraction with colorizing support
-type ColorPrinter interface {
 	// Cprint prints data with colorizing support
 	Cprint(format string, a ...interface{})
 }
