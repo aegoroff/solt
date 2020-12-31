@@ -1,6 +1,8 @@
 package api
 
-import "github.com/cheynewallace/tabby"
+import (
+	"github.com/cheynewallace/tabby"
+)
 
 // Tabler table drawing component
 type Tabler struct {
@@ -19,35 +21,33 @@ func NewTabler(prn Printer, margin int) *Tabler {
 }
 
 // AddHead adds headline
-func (t *Tabler) AddHead(columns ...string) {
-	names := make([]interface{}, len(columns))
-	underlines := make([]interface{}, len(columns))
-	for i, column := range columns {
-		under := newUnderline(column)
-		if i == 0 {
-			underlines[i] = t.margin.Margin(under)
-			names[i] = t.margin.Margin(column)
-		} else {
-			underlines[i] = under
-			names[i] = column
-		}
-	}
-	t.tab.AddLine(names...)
-	t.tab.AddLine(underlines...)
+func (t *Tabler) AddHead(line ...string) {
+	t.addLine(line, originalString, underline)
 }
 
 // AddLine adds data line to the table
 func (t Tabler) AddLine(line ...string) {
-	data := make([]interface{}, len(line))
+	t.addLine(line, originalString)
+}
+
+func (t Tabler) addLine(line []string, decors ...func(s string) string) {
+	for _, d := range decors {
+		t.tab.AddLine(t.newLine(line, d)...)
+	}
+}
+
+func (t Tabler) newLine(line []string, d func(s string) string) []interface{} {
+	result := make([]interface{}, len(line))
 	for i, column := range line {
+		decorated := d(column)
 		if i == 0 {
-			data[i] = t.margin.Margin(column)
+			result[i] = t.margin.Margin(decorated)
 		} else {
-			data[i] = column
+			result[i] = decorated
 		}
 	}
 
-	t.tab.AddLine(data...)
+	return result
 }
 
 // Print prints table
@@ -55,8 +55,10 @@ func (t *Tabler) Print() {
 	t.tab.Print()
 }
 
-// newUnderline creates new dashes string that can be used as underline
+func originalString(s string) string { return s }
+
+// underline creates new dashes string that can be used as underline
 // the length of the line is equal len of string specified
-func newUnderline(s string) string {
+func underline(s string) string {
 	return NewCustomMarginer(len(s), "-").Margin("")
 }
