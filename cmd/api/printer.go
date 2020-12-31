@@ -5,23 +5,18 @@ import (
 )
 
 type prn struct {
-	w  io.WriteCloser
-	pe PrintEnvironment
+	env PrintEnvironment
 }
 
 // NewPrinter creates new Printer interface instance
 func NewPrinter(pe PrintEnvironment) Printer {
-	p := prn{
-		w:  pe.Writer(),
-		pe: pe,
-	}
-	return &p
+	return &prn{env: pe}
 }
 
 func (r *prn) Writer() io.WriteCloser {
-	return r.w
+	return r.env.Writer()
 }
 
 func (r *prn) Cprint(format string, a ...interface{}) {
-	r.pe.PrintFunc(r.w, format, a...)
+	r.env.PrintFunc(r.Writer(), format, a...)
 }
