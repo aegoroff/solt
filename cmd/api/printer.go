@@ -11,10 +11,8 @@ type prn struct {
 
 // NewPrinter creates new Printer interface instance
 func NewPrinter(pe PrintEnvironment) Printer {
-	w := pe.Writer()
-
 	p := prn{
-		w:  w,
+		w:  pe.Writer(),
 		pe: pe,
 	}
 	return &p
