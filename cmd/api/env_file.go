@@ -8,6 +8,8 @@ import (
 type fileEnvironment struct {
 	path *string
 	fs   afero.Fs
+	// base is wrapped PrintEnvironment
+	// it may be memory buffer, console, etc.
 	base PrintEnvironment
 }
 
