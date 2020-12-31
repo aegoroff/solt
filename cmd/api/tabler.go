@@ -41,10 +41,9 @@ func (t Tabler) newLine(line []string, d func(s string) string) []interface{} {
 	for i, column := range line {
 		decorated := d(column)
 		if i == 0 {
-			result[i] = t.margin.Margin(decorated)
-		} else {
-			result[i] = decorated
+			decorated = t.margin.Margin(decorated)
 		}
+		result[i] = decorated
 	}
 
 	return result
