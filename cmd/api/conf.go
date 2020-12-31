@@ -47,7 +47,7 @@ func (c *Conf) Prn() Printer {
 }
 
 // Writer gets underlying Writer
-func (c *Conf) Writer() io.WriteCloser {
+func (c *Conf) W() io.WriteCloser {
 	return c.pe.Writer()
 }
 

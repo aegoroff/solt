@@ -34,7 +34,7 @@ func (b *BaseCommand) Prn() Printer {
 
 // Writer gets underlying io.WriteCloser
 func (b *BaseCommand) Writer() io.WriteCloser {
-	return b.conf.Writer()
+	return b.conf.W()
 }
 
 // NewBaseCmd creates new BaseCommand instance
@@ -73,7 +73,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		if err != nil {
 			return err
 		}
-		defer scan.Close(c.conf.Writer())
+		defer scan.Close(c.conf.W())
 
 		return e.Execute()
 	}
