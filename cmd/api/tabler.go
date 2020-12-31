@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/cheynewallace/tabby"
+	"text/tabwriter"
 )
 
 // Tabler table drawing component
@@ -13,10 +14,11 @@ type Tabler struct {
 
 // NewTabler creates new Tabler instance
 func NewTabler(prn Printer, margin int) *Tabler {
+	tw := new(tabwriter.Writer).Init(prn.Writer(), 0, 8, 4, ' ', 0)
 	return &Tabler{
 		prn:    prn,
 		margin: NewMarginer(margin),
-		tab:    tabby.NewCustom(prn.Twriter()),
+		tab:    tabby.NewCustom(tw),
 	}
 }
 

@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"io"
-	"text/tabwriter"
 )
 
 // Matcher defines string matcher interface
@@ -33,11 +32,7 @@ type StringEnvironment interface {
 type Printer interface {
 	Writable
 
-	// Twriter gets underlying  *tabwriter.Writer
-	// to output tabular data
-	Twriter() *tabwriter.Writer
-
-	// Cprint prints data with suppport colorizing
+	// Cprint prints data with colorizing support
 	Cprint(format string, a ...interface{})
 }
 
