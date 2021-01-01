@@ -47,7 +47,7 @@ func (c *infoCommand) Execute() error {
 
 		tbl.Print()
 
-		c.Prn().Cprint("\n")
+		c.Prn().Println()
 
 		c.showProjectsInfo(sln.Projects)
 		c.showSectionsInfo(sln.GlobalSections)
@@ -70,7 +70,7 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {
 		tbl.AddLine(k, strconv.Itoa(v))
 	}
 	tbl.Print()
-	c.Prn().Cprint("\n")
+	c.Prn().Println()
 }
 
 func (c *infoCommand) showSectionsInfo(sections []*solution.Section) {
@@ -94,9 +94,9 @@ func (c *infoCommand) showSectionsInfo(sections []*solution.Section) {
 
 	prn.print(configurations, "Configuration")
 
-	c.Prn().Cprint("\n")
+	c.Prn().Println()
 
 	prn.print(platforms, "Platform")
 
-	c.Prn().Cprint("\n")
+	c.Prn().Println()
 }

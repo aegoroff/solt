@@ -12,3 +12,7 @@ func NewPrinter(pe PrintEnvironment) Printer {
 func (r *prn) Cprint(format string, a ...interface{}) {
 	r.env.PrintFunc(r.env.Writer(), format, a...)
 }
+
+func (r *prn) Println() {
+	r.Cprint("\n")
+}

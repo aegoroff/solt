@@ -24,7 +24,7 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	pm := api.NewMarginer(3)
 	rm := api.NewMarginer(5)
 
-	v.prn.Cprint("\n")
+	v.prn.Println()
 	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), path)
 
 	projects := make([]string, len(refs))
@@ -45,6 +45,6 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 		for _, s := range items {
 			v.prn.Cprint(rm.Margin("<gray>%s</>\n"), s)
 		}
-		v.prn.Cprint("\n")
+		v.prn.Println()
 	}
 }

@@ -32,6 +32,9 @@ type StringEnvironment interface {
 type Printer interface {
 	// Cprint prints data with colorizing support
 	Cprint(format string, a ...interface{})
+
+	// Println prints new line
+	Println()
 }
 
 // Writable represents io.Writer container
