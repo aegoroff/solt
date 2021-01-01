@@ -10,24 +10,27 @@ import (
 
 func TestCheckExistence(t *testing.T) {
 	var tests = []struct {
+		name   string
 		in     []string
 		expect []string
 	}{
-		{[]string{"a.txt", "b.txt"}, []string{"b.txt"}},
-		{[]string{"a.txt"}, []string{}},
+		{"has unexist files", []string{"a.txt", "b.txt"}, []string{"b.txt"}},
+		{"all files exist", []string{"a.txt"}, []string{}},
 	}
 	for _, tst := range tests {
-		// Arrange
-		ass := assert.New(t)
-		memfs := afero.NewMemMapFs()
-		_ = afero.WriteFile(memfs, "a.txt", []byte("a"), 0644)
-		f := NewFiler(memfs, bytes.NewBufferString(""))
+		t.Run(tst.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			memfs := afero.NewMemMapFs()
+			_ = afero.WriteFile(memfs, "a.txt", []byte("a"), 0644)
+			f := NewFiler(memfs, bytes.NewBufferString(""))
 
-		// Act
-		res := f.CheckExistence(tst.in)
+			// Act
+			res := f.CheckExistence(tst.in)
 
-		// Assert
-		ass.ElementsMatch(tst.expect, res)
+			// Assert
+			ass.ElementsMatch(tst.expect, res)
+		})
 	}
 }
 
@@ -78,20 +81,31 @@ func TestFiler_Write(t *testing.T) {
 }
 
 func TestFiler_Write_Error(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
-	memfs := afero.NewMemMapFs()
-	readOnly := afero.NewReadOnlyFs(memfs)
-	f := NewFiler(readOnly, bytes.NewBufferString(""))
-	path := "a.txt"
+	var tests = []struct {
+		name    string
+		content []byte
+	}{
+		{"read only fs", []byte("a")},
+		{"nil", nil},
+	}
+	for _, tst := range tests {
+		t.Run(tst.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			memfs := afero.NewMemMapFs()
+			readOnly := afero.NewReadOnlyFs(memfs)
+			f := NewFiler(readOnly, bytes.NewBufferString(""))
+			path := "a.txt"
 
-	// Act
-	f.Write(path, []byte("a"))
+			// Act
+			f.Write(path, tst.content)
 
-	// Assert
-	content, err := afero.ReadFile(memfs, path)
-	ass.Error(err)
-	ass.Nil(content)
+			// Assert
+			content, err := afero.ReadFile(memfs, path)
+			ass.Error(err)
+			ass.Nil(content)
+		})
+	}
 }
 
 func TestClose(t *testing.T) {
