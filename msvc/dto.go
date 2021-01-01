@@ -2,6 +2,7 @@ package msvc
 
 import (
 	"encoding/xml"
+	"path/filepath"
 	"solt/solution"
 )
 
@@ -17,17 +18,19 @@ type nugetPackage struct {
 	DevelopmentDependency string `xml:"developmentDependency,attr"`
 }
 
+type includes []include
+
 type msbuildProject struct {
 	XMLName           xml.Name           `xml:"Project"`
 	Sdk               string             `xml:"Sdk,attr"`
 	ToolsVersion      string             `xml:"ToolsVersion,attr"`
 	DefaultTargets    string             `xml:"DefaultTargets,attr"`
 	ID                string             `xml:"PropertyGroup>ProjectGuid"`
-	Compiles          []include          `xml:"ItemGroup>Compile"`
-	CLCompiles        []include          `xml:"ItemGroup>ClCompile"`
-	CLInclude         []include          `xml:"ItemGroup>ClInclude"`
-	Contents          []include          `xml:"ItemGroup>Content"`
-	Nones             []include          `xml:"ItemGroup>None"`
+	Compiles          includes           `xml:"ItemGroup>Compile"`
+	CLCompiles        includes           `xml:"ItemGroup>ClCompile"`
+	CLInclude         includes           `xml:"ItemGroup>ClInclude"`
+	Contents          includes           `xml:"ItemGroup>Content"`
+	Nones             includes           `xml:"ItemGroup>None"`
 	References        []reference        `xml:"ItemGroup>Reference"`
 	ProjectReferences []projectReference `xml:"ItemGroup>ProjectReference"`
 	PackageReferences []packageReference `xml:"ItemGroup>PackageReference"`
@@ -90,6 +93,16 @@ func (p *packages) nugetPackages() []*NugetPackage {
 
 	for i, pkg := range p.Packages {
 		result[i] = &NugetPackage{ID: pkg.ID, Version: pkg.Version}
+	}
+
+	return result
+}
+
+func (in *includes) paths(basePath string) []string {
+	result := make([]string, len(*in))
+
+	for i, c := range *in {
+		result[i] = filepath.Join(basePath, c.path())
 	}
 
 	return result

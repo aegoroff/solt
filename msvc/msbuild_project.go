@@ -33,29 +33,15 @@ func (prj *MsbuildProject) Files() []string {
 	msp := prj.Project
 
 	l := len(msp.Contents) + len(msp.Nones) + len(msp.CLCompiles) + len(msp.CLInclude) + len(msp.Compiles)
-	includes := make([]include, 0, l)
-	includes = append(includes, msp.Contents...)
-	includes = append(includes, msp.Nones...)
-	includes = append(includes, msp.CLCompiles...)
-	includes = append(includes, msp.CLInclude...)
-	includes = append(includes, msp.Compiles...)
+	incl := make(includes, 0, l)
+	incl = append(incl, msp.Contents...)
+	incl = append(incl, msp.Nones...)
+	incl = append(incl, msp.CLCompiles...)
+	incl = append(incl, msp.CLInclude...)
+	incl = append(incl, msp.Compiles...)
 
-	result := make([]string, len(includes))
-	copy(result, createPathsFromIncludes(includes, folderPath))
-
-	return result
-}
-
-func createPathsFromIncludes(paths []include, basePath string) []string {
-	if paths == nil {
-		return []string{}
-	}
-
-	result := make([]string, len(paths))
-
-	for i, c := range paths {
-		result[i] = filepath.Join(basePath, c.path())
-	}
+	result := make([]string, len(incl))
+	copy(result, incl.paths(folderPath))
 
 	return result
 }
