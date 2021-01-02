@@ -22,6 +22,7 @@ func (*stdout) Close() error {
 	return nil
 }
 
+// NewConsoleEnvironment creates new PrintEnvironment that outputs to console
 func NewConsoleEnvironment() PrintEnvironment {
 	return &consoleEnvironment{stdout: &stdout{w: os.Stdout}}
 }
