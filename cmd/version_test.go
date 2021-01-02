@@ -48,6 +48,17 @@ func Test_Help(t *testing.T) {
 	ass.Contains(env.String(), "")
 }
 
+func Test_Console(t *testing.T) {
+	// Arrange
+	memfs := afero.NewMemMapFs()
+	env := api.NewConsoleEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "ver")
+
+	// Assert
+}
+
 func Test_Write_File(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
