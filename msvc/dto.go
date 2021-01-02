@@ -107,3 +107,7 @@ func (in *includes) paths(basePath string) []string {
 
 	return result
 }
+
+func (in *includes) append(o includes, start int) int {
+	return copy((*in)[start:], o)
+}
