@@ -33,7 +33,7 @@ func (c *lostProjectsCommand) Execute() error {
 	// so these projects are not considered lost
 	var linkedProjects []string
 
-	projectLinksBySolution := make(map[string][]string)
+	projectLinksBySolution := make(map[string][]string, len(solutions))
 	// Each found solution
 	for _, sln := range solutions {
 		links := sln.AllProjectPaths(msvc.PassThrough)
