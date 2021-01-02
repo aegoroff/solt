@@ -46,7 +46,7 @@ func NewBaseCmd(c *Conf) *BaseCommand {
 	}
 }
 
-// CobraCreator represents cobra command creation absraction
+// CobraCreator represents cobra command creation abstraction
 type CobraCreator struct {
 	exe  func() Executor
 	conf *Conf
@@ -79,7 +79,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 	}
 }
 
-// NewCommand cretes new *cobra.Command instance
+// NewCommand creates new *cobra.Command instance
 func (c *CobraCreator) NewCommand(use, alias, short string) *cobra.Command {
 	var cc = &cobra.Command{
 		Use:     use,
