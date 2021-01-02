@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"solt/cmd/api"
-	"solt/solution"
+	"solt/internal/sys"
 	"strings"
 	"testing"
 )
@@ -31,7 +31,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(`
+	ass.Equal(sys.ToValidPath(`
  Solution: a\a.sln
    project: a\a\a.csproj has redundant references
      a\b\b.csproj
@@ -72,7 +72,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 
 			// Assert
 			actual := env.String()
-			ass.Equal(solution.ToValidPath("Fixed 1 redundant project references in 1 projects within solution a\\a.sln\n"), actual)
+			ass.Equal(sys.ToValidPath("Fixed 1 redundant project references in 1 projects within solution a\\a.sln\n"), actual)
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)

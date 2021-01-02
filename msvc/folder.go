@@ -4,7 +4,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"path/filepath"
-	"solt/solution"
+	"solt/internal/sys"
 )
 
 // Folder defines filesystem folder descriptor (path and content structure)
@@ -43,7 +43,7 @@ func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 		if len(np) == 0 {
 			continue
 		}
-		pp := solution.ToValidPath(prj.Path)
+		pp := sys.ToValidPath(prj.Path)
 		sources = append(sources, filepath.Base(pp))
 	}
 	return result, sources

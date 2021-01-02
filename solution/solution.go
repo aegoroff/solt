@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"log"
+	"solt/internal/sys"
 	"strings"
 )
 
@@ -101,7 +102,7 @@ func onProject(projectType, name, path, id string) {
 	p := Project{
 		TypeID: projectType,
 		Name:   name,
-		Path:   ToValidPath(path),
+		Path:   sys.ToValidPath(path),
 		ID:     id,
 	}
 	if v, ok := ProjectsGuids[p.TypeID]; ok {

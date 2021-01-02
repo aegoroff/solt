@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"solt/cmd/api"
-	"solt/solution"
+	"solt/internal/sys"
 	"testing"
 )
 
@@ -28,7 +28,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(`
+	ass.Equal(sys.ToValidPath(`
   a\a (packages.config)
   Package            Version
   -------            -------
@@ -57,7 +57,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(`
+	ass.Equal(sys.ToValidPath(`
   a\a (a.csproj)
   Package              Version
   -------              -------
@@ -108,7 +108,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(` Different nuget package's versions in the same solution found:
+	ass.Equal(sys.ToValidPath(` Different nuget package's versions in the same solution found:
 
   a\a.sln
   Package              Version
@@ -137,7 +137,7 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(` Different nuget package's versions in the same solution found:
+	ass.Equal(sys.ToValidPath(` Different nuget package's versions in the same solution found:
 
   a\a.sln
   Package              Version
@@ -172,7 +172,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(solution.ToValidPath(`
+	ass.Equal(sys.ToValidPath(`
   a\a.sln
   Package            Version
   -------            -------
@@ -232,8 +232,8 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, solution.ToValidPath("d\\a1\\a.sln"))
-	ass.Contains(actual, solution.ToValidPath("d\\a\\a.sln"))
+	ass.Contains(actual, sys.ToValidPath("d\\a1\\a.sln"))
+	ass.Contains(actual, sys.ToValidPath("d\\a\\a.sln"))
 	ass.Contains(actual, "CommandLineParser    2.8.0")
 	ass.Contains(actual, "CmdLine            1.0.7.509")
 	ass.Contains(actual, "Newtonsoft.Json    12.0.1")

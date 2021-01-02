@@ -3,7 +3,7 @@ package msvc
 import (
 	"encoding/xml"
 	"path/filepath"
-	"solt/solution"
+	"solt/internal/sys"
 )
 
 type packages struct {
@@ -64,7 +64,7 @@ type msbuildImport struct {
 }
 
 func (i *include) path() string {
-	return solution.ToValidPath(i.Include)
+	return sys.ToValidPath(i.Include)
 }
 
 // IsSdkProject gets whether a project is a the new VS 2017 or later project
@@ -85,7 +85,7 @@ func (p *msbuildProject) IsSdkProject() bool {
 
 // Path gets referenced project path
 func (r *projectReference) Path() string {
-	return solution.ToValidPath(r.Include)
+	return sys.ToValidPath(r.Include)
 }
 
 func (p *packages) nugetPackages() []*NugetPackage {

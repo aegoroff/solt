@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"solt/cmd/api"
 	"solt/internal/sys"
-	"solt/solution"
 	"unicode/utf8"
 )
 
@@ -25,7 +24,7 @@ type projectReference struct {
 }
 
 func (r *projectReference) path() string {
-	return solution.ToValidPath(r.Path)
+	return sys.ToValidPath(r.Path)
 }
 
 func newFixer(p api.Printer, w api.Writable, fs afero.Fs) actioner {
