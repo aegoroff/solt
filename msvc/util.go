@@ -17,15 +17,21 @@ func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
 		return err
 	}
 	defer scan.Close(f)
+	s, err := f.Stat()
+	if err != nil {
+		log.Print(err)
+		return err
+	}
 
-	return unmarshalXML(f, result)
+	return unmarshalXML(f, result, int(s.Size()))
 }
 
-func unmarshalXML(r io.Reader, result interface{}) error {
+func unmarshalXML(r io.Reader, result interface{}, sz int) error {
 	s := bufio.NewScanner(r)
-	var data []byte
+	data := make([]byte, sz)
+	start := 0
 	for s.Scan() {
-		data = append(data, s.Bytes()...)
+		start += copy(data[start:], s.Bytes())
 	}
 	err := xml.Unmarshal(data, result)
 	return err

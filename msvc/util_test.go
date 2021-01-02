@@ -19,7 +19,7 @@ func TestUnmarshalXML_PackagesConfig(t *testing.T) {
 `
 	r := strings.NewReader(packangesconfig)
 	// Act
-	_ = unmarshalXML(r, &packages)
+	_ = unmarshalXML(r, &packages, len(packangesconfig))
 
 	// Assert
 	ass.Equal(1, len(packages.Packages))
@@ -105,7 +105,7 @@ func TestUnmarshalXML_MsbuildProject(t *testing.T) {
 	r := strings.NewReader(project)
 
 	// Act
-	_ = unmarshalXML(r, &prj)
+	_ = unmarshalXML(r, &prj, len(project))
 
 	// Assert
 	ass.Equal(2, len(prj.Compiles))
