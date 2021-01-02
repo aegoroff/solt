@@ -59,7 +59,7 @@ func NewCobraCreator(c *Conf, exe func() Executor) *CobraCreator {
 
 func (c *CobraCreator) runE() cobraRunSignature {
 	return func(cc *cobra.Command, args []string) error {
-		// IMPORTANT: Excecutors initialization order defines output order
+		// IMPORTANT: Executors initialization order defines output order
 		var e Executor
 		{
 			e = c.exe()
