@@ -25,7 +25,7 @@ type Filer interface {
 	Write(path string, content []byte)
 
 	// Read reads file content
-	Read(path string) *bytes.Buffer
+	Read(path string) (*bytes.Buffer, error)
 }
 
 // NewFiler creates new Filer instance
@@ -103,19 +103,26 @@ func (f *filer) Write(path string, content []byte) {
 	}
 }
 
-func (f *filer) Read(path string) *bytes.Buffer {
+func (f *filer) Read(path string) (*bytes.Buffer, error) {
 	file, err := f.fs.Open(filepath.Clean(path))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	defer scan.Close(file)
 
-	buf := bytes.NewBuffer(nil)
+	s, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	b := make([]byte, 0, int(s.Size()))
+
+	buf := bytes.NewBuffer(b)
 	_, err = io.Copy(buf, file)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return buf
+	return buf, nil
 }

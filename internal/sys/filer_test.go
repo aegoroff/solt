@@ -43,9 +43,10 @@ func TestFiler_Read(t *testing.T) {
 	f := NewFiler(memfs, bytes.NewBufferString(""))
 
 	// Act
-	buf := f.Read(path)
+	buf, err := f.Read(path)
 
 	// Assert
+	ass.NoError(err)
 	ass.NotNil(buf)
 	ass.Equal("a", string(buf.Bytes()))
 }
@@ -58,9 +59,10 @@ func TestFiler_Read_NotExist(t *testing.T) {
 	f := NewFiler(memfs, bytes.NewBufferString(""))
 
 	// Act
-	buf := f.Read(path)
+	buf, err := f.Read(path)
 
 	// Assert
+	ass.Error(err)
 	ass.Nil(buf)
 }
 

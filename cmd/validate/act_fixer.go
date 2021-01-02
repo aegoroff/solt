@@ -97,7 +97,7 @@ func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []in
 }
 
 func (f *fixer) getNewFileContent(project string, ends []int64) []byte {
-	buf := f.filer.Read(project)
+	buf, _ := f.filer.Read(project)
 
 	if buf == nil {
 		return nil
