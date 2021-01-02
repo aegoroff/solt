@@ -33,7 +33,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
  Solution: a\a.sln
-   project: a\a\a.csproj has redundant references
+   project a\a\a.csproj has redundant references:
      a\b\b.csproj
 
 `), actual)

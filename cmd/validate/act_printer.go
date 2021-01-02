@@ -37,7 +37,7 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	sortfold.Strings(projects)
 
 	for _, project := range projects {
-		v.prn.Cprint(pm.Margin("project: <bold>%s</> has redundant references\n"), project)
+		v.prn.Cprint(pm.Margin("project <yellow>%s</> has redundant references:\n"), project)
 		rrs := refs[project]
 
 		items := rrs.Items()
