@@ -40,7 +40,7 @@ func (c *validateCommand) Execute(cc *cobra.Command) error {
 	valid := newValidator(c.Fs(), c.SourcesPath(), prn)
 
 	valid.validate()
-	return c.ShowHelp(cc)
+	return c.ShowHelpIfNecessary(cc)
 }
 
 func (c *fixCommand) Execute(cc *cobra.Command) error {
@@ -48,5 +48,5 @@ func (c *fixCommand) Execute(cc *cobra.Command) error {
 	valid := newValidator(c.Fs(), c.SourcesPath(), fix)
 
 	valid.validate()
-	return c.ShowHelp(cc)
+	return c.ShowHelpIfNecessary(cc)
 }

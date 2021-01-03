@@ -53,7 +53,7 @@ func (c *infoCommand) Execute(cc *cobra.Command) error {
 		c.showSectionsInfo(sln.GlobalSections)
 	}
 
-	return c.ShowHelp(cc)
+	return c.ShowHelpIfNecessary(cc)
 }
 
 func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {

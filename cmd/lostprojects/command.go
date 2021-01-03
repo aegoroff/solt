@@ -64,7 +64,7 @@ func (c *lostProjectsCommand) Execute(cc *cobra.Command) error {
 	// Included but not exist in FS
 	s.WriteMap(unexistProjects, "Solution")
 
-	return c.ShowHelp(cc)
+	return c.ShowHelpIfNecessary(cc)
 }
 
 func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {

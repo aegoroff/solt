@@ -139,3 +139,17 @@ Solution: a\a.sln
  a\a\a.csproj
 `), actual)
 }
+
+func Test_FindLostProjectsNoPath_NoOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	env := api.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "lp")
+
+	// Assert
+	actual := env.String()
+	ass.Equal(``, actual)
+}

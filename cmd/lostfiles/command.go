@@ -69,5 +69,5 @@ func (c *lostFilesCommand) Execute(cc *cobra.Command) error {
 		logic.remove(lostFiles)
 	}
 
-	return c.ShowHelp(cc)
+	return c.ShowHelpIfNecessary(cc)
 }
