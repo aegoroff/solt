@@ -24,7 +24,7 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *lostProjectsCommand) Execute() error {
+func (c *lostProjectsCommand) Execute(cc *cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
@@ -64,7 +64,7 @@ func (c *lostProjectsCommand) Execute() error {
 	// Included but not exist in FS
 	s.WriteMap(unexistProjects, "Solution")
 
-	return nil
+	return c.ShowHelp(cc)
 }
 
 func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {

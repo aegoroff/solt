@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"io"
 )
 
@@ -46,5 +47,5 @@ type Writable interface {
 // Executor represent executable command interface
 type Executor interface {
 	// Execute starts execute command's code
-	Execute() error
+	Execute(cc *cobra.Command) error
 }

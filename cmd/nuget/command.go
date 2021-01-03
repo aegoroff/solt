@@ -62,16 +62,16 @@ func newNugetByProject(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *nugetCommand) Execute() error {
+func (c *nugetCommand) Execute(cc *cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 	c.execute(foldersTree)
-	return nil
+	return c.ShowHelp(cc)
 }
 
-func (c *nugetByProjectCommand) Execute() error {
+func (c *nugetByProjectCommand) Execute(cc *cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 	c.execute(foldersTree)
-	return nil
+	return c.ShowHelp(cc)
 }
 
 func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {

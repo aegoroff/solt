@@ -35,18 +35,18 @@ func newFix(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *validateCommand) Execute() error {
+func (c *validateCommand) Execute(cc *cobra.Command) error {
 	prn := newPrinter(c.Prn())
 	valid := newValidator(c.Fs(), c.SourcesPath(), prn)
 
 	valid.validate()
-	return nil
+	return c.ShowHelp(cc)
 }
 
-func (c *fixCommand) Execute() error {
+func (c *fixCommand) Execute(cc *cobra.Command) error {
 	fix := newFixer(c.Prn(), c, c.Fs())
 	valid := newValidator(c.Fs(), c.SourcesPath(), fix)
 
 	valid.validate()
-	return nil
+	return c.ShowHelp(cc)
 }

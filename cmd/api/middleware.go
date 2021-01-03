@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/aegoroff/dirstat/scan"
 	"github.com/dustin/go-humanize"
+	"github.com/spf13/cobra"
 	"log"
 	"runtime"
 	"runtime/pprof"
@@ -64,8 +65,8 @@ func newMemoryProfileExecutor(e Executor, c *Conf) Executor {
 	return &em
 }
 
-func (e *executorMemUsage) Execute() error {
-	err := e.wrapped.Execute()
+func (e *executorMemUsage) Execute(cc *cobra.Command) error {
+	err := e.wrapped.Execute(cc)
 
 	if !*e.c.Diag() {
 		return err
@@ -81,8 +82,8 @@ func (e *executorMemUsage) Execute() error {
 	return err
 }
 
-func (e *executorTimeMeasure) Execute() error {
-	err := e.wrapped.Execute()
+func (e *executorTimeMeasure) Execute(cc *cobra.Command) error {
+	err := e.wrapped.Execute(cc)
 
 	if !*e.c.Diag() {
 		return err
@@ -93,7 +94,7 @@ func (e *executorTimeMeasure) Execute() error {
 	return err
 }
 
-func (e *executorCPUProfile) Execute() error {
+func (e *executorCPUProfile) Execute(cc *cobra.Command) error {
 	if *e.c.Diag() && *e.c.CPU() != "" {
 		f, err := e.c.Fs().Create(*e.c.CPU())
 		if err != nil {
@@ -103,11 +104,11 @@ func (e *executorCPUProfile) Execute() error {
 		defer pprof.StopCPUProfile()
 	}
 
-	return e.wrapped.Execute()
+	return e.wrapped.Execute(cc)
 }
 
-func (e *executorMemoryProfile) Execute() error {
-	err := e.wrapped.Execute()
+func (e *executorMemoryProfile) Execute(cc *cobra.Command) error {
+	err := e.wrapped.Execute(cc)
 	if *e.c.Diag() && *e.c.Memory() != "" {
 		f, err := e.c.Fs().Create(*e.c.Memory())
 		if err != nil {

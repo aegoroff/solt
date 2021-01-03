@@ -38,7 +38,7 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *lostFilesCommand) Execute() error {
+func (c *lostFilesCommand) Execute(cc *cobra.Command) error {
 	filecollect := newFileCollector(c.filter)
 	foldcollect := newFoldersCollector()
 
@@ -69,5 +69,5 @@ func (c *lostFilesCommand) Execute() error {
 		logic.remove(lostFiles)
 	}
 
-	return nil
+	return c.ShowHelp(cc)
 }

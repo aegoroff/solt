@@ -28,7 +28,7 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *infoCommand) Execute() error {
+func (c *infoCommand) Execute(cc *cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	solutions := msvc.SelectSolutions(foldersTree)
@@ -53,7 +53,7 @@ func (c *infoCommand) Execute() error {
 		c.showSectionsInfo(sln.GlobalSections)
 	}
 
-	return nil
+	return c.ShowHelp(cc)
 }
 
 func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {

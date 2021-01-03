@@ -25,7 +25,7 @@ func newVersion(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *versionCommand) Execute() error {
+func (c *versionCommand) Execute(*cobra.Command) error {
 	c.Prn().Cprint("%s\n", Version)
 	return nil
 }

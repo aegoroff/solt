@@ -59,7 +59,7 @@ func (c *Conf) SourcesPath() *string {
 func (c *Conf) init() error {
 	p, err := c.pe.NewPrinter()
 	c.p = p
-	if err != nil {
+	if err != nil || *c.SourcesPath() == "" {
 		return err
 	}
 

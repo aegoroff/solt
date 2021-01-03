@@ -37,6 +37,14 @@ func (b *BaseCommand) Writer() io.WriteCloser {
 	return b.conf.W()
 }
 
+// ShowHelp shows help if no sources path defined
+func (b *BaseCommand) ShowHelp(cc *cobra.Command) error {
+	if b.sourcesPath == "" {
+		return cc.Help()
+	}
+	return nil
+}
+
 // NewBaseCmd creates new BaseCommand instance
 func NewBaseCmd(c *Conf) *BaseCommand {
 	return &BaseCommand{
@@ -75,7 +83,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		}
 		defer scan.Close(c.conf.W())
 
-		return e.Execute()
+		return e.Execute(cc)
 	}
 }
 
