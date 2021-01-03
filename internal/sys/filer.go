@@ -115,7 +115,7 @@ func (f *filer) Read(path string) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	b := make([]byte, 0, int(s.Size()))
+	b := make([]byte, 0, s.Size())
 
 	buf := bytes.NewBuffer(b)
 	_, err = io.Copy(buf, file)
