@@ -45,7 +45,7 @@ func Test_Help(t *testing.T) {
 	_ = Execute(memfs, env, "")
 
 	// Assert
-	ass.Contains(env.String(), "")
+	ass.Empty(env.String())
 }
 
 func Test_Console(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_Write_File(t *testing.T) {
 	_ = Execute(memfs, env, "ver", "-o", fp)
 
 	// Assert
-	ass.Equal("", env.String())
+	ass.Empty(env.String())
 	_, err := memfs.Stat(fp)
 	ass.NoError(err)
 }
@@ -87,7 +87,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	_ = Execute(ro, env, "ver", "-o", fp)
 
 	// Assert
-	ass.Contains(env.String(), "")
+	ass.Empty(env.String())
 	_, err := memfs.Stat(fp)
 	ass.Error(err)
 }

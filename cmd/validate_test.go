@@ -130,3 +130,31 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	actual := env.String()
 	ass.Equal("", actual)
 }
+
+func Test_ValidateSdkNoPath_OutputHelp(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	env := api.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "va")
+
+	// Assert
+	actual := env.String()
+	ass.Contains(actual, "Validates SDK projects within solution(s)")
+}
+
+func Test_FixSdkNoPath_OutputHelp(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	env := api.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "va", "fix")
+
+	// Assert
+	actual := env.String()
+	ass.Contains(actual, "Fixes redundant SDK projects references")
+}

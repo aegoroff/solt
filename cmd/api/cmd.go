@@ -75,6 +75,8 @@ func (c *CobraCreator) runE() cobraRunSignature {
 		}
 		defer scan.Close(c.conf.W())
 
+		cc.SetOut(c.conf.W())
+
 		return e.Execute(cc)
 	}
 }
