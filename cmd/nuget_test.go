@@ -238,3 +238,18 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	ass.Contains(actual, "CmdLine            1.0.7.509")
 	ass.Contains(actual, "Newtonsoft.Json    12.0.1")
 }
+
+func Test_NugetCmdBySolutionUnexistPath_NoOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "u/"
+	memfs := afero.NewMemMapFs()
+	env := api.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "nu", "-p", dir)
+
+	// Assert
+	actual := env.String()
+	ass.Equal(``, actual)
+}
