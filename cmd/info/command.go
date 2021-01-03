@@ -18,17 +18,17 @@ type infoCommand struct {
 // New creates new command that shows information about solutions
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return &infoCommand{
+		return api.NewExecutorShowHelp(&infoCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			margin:      2,
-		}
+		}, c)
 	})
 
 	cmd := cc.NewCommand("in", "info", "Get information about found solutions")
 	return cmd
 }
 
-func (c *infoCommand) Execute(cc *cobra.Command) error {
+func (c *infoCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	solutions := msvc.SelectSolutions(foldersTree)
@@ -53,7 +53,7 @@ func (c *infoCommand) Execute(cc *cobra.Command) error {
 		c.showSectionsInfo(sln.GlobalSections)
 	}
 
-	return c.ShowHelpIfNecessary(cc)
+	return nil
 }
 
 func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {

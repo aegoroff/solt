@@ -36,6 +36,15 @@ type executorMemoryProfile struct {
 	*executorMiddleware
 }
 
+type executorShowHelp struct {
+	*executorMiddleware
+}
+
+// NewExecutorShowHelp shows help if no sources path defined
+func NewExecutorShowHelp(e Executor, c *Conf) Executor {
+	return &executorShowHelp{executorMiddleware: newExecutorMiddleware(e, c)}
+}
+
 func newMemUsageExecutor(e Executor, c *Conf) Executor {
 	em := executorMemUsage{
 		newExecutorMiddleware(e, c),
@@ -122,4 +131,11 @@ func (e *executorMemoryProfile) Execute(cc *cobra.Command) error {
 		}
 	}
 	return err
+}
+
+func (e *executorShowHelp) Execute(cc *cobra.Command) error {
+	if *e.c.SourcesPath() == "" {
+		return cc.Help()
+	}
+	return e.wrapped.Execute(cc)
 }

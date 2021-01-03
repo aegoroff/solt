@@ -37,14 +37,6 @@ func (b *BaseCommand) Writer() io.WriteCloser {
 	return b.conf.W()
 }
 
-// ShowHelpIfNecessary shows help if no sources path defined
-func (b *BaseCommand) ShowHelpIfNecessary(cc *cobra.Command) error {
-	if b.sourcesPath == "" {
-		return cc.Help()
-	}
-	return nil
-}
-
 // NewBaseCmd creates new BaseCommand instance
 func NewBaseCmd(c *Conf) *BaseCommand {
 	return &BaseCommand{

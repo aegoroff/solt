@@ -21,12 +21,12 @@ func New(c *api.Conf) *cobra.Command {
 	var filter string
 
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return &lostFilesCommand{
+		return api.NewExecutorShowHelp(&lostFilesCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			removeLost:  removeLost,
 			searchAll:   searchAll,
 			filter:      filter,
-		}
+		}, c)
 	})
 
 	cmd := cc.NewCommand("lf", "lostfiles", "Find lost files in the folder specified")
@@ -38,7 +38,7 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *lostFilesCommand) Execute(cc *cobra.Command) error {
+func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	filecollect := newFileCollector(c.filter)
 	foldcollect := newFoldersCollector()
 
@@ -69,5 +69,5 @@ func (c *lostFilesCommand) Execute(cc *cobra.Command) error {
 		logic.remove(lostFiles)
 	}
 
-	return c.ShowHelpIfNecessary(cc)
+	return nil
 }

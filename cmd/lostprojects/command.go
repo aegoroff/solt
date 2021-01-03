@@ -14,9 +14,9 @@ type lostProjectsCommand struct {
 // New creates new command that does lost projects search
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return &lostProjectsCommand{
+		return api.NewExecutorShowHelp(&lostProjectsCommand{
 			BaseCommand: api.NewBaseCmd(c),
-		}
+		}, c)
 	})
 
 	cmd := cc.NewCommand("lp", "lostprojects", "Find projects that not included into any solution")
@@ -24,7 +24,7 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *lostProjectsCommand) Execute(cc *cobra.Command) error {
+func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
@@ -64,7 +64,7 @@ func (c *lostProjectsCommand) Execute(cc *cobra.Command) error {
 	// Included but not exist in FS
 	s.WriteMap(unexistProjects, "Solution")
 
-	return c.ShowHelpIfNecessary(cc)
+	return nil
 }
 
 func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {

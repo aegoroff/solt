@@ -28,11 +28,11 @@ func New(c *api.Conf) *cobra.Command {
 	var verbose bool
 
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return &nugetCommand{
+		return api.NewExecutorShowHelp(&nugetCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			mismatch:    mismatch,
 			verbose:     verbose,
-		}
+		}, c)
 	})
 
 	descr := "Get nuget packages information within solutions"
@@ -51,9 +51,9 @@ func New(c *api.Conf) *cobra.Command {
 
 func newNugetByProject(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return &nugetByProjectCommand{
+		return api.NewExecutorShowHelp(&nugetByProjectCommand{
 			BaseCommand: api.NewBaseCmd(c),
-		}
+		}, c)
 	})
 
 	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
@@ -62,16 +62,16 @@ func newNugetByProject(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func (c *nugetCommand) Execute(cc *cobra.Command) error {
+func (c *nugetCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 	c.execute(foldersTree)
-	return c.ShowHelpIfNecessary(cc)
+	return nil
 }
 
-func (c *nugetByProjectCommand) Execute(cc *cobra.Command) error {
+func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 	c.execute(foldersTree)
-	return c.ShowHelpIfNecessary(cc)
+	return nil
 }
 
 func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
