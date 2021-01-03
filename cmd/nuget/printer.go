@@ -46,8 +46,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	})
 
 	for _, item := range packs {
-		versions := item.versions.Items()
-		sortfold.Strings(versions)
+		versions := item.versions.SortedItems(sortfold.Strings)
 
 		tbl.AddLine(item.pkg, strings.Join(versions, ", "))
 	}
