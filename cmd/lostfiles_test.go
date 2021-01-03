@@ -286,7 +286,7 @@ func Test_FindLostFilesNoPath_NoOutput(t *testing.T) {
 	env := api.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p")
+	_ = Execute(memfs, env, "lf")
 
 	// Assert
 	actual := env.String()
