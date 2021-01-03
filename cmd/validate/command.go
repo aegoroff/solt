@@ -11,9 +11,8 @@ type fixCommand struct{ *api.BaseCommand }
 // New creates new command that does validates SDK projects
 func New(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return api.NewExecutorShowHelp(&validateCommand{
-			BaseCommand: api.NewBaseCmd(c),
-		}, c)
+		exe := &validateCommand{api.NewBaseCmd(c)}
+		return api.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("va", "validate", "Validates SDK projects within solution(s)")
@@ -25,9 +24,8 @@ func New(c *api.Conf) *cobra.Command {
 
 func newFix(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return api.NewExecutorShowHelp(&fixCommand{
-			BaseCommand: api.NewBaseCmd(c),
-		}, c)
+		exe := &fixCommand{api.NewBaseCmd(c)}
+		return api.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("fix", "fixprojects", "Fixes redundant SDK projects references")

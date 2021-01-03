@@ -21,12 +21,13 @@ func New(c *api.Conf) *cobra.Command {
 	var filter string
 
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return api.NewExecutorShowHelp(&lostFilesCommand{
+		exe := &lostFilesCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			removeLost:  removeLost,
 			searchAll:   searchAll,
 			filter:      filter,
-		}, c)
+		}
+		return api.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("lf", "lostfiles", "Find lost files in the folder specified")

@@ -28,11 +28,12 @@ func New(c *api.Conf) *cobra.Command {
 	var verbose bool
 
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return api.NewExecutorShowHelp(&nugetCommand{
+		exe := &nugetCommand{
 			BaseCommand: api.NewBaseCmd(c),
 			mismatch:    mismatch,
 			verbose:     verbose,
-		}, c)
+		}
+		return api.NewExecutorShowHelp(exe, c)
 	})
 
 	descr := "Get nuget packages information within solutions"
@@ -51,9 +52,8 @@ func New(c *api.Conf) *cobra.Command {
 
 func newNugetByProject(c *api.Conf) *cobra.Command {
 	cc := api.NewCobraCreator(c, func() api.Executor {
-		return api.NewExecutorShowHelp(&nugetByProjectCommand{
-			BaseCommand: api.NewBaseCmd(c),
-		}, c)
+		exe := &nugetByProjectCommand{api.NewBaseCmd(c)}
+		return api.NewExecutorShowHelp(exe, c)
 	})
 
 	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
