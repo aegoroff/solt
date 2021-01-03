@@ -34,6 +34,18 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 	}
 }
 
+func TestNewPartialMatcher_EmptyMatches(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+
+	// Act
+	m, err := NewPartialMatcher([]string{}, strings.ToUpper)
+
+	// Assert
+	ass.Error(err)
+	ass.Nil(m)
+}
+
 func Test_MatchOneOfPatterns_Exact(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
