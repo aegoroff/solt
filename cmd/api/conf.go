@@ -59,5 +59,12 @@ func (c *Conf) SourcesPath() *string {
 func (c *Conf) init() error {
 	p, err := c.pe.NewPrinter()
 	c.p = p
+	if err != nil {
+		return err
+	}
+
+	sp := *c.SourcesPath()
+	_, err = c.Fs().Stat(sp)
+
 	return err
 }
