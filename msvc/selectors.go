@@ -2,8 +2,6 @@ package msvc
 
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/akutz/sortfold"
-	"sort"
 )
 
 // SelectProjects gets all Visual Studion solutions found in a directory
@@ -21,7 +19,6 @@ func SelectProjects(foldersTree rbtree.RbTree) []*MsbuildProject {
 func SelectSolutions(foldersTree rbtree.RbTree) []*VisualStudioSolution {
 	w := walkSol{solutions: make([]*VisualStudioSolution, 0)}
 	walk(foldersTree, &w)
-	sortSolutions(w.solutions)
 	return w.solutions
 }
 
@@ -35,7 +32,6 @@ func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolut
 	}}
 
 	walk(foldersTree, &ws, &wp)
-	sortSolutions(ws.solutions)
 	return ws.solutions, projects
 }
 
@@ -43,10 +39,4 @@ func SelectSolutionsAndProjects(foldersTree rbtree.RbTree) ([]*VisualStudioSolut
 func WalkProjectFolders(foldersTree rbtree.RbTree, action ProjectHandler) {
 	w := &walkPrj{handler: action}
 	walk(foldersTree, w)
-}
-
-func sortSolutions(solutions []*VisualStudioSolution) {
-	sort.Slice(solutions, func(i, j int) bool {
-		return sortfold.CompareFold(solutions[i].Path, solutions[j].Path) < 0
-	})
 }

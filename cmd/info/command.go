@@ -33,6 +33,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	solutions := msvc.SelectSolutions(foldersTree)
+	msvc.SortSolutions(solutions)
 
 	for _, sol := range solutions {
 		sln := sol.Solution

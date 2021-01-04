@@ -2,9 +2,11 @@ package msvc
 
 import (
 	"github.com/aegoroff/dirstat/scan"
+	"github.com/akutz/sortfold"
 	"github.com/spf13/afero"
 	"path/filepath"
 	"solt/solution"
+	"sort"
 )
 
 const (
@@ -24,6 +26,21 @@ type VisualStudioSolution struct {
 	// filesystem path
 	Path string
 }
+
+// SortSolutions sorts solutions by path
+func SortSolutions(solutions []*VisualStudioSolution) {
+	sort.Sort(visualStudioSolutionSlice(solutions))
+}
+
+type visualStudioSolutionSlice []*VisualStudioSolution
+
+func (v visualStudioSolutionSlice) Len() int { return len(v) }
+
+func (v visualStudioSolutionSlice) Less(i, j int) bool {
+	return sortfold.CompareFold(v[i].Path, v[j].Path) < 0
+}
+
+func (v visualStudioSolutionSlice) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 
 // AllProjectPaths gets all possible projects' paths defined in solution
 func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []string {
