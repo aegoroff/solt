@@ -3,7 +3,6 @@ package lostprojects
 import (
 	"github.com/spf13/cobra"
 	"solt/cmd/api"
-	"solt/internal/sys"
 	"solt/msvc"
 )
 
@@ -32,12 +31,13 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	// so these projects are not considered lost
 	var linkedProjects []string
 
-	projectLinksBySolution := make(map[string][]string, len(solutions))
+	exist := newExister(c.Fs(), c.Writer())
+
 	// Each found solution
 	for _, sln := range solutions {
 		links := sln.AllProjectPaths(msvc.PassThrough)
-		projectLinksBySolution[sln.Path] = links
 		linkedProjects = append(linkedProjects, links...)
+		exist.validate(sln.Path, links)
 	}
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
@@ -54,30 +54,9 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	// Lost projects that have includes files that used
 	s.WriteSlice(lostWithIncludes)
 
-	unexistProjects := c.getUnexistProjects(projectLinksBySolution)
-
-	if len(unexistProjects) > 0 {
-		c.Prn().Cprint("\n<red>These projects are included into a solution but not found in the file system:</>\n")
-	}
-
-	// Included but not exist in FS
-	s.WriteMap(unexistProjects, "Solution")
+	exist.print(c.Prn())
 
 	return nil
-}
-
-func (c *lostProjectsCommand) getUnexistProjects(projectsInSolutions map[string][]string) map[string][]string {
-	var result = make(map[string][]string)
-
-	filer := sys.NewFiler(c.Fs(), c.Writer())
-	for spath, projects := range projectsInSolutions {
-		nonexist := filer.CheckExistence(projects)
-
-		if len(nonexist) > 0 {
-			result[spath] = append(result[spath], nonexist...)
-		}
-	}
-	return result
 }
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
