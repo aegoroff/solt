@@ -40,15 +40,15 @@ func New(c *api.Conf) *cobra.Command {
 }
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	filecollect := newFileCollector(c.filter)
-	foldcollect := newFoldersCollector()
+	files := newFileCollector(c.filter)
+	ignoredFolders := newIgnoredFoldersCollector()
 
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), filecollect, foldcollect)
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), files, ignoredFolders)
 
 	projects := msvc.SelectProjects(foldersTree)
 
 	exister := api.NewExister(c.Fs(), c.Writer())
-	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, exister)
+	logic := newLostFilesLogic(c.searchAll, files.files, ignoredFolders.folders, exister)
 	err := logic.initialize(projects)
 
 	if err != nil {

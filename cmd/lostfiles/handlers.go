@@ -25,7 +25,7 @@ func newFileCollector(filter string) *fileCollector {
 	}
 }
 
-func newFoldersCollector() *ignoredFoldersCollector {
+func newIgnoredFoldersCollector() *ignoredFoldersCollector {
 	return &ignoredFoldersCollector{
 		folders: make(c9s.StringHashSet),
 	}
