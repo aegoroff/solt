@@ -35,9 +35,9 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 
 	// Each found solution
 	for _, sln := range solutions {
-		links := sln.AllProjectPaths(msvc.PassThrough)
-		linkedProjects = append(linkedProjects, links...)
-		exist.validate(sln.Path, links)
+		projects := sln.AllProjectPaths(msvc.PassThrough)
+		linkedProjects = append(linkedProjects, projects...)
+		exist.validate(sln.Path, projects)
 	}
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
