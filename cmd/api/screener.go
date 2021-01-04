@@ -6,15 +6,17 @@ import (
 
 // Screener is an abstraction that does comples structures output
 type Screener struct {
-	p Printer
-	m *Marginer
+	p  Printer
+	m1 *Marginer
+	m2 *Marginer
 }
 
 // NewScreener creates new Screener instance
 func NewScreener(p Printer) *Screener {
 	s := Screener{
-		p: p,
-		m: NewMarginer(1),
+		p:  p,
+		m1: NewMarginer(1),
+		m2: NewMarginer(2),
 	}
 	return &s
 }
@@ -29,7 +31,8 @@ func (s *Screener) WriteMap(itemsMap map[string][]string, keyPrefix string) {
 	sortfold.Strings(keys)
 
 	for _, k := range keys {
-		s.p.Cprint("\n<gray>%s: %s</>\n", keyPrefix, k)
+		s.p.Println()
+		s.p.Cprint(s.m1.Margin("<gray>%s: %s</>\n"), keyPrefix, k)
 		s.WriteSlice(itemsMap[k])
 	}
 }
@@ -38,6 +41,6 @@ func (s *Screener) WriteMap(itemsMap map[string][]string, keyPrefix string) {
 func (s *Screener) WriteSlice(items []string) {
 	sortfold.Strings(items)
 	for _, item := range items {
-		s.p.Cprint(s.m.Margin("%s\n"), item)
+		s.p.Cprint(s.m2.Margin("%s\n"), item)
 	}
 }

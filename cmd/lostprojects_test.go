@@ -55,7 +55,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	ass.Equal(sys.ToValidPath(`
 These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
 
- a\a\a1.csproj
+  a\a\a1.csproj
 `), actual)
 }
 
@@ -84,7 +84,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	ass.Equal(sys.ToValidPath(`
 These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
 
- a\a1\a1.csproj
+  a\a1\a1.csproj
 `), actual)
 }
 
@@ -109,7 +109,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath(` a\a1\a1.csproj
+	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
 `), actual)
 }
 
@@ -135,8 +135,8 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	ass.Equal(sys.ToValidPath(`
 These projects are included into a solution but not found in the file system:
 
-Solution: a\a.sln
- a\a\a.csproj
+ Solution: a\a.sln
+  a\a\a.csproj
 `), actual)
 }
 

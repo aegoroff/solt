@@ -18,7 +18,7 @@ func Test_writeSlice(t *testing.T) {
 	s.WriteSlice(items)
 
 	// Assert
-	ass.Equal(" aa\n rr\n xy\n", env.String())
+	ass.Equal("  aa\n  rr\n  xy\n", env.String())
 }
 
 func Test_writeMap(t *testing.T) {
@@ -36,5 +36,5 @@ func Test_writeMap(t *testing.T) {
 	s.WriteMap(m, "SI")
 
 	// Assert
-	ass.Equal("\nSI: a\n gt\n rr\n xy\n\nSI: b\n ff\n lz\n xy\n", env.String())
+	ass.Equal("\n SI: a\n  gt\n  rr\n  xy\n\n SI: b\n  ff\n  lz\n  xy\n", env.String())
 }
