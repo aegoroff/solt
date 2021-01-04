@@ -29,7 +29,7 @@ func (e *Exister) Validate(root string, paths []string) {
 	}
 }
 
-// Print outputs uneist files info
+// Print outputs unexist files info
 func (e *Exister) Print(p Printer, title string, container string) {
 	if len(e.unexist) > 0 {
 		p.Println()
