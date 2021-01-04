@@ -10,6 +10,9 @@ import (
 type Matcher interface {
 	// Match do string matching to several patterns
 	Match(s string) bool
+
+	// Match do any string matching to several patterns
+	MatchAny(ss []string) bool
 }
 
 // PrintEnvironment represents concrete printing environment abstraction

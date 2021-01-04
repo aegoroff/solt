@@ -7,15 +7,27 @@ import (
 	"github.com/anknown/ahocorasick"
 )
 
+type matchA struct {
+	m Matcher
+}
+
 // matchP defines partial matching
 type matchP struct {
+	*matchA
 	machine   *goahocorasick.Machine
 	decorator func(s string) string
 }
 
 // matchE defines exact matching using rbtree.RbTree
 type matchE struct {
+	*matchA
 	tree rbtree.RbTree
+}
+
+type matchL struct {
+	*matchA
+	include Matcher
+	exclude Matcher
 }
 
 type caseless string
@@ -32,17 +44,15 @@ func (c *caseless) compare(y rbtree.Comparable) int {
 	return sortfold.CompareFold(string(*c), string(*y.(*caseless)))
 }
 
-type matchL struct {
-	include Matcher
-	exclude Matcher
-}
-
 // NewLostItemMatcher creates new Matcher instance that detects lost item
 func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
-	return &matchL{
+	m := &matchL{
+		matchA:  &matchA{},
 		include: incl,
 		exclude: excl,
 	}
+	m.matchA.m = m
+	return m
 }
 
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
@@ -59,12 +69,13 @@ func NewPartialMatcher(matches []string, decorator func(s string) string) (Match
 	if err != nil {
 		return nil, err
 	}
-	aho := matchP{
+	aho := &matchP{
+		matchA:    &matchA{},
 		machine:   machine,
 		decorator: decorator,
 	}
-
-	return &aho, nil
+	aho.matchA.m = aho
+	return aho, nil
 }
 
 // NewExactMatch creates exact matcher from strings slice
@@ -75,8 +86,12 @@ func NewExactMatch(matches []string) Matcher {
 		tree.Insert(&cs)
 	}
 
-	hs := matchE{tree: tree}
-	return &hs
+	m := &matchE{
+		matchA: &matchA{},
+		tree:   tree,
+	}
+	m.matchA.m = m
+	return m
 }
 
 // Match do string matching to several patterns
@@ -94,4 +109,14 @@ func (m *matchE) Match(s string) bool {
 	cs := caseless(s)
 	_, ok := m.tree.SearchNode(&cs)
 	return ok
+}
+
+func (m *matchA) MatchAny(ss []string) bool {
+	for _, s := range ss {
+		if m.m.Match(s) {
+			return true
+		}
+	}
+
+	return false
 }

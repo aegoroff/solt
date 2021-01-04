@@ -62,43 +62,33 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	projectMatch := api.NewExactMatch(linkedProjects)
-	projectsOutsideSolution := allProjects[:0]
+	incl := api.NewExactMatch(linkedProjects)
+
+	lostProjects := allProjects[:0]
 	var allSolutionFiles []string
 
 	for _, prj := range allProjects {
-		if projectMatch.Match(prj.Path) {
-			allSolutionFiles = append(allSolutionFiles, prj.Files()...)
+		if !incl.Match(prj.Path) {
+			lostProjects = append(lostProjects, prj)
 		} else {
-			projectsOutsideSolution = append(projectsOutsideSolution, prj)
+			allSolutionFiles = append(allSolutionFiles, prj.Files()...)
 		}
 	}
 
-	anySolutionFile := api.NewExactMatch(allSolutionFiles)
-	return separateProjects(projectsOutsideSolution, anySolutionFile)
+	return separateProjects(lostProjects, allSolutionFiles)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, anySolutionFile api.Matcher) ([]string, []string) {
+func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
+	solutionFiles := api.NewExactMatch(allSolutionFiles)
+
 	for _, prj := range projectsOutsideSolution {
-		if hasFilesIncludedIntoSolution(prj, anySolutionFile) {
+		if solutionFiles.MatchAny(prj.Files()) {
 			lostWithIncludes = append(lostWithIncludes, prj.Path)
 		} else {
 			lost = append(lost, prj.Path)
 		}
 	}
 	return lost, lostWithIncludes
-}
-
-func hasFilesIncludedIntoSolution(prj *msvc.MsbuildProject, anySolutionFile api.Matcher) bool {
-	projectFiles := prj.Files()
-
-	for _, f := range projectFiles {
-		if anySolutionFile.Match(f) {
-			return true
-		}
-	}
-
-	return false
 }
