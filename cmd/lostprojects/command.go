@@ -78,16 +78,16 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 	return separateProjects(lostProjects, allSolutionFiles)
 }
 
-func separateProjects(projectsOutsideSolution []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
+func separateProjects(lostProjects []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
 	solutionFiles := api.NewExactMatch(allSolutionFiles)
 
-	for _, prj := range projectsOutsideSolution {
-		if solutionFiles.MatchAny(prj.Files()) {
-			lostWithIncludes = append(lostWithIncludes, prj.Path)
+	for _, lp := range lostProjects {
+		if solutionFiles.MatchAny(lp.Files()) {
+			lostWithIncludes = append(lostWithIncludes, lp.Path)
 		} else {
-			lost = append(lost, prj.Path)
+			lost = append(lost, lp.Path)
 		}
 	}
 	return lost, lostWithIncludes
