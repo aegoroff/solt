@@ -47,8 +47,8 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	filer := sys.NewFiler(c.Fs(), c.Writer())
-	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, filer)
+	exister := api.NewExister(c.Fs(), c.Writer())
+	logic := newLostFilesLogic(c.searchAll, filecollect.files, foldcollect.folders, exister)
 	err := logic.initialize(projects)
 
 	if err != nil {
@@ -60,14 +60,12 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	s := api.NewScreener(c.Prn())
 	s.WriteSlice(lostFiles)
 
-	if len(logic.unexistFiles) > 0 {
-		c.Prn().Cprint("\n<red>These files included into projects but not exist in the file system.</>\n")
-
-		s.WriteMap(logic.unexistFiles, "Project")
-	}
+	title := "<red>These files included into projects but not exist in the file system.</>"
+	exister.Print(c.Prn(), title, "Project")
 
 	if c.removeLost {
-		logic.remove(lostFiles)
+		filer := sys.NewFiler(c.Fs(), c.Writer())
+		filer.Remove(lostFiles)
 	}
 
 	return nil

@@ -31,13 +31,13 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	// so these projects are not considered lost
 	var linkedProjects []string
 
-	exist := newExister(c.Fs(), c.Writer())
+	exist := api.NewExister(c.Fs(), c.Writer())
 
 	// Each found solution
 	for _, sln := range solutions {
 		projects := sln.AllProjectPaths(msvc.PassThrough)
 		linkedProjects = append(linkedProjects, projects...)
-		exist.validate(sln.Path, projects)
+		exist.Validate(sln.Path, projects)
 	}
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
@@ -54,7 +54,8 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	// Lost projects that have includes files that used
 	s.WriteSlice(lostWithIncludes)
 
-	exist.print(c.Prn())
+	title := "<red>These projects are included into a solution but not found in the file system:</>"
+	exist.Print(c.Prn(), title, "Solution")
 
 	return nil
 }

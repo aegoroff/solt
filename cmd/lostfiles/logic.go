@@ -4,7 +4,6 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
 	"solt/cmd/api"
-	"solt/internal/sys"
 	"solt/msvc"
 	"strings"
 )
@@ -12,20 +11,18 @@ import (
 type lostFilesLogic struct {
 	foundFiles     []string
 	excludeFolders c9s.StringHashSet
-	unexistFiles   map[string][]string
 	includedFiles  []string
 	nonExistence   bool
-	filer          sys.Filer
+	exister        *api.Exister
 	lost           api.Matcher
 }
 
-func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, filer sys.Filer) *lostFilesLogic {
+func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, exister *api.Exister) *lostFilesLogic {
 	return &lostFilesLogic{
 		foundFiles:     foundFiles,
 		excludeFolders: foldersToIgnore,
-		unexistFiles:   make(map[string][]string),
 		nonExistence:   nonExistence,
-		filer:          filer,
+		exister:        exister,
 	}
 }
 
@@ -62,14 +59,8 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 }
 
 func (lf *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string) {
-	if !lf.nonExistence {
-		return
-	}
-
-	nonexist := lf.filer.CheckExistence(includes)
-
-	if len(nonexist) > 0 {
-		lf.unexistFiles[project] = append(lf.unexistFiles[project], nonexist...)
+	if lf.nonExistence {
+		lf.exister.Validate(project, includes)
 	}
 }
 
@@ -99,8 +90,4 @@ func (lf *lostFilesLogic) find() []string {
 	}
 
 	return result
-}
-
-func (lf *lostFilesLogic) remove(lostFiles []string) {
-	lf.filer.Remove(lostFiles)
 }
