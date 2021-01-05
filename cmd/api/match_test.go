@@ -93,7 +93,7 @@ func Test_MatchAnyOneOfPatterns_Exact(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// Act
 			m := NewExactMatch(test.patterns)
-			result := m.MatchAny(test.input)
+			result := MatchAny(m, test.input)
 
 			// Assert
 			ass.Equal(test.result, result)
