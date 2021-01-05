@@ -37,6 +37,12 @@ func (h *skpper) Handler(path string) {
 func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
 	pdir := filepath.Dir(prj.Path)
 
+	// In case of SDK projects all files inside project folder are considered included
+	if prj.Project.IsSdkProject() {
+		h.folders.Add(pdir)
+		return
+	}
+
 	subfolders := []string{"obj"}
 
 	// Exclude output paths too something like bin\Debug, bin\Release etc.
@@ -48,10 +54,5 @@ func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
 	for _, s := range subfolders {
 		sub := filepath.Join(pdir, sys.ToValidPath(s))
 		h.folders.Add(sub)
-	}
-
-	// In case of SDK projects all files inside project folder are considered included
-	if prj.Project.IsSdkProject() {
-		h.folders.Add(pdir)
 	}
 }
