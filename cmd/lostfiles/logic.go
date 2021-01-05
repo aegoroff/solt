@@ -52,13 +52,13 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 		includes := prj.Files()
 		lf.includedFiles = append(lf.includedFiles, includes...)
 
-		lf.addToUnexistIfNeeded(prj.Path, includes)
+		lf.validateExistence(prj.Path, includes)
 	}
 
 	return lf.initializeLostMatcher()
 }
 
-func (lf *lostFilesLogic) addToUnexistIfNeeded(project string, includes []string) {
+func (lf *lostFilesLogic) validateExistence(project string, includes []string) {
 	if lf.nonExistence {
 		lf.exister.Validate(project, includes)
 	}
