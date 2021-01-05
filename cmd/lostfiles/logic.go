@@ -78,16 +78,5 @@ func (lf *lostFilesLogic) initializeLostMatcher() error {
 }
 
 func (lf *lostFilesLogic) find() []string {
-	if lf.lost == nil {
-		return []string{}
-	}
-
-	result := lf.foundFiles[:0]
-	for _, file := range lf.foundFiles {
-		if lf.lost.Match(file) {
-			result = append(result, file)
-		}
-	}
-
-	return result
+	return api.Filter(lf.foundFiles, lf.lost)
 }

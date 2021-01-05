@@ -94,10 +94,38 @@ func Test_MatchAnyOneOfPatterns_Exact(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// Act
 			m := NewExactMatch(test.patterns)
-			result := MatchAny(m, test.input)
+			result := MatchAny(test.input, m)
 
 			// Assert
 			ass.Equal(test.result, result)
+		})
+	}
+}
+
+func Test_Filter(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	m := NewExactMatch([]string{"xxx", "yyy", "zzz"})
+
+	var tests = []struct {
+		name     string
+		input    []string
+		expected []string
+	}{
+		{"one matched", []string{"aa", "yyy", "bb"}, []string{"yyy"}},
+		{"all matched", []string{"xxx", "yyy", "zzz"}, []string{"xxx", "yyy", "zzz"}},
+		{"all not matched", []string{"eee", "rr", "dd"}, []string{}},
+		{"one not matched", []string{"xxx", "yyy", "ee"}, []string{"xxx", "yyy"}},
+		{"empty", []string{}, []string{}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Act
+			result := Filter(test.input, m)
+
+			// Assert
+			ass.Equal(test.expected, result)
 		})
 	}
 }

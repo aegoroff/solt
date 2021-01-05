@@ -99,7 +99,7 @@ func (m *matchE) Match(s string) bool {
 }
 
 // MatchAny does any string matching to several patterns
-func MatchAny(m Matcher, ss []string) bool {
+func MatchAny(ss []string, m Matcher) bool {
 	for _, s := range ss {
 		if m.Match(s) {
 			return true
@@ -107,4 +107,17 @@ func MatchAny(m Matcher, ss []string) bool {
 	}
 
 	return false
+}
+
+// Filter filters slice using Matcher. Only matched strings will be in result
+// IMPORTANT: source slice MUST NOT be used after calling this method
+func Filter(ss []string, m Matcher) []string {
+	result := ss[:0]
+	for _, file := range ss {
+		if m.Match(file) {
+			result = append(result, file)
+		}
+	}
+
+	return result
 }

@@ -84,7 +84,7 @@ func separateProjects(lostProjects []*msvc.MsbuildProject, allSolutionFiles []st
 	solutionFiles := api.NewExactMatch(allSolutionFiles)
 
 	for _, lp := range lostProjects {
-		if api.MatchAny(solutionFiles, lp.Files()) {
+		if api.MatchAny(lp.Files(), solutionFiles) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path)
 		} else {
 			lost = append(lost, lp.Path)
