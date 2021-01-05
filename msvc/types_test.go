@@ -36,5 +36,4 @@ func TestSortSolutions(t *testing.T) {
 			ass.Equal(tst.expect, result)
 		})
 	}
-
 }
