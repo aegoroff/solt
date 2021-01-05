@@ -47,11 +47,12 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	exister := api.NewExister(c.Fs(), c.Writer())
-	logic := newLostFilesLogic(c.searchAll, ignoredFolders.folders, exister)
-	logic.initialize(projects)
+	exist := api.NewExister(c.Fs(), c.Writer())
+	wrapper := newExister(c.searchAll, exist)
+	enum := newEnumerator(ignoredFolders.folders, wrapper)
+	enum.enumerate(projects)
 
-	lf, err := newFinder(logic.includedFiles, logic.excludeFolders.Items())
+	lf, err := newFinder(enum.includedFiles(), enum.excludedFolders())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil
@@ -63,7 +64,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	s.WriteSlice(lostFiles)
 
 	title := "<red>These files included into projects but not exist in the file system.</>"
-	exister.Print(c.Prn(), title, "Project")
+	exist.Print(c.Prn(), title, "Project")
 
 	if c.removeLost {
 		filer := sys.NewFiler(c.Fs(), c.Writer())

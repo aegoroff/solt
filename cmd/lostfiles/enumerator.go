@@ -3,27 +3,32 @@ package lostfiles
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
-	"solt/cmd/api"
 	"solt/msvc"
 )
 
-type lostFilesLogic struct {
+type enumerator struct {
 	excludeFolders c9s.StringHashSet
-	includedFiles  []string
-	nonExistence   bool
-	exister        *api.Exister
+	includes       []string
+	exister        exister
 }
 
-func newLostFilesLogic(nonExistence bool, foldersToIgnore c9s.StringHashSet, exister *api.Exister) *lostFilesLogic {
-	return &lostFilesLogic{
+func newEnumerator(foldersToIgnore c9s.StringHashSet, exister exister) *enumerator {
+	return &enumerator{
 		excludeFolders: foldersToIgnore,
-		nonExistence:   nonExistence,
 		exister:        exister,
 	}
 }
 
-// initialize fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
-func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
+func (e *enumerator) includedFiles() []string {
+	return e.includes
+}
+
+func (e *enumerator) excludedFolders() []string {
+	return e.excludeFolders.Items()
+}
+
+// enumerate fills excludeFolders, includes and validates files existence
+func (e *enumerator) enumerate(projects []*msvc.MsbuildProject) {
 	subfoldersToExclude := []string{"obj"}
 
 	for _, prj := range projects {
@@ -37,23 +42,17 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
 		// Add project base + exclude subfolder into exclude folders list
 		for _, s := range subfoldersToExclude {
 			sub := filepath.Join(pdir, s)
-			lf.excludeFolders.Add(sub)
+			e.excludeFolders.Add(sub)
 		}
 
 		// In case of SDK projects all files inside project folder are considered included
 		if prj.Project.IsSdkProject() {
-			lf.excludeFolders.Add(pdir)
+			e.excludeFolders.Add(pdir)
 		}
 
 		includes := prj.Files()
-		lf.includedFiles = append(lf.includedFiles, includes...)
+		e.includes = append(e.includes, includes...)
 
-		lf.validateExistence(prj.Path, includes)
-	}
-}
-
-func (lf *lostFilesLogic) validateExistence(project string, includes []string) {
-	if lf.nonExistence {
-		lf.exister.Validate(project, includes)
+		e.exister.exist(prj.Path, includes)
 	}
 }
