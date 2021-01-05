@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"solt/cmd/api"
 	"solt/msvc"
-	"strings"
 )
 
 type lostFilesLogic struct {
@@ -27,7 +26,7 @@ func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c
 }
 
 // initialize fills subfoldersToExclude, excludeFolders, includedFiles and unexistFiles
-func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
+func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) {
 	subfoldersToExclude := []string{"obj"}
 
 	for _, prj := range projects {
@@ -54,29 +53,10 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 
 		lf.validateExistence(prj.Path, includes)
 	}
-
-	return lf.initializeLostMatcher()
 }
 
 func (lf *lostFilesLogic) validateExistence(project string, includes []string) {
 	if lf.nonExistence {
 		lf.exister.Validate(project, includes)
 	}
-}
-
-func (lf *lostFilesLogic) initializeLostMatcher() error {
-	excludes, err := api.NewPartialMatcher(lf.excludeFolders.Items(), strings.ToUpper)
-	if err != nil {
-		return err
-	}
-
-	includes := api.NewExactMatch(lf.includedFiles)
-
-	lf.lost = api.NewLostItemMatcher(includes, excludes)
-
-	return nil
-}
-
-func (lf *lostFilesLogic) find() []string {
-	return api.Filter(lf.foundFiles, lf.lost)
 }

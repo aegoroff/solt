@@ -49,14 +49,15 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	exister := api.NewExister(c.Fs(), c.Writer())
 	logic := newLostFilesLogic(c.searchAll, files.files, ignoredFolders.folders, exister)
-	err := logic.initialize(projects)
+	logic.initialize(projects)
 
+	lf, err := newLostFinder(logic.includedFiles, logic.excludeFolders.Items())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil
 	}
 
-	lostFiles := logic.find()
+	lostFiles := lf.find(logic.foundFiles)
 
 	s := api.NewScreener(c.Prn())
 	s.WriteSlice(lostFiles)
