@@ -129,3 +129,15 @@ func Test_Filter(t *testing.T) {
 		})
 	}
 }
+
+func Test_Filter_Nil(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+
+	// Act
+	result := Filter([]string{"a"}, nil)
+
+	// Assert
+	ass.Equal([]string{}, result)
+
+}

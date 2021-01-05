@@ -112,6 +112,9 @@ func MatchAny(ss []string, m Matcher) bool {
 // Filter filters slice using Matcher. Only matched strings will be in result
 // IMPORTANT: source slice MUST NOT be used after calling this method
 func Filter(ss []string, m Matcher) []string {
+	if m == nil {
+		return []string{}
+	}
 	result := ss[:0]
 	for _, file := range ss {
 		if m.Match(file) {
