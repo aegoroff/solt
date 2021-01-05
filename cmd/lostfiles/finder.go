@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-type lostFinder struct {
+type finder struct {
 	m api.Matcher
 }
 
-func newLostFinder(includedFiles, excludedFolders []string) (*lostFinder, error) {
+func newFinder(includedFiles, excludedFolders []string) (*finder, error) {
 	excludes, err := api.NewPartialMatcher(excludedFolders, strings.ToUpper)
 	if err != nil {
 		return nil, err
@@ -19,9 +19,9 @@ func newLostFinder(includedFiles, excludedFolders []string) (*lostFinder, error)
 
 	m := api.NewLostItemMatcher(includes, excludes)
 
-	return &lostFinder{m: m}, nil
+	return &finder{m: m}, nil
 }
 
-func (l *lostFinder) find(files []string) []string {
+func (l *finder) find(files []string) []string {
 	return api.Filter(files, l.m)
 }

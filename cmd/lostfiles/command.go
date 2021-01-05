@@ -51,7 +51,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	logic := newLostFilesLogic(c.searchAll, files.files, ignoredFolders.folders, exister)
 	logic.initialize(projects)
 
-	lf, err := newLostFinder(logic.includedFiles, logic.excludeFolders.Items())
+	lf, err := newFinder(logic.includedFiles, logic.excludeFolders.Items())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil
