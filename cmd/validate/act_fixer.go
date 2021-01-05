@@ -2,11 +2,9 @@ package validate
 
 import (
 	"encoding/xml"
-	"fmt"
 	"github.com/aegoroff/dirstat/scan"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"io"
 	"path/filepath"
 	"solt/cmd/api"
 	"solt/internal/sys"
@@ -17,6 +15,7 @@ type fixer struct {
 	prn   api.Printer
 	fs    afero.Fs
 	filer sys.Filer
+	w     api.Writable
 }
 
 type projectReference struct {
@@ -31,6 +30,7 @@ func newFixer(p api.Printer, w api.Writable, fs afero.Fs) actioner {
 	return &fixer{
 		prn:   p,
 		fs:    fs,
+		w:     w,
 		filer: sys.NewFiler(fs, w.Writer()),
 	}
 }
@@ -59,28 +59,21 @@ func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []in
 	}
 	defer scan.Close(file)
 
-	decoder := xml.NewDecoder(file)
 	pdir := filepath.Dir(project)
 
 	ends := make([]int64, 0)
-	for {
-		t, err := decoder.Token()
-		if t == nil {
-			if err != nil && err != io.EOF {
-				fmt.Println(err)
-			}
-			break
-		}
 
-		off := decoder.InputOffset()
+	decoder := api.NewXMLDecoder(f.w.Writer())
+	decoder.Decode(file, func(d *xml.Decoder, t xml.Token) {
+		off := d.InputOffset()
 
 		switch v := t.(type) {
 		case xml.StartElement:
 			if v.Name.Local == "ProjectReference" {
 				var prj projectReference
 				// decode a whole chunk of following XML into the variable
-				_ = decoder.DecodeElement(&prj, &v)
-				offAfter := decoder.InputOffset()
+				_ = d.DecodeElement(&prj, &v)
+				offAfter := d.InputOffset()
 				referenceFullPath := filepath.Join(pdir, prj.path())
 				if toRemove.Contains(referenceFullPath) {
 					ends = append(ends, off)
@@ -90,7 +83,7 @@ func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []in
 				}
 			}
 		}
-	}
+	})
 
 	return ends
 }
