@@ -19,6 +19,7 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 		{[]string{"xxx", "yyy", "zzz"}, "yyy", true},
 		{[]string{"xxx", "yyy", "zzz"}, "yyyzzz", true},
 		{[]string{"xxx", "yyy", "zzz"}, "cccyyybbb", true},
+		{[]string{"xxx", "yyy", "zzz"}, "CCCYYYBBB", true},
 		{[]string{"xxx", "yyy", "zzz"}, "aaa", false},
 	}
 
