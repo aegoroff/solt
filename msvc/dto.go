@@ -2,7 +2,6 @@ package msvc
 
 import (
 	"encoding/xml"
-	"path/filepath"
 	"solt/internal/sys"
 )
 
@@ -101,8 +100,9 @@ func (p *packages) nugetPackages() []*NugetPackage {
 func (in *includes) paths(basePath string) []string {
 	result := make([]string, len(*in))
 
+	d := newMsbuildStandardPaths(basePath)
 	for i, c := range *in {
-		result[i] = filepath.Join(basePath, c.path())
+		result[i] = d.decorate(c.path())
 	}
 
 	return result
