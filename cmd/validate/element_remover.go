@@ -21,23 +21,26 @@ func newElementRemover(project string, toRemove c9s.StringHashSet) *elementRemov
 }
 
 func (r *elementRemover) decode(d *xml.Decoder, t xml.Token) {
-	off := d.InputOffset()
-
 	switch v := t.(type) {
 	case xml.StartElement:
 		if v.Name.Local == "ProjectReference" {
 			var prj projectReference
 			// decode a whole chunk of following XML into the variable
+			offBefore := d.InputOffset()
 			_ = d.DecodeElement(&prj, &v)
 			offAfter := d.InputOffset()
 
-			referenceFullPath := filepath.Join(r.dir, prj.path())
-			if r.toRemove.Contains(referenceFullPath) {
-				r.ends = append(r.ends, off)
-				if offAfter > off {
-					r.ends = append(r.ends, offAfter)
-				}
-			}
+			r.addEnds(prj, offBefore, offAfter)
+		}
+	}
+}
+
+func (r *elementRemover) addEnds(prj projectReference, offBefore int64, offAfter int64) {
+	fullPath := filepath.Join(r.dir, prj.path())
+	if r.toRemove.Contains(fullPath) {
+		r.ends = append(r.ends, offBefore)
+		if offAfter > offBefore {
+			r.ends = append(r.ends, offAfter)
 		}
 	}
 }
