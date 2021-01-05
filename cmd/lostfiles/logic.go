@@ -33,7 +33,7 @@ func (lf *lostFilesLogic) initialize(projects []*msvc.MsbuildProject) error {
 	for _, prj := range projects {
 		pdir := filepath.Dir(prj.Path)
 
-		// Exclude output paths too
+		// Exclude output paths too something like bin\Debug, bin\Release etc.
 		if prj.Project.OutputPaths != nil {
 			subfoldersToExclude = append(subfoldersToExclude, prj.Project.OutputPaths...)
 		}
