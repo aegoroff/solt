@@ -1,7 +1,6 @@
 package validate
 
 import (
-	"encoding/xml"
 	"github.com/aegoroff/dirstat/scan"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
@@ -59,33 +58,12 @@ func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []in
 	}
 	defer scan.Close(file)
 
-	pdir := filepath.Dir(project)
-
-	ends := make([]int64, 0)
+	er := newElementRemover(project, toRemove)
 
 	decoder := api.NewXMLDecoder(f.w.Writer())
-	decoder.Decode(file, func(d *xml.Decoder, t xml.Token) {
-		off := d.InputOffset()
+	decoder.Decode(file, er.decode)
 
-		switch v := t.(type) {
-		case xml.StartElement:
-			if v.Name.Local == "ProjectReference" {
-				var prj projectReference
-				// decode a whole chunk of following XML into the variable
-				_ = d.DecodeElement(&prj, &v)
-				offAfter := d.InputOffset()
-				referenceFullPath := filepath.Join(pdir, prj.path())
-				if toRemove.Contains(referenceFullPath) {
-					ends = append(ends, off)
-					if offAfter > off {
-						ends = append(ends, offAfter)
-					}
-				}
-			}
-		}
-	})
-
-	return ends
+	return er.ends
 }
 
 func (f *fixer) getNewFileContent(project string, ends []int64) []byte {
