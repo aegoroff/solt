@@ -25,14 +25,18 @@ func (x *XMLDecoder) Decode(rdr io.Reader, decoders ...DecodeFn) {
 	for {
 		t, err := decoder.Token()
 		if t == nil {
-			if err != nil && err != io.EOF {
-				_, _ = fmt.Fprintln(x.w, err)
-			}
+			x.print(err)
 			break
 		}
 
 		for _, fn := range decoders {
 			fn(decoder, t)
 		}
+	}
+}
+
+func (x *XMLDecoder) print(err error) {
+	if err != nil && err != io.EOF {
+		_, _ = fmt.Fprintln(x.w, err)
 	}
 }
