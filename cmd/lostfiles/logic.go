@@ -12,7 +12,6 @@ type lostFilesLogic struct {
 	includedFiles  []string
 	nonExistence   bool
 	exister        *api.Exister
-	lost           api.Matcher
 }
 
 func newLostFilesLogic(nonExistence bool, foldersToIgnore c9s.StringHashSet, exister *api.Exister) *lostFilesLogic {
