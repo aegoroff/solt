@@ -37,15 +37,15 @@ func (h *skpper) Handler(path string) {
 func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
 	pdir := filepath.Dir(prj.Path)
 
-	subfoldersToExclude := []string{"obj"}
+	subfolders := []string{"obj"}
 
 	// Exclude output paths too something like bin\Debug, bin\Release etc.
 	if prj.Project.OutputPaths != nil {
-		subfoldersToExclude = append(subfoldersToExclude, prj.Project.OutputPaths...)
+		subfolders = append(subfolders, prj.Project.OutputPaths...)
 	}
 
 	// Add project base + exclude subfolder into exclude folders list
-	for _, s := range subfoldersToExclude {
+	for _, s := range subfolders {
 		sub := filepath.Join(pdir, sys.ToValidPath(s))
 		h.folders.Add(sub)
 	}
