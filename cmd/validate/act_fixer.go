@@ -17,14 +17,6 @@ type fixer struct {
 	w     api.Writable
 }
 
-type projectReference struct {
-	Path string `xml:"Include,attr"`
-}
-
-func (r *projectReference) path() string {
-	return sys.ToValidPath(r.Path)
-}
-
 func newFixer(p api.Printer, w api.Writable, fs afero.Fs) actioner {
 	return &fixer{
 		prn:   p,
@@ -58,12 +50,12 @@ func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []in
 	}
 	defer scan.Close(file)
 
-	er := newElementRemover(project, toRemove)
+	ed := newElementEndDetector(project, toRemove)
 
 	decoder := api.NewXMLDecoder(f.w.Writer())
-	decoder.Decode(file, er.decode)
+	decoder.Decode(file, ed.decode)
 
-	return er.ends
+	return ed.ends
 }
 
 func (f *fixer) getNewFileContent(project string, ends []int64) []byte {
