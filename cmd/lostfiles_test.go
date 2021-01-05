@@ -292,3 +292,17 @@ func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
 	actual := env.String()
 	ass.Contains(actual, "Find lost files in the folder specified")
 }
+
+func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	env := api.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "lf", "-p", "/")
+
+	// Assert
+	actual := env.String()
+	ass.Equal("", actual)
+}

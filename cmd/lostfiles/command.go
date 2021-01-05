@@ -52,7 +52,8 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	err := logic.initialize(projects)
 
 	if err != nil {
-		return err
+		// return nil so as not to confuse user if no project found and it's normal case
+		return nil
 	}
 
 	lostFiles := logic.find()
