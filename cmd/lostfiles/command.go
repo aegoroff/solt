@@ -41,18 +41,18 @@ func New(c *api.Conf) *cobra.Command {
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	foundFiles := newFileCollector(c.filter)
-	ignoredFolders := newIgnoredFoldersCollector()
+	skip := newSkipper()
 
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), foundFiles, ignoredFolders)
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), foundFiles, skip)
 
 	projects := msvc.SelectProjects(foldersTree)
 
 	exist := api.NewExister(c.Fs(), c.Writer())
 	wrapper := newExister(c.searchAll, exist)
-	enum := newEnumerator(ignoredFolders.folders, wrapper)
+	enum := newEnumerator(skip, wrapper)
 	enum.enumerate(projects)
 
-	lf, err := newFinder(enum.includedFiles(), enum.excludedFolders())
+	lf, err := newFinder(enum.includedFiles(), skip.skipped())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil

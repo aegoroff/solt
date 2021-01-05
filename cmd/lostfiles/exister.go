@@ -2,10 +2,6 @@ package lostfiles
 
 import "solt/cmd/api"
 
-type exister interface {
-	exist(project string, includes []string)
-}
-
 type nopExister struct{}
 
 func (*nopExister) exist(string, []string) {}
