@@ -8,7 +8,6 @@ import (
 )
 
 type lostFilesLogic struct {
-	foundFiles     []string
 	excludeFolders c9s.StringHashSet
 	includedFiles  []string
 	nonExistence   bool
@@ -16,9 +15,8 @@ type lostFilesLogic struct {
 	lost           api.Matcher
 }
 
-func newLostFilesLogic(nonExistence bool, foundFiles []string, foldersToIgnore c9s.StringHashSet, exister *api.Exister) *lostFilesLogic {
+func newLostFilesLogic(nonExistence bool, foldersToIgnore c9s.StringHashSet, exister *api.Exister) *lostFilesLogic {
 	return &lostFilesLogic{
-		foundFiles:     foundFiles,
 		excludeFolders: foldersToIgnore,
 		nonExistence:   nonExistence,
 		exister:        exister,

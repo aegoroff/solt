@@ -40,15 +40,15 @@ func New(c *api.Conf) *cobra.Command {
 }
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	files := newFileCollector(c.filter)
+	foundFiles := newFileCollector(c.filter)
 	ignoredFolders := newIgnoredFoldersCollector()
 
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), files, ignoredFolders)
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), foundFiles, ignoredFolders)
 
 	projects := msvc.SelectProjects(foldersTree)
 
 	exister := api.NewExister(c.Fs(), c.Writer())
-	logic := newLostFilesLogic(c.searchAll, files.files, ignoredFolders.folders, exister)
+	logic := newLostFilesLogic(c.searchAll, ignoredFolders.folders, exister)
 	logic.initialize(projects)
 
 	lf, err := newFinder(logic.includedFiles, logic.excludeFolders.Items())
@@ -57,7 +57,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 		return nil
 	}
 
-	lostFiles := lf.find(logic.foundFiles)
+	lostFiles := lf.find(foundFiles.files)
 
 	s := api.NewScreener(c.Prn())
 	s.WriteSlice(lostFiles)
