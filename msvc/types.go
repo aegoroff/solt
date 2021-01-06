@@ -62,10 +62,6 @@ type ProjectHandler func(*MsbuildProject, *Folder)
 // StringDecorator defines string decorating function
 type StringDecorator func(s string) string
 
-// PassThrough just return original string without modification
-// it can be used as non destructive decorator
-func PassThrough(s string) string { return s }
-
 type filesystem struct{ fs afero.Fs }
 
 func newFs(fs afero.Fs) scan.Filesystem {
