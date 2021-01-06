@@ -37,7 +37,7 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 
 		if err == nil {
 			ends := f.getElementsEnds(buf, project, rrs)
-			newContent := f.getNewFileContent(buf, ends)
+			newContent := getNewFileContent(buf, ends)
 			f.filer.Write(project, newContent)
 		}
 	}
@@ -56,7 +56,7 @@ func (f *fixer) getElementsEnds(buf *bytes.Buffer, project string, toRemove c9s.
 	return ed.ends
 }
 
-func (*fixer) getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
+func getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
 	result := make([]byte, 0, buf.Len())
 	start := 0
 	for _, end := range ends {
