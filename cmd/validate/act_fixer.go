@@ -1,10 +1,9 @@
 package validate
 
 import (
-	"github.com/aegoroff/dirstat/scan"
+	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"path/filepath"
 	"solt/cmd/api"
 	"solt/internal/sys"
 	"unicode/utf8"
@@ -34,37 +33,30 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 	invalidRefsCount := 0
 	for project, rrs := range refs {
 		invalidRefsCount += rrs.Count()
-		ends := f.getElementsEnds(project, rrs)
-		newContent := f.getNewFileContent(project, ends)
-		f.filer.Write(project, newContent)
+		buf, err := f.filer.Read(project)
+
+		if err == nil {
+			ends := f.getElementsEnds(buf, project, rrs)
+			newContent := f.getNewFileContent(buf, ends)
+			f.filer.Write(project, newContent)
+		}
 	}
 
 	const mf = "Fixed <red>%d</> redundant project references in <red>%d</> projects within solution <red>%s</>\n"
 	f.prn.Cprint(mf, invalidRefsCount, len(refs), path)
 }
 
-func (f *fixer) getElementsEnds(project string, toRemove c9s.StringHashSet) []int64 {
-	file, err := f.fs.Open(filepath.Clean(project))
-	if err != nil {
-		return nil
-	}
-	defer scan.Close(file)
-
+func (f *fixer) getElementsEnds(buf *bytes.Buffer, project string, toRemove c9s.StringHashSet) []int64 {
 	ed := newElementEndDetector(project, toRemove)
 
 	decoder := api.NewXMLDecoder(f.w.Writer())
-	decoder.Decode(file, ed.decode)
+	r := bytes.NewReader(buf.Bytes())
+	decoder.Decode(r, ed.decode)
 
 	return ed.ends
 }
 
-func (f *fixer) getNewFileContent(project string, ends []int64) []byte {
-	buf, _ := f.filer.Read(project)
-
-	if buf == nil {
-		return nil
-	}
-
+func (f *fixer) getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
 	result := make([]byte, 0, buf.Len())
 	start := 0
 	for _, end := range ends {
