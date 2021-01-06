@@ -52,20 +52,28 @@ func Parse(rdr io.Reader) (*Solution, error) {
 		return nil, err
 	}
 
-	sb := strings.Builder{}
+	str, err := scan(bs)
 
-	for bs.Scan() {
-		_, err = sb.WriteString(bs.Text())
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
-
-	str := sb.String()
 
 	sol := parse(str, false)
 
 	return sol, nil
+}
+
+func scan(bs *bufio.Scanner) (string, error) {
+	sb := strings.Builder{}
+
+	for bs.Scan() {
+		_, err := sb.WriteString(bs.Text())
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return sb.String(), nil
 }
 
 func newScanner(rdr io.Reader) (*bufio.Scanner, error) {
