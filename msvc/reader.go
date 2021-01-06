@@ -7,74 +7,89 @@ import (
 	"sync"
 )
 
-type reader struct {
-	modules    []readerModule
-	aggregator chan *Folder
-}
-
 // ReadSolutionDir reads filesystem directory and all its childs to get information
 // about all solutions and projects in this tree.
 // It returns tree
 func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rbtree.RbTree {
-	result := rbtree.NewRbTree()
-
-	aggregateChannel := make(chan *Folder, 4)
-	fileChannel := make(chan string, 16)
-
-	var wg sync.WaitGroup
-
-	// Aggregating goroutine
-	go func() {
-		defer wg.Done()
-		for folder := range aggregateChannel {
-			current, ok := result.Search(folder)
-			if !ok {
-				// Create new node
-				result.Insert(folder)
-			} else {
-				// Update current, that has already been created before
-				folder.copyContent(current.(*Folder))
-			}
-		}
-	}()
-
 	modules := newReaderModules(fs)
 
-	rdr := reader{aggregator: aggregateChannel, modules: modules}
+	rdr := newReader(modules)
 
-	fhandlers := []ReaderHandler{&rdr}
-	fhandlers = append(fhandlers, fileHandlers...)
+	fh := newFileEventHanlder(rdr)
+	fh.addHandlers(fileHandlers...)
 
-	// Reading files goroutine
-	go func(handlers []ReaderHandler) {
-		defer close(aggregateChannel)
-
-		for path := range fileChannel {
-			for _, h := range handlers {
-				h.Handler(path)
-			}
-		}
-	}(fhandlers)
-
-	fh := &fileEventHanlder{ch: fileChannel}
-	// Start reading path
-	wg.Add(1)
+	go rdr.aggregate()
 
 	scan.Scan(path, newFs(fs), fh)
 
-	close(fileChannel)
-
-	wg.Wait()
-
-	return result
+	return rdr.getResult()
 }
 
 type fileEventHanlder struct {
-	ch chan<- string
+	handlers []ReaderHandler
+}
+
+func newFileEventHanlder(rdr ReaderHandler) *fileEventHanlder {
+	return &fileEventHanlder{
+		handlers: []ReaderHandler{rdr},
+	}
+}
+
+func (f *fileEventHanlder) addHandlers(handlers ...ReaderHandler) {
+	f.handlers = append(f.handlers, handlers...)
 }
 
 func (f *fileEventHanlder) Handle(evt *scan.ScanEvent) {
 	if evt.File != nil {
-		f.ch <- evt.File.Path
+		for _, h := range f.handlers {
+			h.Handler(evt.File.Path)
+		}
+	}
+}
+
+type reader struct {
+	modules    []readerModule
+	aggregator chan *Folder
+	result     rbtree.RbTree
+	wg         sync.WaitGroup
+}
+
+func (r *reader) getResult() rbtree.RbTree {
+	close(r.aggregator)
+	r.wg.Wait()
+	return r.result
+}
+
+func newReader(modules []readerModule) *reader {
+	return &reader{
+		modules:    modules,
+		result:     rbtree.NewRbTree(),
+		aggregator: make(chan *Folder, 4),
+	}
+}
+
+func (r *reader) Handler(path string) {
+	for _, m := range r.modules {
+		if !m.filter(path) {
+			continue
+		}
+		if folder, ok := m.read(path); ok {
+			r.aggregator <- folder
+		}
+	}
+}
+
+func (r *reader) aggregate() {
+	r.wg.Add(1)
+	defer r.wg.Done()
+	for folder := range r.aggregator {
+		current, ok := r.result.Search(folder)
+		if !ok {
+			// Create new node
+			r.result.Insert(folder)
+		} else {
+			// Update current, that has already been created before
+			folder.copyContent(current.(*Folder))
+		}
 	}
 }

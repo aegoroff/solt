@@ -29,17 +29,6 @@ type readerSolution struct {
 	fs afero.Fs
 }
 
-func (r *reader) Handler(path string) {
-	for _, m := range r.modules {
-		if !m.filter(path) {
-			continue
-		}
-		if folder, ok := m.read(path); ok {
-			r.aggregator <- folder
-		}
-	}
-}
-
 // packages.config
 
 func (*readerPackagesConfig) filter(path string) bool {
