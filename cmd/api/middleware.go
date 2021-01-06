@@ -109,7 +109,7 @@ func (e *executorCPUProfile) Execute(cc *cobra.Command) error {
 		if err != nil {
 			return err
 		}
-		err = pprof.StartCPUProfile(f)
+		_ = pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
 

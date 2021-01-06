@@ -39,7 +39,7 @@ func (prj *MsbuildProject) Files() []string {
 	start += incl.append(msp.Nones, start)
 	start += incl.append(msp.CLCompiles, start)
 	start += incl.append(msp.CLInclude, start)
-	start += incl.append(msp.Compiles, start)
+	incl.append(msp.Compiles, start)
 
 	result := make([]string, l)
 	copy(result, incl.paths(folderPath))
