@@ -56,7 +56,7 @@ func (f *fixer) getElementsEnds(buf *bytes.Buffer, project string, toRemove c9s.
 	return ed.ends
 }
 
-func (f *fixer) getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
+func (*fixer) getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
 	result := make([]byte, 0, buf.Len())
 	start := 0
 	for _, end := range ends {
