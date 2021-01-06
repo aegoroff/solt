@@ -47,20 +47,11 @@ func (lx *lexer) Error(e string) {
 
 // Parse parses visual studio solution file specified by io.Reader
 func Parse(rdr io.Reader) (*Solution, error) {
-	br := bufio.NewReader(rdr)
-	r, _, err := br.ReadRune()
+	bs, err := newScanner(rdr)
 	if err != nil {
 		return nil, err
 	}
-	if r != '\uFEFF' {
-		err = br.UnreadRune() // Not a BOM -- put the rune back
-		if err != nil {
-			return nil, err
-		}
-	}
 
-	bs := bufio.NewScanner(br)
-	bs.Split(bufio.ScanRunes)
 	sb := strings.Builder{}
 
 	for bs.Scan() {
@@ -75,6 +66,25 @@ func Parse(rdr io.Reader) (*Solution, error) {
 	sol := parse(str, false)
 
 	return sol, nil
+}
+
+func newScanner(rdr io.Reader) (*bufio.Scanner, error) {
+	br := bufio.NewReader(rdr)
+	r, _, err := br.ReadRune()
+	if err != nil {
+		return nil, err
+	}
+	if r != '\uFEFF' {
+		err = br.UnreadRune() // Not a BOM -- put the rune back
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	bs := bufio.NewScanner(br)
+	bs.Split(bufio.ScanRunes)
+
+	return bs, nil
 }
 
 func parse(str string, debug bool) *Solution {
