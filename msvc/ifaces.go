@@ -7,8 +7,8 @@ type ReaderHandler interface {
 }
 
 type readerModule interface {
-	filter(path string) bool
-	read(path string) (*Folder, bool)
+	allow(path string) bool
+	read(path string, ch chan<- *Folder)
 }
 
 type walker interface {

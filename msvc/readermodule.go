@@ -31,41 +31,41 @@ type readerSolution struct {
 
 // packages.config
 
-func (*readerPackagesConfig) filter(path string) bool {
+func (*readerPackagesConfig) allow(path string) bool {
 	_, file := filepath.Split(path)
 	return strings.EqualFold(file, packagesConfigFile)
 }
 
-func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
+func (r *readerPackagesConfig) read(path string, ch chan<- *Folder) {
 	pack := packages{}
 	d := sys.NewXMLDecoder(nil)
 
 	err := d.UnmarshalFrom(path, r.fs, &pack)
 	if err != nil {
-		return nil, false
+		return
 	}
 
 	f := newFolder(path)
 
 	f.Content.Packages = &pack
 
-	return f, true
+	ch <- f
 }
 
 // MSBuild projects
 
-func (*readerMsbuild) filter(path string) bool {
+func (*readerMsbuild) allow(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, csharpProjectExt) || strings.EqualFold(ext, cppProjectExt)
 }
 
-func (r *readerMsbuild) read(path string) (*Folder, bool) {
+func (r *readerMsbuild) read(path string, ch chan<- *Folder) {
 	project := msbuildProject{}
 	d := sys.NewXMLDecoder(nil)
 
 	err := d.UnmarshalFrom(path, r.fs, &project)
 	if err != nil {
-		return nil, false
+		return
 	}
 
 	f := newFolder(path)
@@ -74,21 +74,21 @@ func (r *readerMsbuild) read(path string) (*Folder, bool) {
 
 	f.Content.Projects = append(f.Content.Projects, &p)
 
-	return f, true
+	ch <- f
 }
 
 // VS Solutions
 
-func (*readerSolution) filter(path string) bool {
+func (*readerSolution) allow(path string) bool {
 	ext := filepath.Ext(path)
 	return strings.EqualFold(ext, SolutionFileExt)
 }
 
-func (r *readerSolution) read(path string) (*Folder, bool) {
+func (r *readerSolution) read(path string, ch chan<- *Folder) {
 	file, err := r.fs.Open(filepath.Clean(path))
 	if err != nil {
 		log.Println(err)
-		return nil, false
+		return
 	}
 	defer scan.Close(file)
 
@@ -96,7 +96,7 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 
 	if err != nil {
 		log.Println(err)
-		return nil, false
+		return
 	}
 
 	f := newFolder(path)
@@ -105,5 +105,5 @@ func (r *readerSolution) read(path string) (*Folder, bool) {
 
 	f.Content.Solutions = append(f.Content.Solutions, &s)
 
-	return f, true
+	ch <- f
 }

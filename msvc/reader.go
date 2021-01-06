@@ -64,17 +64,14 @@ func newReader(modules []readerModule) *reader {
 	return &reader{
 		modules:    modules,
 		result:     rbtree.NewRbTree(),
-		aggregator: make(chan *Folder, 4),
+		aggregator: make(chan *Folder, 64),
 	}
 }
 
 func (r *reader) Handler(path string) {
 	for _, m := range r.modules {
-		if !m.filter(path) {
-			continue
-		}
-		if folder, ok := m.read(path); ok {
-			r.aggregator <- folder
+		if m.allow(path) {
+			m.read(path, r.aggregator)
 		}
 	}
 }

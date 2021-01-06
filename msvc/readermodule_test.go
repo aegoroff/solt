@@ -10,15 +10,17 @@ func Test_readerSolution_readUnexist(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
+	ch := make(chan *Folder, 4)
 
 	rm := readerSolution{fs: memfs}
 
 	// Act
-	f, r := rm.read("ddd")
+	rm.read("ddd", ch)
+	close(ch)
 
 	// Assert
+	f := <-ch
 	ass.Nil(f)
-	ass.False(r)
 }
 
 func Test_readerSolution_readBad(t *testing.T) {
@@ -27,15 +29,16 @@ func Test_readerSolution_readBad(t *testing.T) {
 	memfs := afero.NewMemMapFs()
 	dir := "a/"
 	_ = afero.WriteFile(memfs, dir+"a.sln", []byte("xxx"), 0644)
-
 	rm := readerSolution{fs: memfs}
+	ch := make(chan *Folder, 4)
 
 	// Act
-	f, r := rm.read(dir)
+	rm.read(dir, ch)
+	close(ch)
 
 	// Assert
+	f := <-ch
 	ass.Nil(f)
-	ass.False(r)
 }
 
 func Test_readerMsbuild_readBad(t *testing.T) {
@@ -44,15 +47,16 @@ func Test_readerMsbuild_readBad(t *testing.T) {
 	memfs := afero.NewMemMapFs()
 	path := "a/a.csproj"
 	_ = afero.WriteFile(memfs, path, []byte("xxx"), 0644)
-
 	rm := readerMsbuild{fs: memfs}
+	ch := make(chan *Folder, 4)
 
 	// Act
-	f, r := rm.read(path)
+	rm.read(path, ch)
+	close(ch)
 
 	// Assert
+	f := <-ch
 	ass.Nil(f)
-	ass.False(r)
 }
 
 func Test_readerPackagesConfig_readBad(t *testing.T) {
@@ -61,13 +65,14 @@ func Test_readerPackagesConfig_readBad(t *testing.T) {
 	memfs := afero.NewMemMapFs()
 	path := "a/packages.config"
 	_ = afero.WriteFile(memfs, path, []byte("xxx"), 0644)
-
 	rm := readerPackagesConfig{fs: memfs}
+	ch := make(chan *Folder, 4)
 
 	// Act
-	f, r := rm.read(path)
+	rm.read(path, ch)
+	close(ch)
 
 	// Assert
+	f := <-ch
 	ass.Nil(f)
-	ass.False(r)
 }
