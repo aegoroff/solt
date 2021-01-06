@@ -33,11 +33,11 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 	invalidRefsCount := 0
 	for project, rrs := range refs {
 		invalidRefsCount += rrs.Count()
-		buf, err := f.filer.Read(project)
+		data, err := f.filer.Read(project)
 
 		if err == nil {
-			ends := f.getElementsEnds(buf, project, rrs)
-			newContent := getNewFileContent(buf, ends)
+			ends := f.getElementsEnds(data, project, rrs)
+			newContent := getNewFileContent(data, ends)
 			f.filer.Write(project, newContent)
 		}
 	}
@@ -46,21 +46,20 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 	f.prn.Cprint(mf, invalidRefsCount, len(refs), path)
 }
 
-func (f *fixer) getElementsEnds(buf *bytes.Buffer, project string, toRemove c9s.StringHashSet) []int64 {
+func (f *fixer) getElementsEnds(data []byte, project string, toRemove c9s.StringHashSet) []int64 {
 	ed := newElementEndDetector(project, toRemove)
 
 	decoder := api.NewXMLDecoder(f.w.Writer())
-	// IMPORTANT: you MUST use Reader wrapper over buf.Bytes() because buf can be used several times
-	// and it's not seekable
-	r := bytes.NewReader(buf.Bytes())
+	r := bytes.NewReader(data)
 	decoder.Decode(r, ed.decode)
 
 	return ed.ends
 }
 
-func getNewFileContent(buf *bytes.Buffer, ends []int64) []byte {
-	result := make([]byte, 0, buf.Len())
+func getNewFileContent(data []byte, ends []int64) []byte {
+	result := make([]byte, 0, len(data))
 	start := 0
+	buf := bytes.NewBuffer(data)
 	for _, end := range ends {
 		n := int(end) - start
 		start = int(end)

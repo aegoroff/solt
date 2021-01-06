@@ -48,7 +48,7 @@ func TestFiler_Read(t *testing.T) {
 	// Assert
 	ass.NoError(err)
 	ass.NotNil(buf)
-	ass.Equal("a", string(buf.Bytes()))
+	ass.Equal("a", string(buf))
 }
 
 func TestFiler_Read_NotExist(t *testing.T) {

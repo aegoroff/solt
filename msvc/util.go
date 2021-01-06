@@ -1,6 +1,7 @@
 package msvc
 
 import (
+	"bytes"
 	"encoding/xml"
 	"github.com/spf13/afero"
 	"io"
@@ -15,7 +16,8 @@ func unmarshalXMLFrom(path string, fs afero.Fs, result interface{}) error {
 		return err
 	}
 
-	return unmarshalXML(b, result)
+	r := bytes.NewReader(b)
+	return unmarshalXML(r, result)
 }
 
 func unmarshalXML(r io.Reader, result interface{}) error {
