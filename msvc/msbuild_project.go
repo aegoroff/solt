@@ -4,6 +4,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"path/filepath"
+	"strings"
 )
 
 // MsbuildProject defines MSBuild project structure
@@ -14,16 +15,12 @@ type MsbuildProject struct {
 
 // LessThan implements rbtree.Comparable interface
 func (prj *MsbuildProject) LessThan(y rbtree.Comparable) bool {
-	return prj.compare(y) < 0
+	return sortfold.CompareFold(prj.Path, y.(*MsbuildProject).Path) < 0
 }
 
 // EqualTo implements rbtree.Comparable interface
 func (prj *MsbuildProject) EqualTo(y rbtree.Comparable) bool {
-	return prj.compare(y) == 0
-}
-
-func (prj *MsbuildProject) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(prj.Path, y.(*MsbuildProject).Path)
+	return strings.EqualFold(prj.Path, y.(*MsbuildProject).Path)
 }
 
 // Files gets all files included into MSBuild project

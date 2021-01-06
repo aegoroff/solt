@@ -4,6 +4,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/msvc"
+	"strings"
 )
 
 type node struct {
@@ -30,13 +31,9 @@ func (n *node) String() string {
 }
 
 func (n *node) LessThan(y rbtree.Comparable) bool {
-	return n.compare(y) < 0
+	return sortfold.CompareFold(n.String(), y.(*node).String()) < 0
 }
 
 func (n *node) EqualTo(y rbtree.Comparable) bool {
-	return n.compare(y) == 0
-}
-
-func (n *node) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(n.String(), y.(*node).String())
+	return strings.EqualFold(n.String(), y.(*node).String())
 }

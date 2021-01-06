@@ -5,6 +5,7 @@ import (
 	"github.com/akutz/sortfold"
 	"path/filepath"
 	"solt/internal/sys"
+	"strings"
 )
 
 // Folder defines filesystem folder descriptor (path and content structure)
@@ -51,16 +52,12 @@ func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 
 // LessThan implements rbtree.Comparable interface
 func (x *Folder) LessThan(y rbtree.Comparable) bool {
-	return x.compare(y) < 0
+	return sortfold.CompareFold(x.Path, y.(*Folder).Path) < 0
 }
 
 // EqualTo implements rbtree.Comparable interface
 func (x *Folder) EqualTo(y rbtree.Comparable) bool {
-	return x.compare(y) == 0
-}
-
-func (x *Folder) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(x.Path, y.(*Folder).Path)
+	return strings.EqualFold(x.Path, y.(*Folder).Path)
 }
 
 func newFolder(path string) *Folder {

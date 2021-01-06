@@ -5,6 +5,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
+	"strings"
 )
 
 // matchP defines partial matching
@@ -26,15 +27,11 @@ type matchL struct {
 type caseless string
 
 func (c *caseless) LessThan(y rbtree.Comparable) bool {
-	return c.compare(y) < 0
+	return sortfold.CompareFold(string(*c), string(*y.(*caseless))) < 0
 }
 
 func (c *caseless) EqualTo(y rbtree.Comparable) bool {
-	return c.compare(y) == 0
-}
-
-func (c *caseless) compare(y rbtree.Comparable) int {
-	return sortfold.CompareFold(string(*c), string(*y.(*caseless)))
+	return strings.EqualFold(string(*c), string(*y.(*caseless)))
 }
 
 // NewLostItemMatcher creates new Matcher instance that detects lost item
