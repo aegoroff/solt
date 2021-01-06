@@ -49,7 +49,7 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 func (f *fixer) getElementsEnds(data []byte, project string, toRemove c9s.StringHashSet) []int64 {
 	ed := newElementEndDetector(project, toRemove)
 
-	decoder := api.NewXMLDecoder(f.w.Writer())
+	decoder := sys.NewXMLDecoder(f.w.Writer())
 	r := bytes.NewReader(data)
 	decoder.Decode(r, ed.decode)
 

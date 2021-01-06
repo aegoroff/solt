@@ -1,8 +1,10 @@
-package api
+package sys
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
+	"github.com/spf13/afero"
 	"io"
 )
 
@@ -35,8 +37,25 @@ func (x *XMLDecoder) Decode(rdr io.Reader, decoders ...DecodeFn) {
 	}
 }
 
+// UnmarshalFrom unmarshal whole xml file using path specified
+func (x *XMLDecoder) UnmarshalFrom(path string, fs afero.Fs, result interface{}) error {
+	filer := NewFiler(fs, x.w)
+	b, err := filer.Read(path)
+	if err != nil {
+		return err
+	}
+
+	r := bytes.NewReader(b)
+	return x.Unmarshal(r, result)
+}
+
+// UnmarshalFrom unmarshal whole xml file using reader specified
+func (*XMLDecoder) Unmarshal(r io.Reader, result interface{}) error {
+	return xml.NewDecoder(r).Decode(result)
+}
+
 func (x *XMLDecoder) print(err error) {
-	if err != nil && err != io.EOF {
+	if err != nil && err != io.EOF && x.w != nil {
 		_, _ = fmt.Fprintln(x.w, err)
 	}
 }

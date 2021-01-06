@@ -1,8 +1,10 @@
 package msvc
 
 import (
+	"bytes"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
+	"solt/internal/sys"
 	"strings"
 	"testing"
 )
@@ -17,9 +19,12 @@ func TestUnmarshalXML_PackagesConfig(t *testing.T) {
   <package id="YaccLexTools" version="0.2.2" targetFramework="net45" />
 </packages>
 `
+	out := bytes.NewBuffer(nil)
+	d := sys.NewXMLDecoder(out)
+
 	r := strings.NewReader(packangesconfig)
 	// Act
-	_ = unmarshalXML(r, &packages)
+	_ = d.Unmarshal(r, &packages)
 
 	// Assert
 	ass.Equal(1, len(packages.Packages))
@@ -33,9 +38,11 @@ func Test_unmarshalXMLFrom_UnexistFile(t *testing.T) {
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
 	packages := packages{}
+	out := bytes.NewBuffer(nil)
+	d := sys.NewXMLDecoder(out)
 
 	// Act
-	err := unmarshalXMLFrom("unexit", memfs, &packages)
+	err := d.UnmarshalFrom("unexit", memfs, &packages)
 
 	// Assert
 	ass.Error(err)
@@ -103,9 +110,11 @@ func TestUnmarshalXML_MsbuildProject(t *testing.T) {
 </Project>
 `
 	r := strings.NewReader(project)
+	out := bytes.NewBuffer(nil)
+	d := sys.NewXMLDecoder(out)
 
 	// Act
-	_ = unmarshalXML(r, &prj)
+	_ = d.Unmarshal(r, &prj)
 
 	// Assert
 	ass.Equal(2, len(prj.Compiles))

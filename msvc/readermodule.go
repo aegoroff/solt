@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"log"
 	"path/filepath"
+	"solt/internal/sys"
 	"solt/solution"
 	"strings"
 )
@@ -48,8 +49,9 @@ func (*readerPackagesConfig) filter(path string) bool {
 
 func (r *readerPackagesConfig) read(path string) (*Folder, bool) {
 	pack := packages{}
+	d := sys.NewXMLDecoder(nil)
 
-	err := unmarshalXMLFrom(path, r.fs, &pack)
+	err := d.UnmarshalFrom(path, r.fs, &pack)
 	if err != nil {
 		return nil, false
 	}
@@ -70,8 +72,9 @@ func (*readerMsbuild) filter(path string) bool {
 
 func (r *readerMsbuild) read(path string) (*Folder, bool) {
 	project := msbuildProject{}
+	d := sys.NewXMLDecoder(nil)
 
-	err := unmarshalXMLFrom(path, r.fs, &project)
+	err := d.UnmarshalFrom(path, r.fs, &project)
 	if err != nil {
 		return nil, false
 	}
