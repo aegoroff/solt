@@ -50,6 +50,8 @@ func (f *fixer) getElementsEnds(buf *bytes.Buffer, project string, toRemove c9s.
 	ed := newElementEndDetector(project, toRemove)
 
 	decoder := api.NewXMLDecoder(f.w.Writer())
+	// IMPORTANT: you MUST use Reader wrapper over buf.Bytes() because buf can be used several times
+	// and it's not seekable
 	r := bytes.NewReader(buf.Bytes())
 	decoder.Decode(r, ed.decode)
 
