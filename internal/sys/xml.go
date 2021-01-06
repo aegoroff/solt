@@ -49,7 +49,7 @@ func (x *XMLDecoder) UnmarshalFrom(path string, fs afero.Fs, result interface{})
 	return x.Unmarshal(r, result)
 }
 
-// UnmarshalFrom unmarshal whole xml file using reader specified
+// Unmarshal unmarshal whole xml file using reader specified
 func (*XMLDecoder) Unmarshal(r io.Reader, result interface{}) error {
 	return xml.NewDecoder(r).Decode(result)
 }
