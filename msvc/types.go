@@ -27,10 +27,12 @@ type VisualStudioSolution struct {
 	path string
 }
 
+// Path gets full path to solution
 func (s *VisualStudioSolution) Path() string {
 	return s.path
 }
 
+// Items gets all paths of projects' included into solution
 func (s *VisualStudioSolution) Items() []string {
 	return s.AllProjectPaths(func(s string) string { return s })
 }

@@ -18,6 +18,7 @@ func NewMsbuildProject(path string) *MsbuildProject {
 	return &MsbuildProject{path: path}
 }
 
+// Path gets full path to project
 func (prj *MsbuildProject) Path() string {
 	return prj.path
 }
