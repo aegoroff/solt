@@ -40,14 +40,15 @@ func New(c *fw.Conf) *cobra.Command {
 }
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	exist := newExister(c.searchAll, c.Fs(), c.Writer())
-	incl := newIncluder(exist)
-
 	collect := newCollector(c.filter)
 	skip := newSkipper()
 
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), collect, skip)
 	projects := msvc.SelectProjects(foldersTree)
+
+	exist := newExister(c.searchAll, c.Fs(), c.Writer())
+	incl := newIncluder(exist)
+
 	enumerate(projects, skip.fromProject, incl.fromProject)
 
 	lf, err := newFinder(incl.files(), skip.folders())
