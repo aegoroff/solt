@@ -39,7 +39,7 @@ func (f *fileEventHanlder) addHandlers(handlers ...ReaderHandler) {
 	f.handlers = append(f.handlers, handlers...)
 }
 
-func (f *fileEventHanlder) Handle(evt *scan.ScanEvent) {
+func (f *fileEventHanlder) Handle(evt *scan.Event) {
 	if evt.File != nil {
 		for _, h := range f.handlers {
 			h.Handler(evt.File.Path)
