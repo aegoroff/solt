@@ -51,12 +51,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	enumerate(projects, skip.fromProject, incl.fromProject)
 
-	lf, err := newFinder(incl.files(), skip.folders())
-	if err != nil {
-		// return nil so as not to confuse user if no project found and it's normal case
-		return nil
-	}
-
+	lf := newFinder(incl.files(), skip.folders())
 	lost := lf.find(collect.files)
 
 	c.print(lost)

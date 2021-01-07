@@ -90,6 +90,25 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	ass.Equal(sys.ToValidPath("  a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
 }
 
+func Test_FindLostFilesCmdNoProjects_AllFilesLost(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	env := fw.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "lf", "-p", dir)
+
+	// Assert
+	actual := env.String()
+	ass.Equal(sys.ToValidPath("  a\\a\\Program.cs\n  a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
+}
+
 func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
