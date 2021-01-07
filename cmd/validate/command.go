@@ -2,17 +2,17 @@ package validate
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 )
 
-type validateCommand struct{ *api.BaseCommand }
-type fixCommand struct{ *api.BaseCommand }
+type validateCommand struct{ *fw.BaseCommand }
+type fixCommand struct{ *fw.BaseCommand }
 
 // New creates new command that does validates SDK projects
-func New(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
-		exe := &validateCommand{api.NewBaseCmd(c)}
-		return api.NewExecutorShowHelp(exe, c)
+func New(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
+		exe := &validateCommand{fw.NewBaseCmd(c)}
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("va", "validate", "Validates SDK projects within solution(s)")
@@ -22,10 +22,10 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func newFix(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
-		exe := &fixCommand{api.NewBaseCmd(c)}
-		return api.NewExecutorShowHelp(exe, c)
+func newFix(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
+		exe := &fixCommand{fw.NewBaseCmd(c)}
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("fix", "fixprojects", "Fixes redundant SDK projects references")

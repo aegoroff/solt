@@ -3,14 +3,14 @@ package validate
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 )
 
 type printer struct {
-	prn api.Printer
+	prn fw.Printer
 }
 
-func newPrinter(p api.Printer) actioner {
+func newPrinter(p fw.Printer) actioner {
 	return &printer{
 		prn: p,
 	}
@@ -20,9 +20,9 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
-	sm := api.NewMarginer(1)
-	pm := api.NewMarginer(3)
-	rm := api.NewMarginer(5)
+	sm := fw.NewMarginer(1)
+	pm := fw.NewMarginer(3)
+	rm := fw.NewMarginer(5)
 
 	v.prn.Println()
 	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), path)

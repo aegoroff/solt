@@ -2,20 +2,20 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 )
 
 // Version defines program version
 var Version = "0.12.9-dev"
 
 type versionCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 }
 
-func newVersion(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
+func newVersion(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		return &versionCommand{
-			BaseCommand: api.NewBaseCmd(c),
+			BaseCommand: fw.NewBaseCmd(c),
 		}
 	})
 

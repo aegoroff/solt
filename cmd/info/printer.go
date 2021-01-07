@@ -3,20 +3,20 @@ package info
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 )
 
 type printer struct {
 	margin int
-	w      api.Writable
+	w      fw.Writable
 }
 
-func newPrinter(margin int, w api.Writable) *printer {
+func newPrinter(margin int, w fw.Writable) *printer {
 	return &printer{margin: margin, w: w}
 }
 
 func (p *printer) print(set c9s.StringHashSet, name string) {
-	tbl := api.NewTabler(p.w, p.margin)
+	tbl := fw.NewTabler(p.w, p.margin)
 	tbl.AddHead(name)
 
 	items := set.SortedItems(sortfold.Strings)

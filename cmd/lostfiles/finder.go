@@ -1,27 +1,27 @@
 package lostfiles
 
 import (
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"strings"
 )
 
 type finder struct {
-	m api.Matcher
+	m fw.Matcher
 }
 
 func newFinder(includedFiles, excludedFolders []string) (*finder, error) {
-	excludes, err := api.NewPartialMatcher(excludedFolders, strings.ToUpper)
+	excludes, err := fw.NewPartialMatcher(excludedFolders, strings.ToUpper)
 	if err != nil {
 		return nil, err
 	}
 
-	includes := api.NewExactMatch(includedFiles)
+	includes := fw.NewExactMatch(includedFiles)
 
-	m := api.NewLostItemMatcher(includes, excludes)
+	m := fw.NewLostItemMatcher(includes, excludes)
 
 	return &finder{m: m}, nil
 }
 
 func (l *finder) find(files []string) []string {
-	return api.Filter(files, l.m)
+	return fw.Filter(files, l.m)
 }

@@ -3,7 +3,7 @@ package info
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/msvc"
 	"solt/solution"
 	"strconv"
@@ -11,18 +11,18 @@ import (
 )
 
 type infoCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 	margin int
 }
 
 // New creates new command that shows information about solutions
-func New(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
+func New(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		exe := &infoCommand{
-			BaseCommand: api.NewBaseCmd(c),
+			BaseCommand: fw.NewBaseCmd(c),
 			margin:      2,
 		}
-		return api.NewExecutorShowHelp(exe, c)
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("in", "info", "Get information about found solutions")
@@ -40,7 +40,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 
 		c.Prn().Cprint(" <gray>%s</>\n", sol.Path)
 
-		tbl := api.NewTabler(c, c.margin)
+		tbl := fw.NewTabler(c, c.margin)
 
 		tbl.AddLine("Header", sln.Header)
 		tbl.AddLine("Product", sln.Comment)
@@ -65,7 +65,7 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {
 		byType[p.Type]++
 	}
 
-	tbl := api.NewTabler(c, c.margin)
+	tbl := fw.NewTabler(c, c.margin)
 	tbl.AddHead("Project type", "Count")
 
 	for k, v := range byType {

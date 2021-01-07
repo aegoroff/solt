@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/internal/sys"
 	"strings"
 	"testing"
@@ -24,7 +24,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va", "-p", dir)
@@ -65,7 +65,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 			_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-			env := api.NewMemoryEnvironment()
+			env := fw.NewMemoryEnvironment()
 
 			// Act
 			_ = Execute(memfs, env, "va", "fix", "-p", dir)
@@ -98,7 +98,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va", "-p", dir)
@@ -121,7 +121,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "fr", "-p", dir)
@@ -135,7 +135,7 @@ func Test_ValidateSdkNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va")
@@ -149,7 +149,7 @@ func Test_FixSdkNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "va", "fix")

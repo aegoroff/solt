@@ -2,19 +2,19 @@ package lostprojects
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/msvc"
 )
 
 type lostProjectsCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 }
 
 // New creates new command that does lost projects search
-func New(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
-		exe := &lostProjectsCommand{api.NewBaseCmd(c)}
-		return api.NewExecutorShowHelp(exe, c)
+func New(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
+		exe := &lostProjectsCommand{fw.NewBaseCmd(c)}
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("lp", "lostprojects", "Find projects that not included into any solution")
@@ -31,7 +31,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	// so these projects are not considered lost
 	var linkedProjects []string
 
-	exist := api.NewExister(c.Fs(), c.Writer())
+	exist := fw.NewExister(c.Fs(), c.Writer())
 
 	// Each found solution
 	for _, sln := range solutions {
@@ -42,7 +42,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 
 	lost, lostWithIncludes := findLostProjects(allProjects, linkedProjects)
 
-	s := api.NewScreener(c.Prn())
+	s := fw.NewScreener(c.Prn())
 	// Lost projects
 	s.WriteSlice(lost)
 
@@ -62,7 +62,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 
 func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	incl := api.NewExactMatch(linkedProjects)
+	incl := fw.NewExactMatch(linkedProjects)
 
 	lostProjects := allProjects[:0]
 	var allSolutionFiles []string
@@ -81,10 +81,10 @@ func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []strin
 func separateProjects(lostProjects []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
-	solutionFiles := api.NewExactMatch(allSolutionFiles)
+	solutionFiles := fw.NewExactMatch(allSolutionFiles)
 
 	for _, lp := range lostProjects {
-		if api.MatchAny(lp.Files(), solutionFiles) {
+		if fw.MatchAny(lp.Files(), solutionFiles) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path)
 		} else {
 			lost = append(lost, lp.Path)

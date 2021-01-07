@@ -1,16 +1,16 @@
 package lostfiles
 
-import "solt/cmd/api"
+import "solt/cmd/fw"
 
 type nopExister struct{}
 
 func (*nopExister) exist(string, []string) {}
 
 type realExister struct {
-	e *api.Exister
+	e *fw.Exister
 }
 
-func newExister(validate bool, e *api.Exister) exister {
+func newExister(validate bool, e *fw.Exister) exister {
 	if validate {
 		return &realExister{e: e}
 	}

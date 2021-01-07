@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"testing"
 )
 
@@ -24,7 +24,7 @@ func Test_Version(t *testing.T) {
 			// Arrange
 			ass := assert.New(t)
 			memfs := afero.NewMemMapFs()
-			env := api.NewMemoryEnvironment()
+			env := fw.NewMemoryEnvironment()
 
 			// Act
 			_ = Execute(memfs, env, test.cmd...)
@@ -39,7 +39,7 @@ func Test_Help(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "")
@@ -51,7 +51,7 @@ func Test_Help(t *testing.T) {
 func Test_Console(t *testing.T) {
 	// Arrange
 	memfs := afero.NewMemMapFs()
-	env := api.NewConsoleEnvironment()
+	env := fw.NewConsoleEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "ver")
@@ -63,7 +63,7 @@ func Test_Write_File(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 	fp := "/f"
 
 	// Act
@@ -79,7 +79,7 @@ func Test_Write_ReadonlyFile(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 	fp := "/f"
 	ro := afero.NewReadOnlyFs(memfs)
 

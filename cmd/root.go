@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/cmd/info"
 	"solt/cmd/lostfiles"
 	"solt/cmd/lostprojects"
@@ -23,7 +23,7 @@ func newRoot() *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
+func Execute(fs afero.Fs, pe fw.PrintEnvironment, args ...string) error {
 	rootCmd := newRoot()
 
 	var sourcesPath string
@@ -47,9 +47,9 @@ func Execute(fs afero.Fs, pe api.PrintEnvironment, args ...string) error {
 
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	env := api.NewWriteFileEnvironment(&resultfile, fs, pe)
+	env := fw.NewWriteFileEnvironment(&resultfile, fs, pe)
 
-	c := api.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
+	c := fw.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
 
 	rootCmd.AddCommand(info.New(c))
 	rootCmd.AddCommand(lostfiles.New(c))

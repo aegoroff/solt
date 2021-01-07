@@ -4,19 +4,19 @@ import (
 	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/internal/sys"
 	"unicode/utf8"
 )
 
 type fixer struct {
-	prn   api.Printer
+	prn   fw.Printer
 	fs    afero.Fs
 	filer sys.Filer
-	w     api.Writable
+	w     fw.Writable
 }
 
-func newFixer(p api.Printer, w api.Writable, fs afero.Fs) actioner {
+func newFixer(p fw.Printer, w fw.Writable, fs afero.Fs) actioner {
 	return &fixer{
 		prn:   p,
 		fs:    fs,

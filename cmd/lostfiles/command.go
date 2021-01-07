@@ -2,32 +2,32 @@ package lostfiles
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/internal/sys"
 	"solt/msvc"
 )
 
 type lostFilesCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 	removeLost bool
 	searchAll  bool
 	filter     string
 }
 
 // New creates new command that does lost files search
-func New(c *api.Conf) *cobra.Command {
+func New(c *fw.Conf) *cobra.Command {
 	var removeLost bool
 	var searchAll bool
 	var filter string
 
-	cc := api.NewCobraCreator(c, func() api.Executor {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		exe := &lostFilesCommand{
-			BaseCommand: api.NewBaseCmd(c),
+			BaseCommand: fw.NewBaseCmd(c),
 			removeLost:  removeLost,
 			searchAll:   searchAll,
 			filter:      filter,
 		}
-		return api.NewExecutorShowHelp(exe, c)
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("lf", "lostfiles", "Find lost files in the folder specified")
@@ -47,7 +47,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	projects := msvc.SelectProjects(foldersTree)
 
-	exist := api.NewExister(c.Fs(), c.Writer())
+	exist := fw.NewExister(c.Fs(), c.Writer())
 	wrapper := newExister(c.searchAll, exist)
 	enum := newEnumerator(skip, wrapper)
 	enum.enumerate(projects)
@@ -60,7 +60,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	lostFiles := lf.find(foundFiles.files)
 
-	s := api.NewScreener(c.Prn())
+	s := fw.NewScreener(c.Prn())
 	s.WriteSlice(lostFiles)
 
 	title := "<red>These files included into projects but not exist in the file system.</>"

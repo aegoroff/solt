@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/internal/sys"
 	"testing"
 )
@@ -21,7 +21,7 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
@@ -55,7 +55,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+tst.path, []byte(codeFileContent), 0644)
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-		env := api.NewMemoryEnvironment()
+		env := fw.NewMemoryEnvironment()
 
 		// Act
 		_ = Execute(memfs, env, "lf", "-p", dir)
@@ -80,7 +80,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
@@ -116,7 +116,7 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir2+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", root)
@@ -139,7 +139,7 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
@@ -171,7 +171,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 		_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-		env := api.NewMemoryEnvironment()
+		env := fw.NewMemoryEnvironment()
 
 		// Act
 		_ = Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
@@ -196,7 +196,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir, "-r")
@@ -223,7 +223,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo1.cs", []byte(assemblyInfoContent), 0644)
 
 	fs := afero.NewReadOnlyFs(memfs)
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(fs, env, "lf", "-p", dir, "-r")
@@ -247,7 +247,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir, "-a")
@@ -269,7 +269,7 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", dir)
@@ -283,7 +283,7 @@ func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf")
@@ -297,7 +297,7 @@ func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := api.NewMemoryEnvironment()
+	env := fw.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "lf", "-p", "/")

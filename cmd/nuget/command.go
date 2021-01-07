@@ -5,7 +5,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
 	"path/filepath"
-	"solt/cmd/api"
+	"solt/cmd/fw"
 	"solt/msvc"
 	"strings"
 )
@@ -13,27 +13,27 @@ import (
 const empiricNugetPacksForEachProject = 16
 
 type nugetCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 	mismatch bool
 	verbose  bool
 }
 
 type nugetByProjectCommand struct {
-	*api.BaseCommand
+	*fw.BaseCommand
 }
 
 // New creates new command that does nuget packages feature
-func New(c *api.Conf) *cobra.Command {
+func New(c *fw.Conf) *cobra.Command {
 	var mismatch bool
 	var verbose bool
 
-	cc := api.NewCobraCreator(c, func() api.Executor {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		exe := &nugetCommand{
-			BaseCommand: api.NewBaseCmd(c),
+			BaseCommand: fw.NewBaseCmd(c),
 			mismatch:    mismatch,
 			verbose:     verbose,
 		}
-		return api.NewExecutorShowHelp(exe, c)
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	descr := "Get nuget packages information within solutions"
@@ -50,10 +50,10 @@ func New(c *api.Conf) *cobra.Command {
 	return cmd
 }
 
-func newNugetByProject(c *api.Conf) *cobra.Command {
-	cc := api.NewCobraCreator(c, func() api.Executor {
-		exe := &nugetByProjectCommand{api.NewBaseCmd(c)}
-		return api.NewExecutorShowHelp(exe, c)
+func newNugetByProject(c *fw.Conf) *cobra.Command {
+	cc := fw.NewCobraCreator(c, func() fw.Executor {
+		exe := &nugetByProjectCommand{fw.NewBaseCmd(c)}
+		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	msg := "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files"
