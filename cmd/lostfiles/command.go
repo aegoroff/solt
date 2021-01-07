@@ -40,10 +40,10 @@ func New(c *fw.Conf) *cobra.Command {
 }
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	foundFiles := newCollector(c.filter)
+	collect := newCollector(c.filter)
 	skip := newSkipper()
 
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), foundFiles, skip)
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), collect, skip)
 
 	projects := msvc.SelectProjects(foldersTree)
 
@@ -58,17 +58,17 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 		return nil
 	}
 
-	lostFiles := lf.find(foundFiles.files)
+	lost := lf.find(collect.files)
 
 	s := fw.NewScreener(c.Prn())
-	s.WriteSlice(lostFiles)
+	s.WriteSlice(lost)
 
 	title := "<red>These files included into projects but not exist in the file system.</>"
 	exist.Print(c.Prn(), title, "Project")
 
 	if c.removeLost {
 		filer := sys.NewFiler(c.Fs(), c.Writer())
-		filer.Remove(lostFiles)
+		filer.Remove(lost)
 	}
 
 	return nil
