@@ -70,7 +70,7 @@ func (r *readerMsbuild) read(path string, ch chan<- *Folder) {
 
 	f := newFolder(path)
 
-	p := MsbuildProject{Project: &project, Path: path}
+	p := MsbuildProject{Project: &project, path: path}
 
 	f.Content.Projects = append(f.Content.Projects, &p)
 
@@ -101,7 +101,7 @@ func (r *readerSolution) read(path string, ch chan<- *Folder) {
 
 	f := newFolder(path)
 
-	s := VisualStudioSolution{Solution: sln, Path: path}
+	s := VisualStudioSolution{Solution: sln, path: path}
 
 	f.Content.Solutions = append(f.Content.Solutions, &s)
 

@@ -22,7 +22,7 @@ func TestSortSolutions(t *testing.T) {
 			ass := assert.New(t)
 			var slice []*VisualStudioSolution
 			for _, s := range tst.in {
-				slice = append(slice, &VisualStudioSolution{Path: s})
+				slice = append(slice, &VisualStudioSolution{path: s})
 			}
 
 			// Act
@@ -31,7 +31,7 @@ func TestSortSolutions(t *testing.T) {
 			// Assert
 			var result []string
 			for _, solution := range slice {
-				result = append(result, solution.Path)
+				result = append(result, solution.Path())
 			}
 			ass.Equal(tst.expect, result)
 		})

@@ -14,3 +14,11 @@ type readerModule interface {
 type walker interface {
 	walk(f *Folder)
 }
+
+// Container provides paths container interface
+type Container interface {
+	// Path provides Container's path itself
+	Path() string
+	// Items provides all paths included into container
+	Items() []string
+}

@@ -14,10 +14,11 @@ type node struct {
 }
 
 func newNode(id int64, prj *msvc.MsbuildProject) *node {
+	path := prj.Path()
 	n := node{
 		id:       id,
 		project:  prj,
-		fullPath: &prj.Path,
+		fullPath: &path,
 	}
 	return &n
 }

@@ -49,3 +49,11 @@ type Executor interface {
 	// Execute starts execute command's code
 	Execute(cc *cobra.Command) error
 }
+
+// Exister provides file existence validation in a container
+type Exister interface {
+	// Validate validates whether files from container exist in filesystem
+	Validate(root string, includes []string)
+	// Print outputs unexist files info
+	Print(p Printer, title string, container string)
+}

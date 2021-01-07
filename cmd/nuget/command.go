@@ -153,7 +153,7 @@ func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTr
 		reduced := mergeNugetPacks(npacks)
 
 		if len(reduced) > 0 {
-			nf := newNugetFolder(sol.Path, reduced, projectFolders)
+			nf := newNugetFolder(sol.Path(), reduced, projectFolders)
 			result.Insert(nf)
 		}
 	}

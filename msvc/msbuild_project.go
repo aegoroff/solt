@@ -10,22 +10,31 @@ import (
 // MsbuildProject defines MSBuild project structure
 type MsbuildProject struct {
 	Project *msbuildProject
-	Path    string
+	path    string
+}
+
+// NewMsbuildProject creates new *MsbuildProject instance
+func NewMsbuildProject(path string) *MsbuildProject {
+	return &MsbuildProject{path: path}
+}
+
+func (prj *MsbuildProject) Path() string {
+	return prj.path
 }
 
 // LessThan implements rbtree.Comparable interface
 func (prj *MsbuildProject) LessThan(y rbtree.Comparable) bool {
-	return sortfold.CompareFold(prj.Path, y.(*MsbuildProject).Path) < 0
+	return sortfold.CompareFold(prj.path, y.(*MsbuildProject).path) < 0
 }
 
 // EqualTo implements rbtree.Comparable interface
 func (prj *MsbuildProject) EqualTo(y rbtree.Comparable) bool {
-	return strings.EqualFold(prj.Path, y.(*MsbuildProject).Path)
+	return strings.EqualFold(prj.path, y.(*MsbuildProject).path)
 }
 
-// Files gets all files included into MSBuild project
-func (prj *MsbuildProject) Files() []string {
-	folderPath := filepath.Dir(prj.Path)
+// Items gets all files included into MSBuild project
+func (prj *MsbuildProject) Items() []string {
+	folderPath := filepath.Dir(prj.path)
 
 	msp := prj.Project
 

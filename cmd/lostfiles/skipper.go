@@ -35,7 +35,7 @@ func (h *skpper) Handler(path string) {
 }
 
 func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
-	pdir := filepath.Dir(prj.Path)
+	pdir := filepath.Dir(prj.Path())
 
 	// In case of SDK projects all files inside project folder are considered included
 	if prj.Project.IsSdkProject() {

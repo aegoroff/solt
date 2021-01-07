@@ -47,16 +47,20 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	projects := msvc.SelectProjects(foldersTree)
 
 	exist := newExister(c.searchAll, c.Fs(), c.Writer())
-	incl := newIncluder(exist)
+	incl := fw.NewIncluder(exist)
 
-	enumerate(projects, skip.fromProject, incl.fromProject)
+	for _, p := range projects {
+		skip.fromProject(p)
+		incl.From(p)
+	}
 
-	lf := newFinder(incl.files(), skip.folders())
+	lf := newFinder(incl.Includes(), skip.folders())
 	lost := lf.find(collect.files)
 
 	c.print(lost)
 
-	exist.print(c.Prn())
+	title := "<red>These files included into projects but not exist in the file system.</>"
+	exist.Print(c.Prn(), title, "Project")
 
 	c.removeIfRequested(lost)
 

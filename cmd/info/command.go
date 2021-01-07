@@ -38,7 +38,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	for _, sol := range solutions {
 		sln := sol.Solution
 
-		c.Prn().Cprint(" <gray>%s</>\n", sol.Path)
+		c.Prn().Cprint(" <gray>%s</>\n", sol.Path())
 
 		tbl := fw.NewTabler(c, c.margin)
 

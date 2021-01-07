@@ -37,7 +37,7 @@ func (m *validator) validate() {
 
 		redundants := m.findRedundants(g, allNodes)
 
-		m.act.action(sol.Path, redundants)
+		m.act.action(sol.Path(), redundants)
 	}
 }
 
@@ -60,7 +60,7 @@ func (m *validator) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbt
 }
 
 func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
-	solutionPath := filepath.Dir(sln.Path)
+	solutionPath := filepath.Dir(sln.Path())
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.NewRbTree()
 	ix := int64(1)
@@ -69,9 +69,7 @@ func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtre
 			continue
 		}
 
-		p := &msvc.MsbuildProject{
-			Path: filepath.Join(solutionPath, prj.Path),
-		}
+		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, prj.Path))
 
 		msbuild, ok := sdkTree.Search(p)
 		if !ok {
@@ -144,7 +142,7 @@ func (*validator) getReferences(to *node, allNodes rbtree.RbTree) []*node {
 		return []*node{}
 	}
 
-	dir := filepath.Dir(to.project.Path)
+	dir := filepath.Dir(to.project.Path())
 
 	var result []*node
 	for _, ref := range to.project.Project.ProjectReferences {

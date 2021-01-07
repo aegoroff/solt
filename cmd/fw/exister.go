@@ -6,22 +6,21 @@ import (
 	"solt/internal/sys"
 )
 
-// Exister provides file existence validation in a container
-type Exister struct {
+type exister struct {
 	filer   sys.Filer
 	unexist map[string][]string
 }
 
 // NewExister creates new Exister instance
-func NewExister(fs afero.Fs, w io.Writer) *Exister {
-	return &Exister{
+func NewExister(fs afero.Fs, w io.Writer) Exister {
+	return &exister{
 		unexist: make(map[string][]string),
 		filer:   sys.NewFiler(fs, w),
 	}
 }
 
 // Validate validates whether files from container exist in filesystem
-func (e *Exister) Validate(root string, paths []string) {
+func (e *exister) Validate(root string, paths []string) {
 	nonexist := e.filer.CheckExistence(paths)
 
 	if len(nonexist) > 0 {
@@ -30,7 +29,7 @@ func (e *Exister) Validate(root string, paths []string) {
 }
 
 // Print outputs unexist files info
-func (e *Exister) Print(p Printer, title string, container string) {
+func (e *exister) Print(p Printer, title string, container string) {
 	if len(e.unexist) > 0 {
 		p.Println()
 		p.Cprint(title)

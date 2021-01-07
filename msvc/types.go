@@ -24,7 +24,15 @@ type VisualStudioSolution struct {
 	Solution *solution.Solution
 
 	// filesystem path
-	Path string
+	path string
+}
+
+func (s *VisualStudioSolution) Path() string {
+	return s.path
+}
+
+func (s *VisualStudioSolution) Items() []string {
+	return s.AllProjectPaths(func(s string) string { return s })
 }
 
 // SortSolutions sorts solutions by path
@@ -37,14 +45,14 @@ type visualStudioSolutionSlice []*VisualStudioSolution
 func (v visualStudioSolutionSlice) Len() int { return len(v) }
 
 func (v visualStudioSolutionSlice) Less(i, j int) bool {
-	return sortfold.CompareFold(v[i].Path, v[j].Path) < 0
+	return sortfold.CompareFold(v[i].path, v[j].path) < 0
 }
 
 func (v visualStudioSolutionSlice) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 
 // AllProjectPaths gets all possible projects' paths defined in solution
 func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []string {
-	solutionPath := filepath.Dir(s.Path)
+	solutionPath := filepath.Dir(s.path)
 	var paths = make([]string, 0, len(s.Solution.Projects))
 	for _, sp := range s.Solution.Projects {
 		if sp.TypeID == solution.IDSolutionFolder {

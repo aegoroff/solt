@@ -44,7 +44,7 @@ func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 		if len(np) == 0 {
 			continue
 		}
-		pp := sys.ToValidPath(prj.Path)
+		pp := sys.ToValidPath(prj.path)
 		sources = append(sources, filepath.Base(pp))
 	}
 	return result, sources
