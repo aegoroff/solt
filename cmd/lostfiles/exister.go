@@ -1,20 +1,35 @@
 package lostfiles
 
-import "solt/cmd/fw"
+import (
+	"github.com/spf13/afero"
+	"io"
+	"solt/cmd/fw"
+)
 
-type nopExister struct{}
+func newExister(validate bool, fs afero.Fs, w io.Writer) exister {
+	if validate {
+		return &realExister{e: fw.NewExister(fs, w)}
+	}
+	return &stubExister{}
+}
 
-func (*nopExister) exist(string, []string) {}
+// Stub that do nothing
+
+type stubExister struct{}
+
+func (*stubExister) print(fw.Printer) {}
+
+func (*stubExister) exist(string, []string) {}
+
+// Real
 
 type realExister struct {
 	e *fw.Exister
 }
 
-func newExister(validate bool, e *fw.Exister) exister {
-	if validate {
-		return &realExister{e: e}
-	}
-	return &nopExister{}
+func (r *realExister) print(p fw.Printer) {
+	title := "<red>These files included into projects but not exist in the file system.</>"
+	r.e.Print(p, title, "Project")
 }
 
 func (r *realExister) exist(project string, includes []string) {
