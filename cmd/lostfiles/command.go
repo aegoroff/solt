@@ -58,7 +58,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	exist.print(c.Prn())
 
-	c.remove(lost)
+	c.removeIfRequested(lost)
 
 	return nil
 }
@@ -68,7 +68,7 @@ func (c *lostFilesCommand) print(lost []string) {
 	s.WriteSlice(lost)
 }
 
-func (c *lostFilesCommand) remove(lost []string) {
+func (c *lostFilesCommand) removeIfRequested(lost []string) {
 	if c.removeLost {
 		filer := sys.NewFiler(c.Fs(), c.Writer())
 		filer.Remove(lost)
