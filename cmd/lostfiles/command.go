@@ -1,7 +1,9 @@
 package lostfiles
 
 import (
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"io"
 	"solt/cmd/fw"
 	"solt/internal/sys"
 	"solt/msvc"
@@ -46,7 +48,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), collect, skip)
 	projects := msvc.SelectProjects(foldersTree)
 
-	exist := newExister(c.searchAll, c.Fs(), c.Writer())
+	exist := c.newExister(c.Fs(), c.Writer())
 	incl := fw.NewIncluder(exist)
 
 	for _, p := range projects {
@@ -65,6 +67,13 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	c.removeIfRequested(lost)
 
 	return nil
+}
+
+func (c *lostFilesCommand) newExister(fs afero.Fs, w io.Writer) fw.Exister {
+	if c.searchAll {
+		return fw.NewExister(fs, w)
+	}
+	return fw.NewNullExister()
 }
 
 func (c *lostFilesCommand) print(lost []string) {

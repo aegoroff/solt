@@ -39,3 +39,12 @@ func (e *exister) Print(p Printer, title string, container string) {
 	s := NewScreener(p)
 	s.WriteMap(e.unexist, container)
 }
+
+// NewNullExister creates new Exister that do nothing
+func NewNullExister() Exister { return &nullExister{} }
+
+type nullExister struct{}
+
+func (*nullExister) Print(Printer, string, string) {}
+
+func (*nullExister) Validate(string, []string) {}

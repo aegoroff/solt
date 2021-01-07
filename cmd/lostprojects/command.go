@@ -28,14 +28,14 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
 	exist := fw.NewExister(c.Fs(), c.Writer())
-	incl := fw.NewIncluder(exist)
+	solutionProjects := fw.NewIncluder(exist)
 
 	// Each found solution
 	for _, sln := range solutions {
-		incl.From(sln)
+		solutionProjects.From(sln)
 	}
 
-	lost, lostWithIncludes := findLostProjects(allProjects, incl.Includes())
+	lost, lostWithIncludes := findLostProjects(allProjects, solutionProjects.Includes())
 
 	s := fw.NewScreener(c.Prn())
 	// Lost projects
@@ -55,22 +55,23 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	return nil
 }
 
-func findLostProjects(allProjects []*msvc.MsbuildProject, linkedProjects []string) ([]string, []string) {
+func findLostProjects(allProjects []*msvc.MsbuildProject, solutionProjects []string) ([]string, []string) {
 	// Create projects matching machine
-	incl := fw.NewExactMatch(linkedProjects)
+	incl := fw.NewExactMatch(solutionProjects)
 
 	lostProjects := allProjects[:0]
-	var allSolutionFiles []string
+
+	allSolutionFiles := fw.NewIncluder(fw.NewNullExister())
 
 	for _, prj := range allProjects {
-		if !incl.Match(prj.Path()) {
-			lostProjects = append(lostProjects, prj)
+		if incl.Match(prj.Path()) {
+			allSolutionFiles.From(prj)
 		} else {
-			allSolutionFiles = append(allSolutionFiles, prj.Items()...)
+			lostProjects = append(lostProjects, prj)
 		}
 	}
 
-	return separateProjects(lostProjects, allSolutionFiles)
+	return separateProjects(lostProjects, allSolutionFiles.Includes())
 }
 
 func separateProjects(lostProjects []*msvc.MsbuildProject, allSolutionFiles []string) ([]string, []string) {
