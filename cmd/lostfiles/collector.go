@@ -5,22 +5,22 @@ import (
 	"strings"
 )
 
-type fileCollector struct {
+type collector struct {
 	files  []string
 	filter string
 }
 
-// newFileCollector creates new collector instance
+// newCollector creates new collector instance
 // filter - file extension to collect files that match it
-func newFileCollector(filter string) *fileCollector {
-	return &fileCollector{
+func newCollector(filter string) *collector {
+	return &collector{
 		files:  make([]string, 0),
 		filter: filter,
 	}
 }
 
 // Handler executed on each found file in a folder
-func (h *fileCollector) Handler(path string) {
+func (h *collector) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
 	if strings.EqualFold(ext, h.filter) {

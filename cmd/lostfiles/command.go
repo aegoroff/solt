@@ -40,7 +40,7 @@ func New(c *fw.Conf) *cobra.Command {
 }
 
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	foundFiles := newFileCollector(c.filter)
+	foundFiles := newCollector(c.filter)
 	skip := newSkipper()
 
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), foundFiles, skip)
