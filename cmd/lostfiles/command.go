@@ -48,11 +48,13 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	projects := msvc.SelectProjects(foldersTree)
 
 	exist := fw.NewExister(c.Fs(), c.Writer())
-	wrapper := newExister(c.searchAll, exist)
-	enum := newEnumerator(skip, wrapper)
-	enum.enumerate(projects)
+	wrap := newExister(c.searchAll, exist)
 
-	lf, err := newFinder(enum.includedFiles(), skip.skipped())
+	incl := newIncluder(wrap)
+
+	enumerate(projects, skip.fromProject, incl.fromProject)
+
+	lf, err := newFinder(incl.files(), skip.skipped())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil
