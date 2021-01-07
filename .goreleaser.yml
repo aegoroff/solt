@@ -76,5 +76,7 @@ changelog:
   filters:
     exclude:
       - "^docs:"
+      - "^dosc:"
+      - "^style:"
       - "^test:"
       - "^refactoring:"
