@@ -6,7 +6,7 @@ import (
 )
 
 // Version defines program version
-var Version = "0.12.8-dev"
+var Version = "0.12.9-dev"
 
 type versionCommand struct {
 	*api.BaseCommand
