@@ -9,17 +9,17 @@ import (
 )
 
 type skpper struct {
-	folders collections.StringHashSet
+	items collections.StringHashSet
 }
 
 func newSkipper() *skpper {
 	return &skpper{
-		folders: make(collections.StringHashSet),
+		items: make(collections.StringHashSet),
 	}
 }
 
-func (h *skpper) skipped() []string {
-	return h.folders.Items()
+func (h *skpper) folders() []string {
+	return h.items.Items()
 }
 
 // Handler executed on each found file in a folder
@@ -30,7 +30,7 @@ func (h *skpper) Handler(path string) {
 	if strings.EqualFold(ext, msvc.SolutionFileExt) {
 		dir, _ := filepath.Split(path)
 		ppath := filepath.Join(dir, "packages")
-		h.folders.Add(ppath)
+		h.items.Add(ppath)
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
 
 	// In case of SDK projects all files inside project folder are considered included
 	if prj.Project.IsSdkProject() {
-		h.folders.Add(pdir)
+		h.items.Add(pdir)
 		return
 	}
 
@@ -53,6 +53,6 @@ func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
 	// Add project base + exclude subfolder into exclude folders list
 	for _, s := range subfolders {
 		sub := filepath.Join(pdir, sys.ToValidPath(s))
-		h.folders.Add(sub)
+		h.items.Add(sub)
 	}
 }

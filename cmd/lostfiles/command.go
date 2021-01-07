@@ -50,7 +50,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 	projects := msvc.SelectProjects(foldersTree)
 	enumerate(projects, skip.fromProject, incl.fromProject)
 
-	lf, err := newFinder(incl.files(), skip.skipped())
+	lf, err := newFinder(incl.files(), skip.folders())
 	if err != nil {
 		// return nil so as not to confuse user if no project found and it's normal case
 		return nil
@@ -58,15 +58,23 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	lost := lf.find(collect.files)
 
-	s := fw.NewScreener(c.Prn())
-	s.WriteSlice(lost)
+	c.print(lost)
 
 	exist.print(c.Prn())
 
+	c.remove(lost)
+
+	return nil
+}
+
+func (c *lostFilesCommand) print(lost []string) {
+	s := fw.NewScreener(c.Prn())
+	s.WriteSlice(lost)
+}
+
+func (c *lostFilesCommand) remove(lost []string) {
 	if c.removeLost {
 		filer := sys.NewFiler(c.Fs(), c.Writer())
 		filer.Remove(lost)
 	}
-
-	return nil
 }
