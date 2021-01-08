@@ -190,9 +190,12 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent2), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
 	env := out.NewMemoryEnvironment()
 
