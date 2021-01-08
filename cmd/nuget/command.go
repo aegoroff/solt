@@ -219,11 +219,13 @@ func keepOnlyMismatch(in rbtree.RbTree) {
 }
 
 func onlyMismatches(packs []*pack) []*pack {
-	filtered := packs[:0]
+	n := 0
 	for _, p := range packs {
 		if p.versions.Count() > 1 {
-			filtered = append(filtered, p)
+			packs[n] = p
+			n++
 		}
 	}
-	return filtered
+	packs = packs[:n]
+	return packs
 }
