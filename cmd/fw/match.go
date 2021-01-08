@@ -123,9 +123,9 @@ func Filter(ss []string, m Matcher) []string {
 		return []string{}
 	}
 	n := 0
-	for _, file := range ss {
-		if m.Match(file) {
-			ss[n] = file
+	for _, s := range ss {
+		if m.Match(s) {
+			ss[n] = s
 			n++
 		}
 	}
