@@ -2,6 +2,7 @@ package fw
 
 import (
 	"github.com/stretchr/testify/assert"
+	"solt/cmd/out"
 	"testing"
 )
 
@@ -9,9 +10,9 @@ func Test_writeSlice(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	items := []string{"rr", "aa", "xy"}
-	env := NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
-	p := NewPrinter(env)
+	p := out.NewPrinter(env)
 	s := NewScreener(p)
 
 	// Act
@@ -28,8 +29,8 @@ func Test_writeMap(t *testing.T) {
 	items2 := []string{"ff", "lz", "xy"}
 
 	m := map[string][]string{"a": items1, "b": items2}
-	env := NewMemoryEnvironment()
-	p := NewPrinter(env)
+	env := out.NewMemoryEnvironment()
+	p := out.NewPrinter(env)
 	s := NewScreener(p)
 
 	// Act

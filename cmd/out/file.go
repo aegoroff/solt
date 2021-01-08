@@ -1,4 +1,4 @@
-package fw
+package out
 
 import (
 	"github.com/spf13/afero"

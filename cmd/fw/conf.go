@@ -3,13 +3,14 @@ package fw
 import (
 	"github.com/spf13/afero"
 	"io"
+	"solt/cmd/out"
 )
 
 // Conf is app configuration container
 type Conf struct {
 	filesystem afero.Fs
-	p          Printer
-	pe         PrintEnvironment
+	p          out.Printer
+	pe         out.PrintEnvironment
 	sp         *string
 	cpu        *string
 	memory     *string
@@ -17,7 +18,7 @@ type Conf struct {
 }
 
 // NewConf creates new *Conf instance
-func NewConf(fs afero.Fs, pe PrintEnvironment, sp *string, cpu *string, memory *string, diag *bool) *Conf {
+func NewConf(fs afero.Fs, pe out.PrintEnvironment, sp *string, cpu *string, memory *string, diag *bool) *Conf {
 	return &Conf{filesystem: fs, pe: pe, sp: sp, cpu: cpu, memory: memory, diag: diag}
 }
 
@@ -42,7 +43,7 @@ func (c *Conf) Fs() afero.Fs {
 }
 
 // Prn gets underlying Printer
-func (c *Conf) Prn() Printer {
+func (c *Conf) Prn() out.Printer {
 	return c.p
 }
 

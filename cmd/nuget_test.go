@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/fw"
+	"solt/cmd/out"
 	"solt/internal/sys"
 	"testing"
 )
@@ -21,7 +21,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "p", "-p", dir)
@@ -50,7 +50,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "p", "-p", dir)
@@ -78,7 +78,7 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
@@ -101,7 +101,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
@@ -130,7 +130,7 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir, "-m", "-v")
@@ -165,7 +165,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir)
@@ -193,7 +193,7 @@ func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir)
@@ -225,7 +225,7 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", "d/")
@@ -244,7 +244,7 @@ func Test_NugetCmdBySolutionUnexistPath_NoOutput(t *testing.T) {
 	ass := assert.New(t)
 	dir := "u/"
 	memfs := afero.NewMemMapFs()
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "-p", dir)
@@ -258,7 +258,7 @@ func Test_NugetCmdBySolutionNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu")
@@ -272,7 +272,7 @@ func Test_NugetCmdByProjectNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "nu", "p")

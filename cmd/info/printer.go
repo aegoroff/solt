@@ -4,14 +4,15 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"solt/cmd/fw"
+	"solt/cmd/out"
 )
 
 type printer struct {
 	margin int
-	w      fw.Writable
+	w      out.Writable
 }
 
-func newPrinter(margin int, w fw.Writable) *printer {
+func newPrinter(margin int, w out.Writable) *printer {
 	return &printer{margin: margin, w: w}
 }
 

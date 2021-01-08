@@ -4,13 +4,14 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"solt/cmd/fw"
+	"solt/cmd/out"
 )
 
 type printer struct {
-	prn fw.Printer
+	prn out.Printer
 }
 
-func newPrinter(p fw.Printer) actioner {
+func newPrinter(p out.Printer) actioner {
 	return &printer{
 		prn: p,
 	}

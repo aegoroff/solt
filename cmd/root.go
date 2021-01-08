@@ -8,6 +8,7 @@ import (
 	"solt/cmd/lostfiles"
 	"solt/cmd/lostprojects"
 	"solt/cmd/nuget"
+	"solt/cmd/out"
 	"solt/cmd/validate"
 )
 
@@ -23,7 +24,7 @@ func newRoot() *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(fs afero.Fs, pe fw.PrintEnvironment, args ...string) error {
+func Execute(fs afero.Fs, pe out.PrintEnvironment, args ...string) error {
 	rootCmd := newRoot()
 
 	var sourcesPath string
@@ -47,7 +48,7 @@ func Execute(fs afero.Fs, pe fw.PrintEnvironment, args ...string) error {
 
 	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
 
-	env := fw.NewWriteFileEnvironment(&resultfile, fs, pe)
+	env := out.NewWriteFileEnvironment(&resultfile, fs, pe)
 
 	c := fw.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
 

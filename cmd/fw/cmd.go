@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"io"
+	"solt/cmd/out"
 )
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
@@ -28,7 +29,7 @@ func (b *BaseCommand) Fs() afero.Fs {
 }
 
 // Prn gets printer to output data
-func (b *BaseCommand) Prn() Printer {
+func (b *BaseCommand) Prn() out.Printer {
 	return b.conf.p
 }
 

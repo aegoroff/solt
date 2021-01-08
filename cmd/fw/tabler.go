@@ -2,6 +2,7 @@ package fw
 
 import (
 	"github.com/cheynewallace/tabby"
+	"solt/cmd/out"
 	"text/tabwriter"
 )
 
@@ -12,7 +13,7 @@ type Tabler struct {
 }
 
 // NewTabler creates new Tabler instance
-func NewTabler(w Writable, margin int) *Tabler {
+func NewTabler(w out.Writable, margin int) *Tabler {
 	tw := new(tabwriter.Writer).Init(w.Writer(), 0, 8, 4, ' ', 0)
 	return &Tabler{
 		margin: NewMarginer(margin),

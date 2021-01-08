@@ -4,11 +4,12 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/cmd/fw"
+	"solt/cmd/out"
 	"sort"
 	"strings"
 )
 
-func newNugetPrinter(p fw.Printer, w fw.Writable, column string, margin int) *nugetprint {
+func newNugetPrinter(p out.Printer, w out.Writable, column string, margin int) *nugetprint {
 	np := nugetprint{
 		p:      p,
 		w:      w,
@@ -19,8 +20,8 @@ func newNugetPrinter(p fw.Printer, w fw.Writable, column string, margin int) *nu
 }
 
 type nugetprint struct {
-	p      fw.Printer
-	w      fw.Writable
+	p      out.Printer
+	w      out.Writable
 	column string
 	m      *fw.Marginer
 }

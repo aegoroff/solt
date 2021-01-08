@@ -2,17 +2,18 @@ package fw
 
 import (
 	"github.com/akutz/sortfold"
+	"solt/cmd/out"
 )
 
 // Screener is an abstraction that does comples structures output
 type Screener struct {
-	p  Printer
+	p  out.Printer
 	m1 *Marginer
 	m2 *Marginer
 }
 
 // NewScreener creates new Screener instance
-func NewScreener(p Printer) *Screener {
+func NewScreener(p out.Printer) *Screener {
 	s := Screener{
 		p:  p,
 		m1: NewMarginer(1),

@@ -1,4 +1,4 @@
-package fw
+package out
 
 type prn struct {
 	env PrintEnvironment

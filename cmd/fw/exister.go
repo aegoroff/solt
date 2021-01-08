@@ -3,6 +3,7 @@ package fw
 import (
 	"github.com/spf13/afero"
 	"io"
+	"solt/cmd/out"
 	"solt/internal/sys"
 )
 
@@ -29,7 +30,7 @@ func (e *exister) Validate(root string, paths []string) {
 }
 
 // Print outputs unexist files info
-func (e *exister) Print(p Printer, title string, container string) {
+func (e *exister) Print(p out.Printer, title string, container string) {
 	if len(e.unexist) > 0 {
 		p.Println()
 		p.Cprint(title)
@@ -45,6 +46,6 @@ func NewNullExister() Exister { return &nullExister{} }
 
 type nullExister struct{}
 
-func (*nullExister) Print(Printer, string, string) {}
+func (*nullExister) Print(out.Printer, string, string) {}
 
 func (*nullExister) Validate(string, []string) {}

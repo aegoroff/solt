@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/fw"
+	"solt/cmd/out"
 	"solt/internal/sys"
 	"testing"
 )
@@ -21,7 +21,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
 
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "in", "-p", dir)
@@ -54,7 +54,7 @@ func Test_InfoNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
-	env := fw.NewMemoryEnvironment()
+	env := out.NewMemoryEnvironment()
 
 	// Act
 	_ = Execute(memfs, env, "in")
