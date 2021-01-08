@@ -46,7 +46,7 @@ func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
 // NewPartialMatcher creates new matcher that implements Aho corasick multi pattern matching
 // Partial means that string should contain one of the matcher's strings as substring
 // or whole string
-func NewPartialMatcher(matches []string, decorator func(s string) string) (Matcher, error) {
+func NewPartialMatcher(matches []string, decorator func(s string) string) (Searcher, error) {
 	runes := make([][]rune, len(matches))
 	for i, s := range matches {
 		ds := decorator(s)
@@ -83,6 +83,16 @@ func (a *matchP) Match(s string) bool {
 	ds := a.decorator(s)
 	terms := a.machine.MultiPatternSearch([]rune(ds), true)
 	return len(terms) > 0
+}
+
+func (a *matchP) Search(s string) []string {
+	ds := a.decorator(s)
+	terms := a.machine.MultiPatternSearch([]rune(ds), false)
+	result := make([]string, len(terms))
+	for i, term := range terms {
+		result[i] = string(term.Word)
+	}
+	return result
 }
 
 func (m *matchL) Match(s string) bool {

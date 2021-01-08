@@ -54,18 +54,23 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 }
 
 func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
-	filePaths := make([]string, 0, len(f.allFilesPaths))
-	for path := range f.allFilesPaths {
-		filePaths = append(filePaths, path)
-		for _, lp := range allLost {
-			d := dir(lp.Path())
-			if strings.HasPrefix(path, d) {
-				filePaths = append(filePaths, d)
-			}
+	filePaths := make(c9s.StringHashSet, len(f.allFilesPaths))
+	lostDirs := make([]string, len(allLost))
+
+	for i, lp := range allLost {
+		lostDirs[i] = dir(lp.Path())
+	}
+
+	dm, err := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
+	if err == nil {
+		for path := range f.allFilesPaths {
+			filePaths.Add(path)
+			r := dm.Search(path)
+			filePaths.AddRange(r...)
 		}
 	}
 
-	m, _ := fw.NewPartialMatcher(filePaths, strings.ToUpper)
+	m, _ := fw.NewPartialMatcher(filePaths.Items(), strings.ToUpper)
 	return m
 }
 

@@ -35,6 +35,35 @@ func Test_MatchOneOfPatterns_Partial(t *testing.T) {
 	}
 }
 
+func Test_SearchOneOfPatterns(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	var tests = []struct {
+		patterns []string
+		input    string
+		result   []string
+	}{
+		{[]string{"xxx", "yyy", "zzz"}, "yyyyy", []string{"YYY", "YYY", "YYY"}},
+		{[]string{"xxx", "yyy", "zzz"}, "YYYYY", []string{"YYY", "YYY", "YYY"}},
+		{[]string{"xxx", "yyy", "zzz"}, "yyy", []string{"YYY"}},
+		{[]string{"xxx", "yyy", "zzz"}, "yyyzzz", []string{"YYY", "ZZZ"}},
+		{[]string{"xxx", "yyy", "zzz"}, "cccyyybbb", []string{"YYY"}},
+		{[]string{"xxx", "yyy", "zzz"}, "CCCYYYBBB", []string{"YYY"}},
+		{[]string{"xxx", "yyy", "zzz"}, "aaa", []string{}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			// Act
+			m, _ := NewPartialMatcher(test.patterns, strings.ToUpper)
+			result := m.Search(test.input)
+
+			// Assert
+			ass.Equal(test.result, result)
+		})
+	}
+}
+
 func TestNewPartialMatcher_EmptyMatches(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)

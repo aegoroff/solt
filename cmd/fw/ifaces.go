@@ -12,6 +12,13 @@ type Matcher interface {
 	Match(s string) bool
 }
 
+// Searcher defines string searching interface
+type Searcher interface {
+	Matcher
+	// Search does string matching to several patterns and returns all found
+	Search(s string) []string
+}
+
 // PrintEnvironment represents concrete printing environment abstraction
 type PrintEnvironment interface {
 	Writable
