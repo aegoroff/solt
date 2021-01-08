@@ -122,12 +122,13 @@ func Filter(ss []string, m Matcher) []string {
 	if m == nil {
 		return []string{}
 	}
-	result := ss[:0]
+	n := 0
 	for _, file := range ss {
 		if m.Match(file) {
-			result = append(result, file)
+			ss[n] = file
+			n++
 		}
 	}
-
-	return result
+	ss = ss[:n]
+	return ss
 }
