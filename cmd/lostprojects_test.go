@@ -53,7 +53,8 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	// Assert
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
-These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
+ These projects are not included into any solution
+ but files from the projects' folders are used in another projects within a solution:
 
   a\a\a1.csproj
 `), actual)
@@ -82,7 +83,8 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	// Assert
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
-These projects are not included into any solution but files from the projects' folders are used in another projects within a solution:
+ These projects are not included into any solution
+ but files from the projects' folders are used in another projects within a solution:
 
   a\a1\a1.csproj
 `), actual)
