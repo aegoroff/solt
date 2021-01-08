@@ -114,7 +114,40 @@ func Test_FindLostProjectsCmdOtherDirWithFilesIncludedToLinked_LostProjectsFound
  These projects are not included into any solution
  but files from the projects' folders are used in another projects within a solution:
 
-  a/a1/a1.csproj
+  a\a1\a1.csproj
+`), actual)
+}
+
+func Test_FindLostProjectsCmdOtherDirWithFilesDeepIncludedToLinked_LostProjectsFound(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent3a1b), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent3), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/b/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/b/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	env := fw.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "lp", "-p", dir)
+
+	// Assert
+	actual := env.String()
+	ass.Equal(sys.ToValidPath(`
+ These projects are not included into any solution
+ but files from the projects' folders are used in another projects within a solution:
+
+  a\a1\a1.csproj
 `), actual)
 }
 
