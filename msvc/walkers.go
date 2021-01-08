@@ -31,9 +31,8 @@ func (w *walkSol) walk(f *Folder) {
 	if len(content.Solutions) == 0 {
 		return
 	}
-	for _, sln := range content.Solutions {
-		w.solutions = append(w.solutions, sln)
-	}
+
+	w.solutions = append(w.solutions, content.Solutions...)
 }
 
 func walk(foldersTree rbtree.RbTree, walkers ...walker) {
