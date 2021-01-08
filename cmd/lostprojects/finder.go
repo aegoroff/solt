@@ -37,13 +37,18 @@ func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]
 }
 
 func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
-	var lost []string
+	lost := make([]string, 0, len(allLost))
 	var lostWithIncludes []string
 
-	pathMatch, _ := fw.NewPartialMatcher(f.filesPaths(), strings.ToUpper)
+	lostDirs := make([]string, 0, len(allLost))
+	for _, lp := range allLost {
+		lostDirs = append(lostDirs, dir(lp.Path()))
+	}
+
+	lostDirMatch, _ := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
 
 	for _, lp := range allLost {
-		if pathMatch.Match(lp.Path()) {
+		if lostDirMatch.Match(lp.Path()) && fw.MatchAny(f.filesPaths(), lostDirMatch) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path())
 		} else {
 			lost = append(lost, lp.Path())
@@ -58,9 +63,12 @@ func (f *finder) filesPaths() []string {
 
 func (f *finder) selectFilePaths(p *msvc.MsbuildProject) {
 	for _, s := range p.Items() {
-		d := filepath.Dir(s)
-		f.allFilesPaths.Add(d)
+		f.allFilesPaths.Add(dir(s))
 	}
+}
+
+func dir(path string) string {
+	return trailPathSeparator(filepath.Dir(path))
 }
 
 func trailPathSeparator(s string) string {
