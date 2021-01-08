@@ -47,7 +47,7 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 
 	lostDirMatch, _ := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
 
-	allFilesPaths := f.filesPaths()
+	allFilesPaths := f.allFilesPaths.Items()
 	for _, lp := range allLost {
 		if lostDirMatch.Match(lp.Path()) && fw.MatchAny(allFilesPaths, lostDirMatch) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path())
@@ -56,10 +56,6 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 		}
 	}
 	return lost, lostWithIncludes
-}
-
-func (f *finder) filesPaths() []string {
-	return f.allFilesPaths.ItemsDecorated(trailPathSeparator)
 }
 
 func (f *finder) selectFilePaths(p *msvc.MsbuildProject) {
