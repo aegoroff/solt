@@ -23,17 +23,18 @@ func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]
 	// Create projects matching machine
 	within := fw.NewExactMatch(withinSolution)
 
-	lost := all[:0]
-
+	n := 0
 	for _, p := range all {
 		if within.Match(p.Path()) {
 			f.selectFilePaths(p)
 		} else {
-			lost = append(lost, p)
+			all[n] = p
+			n++
 		}
 	}
 
-	return f.separate(lost)
+	all = all[:n]
+	return f.separate(all)
 }
 
 func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
