@@ -62,11 +62,11 @@ func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
 		lostDirs[i] = dir(lp.Path())
 	}
 
-	dm, err := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
+	ldMatch, err := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
 	if err == nil {
-		for path := range f.allFilesPaths {
-			filePaths.Add(path)
-			r := dm.Search(path)
+		for fp := range f.allFilesPaths {
+			filePaths.Add(fp)
+			r := ldMatch.Search(fp)
 			filePaths.AddRange(r...)
 		}
 	}
