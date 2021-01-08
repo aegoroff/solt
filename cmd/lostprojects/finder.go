@@ -40,22 +40,33 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 	lost := make([]string, 0, len(allLost))
 	var lostWithIncludes []string
 
-	lostDirs := make([]string, 0, len(allLost))
-	for _, lp := range allLost {
-		lostDirs = append(lostDirs, dir(lp.Path()))
-	}
+	filesFoldersM := f.newMatcher(allLost)
 
-	lostDirMatch, _ := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
-
-	allFilesPaths := f.allFilesPaths.Items()
 	for _, lp := range allLost {
-		if lostDirMatch.Match(lp.Path()) && fw.MatchAny(allFilesPaths, lostDirMatch) {
+		d := dir(lp.Path())
+		if filesFoldersM.Match(d) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path())
 		} else {
 			lost = append(lost, lp.Path())
 		}
 	}
 	return lost, lostWithIncludes
+}
+
+func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
+	filePaths := make([]string, 0, len(f.allFilesPaths))
+	for path := range f.allFilesPaths {
+		filePaths = append(filePaths, path)
+		for _, lp := range allLost {
+			d := dir(lp.Path())
+			if strings.HasPrefix(path, d) {
+				filePaths = append(filePaths, d)
+			}
+		}
+	}
+
+	m, _ := fw.NewPartialMatcher(filePaths, strings.ToUpper)
+	return m
 }
 
 func (f *finder) selectFilePaths(p *msvc.MsbuildProject) {
