@@ -60,7 +60,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 `), actual)
 }
 
-func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *testing.T) {
+func Test_FindLostProjectsCmdLostProjectsRemove_LostProjectsRemoved(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	dir := "a/"
@@ -78,11 +78,40 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir1_LostProjectsFound(t *test
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", "-p", dir, "-r")
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  a\\a1\\a1.csproj\n"), actual)
+	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
+
+ Folder 'a\a1\' removed
+`), actual)
+}
+
+func Test_FindLostProjectsCmdLostProjectsRemoveReadOnlyFs_LostProjectsNotRemoved(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(testSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/a1.csproj", []byte(testProjectContent3), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/App.config", []byte(appConfigContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/packages.config", []byte(packagesConfingContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Properties/AssemblyInfo.cs", []byte(assemblyInfoContent), 0644)
+
+	env := out.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(afero.NewReadOnlyFs(memfs), env, "lp", "-p", dir, "-r")
+
+	// Assert
+	actual := env.String()
+	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
+`), actual)
 }
 
 func Test_FindLostProjectsCmdOtherDirWithFilesIncludedToLinked_LostProjectsFound(t *testing.T) {

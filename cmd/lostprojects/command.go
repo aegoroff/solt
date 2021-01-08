@@ -8,16 +8,23 @@ import (
 
 type lostProjectsCommand struct {
 	*fw.BaseCommand
+	removeLost bool
 }
 
 // New creates new command that does lost projects search
 func New(c *fw.Conf) *cobra.Command {
+	var removeLost bool
+
 	cc := fw.NewCobraCreator(c, func() fw.Executor {
-		exe := &lostProjectsCommand{fw.NewBaseCmd(c)}
+		exe := &lostProjectsCommand{
+			BaseCommand: fw.NewBaseCmd(c),
+			removeLost:  removeLost,
+		}
 		return fw.NewExecutorShowHelp(exe, c)
 	})
 
 	cmd := cc.NewCommand("lp", "lostprojects", "Find projects that not included into any solution")
+	cmd.Flags().BoolVarP(&removeLost, "remove", "r", false, "Remove lost projects folders")
 
 	return cmd
 }
@@ -61,5 +68,6 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	title := "<red>These projects are included into a solution but not found in the file system:</>"
 	exist.Print(c.Prn(), title, "Solution")
 
-	return nil
+	r := newRemover(c.Fs(), c.Prn(), c.removeLost)
+	return r.removeAll(lost)
 }
