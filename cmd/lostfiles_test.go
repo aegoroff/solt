@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/out"
+	"solt/internal/out"
 	"solt/internal/sys"
 	"testing"
 )

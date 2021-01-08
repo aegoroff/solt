@@ -2,7 +2,7 @@ package fw
 
 import (
 	"github.com/stretchr/testify/assert"
-	"solt/cmd/out"
+	"solt/internal/out"
 	"testing"
 )
 

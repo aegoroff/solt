@@ -3,7 +3,7 @@ package fw
 import (
 	"github.com/spf13/afero"
 	"io"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 // Conf is app configuration container

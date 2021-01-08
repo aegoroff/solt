@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/afero"
 	"os"
 	"solt/cmd"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 func main() {

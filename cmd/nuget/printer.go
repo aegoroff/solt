@@ -4,7 +4,7 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"solt/cmd/fw"
-	"solt/cmd/out"
+	"solt/internal/out"
 	"sort"
 	"strings"
 )

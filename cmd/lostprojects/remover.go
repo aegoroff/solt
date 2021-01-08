@@ -2,7 +2,7 @@ package lostprojects
 
 import (
 	"github.com/spf13/afero"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 type remover struct {

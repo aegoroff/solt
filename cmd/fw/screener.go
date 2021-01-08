@@ -2,7 +2,7 @@ package fw
 
 import (
 	"github.com/akutz/sortfold"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 // Screener is an abstraction that does comples structures output

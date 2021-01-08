@@ -2,7 +2,7 @@ package fw
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 // Matcher defines string matcher interface

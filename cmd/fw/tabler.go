@@ -2,7 +2,7 @@ package fw
 
 import (
 	"github.com/cheynewallace/tabby"
-	"solt/cmd/out"
+	"solt/internal/out"
 	"text/tabwriter"
 )
 

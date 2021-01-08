@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"io"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error

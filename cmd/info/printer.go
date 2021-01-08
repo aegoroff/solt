@@ -4,7 +4,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
 	"solt/cmd/fw"
-	"solt/cmd/out"
+	"solt/internal/out"
 )
 
 type printer struct {

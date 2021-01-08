@@ -8,8 +8,8 @@ import (
 	"solt/cmd/lostfiles"
 	"solt/cmd/lostprojects"
 	"solt/cmd/nuget"
-	"solt/cmd/out"
 	"solt/cmd/validate"
+	"solt/internal/out"
 )
 
 func newRoot() *cobra.Command {

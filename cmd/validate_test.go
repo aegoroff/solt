@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"solt/cmd/out"
+	"solt/internal/out"
 	"solt/internal/sys"
 	"strings"
 	"testing"
