@@ -31,7 +31,7 @@ func (p *pack) match(other *pack) bool {
 		return false
 	}
 
-	for _, v := range p.versions.Items() {
+	for v := range p.versions {
 		if other.versions.Contains(v) {
 			return true
 		}
