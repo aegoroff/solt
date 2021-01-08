@@ -1,17 +1,21 @@
 package lostprojects
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"os"
+	"path/filepath"
 	"solt/cmd/fw"
 	"solt/msvc"
+	"strings"
 )
 
 type finder struct {
-	allFiles *fw.Includer
+	allFilesPaths c9s.StringHashSet
 }
 
 func newFinder() *finder {
 	return &finder{
-		allFiles: fw.NewIncluder(fw.NewNullExister()),
+		allFilesPaths: make(c9s.StringHashSet),
 	}
 }
 
@@ -23,7 +27,7 @@ func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]
 
 	for _, p := range all {
 		if within.Match(p.Path()) {
-			f.allFiles.From(p)
+			f.selectFilePaths(p)
 		} else {
 			lost = append(lost, p)
 		}
@@ -35,14 +39,30 @@ func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]
 func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 	var lost []string
 	var lostWithIncludes []string
-	solutionFiles := fw.NewExactMatch(f.allFiles.Includes())
+
+	pathMatch, _ := fw.NewPartialMatcher(f.filesPaths(), strings.ToUpper)
 
 	for _, lp := range allLost {
-		if fw.MatchAny(lp.Items(), solutionFiles) {
+		if pathMatch.Match(lp.Path()) {
 			lostWithIncludes = append(lostWithIncludes, lp.Path())
 		} else {
 			lost = append(lost, lp.Path())
 		}
 	}
 	return lost, lostWithIncludes
+}
+
+func (f *finder) filesPaths() []string {
+	return f.allFilesPaths.ItemsDecorated(trailPathSeparator)
+}
+
+func (f *finder) selectFilePaths(p *msvc.MsbuildProject) {
+	for _, s := range p.Items() {
+		d := filepath.Dir(s)
+		f.allFilesPaths.Add(d)
+	}
+}
+
+func trailPathSeparator(s string) string {
+	return s + string(os.PathSeparator)
 }
