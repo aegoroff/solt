@@ -8,22 +8,24 @@ import (
 	"strings"
 )
 
-type skpper struct {
+// skipper is just collector that collects folders
+// which files have to be skipped
+type skipper struct {
 	items collections.StringHashSet
 }
 
-func newSkipper() *skpper {
-	return &skpper{
+func newSkipper() *skipper {
+	return &skipper{
 		items: make(collections.StringHashSet),
 	}
 }
 
-func (h *skpper) folders() []string {
+func (h *skipper) folders() []string {
 	return h.items.Items()
 }
 
 // Handler executed on each found file in a folder
-func (h *skpper) Handler(path string) {
+func (h *skipper) Handler(path string) {
 	// Add file to filtered files slice
 	ext := filepath.Ext(path)
 
@@ -34,7 +36,7 @@ func (h *skpper) Handler(path string) {
 	}
 }
 
-func (h *skpper) fromProject(prj *msvc.MsbuildProject) {
+func (h *skipper) fromProject(prj *msvc.MsbuildProject) {
 	pdir := filepath.Dir(prj.Path())
 
 	// In case of SDK projects all files inside project folder are considered included
