@@ -71,7 +71,10 @@ func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
 		}
 	}
 
-	m, _ := fw.NewPartialMatcher(filePaths.Items(), strings.ToUpper)
+	m, err := fw.NewPartialMatcher(filePaths.Items(), strings.ToUpper)
+	if err != nil {
+		return fw.NewMatchNothing()
+	}
 	return m
 }
 

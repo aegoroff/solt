@@ -34,6 +34,15 @@ func (c *caseless) EqualTo(y rbtree.Comparable) bool {
 	return strings.EqualFold(string(*c), string(*y.(*caseless)))
 }
 
+type matchNothing struct{}
+
+// NewMatchNothing creates new Matcher that matches nothing i.e. always return false on match
+func NewMatchNothing() Matcher {
+	return &matchNothing{}
+}
+
+func (*matchNothing) Match(string) bool { return false }
+
 // NewLostItemMatcher creates new Matcher instance that detects lost item
 func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
 	m := &matchL{

@@ -9,10 +9,6 @@ type finder struct {
 	m fw.Matcher
 }
 
-type matchNothing struct{}
-
-func (*matchNothing) Match(string) bool { return false }
-
 func newFinder(includedFiles, excludedFolders []string) *finder {
 	excludes := exclude(excludedFolders)
 	includes := fw.NewExactMatch(includedFiles)
@@ -24,7 +20,7 @@ func newFinder(includedFiles, excludedFolders []string) *finder {
 func exclude(excludedFolders []string) fw.Matcher {
 	excludes, err := fw.NewPartialMatcher(excludedFolders, strings.ToUpper)
 	if err != nil {
-		return &matchNothing{}
+		return fw.NewMatchNothing()
 	}
 	return excludes
 }
