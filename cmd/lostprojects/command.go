@@ -3,7 +3,7 @@ package lostprojects
 import (
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
-	"solt/cmd/ux"
+	"solt/internal/ux"
 	"solt/msvc"
 )
 

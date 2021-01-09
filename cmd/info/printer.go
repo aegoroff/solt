@@ -3,8 +3,8 @@ package info
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"solt/cmd/ux"
 	"solt/internal/out"
+	"solt/internal/ux"
 )
 
 type printer struct {

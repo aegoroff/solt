@@ -3,8 +3,8 @@ package nuget
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
-	"solt/cmd/ux"
 	"solt/internal/out"
+	"solt/internal/ux"
 	"sort"
 	"strings"
 )

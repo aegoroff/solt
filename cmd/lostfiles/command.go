@@ -5,8 +5,8 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"solt/cmd/fw"
-	"solt/cmd/ux"
 	"solt/internal/sys"
+	"solt/internal/ux"
 	"solt/msvc"
 )
 

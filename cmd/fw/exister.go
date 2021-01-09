@@ -3,9 +3,9 @@ package fw
 import (
 	"github.com/spf13/afero"
 	"io"
-	"solt/cmd/ux"
 	"solt/internal/out"
 	"solt/internal/sys"
+	"solt/internal/ux"
 )
 
 type exister struct {

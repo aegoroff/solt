@@ -4,7 +4,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
-	"solt/cmd/ux"
+	"solt/internal/ux"
 	"solt/msvc"
 	"solt/solution"
 	"strconv"
