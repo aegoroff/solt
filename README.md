@@ -114,7 +114,8 @@ Aliases:
   lp, lostprojects
 
 Flags:
-  -h, --help   help for lp
+  -h, --help     help for lp
+  -r, --remove   Remove lost projects folders
 
 Global Flags:
       --cpuprofile string   Runs CPU profiling if --diag option set.
