@@ -34,7 +34,7 @@ func Execute(fs afero.Fs, pe out.PrintEnvironment, args ...string) error {
 	const profileTrail = "If not set profiling not started. Correct file path should be set here"
 
 	const cDescription = "Runs CPU profiling if --diag option set. " + profileTrail
-	rootCmd.PersistentFlags().StringVarP(&d.Cpu, "cpuprofile", "", "", cDescription)
+	rootCmd.PersistentFlags().StringVarP(&d.CPU, "cpuprofile", "", "", cDescription)
 
 	const mDescription = "Runs memory profiling if --diag option set. " + profileTrail
 	rootCmd.PersistentFlags().StringVarP(&d.Memory, "memprofile", "", "", mDescription)

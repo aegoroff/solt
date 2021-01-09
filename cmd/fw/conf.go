@@ -19,8 +19,8 @@ type Conf struct {
 
 // Diag is app diagnostic context
 type Diag struct {
-	// Cpu path to cpu profiling results
-	Cpu string
+	// CPU path to cpu profiling results
+	CPU string
 	// Memory path to memory profiling results
 	Memory string
 	// Enable whether to enable diagnostic
@@ -29,7 +29,7 @@ type Diag struct {
 
 // NewConf creates new *Conf instance
 func NewConf(fs afero.Fs, pe out.PrintEnvironment, d *Diag) *Conf {
-	return &Conf{filesystem: fs, pe: pe, cpu: &d.Cpu, memory: &d.Memory, diag: &d.Enable}
+	return &Conf{filesystem: fs, pe: pe, cpu: &d.CPU, memory: &d.Memory, diag: &d.Enable}
 }
 
 // Diag gets whether to enable diagnostic mode
