@@ -6,7 +6,7 @@ import (
 )
 
 // Version defines program version
-var Version = "0.12.10-dev"
+var Version = "0.13.0-dev"
 
 type versionCommand struct {
 	*fw.BaseCommand
