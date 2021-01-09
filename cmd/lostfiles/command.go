@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/internal/sys"
 	"solt/msvc"
 )
@@ -77,7 +78,7 @@ func (c *lostFilesCommand) newExister(fs afero.Fs, w io.Writer) fw.Exister {
 }
 
 func (c *lostFilesCommand) print(lost []string) {
-	s := fw.NewScreener(c.Prn())
+	s := ux.NewScreener(c.Prn())
 	s.WriteSlice(lost)
 }
 

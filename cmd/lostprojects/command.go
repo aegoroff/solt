@@ -3,6 +3,7 @@ package lostprojects
 import (
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/msvc"
 )
 
@@ -46,12 +47,12 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 
 	lost, lostWithIncludes := find.filter(allProjects, solutionProjects.Includes())
 
-	s := fw.NewScreener(c.Prn())
+	s := ux.NewScreener(c.Prn())
 	// Lost projects
 	s.WriteSlice(lost)
 
 	if len(lostWithIncludes) > 0 {
-		m1 := fw.NewMarginer(1)
+		m1 := ux.NewMarginer(1)
 
 		l1 := "<red>These projects are not included into any solution</>"
 		l2 := "<red>but files from the projects' folders are used in another projects within a solution:</>"

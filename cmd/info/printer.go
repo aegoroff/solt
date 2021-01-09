@@ -3,7 +3,7 @@ package info
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/internal/out"
 )
 
@@ -17,7 +17,7 @@ func newPrinter(margin int, w out.Writable) *printer {
 }
 
 func (p *printer) print(set c9s.StringHashSet, name string) {
-	tbl := fw.NewTabler(p.w, p.margin)
+	tbl := ux.NewTabler(p.w, p.margin)
 	tbl.AddHead(name)
 
 	items := set.SortedItems(sortfold.Strings)

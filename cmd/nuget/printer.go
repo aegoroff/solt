@@ -3,7 +3,7 @@ package nuget
 import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
-	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/internal/out"
 	"sort"
 	"strings"
@@ -14,7 +14,7 @@ func newNugetPrinter(p out.Printer, w out.Writable, column string, margin int) *
 		p:      p,
 		w:      w,
 		column: column,
-		m:      fw.NewMarginer(margin),
+		m:      ux.NewMarginer(margin),
 	}
 	return &np
 }
@@ -23,7 +23,7 @@ type nugetprint struct {
 	p      out.Printer
 	w      out.Writable
 	column string
-	m      *fw.Marginer
+	m      *ux.Marginer
 }
 
 func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *folder) string) {
@@ -39,7 +39,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	tbl := fw.NewTabler(n.w, n.m.Value())
+	tbl := ux.NewTabler(n.w, n.m.Value())
 	tbl.AddHead(n.column, "Version")
 
 	sort.Slice(packs, func(i, j int) bool {

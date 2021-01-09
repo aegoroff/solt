@@ -4,6 +4,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/msvc"
 	"solt/solution"
 	"strconv"
@@ -40,7 +41,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 
 		c.Prn().Cprint(" <gray>%s</>\n", sol.Path())
 
-		tbl := fw.NewTabler(c, c.margin)
+		tbl := ux.NewTabler(c, c.margin)
 
 		tbl.AddLine("Header", sln.Header)
 		tbl.AddLine("Product", sln.Comment)
@@ -65,7 +66,7 @@ func (c *infoCommand) showProjectsInfo(projects []*solution.Project) {
 		byType[p.Type]++
 	}
 
-	tbl := fw.NewTabler(c, c.margin)
+	tbl := ux.NewTabler(c, c.margin)
 	tbl.AddHead("Project type", "Count")
 
 	for k, v := range byType {

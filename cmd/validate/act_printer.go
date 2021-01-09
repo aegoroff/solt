@@ -3,7 +3,7 @@ package validate
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/akutz/sortfold"
-	"solt/cmd/fw"
+	"solt/cmd/ux"
 	"solt/internal/out"
 )
 
@@ -21,25 +21,25 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
-	m1 := fw.NewMarginer(1)
-	m3 := fw.NewMarginer(3)
-	m5 := fw.NewMarginer(5)
+	m1 := ux.NewMarginer(1)
+	m3 := ux.NewMarginer(3)
+	m5 := ux.NewMarginer(5)
 
 	v.prn.Println()
 	v.prn.Cprint(m1.Margin("Solution: <green>%s</>\n"), path)
 
-	projects := make([]string, len(refs))
+	keys := make([]string, len(refs))
 	i := 0
-	for s := range refs {
-		projects[i] = s
+	for k := range refs {
+		keys[i] = k
 		i++
 	}
 
-	sortfold.Strings(projects)
+	sortfold.Strings(keys)
 
-	for _, project := range projects {
-		v.prn.Cprint(m3.Margin("project <yellow>%s</> has redundant references:\n"), project)
-		rrs := refs[project]
+	for _, k := range keys {
+		v.prn.Cprint(m3.Margin("project <yellow>%s</> has redundant references:\n"), k)
+		rrs := refs[k]
 
 		items := rrs.SortedItems(sortfold.Strings)
 		for _, s := range items {

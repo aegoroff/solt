@@ -3,6 +3,7 @@ package fw
 import (
 	"github.com/spf13/afero"
 	"io"
+	"solt/cmd/ux"
 	"solt/internal/out"
 	"solt/internal/sys"
 )
@@ -37,7 +38,7 @@ func (e *exister) Print(p out.Printer, title string, container string) {
 		p.Println()
 	}
 
-	s := NewScreener(p)
+	s := ux.NewScreener(p)
 	s.WriteMap(e.unexist, container)
 }
 
