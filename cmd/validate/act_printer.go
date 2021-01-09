@@ -21,12 +21,12 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	if len(refs) == 0 {
 		return
 	}
-	sm := fw.NewMarginer(1)
-	pm := fw.NewMarginer(3)
-	rm := fw.NewMarginer(5)
+	m1 := fw.NewMarginer(1)
+	m3 := fw.NewMarginer(3)
+	m5 := fw.NewMarginer(5)
 
 	v.prn.Println()
-	v.prn.Cprint(sm.Margin("Solution: <green>%s</>\n"), path)
+	v.prn.Cprint(m1.Margin("Solution: <green>%s</>\n"), path)
 
 	projects := make([]string, len(refs))
 	i := 0
@@ -38,12 +38,12 @@ func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
 	sortfold.Strings(projects)
 
 	for _, project := range projects {
-		v.prn.Cprint(pm.Margin("project <yellow>%s</> has redundant references:\n"), project)
+		v.prn.Cprint(m3.Margin("project <yellow>%s</> has redundant references:\n"), project)
 		rrs := refs[project]
 
 		items := rrs.SortedItems(sortfold.Strings)
 		for _, s := range items {
-			v.prn.Cprint(rm.Margin("<gray>%s</>\n"), s)
+			v.prn.Cprint(m5.Margin("<gray>%s</>\n"), s)
 		}
 		v.prn.Println()
 	}
