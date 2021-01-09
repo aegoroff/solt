@@ -1,7 +1,7 @@
 package lostfiles
 
 import (
-	"github.com/aegoroff/godatastruct/collections"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
@@ -11,12 +11,12 @@ import (
 // skipper is just collector that collects folders
 // which files have to be skipped
 type skipper struct {
-	items collections.StringHashSet
+	items c9s.StringHashSet
 }
 
 func newSkipper() *skipper {
 	return &skipper{
-		items: make(collections.StringHashSet),
+		items: make(c9s.StringHashSet),
 	}
 }
 

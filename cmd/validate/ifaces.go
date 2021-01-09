@@ -1,7 +1,7 @@
 package validate
 
-import "github.com/aegoroff/godatastruct/collections"
+import c9s "github.com/aegoroff/godatastruct/collections"
 
 type actioner interface {
-	action(path string, items map[string]collections.StringHashSet)
+	action(path string, items map[string]c9s.StringHashSet)
 }
