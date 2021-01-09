@@ -50,13 +50,13 @@ func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 	return result, sources
 }
 
-// LessThan implements rbtree.Comparable interface
-func (x *Folder) LessThan(y rbtree.Comparable) bool {
+// Less implements rbtree.Comparable interface
+func (x *Folder) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(x.Path, y.(*Folder).Path) < 0
 }
 
-// EqualTo implements rbtree.Comparable interface
-func (x *Folder) EqualTo(y rbtree.Comparable) bool {
+// Equal implements rbtree.Comparable interface
+func (x *Folder) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(x.Path, y.(*Folder).Path)
 }
 

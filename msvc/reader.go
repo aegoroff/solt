@@ -63,7 +63,7 @@ func (r *reader) getResult() rbtree.RbTree {
 func newReader(modules []readerModule) *reader {
 	return &reader{
 		modules:    modules,
-		result:     rbtree.NewRbTree(),
+		result:     rbtree.New(),
 		aggregator: make(chan *Folder, 64),
 	}
 }

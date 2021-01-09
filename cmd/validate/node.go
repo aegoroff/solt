@@ -31,10 +31,10 @@ func (n *node) String() string {
 	return *n.fullPath
 }
 
-func (n *node) LessThan(y rbtree.Comparable) bool {
+func (n *node) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(n.String(), y.(*node).String()) < 0
 }
 
-func (n *node) EqualTo(y rbtree.Comparable) bool {
+func (n *node) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(n.String(), y.(*node).String())
 }

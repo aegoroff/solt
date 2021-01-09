@@ -42,7 +42,7 @@ func (m *validator) validate() {
 }
 
 func (*validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
-	tree := rbtree.NewRbTree()
+	tree := rbtree.New()
 
 	for _, project := range allProjects {
 		if !project.Project.IsSdkProject() {
@@ -62,7 +62,7 @@ func (m *validator) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbt
 func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path())
 	g := simple.NewDirectedGraph()
-	nodes := rbtree.NewRbTree()
+	nodes := rbtree.New()
 	ix := int64(1)
 	for _, prj := range sln.Solution.Projects {
 		if prj.TypeID == solution.IDSolutionFolder {

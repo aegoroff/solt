@@ -11,7 +11,7 @@ func newMismatcher(nugets rbtree.RbTree) *mismatcher {
 }
 
 func (m *mismatcher) mismatchedPacks(mismatches []*pack, allPaths []string) rbtree.RbTree {
-	result := rbtree.NewRbTree()
+	result := rbtree.New()
 
 	for _, mismatch := range mismatches {
 		packs := make([]*pack, 0)

@@ -12,11 +12,11 @@ type folder struct {
 	packs   []*pack
 }
 
-func (n *folder) LessThan(y rbtree.Comparable) bool {
+func (n *folder) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(n.path, y.(*folder).path) < 0
 }
 
-func (n *folder) EqualTo(y rbtree.Comparable) bool {
+func (n *folder) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(n.path, y.(*folder).path)
 }
 

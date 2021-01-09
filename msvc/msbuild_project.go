@@ -23,13 +23,13 @@ func (prj *MsbuildProject) Path() string {
 	return prj.path
 }
 
-// LessThan implements rbtree.Comparable interface
-func (prj *MsbuildProject) LessThan(y rbtree.Comparable) bool {
+// Less implements rbtree.Comparable interface
+func (prj *MsbuildProject) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(prj.path, y.(*MsbuildProject).path) < 0
 }
 
-// EqualTo implements rbtree.Comparable interface
-func (prj *MsbuildProject) EqualTo(y rbtree.Comparable) bool {
+// Equal implements rbtree.Comparable interface
+func (prj *MsbuildProject) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(prj.path, y.(*MsbuildProject).path)
 }
 

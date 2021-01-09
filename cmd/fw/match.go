@@ -26,11 +26,11 @@ type matchL struct {
 
 type caseless string
 
-func (c *caseless) LessThan(y rbtree.Comparable) bool {
+func (c *caseless) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(string(*c), string(*y.(*caseless))) < 0
 }
 
-func (c *caseless) EqualTo(y rbtree.Comparable) bool {
+func (c *caseless) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(string(*c), string(*y.(*caseless)))
 }
 
@@ -75,7 +75,7 @@ func NewPartialMatcher(matches []string, decorator func(s string) string) (Searc
 
 // NewExactMatch creates exact matcher from strings slice
 func NewExactMatch(matches []string) Matcher {
-	tree := rbtree.NewRbTree()
+	tree := rbtree.New()
 	for _, s := range matches {
 		cs := caseless(s)
 		tree.Insert(&cs)

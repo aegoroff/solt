@@ -75,7 +75,7 @@ func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 }
 
 func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
-	result := rbtree.NewRbTree()
+	result := rbtree.New()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
 		if len(packages) == 0 {
@@ -146,7 +146,7 @@ func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
 
 // spreadNugetPacks binds all found nuget packages by solutions
 func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree) rbtree.RbTree {
-	result := rbtree.NewRbTree()
+	result := rbtree.New()
 
 	for _, sol := range solutions {
 		npacks, projectFolders := onlySolutionPacks(sol, nugets)
