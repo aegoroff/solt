@@ -69,7 +69,6 @@ Flags:
                             Correct file path should be set here
   -o, --output string       Write results into file. Specify path to 
                             output file using this option
-  -p, --path string         REQUIRED. Path to the sources folder
 
 Use "solt [command] --help" for more information about a command.
 ```
@@ -79,7 +78,7 @@ Use "solt [command] --help" for more information about a command.
 Find lost files in the folder specified
 
 Usage:
-  solt lf [flags]
+  solt lf [path] [flags]
 
 Aliases:
   lf, lostfiles
@@ -101,14 +100,13 @@ Global Flags:
                             Correct file path should be set here
   -o, --output string       Write results into file. Specify path to 
                             output file using this option
-  -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Search lost projects syntax:
 ```
 Find projects that not included into any solution
 
 Usage:
-  solt lp [flags]
+  solt lp [path] [flags]
 
 Aliases:
   lp, lostprojects
@@ -127,15 +125,13 @@ Global Flags:
                             Correct file path should be set here
   -o, --output string       Write results into file. Specify path to 
                             output file using this option
-  -p, --path string         REQUIRED. Path to the sources folder
-
 ```
 ### Nuget information syntax:
 ```
 Get nuget packages information within solutions
 
 Usage:
-  solt nu [flags]
+  solt nu [path] [flags]
   solt nu [command]
 
 Aliases:
@@ -161,14 +157,13 @@ Global Flags:
                             Correct file path should be set here
   -o, --output string       Write results into file. Specify path to 
                             output file using this option
-  -p, --path string         REQUIRED. Path to the sources folder
 ```
 ### Validate SDK projects syntax:
 ```
 Validates SDK projects within solution(s)
 
 Usage:
-  solt va [flags]
+  solt va [path] [flags]
   solt va [command]
 
 Aliases:
@@ -190,5 +185,4 @@ Global Flags:
                             Correct file path should be set here
   -o, --output string       Write results into file. Specify path to 
                             output file using this option
-  -p, --path string         REQUIRED. Path to the sources folder
 ```
