@@ -88,7 +88,7 @@ func (c *CobraCreator) runE() cobraRunSignature {
 
 // NewCommand creates new *cobra.Command instance
 func (c *CobraCreator) NewCommand(use, alias, short string) *cobra.Command {
-	return c.NewArgsCommand(use+" <path>", alias, short, cobra.ExactArgs(1))
+	return c.NewArgsCommand(use+" [path]", alias, short, cobra.MaximumNArgs(1))
 }
 
 // NewArgsCommand creates new *cobra.Command instance

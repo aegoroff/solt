@@ -298,7 +298,7 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	ass.Equal("", actual)
 }
 
-func Test_FindLostFilesNoPath_NoOutput(t *testing.T) {
+func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -309,7 +309,7 @@ func Test_FindLostFilesNoPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Contains(actual, "Find lost files in the folder specified")
 }
 
 func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {

@@ -254,7 +254,7 @@ func Test_NugetCmdBySolutionUnexistPath_NoOutput(t *testing.T) {
 	ass.Equal(``, actual)
 }
 
-func Test_NugetCmdBySolutionNoPath_NoOutput(t *testing.T) {
+func Test_NugetCmdBySolutionNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -265,10 +265,10 @@ func Test_NugetCmdBySolutionNoPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Contains(actual, "Get nuget packages information within solutions")
 }
 
-func Test_NugetCmdByProjectNoPath_NoOutput(t *testing.T) {
+func Test_NugetCmdByProjectNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -279,5 +279,5 @@ func Test_NugetCmdByProjectNoPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Contains(actual, "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files")
 }

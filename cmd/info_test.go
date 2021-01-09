@@ -50,7 +50,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 `), actual)
 }
 
-func Test_InfoNoPath_NoOutput(t *testing.T) {
+func Test_InfoNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -61,5 +61,5 @@ func Test_InfoNoPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Contains(actual, "Get information about found solutions")
 }

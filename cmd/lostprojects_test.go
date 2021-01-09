@@ -235,7 +235,7 @@ These projects are included into a solution but not found in the file system:
 `), actual)
 }
 
-func Test_FindLostProjectsNoPath_NoOutput(t *testing.T) {
+func Test_FindLostProjectsNoPath_OutputHelp(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -246,5 +246,5 @@ func Test_FindLostProjectsNoPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Contains(actual, "Find projects that not included into any solution")
 }
