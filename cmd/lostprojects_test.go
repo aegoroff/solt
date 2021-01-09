@@ -24,7 +24,7 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -48,7 +48,7 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -78,7 +78,7 @@ func Test_FindLostProjectsCmdLostProjectsRemove_LostProjectsRemoved(t *testing.T
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir, "-r")
+	_ = Execute(memfs, env, "lp", dir, "-r")
 
 	// Assert
 	actual := env.String()
@@ -106,7 +106,7 @@ func Test_FindLostProjectsCmdLostProjectsRemoveReadOnlyFs_LostProjectsNotRemoved
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(afero.NewReadOnlyFs(memfs), env, "lp", "-p", dir, "-r")
+	_ = Execute(afero.NewReadOnlyFs(memfs), env, "lp", dir, "-r")
 
 	// Assert
 	actual := env.String()
@@ -135,7 +135,7 @@ func Test_FindLostProjectsCmdOtherDirWithFilesIncludedToLinked_LostProjectsFound
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -168,7 +168,7 @@ func Test_FindLostProjectsCmdOtherDirWithFilesDeepIncludedToLinked_LostProjectsF
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -200,7 +200,7 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -223,7 +223,7 @@ func Test_FindLostProjectsCmdUnexistProjects_LostProjectsFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lp", "-p", dir)
+	_ = Execute(memfs, env, "lp", dir)
 
 	// Assert
 	actual := env.String()
@@ -235,7 +235,7 @@ These projects are included into a solution but not found in the file system:
 `), actual)
 }
 
-func Test_FindLostProjectsNoPath_OutputHelp(t *testing.T) {
+func Test_FindLostProjectsNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -246,5 +246,5 @@ func Test_FindLostProjectsNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Find projects that not included into any solution")
+	ass.Equal("", actual)
 }

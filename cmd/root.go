@@ -27,30 +27,26 @@ func newRoot() *cobra.Command {
 func Execute(fs afero.Fs, pe out.PrintEnvironment, args ...string) error {
 	rootCmd := newRoot()
 
-	var sourcesPath string
-	var cpuprofile string
-	var memprofile string
 	var resultfile string
-	var diag bool
 
-	rootCmd.PersistentFlags().StringVarP(&sourcesPath, "path", "p", "", "REQUIRED. Path to the sources folder")
+	d := fw.Diag{}
 
 	const profileTrail = "If not set profiling not started. Correct file path should be set here"
 
 	const cDescription = "Runs CPU profiling if --diag option set. " + profileTrail
-	rootCmd.PersistentFlags().StringVarP(&cpuprofile, "cpuprofile", "", "", cDescription)
+	rootCmd.PersistentFlags().StringVarP(&d.Cpu, "cpuprofile", "", "", cDescription)
 
 	const mDescription = "Runs memory profiling if --diag option set. " + profileTrail
-	rootCmd.PersistentFlags().StringVarP(&memprofile, "memprofile", "", "", mDescription)
+	rootCmd.PersistentFlags().StringVarP(&d.Memory, "memprofile", "", "", mDescription)
 
 	const fDescription = "Write results into file. Specify path to output file using this option"
 	rootCmd.PersistentFlags().StringVarP(&resultfile, "output", "o", "", fDescription)
 
-	rootCmd.PersistentFlags().BoolVarP(&diag, "diag", "d", false, "Show application diagnostic after run")
+	rootCmd.PersistentFlags().BoolVarP(&d.Enable, "diag", "d", false, "Show application diagnostic after run")
 
 	env := out.NewWriteFileEnvironment(&resultfile, fs, pe)
 
-	c := fw.NewConf(fs, env, &sourcesPath, &cpuprofile, &memprofile, &diag)
+	c := fw.NewConf(fs, env, &d)
 
 	rootCmd.AddCommand(info.New(c))
 	rootCmd.AddCommand(lostfiles.New(c))

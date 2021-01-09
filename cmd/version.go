@@ -19,7 +19,7 @@ func newVersion(c *fw.Conf) *cobra.Command {
 		}
 	})
 
-	cmd := cc.NewCommand("ver", "version", "Print the version number of solt")
+	cmd := cc.NewArgsCommand("ver", "version", "Print the version number of solt", nil)
 	cmd.Long = `All software has versions. This is solt's`
 
 	return cmd

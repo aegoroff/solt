@@ -27,7 +27,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "va", "-p", dir)
+	_ = Execute(memfs, env, "va", dir)
 
 	// Assert
 	actual := env.String()
@@ -68,7 +68,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			env := out.NewMemoryEnvironment()
 
 			// Act
-			_ = Execute(memfs, env, "va", "fix", "-p", dir)
+			_ = Execute(memfs, env, "va", "fix", dir)
 
 			// Assert
 			actual := env.String()
@@ -101,7 +101,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "va", "-p", dir)
+	_ = Execute(memfs, env, "va", dir)
 
 	// Assert
 	actual := env.String()
@@ -124,14 +124,14 @@ func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "fr", "-p", dir)
+	_ = Execute(memfs, env, "fr", dir)
 
 	// Assert
 	actual := env.String()
 	ass.Equal("", actual)
 }
 
-func Test_ValidateSdkNoPath_OutputHelp(t *testing.T) {
+func Test_ValidateSdkNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -142,10 +142,10 @@ func Test_ValidateSdkNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Validates SDK projects within solution(s)")
+	ass.Equal("", actual)
 }
 
-func Test_FixSdkNoPath_OutputHelp(t *testing.T) {
+func Test_FixSdkNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -156,5 +156,5 @@ func Test_FixSdkNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Fixes redundant SDK projects references")
+	ass.Equal("", actual)
 }

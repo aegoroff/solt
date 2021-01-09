@@ -24,7 +24,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "in", "-p", dir)
+	_ = Execute(memfs, env, "in", dir)
 
 	// Assert
 	actual := env.String()
@@ -50,7 +50,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 `), actual)
 }
 
-func Test_InfoNoPath_OutputHelp(t *testing.T) {
+func Test_InfoNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -61,5 +61,5 @@ func Test_InfoNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Get information about found solutions")
+	ass.Equal("", actual)
 }

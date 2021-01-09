@@ -60,6 +60,18 @@ func NewCobraCreator(c *Conf, exe func() Executor) *CobraCreator {
 
 func (c *CobraCreator) runE() cobraRunSignature {
 	return func(cc *cobra.Command, args []string) error {
+		var sp string
+		if len(args) > 0 {
+			sp = args[0]
+		}
+		err := c.conf.init(&sp)
+		if err != nil {
+			return err
+		}
+		defer scan.Close(c.conf.W())
+
+		cc.SetOut(c.conf.W())
+
 		// IMPORTANT: Executors initialization order defines output order
 		var e Executor
 		{
@@ -70,24 +82,22 @@ func (c *CobraCreator) runE() cobraRunSignature {
 			e = newMemoryProfileExecutor(e, c.conf)
 		}
 
-		err := c.conf.init()
-		if err != nil {
-			return err
-		}
-		defer scan.Close(c.conf.W())
-
-		cc.SetOut(c.conf.W())
-
 		return e.Execute(cc)
 	}
 }
 
 // NewCommand creates new *cobra.Command instance
 func (c *CobraCreator) NewCommand(use, alias, short string) *cobra.Command {
+	return c.NewArgsCommand(use+" <path>", alias, short, cobra.ExactArgs(1))
+}
+
+// NewArgsCommand creates new *cobra.Command instance
+func (c *CobraCreator) NewArgsCommand(use, alias, short string, args cobra.PositionalArgs) *cobra.Command {
 	var cc = &cobra.Command{
 		Use:     use,
 		Aliases: []string{alias},
 		Short:   short,
+		Args:    args,
 		RunE:    c.runE(),
 	}
 	return cc

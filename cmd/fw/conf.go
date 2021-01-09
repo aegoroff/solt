@@ -17,9 +17,19 @@ type Conf struct {
 	diag       *bool
 }
 
+// Diag is app diagnostic context
+type Diag struct {
+	// Cpu path to cpu profiling results
+	Cpu string
+	// Memory path to memory profiling results
+	Memory string
+	// Enable whether to enable diagnostic
+	Enable bool
+}
+
 // NewConf creates new *Conf instance
-func NewConf(fs afero.Fs, pe out.PrintEnvironment, sp *string, cpu *string, memory *string, diag *bool) *Conf {
-	return &Conf{filesystem: fs, pe: pe, sp: sp, cpu: cpu, memory: memory, diag: diag}
+func NewConf(fs afero.Fs, pe out.PrintEnvironment, d *Diag) *Conf {
+	return &Conf{filesystem: fs, pe: pe, cpu: &d.Cpu, memory: &d.Memory, diag: &d.Enable}
 }
 
 // Diag gets whether to enable diagnostic mode
@@ -57,9 +67,10 @@ func (c *Conf) SourcesPath() *string {
 	return c.sp
 }
 
-func (c *Conf) init() error {
+func (c *Conf) init(sources *string) error {
 	p, err := c.pe.NewPrinter()
 	c.p = p
+	c.sp = sources
 	if err != nil || *c.SourcesPath() == "" {
 		return err
 	}

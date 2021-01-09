@@ -24,7 +24,7 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "p", "-p", dir)
+	_ = Execute(memfs, env, "nu", "p", dir)
 
 	// Assert
 	actual := env.String()
@@ -53,7 +53,7 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "p", "-p", dir)
+	_ = Execute(memfs, env, "nu", "p", dir)
 
 	// Assert
 	actual := env.String()
@@ -81,7 +81,7 @@ func Test_NugetCmdFindMismatchNoMismath_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
+	_ = Execute(memfs, env, "nu", dir, "-m")
 
 	// Assert
 	actual := env.String()
@@ -104,7 +104,7 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", dir, "-m")
+	_ = Execute(memfs, env, "nu", dir, "-m")
 
 	// Assert
 	actual := env.String()
@@ -133,7 +133,7 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", dir, "-m", "-v")
+	_ = Execute(memfs, env, "nu", dir, "-m", "-v")
 
 	// Assert
 	actual := env.String()
@@ -168,7 +168,7 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", dir)
+	_ = Execute(memfs, env, "nu", dir)
 
 	// Assert
 	actual := env.String()
@@ -196,7 +196,7 @@ func Test_NugetCmdBySolutionNoPackages_NoOutput(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", dir)
+	_ = Execute(memfs, env, "nu", dir)
 
 	// Assert
 	actual := env.String()
@@ -228,7 +228,7 @@ func Test_NugetCmdBySolutionManySolutions_OutputAsSpecified(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "nu", "-p", "d/")
+	_ = Execute(memfs, env, "nu", "d/")
 
 	// Assert
 	actual := env.String()
@@ -254,7 +254,7 @@ func Test_NugetCmdBySolutionUnexistPath_NoOutput(t *testing.T) {
 	ass.Equal(``, actual)
 }
 
-func Test_NugetCmdBySolutionNoPath_OutputHelp(t *testing.T) {
+func Test_NugetCmdBySolutionNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -265,10 +265,10 @@ func Test_NugetCmdBySolutionNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Get nuget packages information within solutions")
+	ass.Equal("", actual)
 }
 
-func Test_NugetCmdByProjectNoPath_OutputHelp(t *testing.T) {
+func Test_NugetCmdByProjectNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -279,5 +279,5 @@ func Test_NugetCmdByProjectNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Get nuget packages information by projects' folders i.e. from packages.config or SDK project files")
+	ass.Equal("", actual)
 }

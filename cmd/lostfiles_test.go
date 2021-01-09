@@ -24,7 +24,7 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", dir)
 
 	// Assert
 	actual := env.String()
@@ -58,7 +58,7 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 		env := out.NewMemoryEnvironment()
 
 		// Act
-		_ = Execute(memfs, env, "lf", "-p", dir)
+		_ = Execute(memfs, env, "lf", dir)
 
 		// Assert
 		actual := env.String()
@@ -83,7 +83,7 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", dir)
 
 	// Assert
 	actual := env.String()
@@ -102,7 +102,7 @@ func Test_FindLostFilesCmdNoProjects_AllFilesLost(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", dir)
 
 	// Assert
 	actual := env.String()
@@ -138,7 +138,7 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", root)
+	_ = Execute(memfs, env, "lf", root)
 
 	// Assert
 	actual := env.String()
@@ -161,7 +161,7 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", dir)
 
 	// Assert
 	actual := env.String()
@@ -193,7 +193,7 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 		env := out.NewMemoryEnvironment()
 
 		// Act
-		_ = Execute(memfs, env, "lf", "-p", dir, "-f", tst.filter)
+		_ = Execute(memfs, env, "lf", dir, "-f", tst.filter)
 
 		// Assert
 		actual := env.String()
@@ -218,7 +218,7 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir, "-r")
+	_ = Execute(memfs, env, "lf", dir, "-r")
 
 	// Assert
 	actual := env.String()
@@ -245,7 +245,7 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(fs, env, "lf", "-p", dir, "-r")
+	_ = Execute(fs, env, "lf", dir, "-r")
 
 	// Assert
 	actual := env.String()
@@ -269,7 +269,7 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir, "-a")
+	_ = Execute(memfs, env, "lf", "-a", dir)
 
 	// Assert
 	actual := env.String()
@@ -291,14 +291,14 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", dir)
+	_ = Execute(memfs, env, "lf", dir)
 
 	// Assert
 	actual := env.String()
 	ass.Equal("", actual)
 }
 
-func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
+func Test_FindLostFilesNoPath_NoOutput(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
@@ -309,7 +309,7 @@ func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Contains(actual, "Find lost files in the folder specified")
+	ass.Equal("", actual)
 }
 
 func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
@@ -319,7 +319,7 @@ func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
 	env := out.NewMemoryEnvironment()
 
 	// Act
-	_ = Execute(memfs, env, "lf", "-p", "/")
+	_ = Execute(memfs, env, "lf", "/")
 
 	// Assert
 	actual := env.String()
