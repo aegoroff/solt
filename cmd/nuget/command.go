@@ -214,7 +214,7 @@ func keepOnlyMismatch(in rbtree.RbTree) {
 	})
 
 	for _, n := range empty {
-		in.DeleteNode(n)
+		in.Delete(n)
 	}
 }
 
