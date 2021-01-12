@@ -30,15 +30,16 @@ func (s *VisualStudioSolution) Items() []string {
 // AllProjectPaths gets all possible projects' paths defined in solution
 func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []string {
 	solutionPath := filepath.Dir(s.path)
-	var paths = make([]string, 0, len(s.Solution.Projects))
+	var paths = make([]string, len(s.Solution.Projects))
+	i := 0
 	for _, sp := range s.Solution.Projects {
-		if sp.TypeID == solution.IDSolutionFolder {
-			continue
+		if sp.TypeID != solution.IDSolutionFolder {
+			fullProjectPath := filepath.Join(solutionPath, sp.Path)
+			paths[i] = decorator(fullProjectPath)
+			i++
 		}
-		fullProjectPath := filepath.Join(solutionPath, sp.Path)
-		paths = append(paths, decorator(fullProjectPath))
 	}
-	return paths
+	return paths[0:i]
 }
 
 // SortSolutions sorts solutions by path
