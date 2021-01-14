@@ -14,8 +14,8 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
-github.com/aegoroff/dirstat v0.13.1 h1:T1m3GDlkBjsrJcSZHWKg0LC0yoT3Wu81/2gu3WaQGMc=
-github.com/aegoroff/dirstat v0.13.1/go.mod h1:ux7koGS35eNzJdpHiXMZve5IzgMYK+4Wea1wFDtCXRo=
+github.com/aegoroff/dirstat v0.14.0 h1:rtKRlW/Bnjy0/BWuuHS4SdHfgSiZNfIRmGu3QhEwcCA=
+github.com/aegoroff/dirstat v0.14.0/go.mod h1:ux7koGS35eNzJdpHiXMZve5IzgMYK+4Wea1wFDtCXRo=
 github.com/aegoroff/godatastruct v1.0.0 h1:47fUUUIjQ2dyObprHuVSp1OOjJ23s6dfdZ6XQJBIkeQ=
 github.com/aegoroff/godatastruct v1.0.0/go.mod h1:WT8eEbkOIhN5LahFJESs7EL5aNk2CVkgJ1jUyNM4LtQ=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
