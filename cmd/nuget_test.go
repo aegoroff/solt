@@ -30,10 +30,10 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
   a\a (packages.config)
-  Package            Version
-  -------            -------
-  CmdLine            1.0.7.509
-  Newtonsoft.Json    12.0.1
+   Package            Version
+   -------            -------
+   CmdLine            1.0.7.509
+   Newtonsoft.Json    12.0.1
 `), actual)
 }
 
@@ -59,9 +59,9 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
   a\a (a.csproj)
-  Package              Version
-  -------              -------
-  CommandLineParser    2.8.0
+   Package              Version
+   -------              -------
+   CommandLineParser    2.8.0
 `), actual)
 }
 
@@ -111,9 +111,9 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
 	ass.Equal(sys.ToValidPath(` Different nuget package's versions in the same solution found:
 
   a\a.sln
-  Package              Version
-  -------              -------
-  CommandLineParser    2.7.0, 2.8.0
+   Package              Version
+   -------              -------
+   CommandLineParser    2.7.0, 2.8.0
 `), actual)
 }
 
@@ -140,15 +140,15 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
 	ass.Equal(sys.ToValidPath(` Different nuget package's versions in the same solution found:
 
   a\a.sln
-  Package              Version
-  -------              -------
-  CommandLineParser    2.7.0, 2.8.0
+   Package              Version
+   -------              -------
+   CommandLineParser    2.7.0, 2.8.0
 
      Package: CommandLineParser
-     Project    Version
-     -------    -------
-     a\a        2.8.0
-     a\b        2.7.0
+      Project    Version
+      -------    -------
+      a\a        2.8.0
+      a\b        2.7.0
 `), actual)
 }
 
@@ -174,10 +174,10 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`
   a\a.sln
-  Package            Version
-  -------            -------
-  CmdLine            1.0.7.509
-  Newtonsoft.Json    12.0.1
+   Package            Version
+   -------            -------
+   CmdLine            1.0.7.509
+   Newtonsoft.Json    12.0.1
 `), actual)
 }
 

@@ -39,7 +39,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	n.p.Cprint("\n")
 	n.p.Cprint(n.m.Margin("<gray>%s</>\n"), parent)
 
-	tbl := ux.NewTabler(n.w, n.m.Value())
+	tbl := ux.NewTabler(n.w, n.m.Value()+1)
 	tbl.AddHead(n.column, "Version")
 
 	sort.Slice(packs, func(i, j int) bool {
