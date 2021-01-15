@@ -1,13 +1,11 @@
 package info
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
 	"solt/solution"
 	"strconv"
-	"strings"
 )
 
 type display struct {
@@ -61,30 +59,18 @@ func (d *display) showProjectsInfo(projects []*solution.Project) {
 	d.p.Println()
 }
 
-func (d *display) showSectionsInfo(sections []*solution.Section) {
-	var configurations = make(c9s.StringHashSet)
-	var platforms = make(c9s.StringHashSet)
+func (d *display) showSectionsInfo(sections sections) {
+	confPlat := newConfigurationPlatform()
 
-	for _, s := range sections {
-		if s.Name != "SolutionConfigurationPlatforms" {
-			continue
-		}
-		for _, item := range s.Items {
-			parts := strings.Split(item.Key, "|")
-			configuration := parts[0]
-			platform := parts[1]
-			configurations.Add(configuration)
-			platforms.Add(platform)
-		}
-	}
+	sections.foreach(confPlat)
 
 	prn := newPrinter(d.margin, d.w)
 
-	prn.print(configurations, "Configuration")
+	prn.print(confPlat.configurations, "Configuration")
 
 	d.p.Println()
 
-	prn.print(platforms, "Platform")
+	prn.print(confPlat.platforms, "Platform")
 
 	d.p.Println()
 }

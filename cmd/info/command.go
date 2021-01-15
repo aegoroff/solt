@@ -26,19 +26,15 @@ func New(c *fw.Conf) *cobra.Command {
 func (c *infoCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
-	solutions := msvc.SelectSolutions(foldersTree)
-	msvc.SortSolutions(solutions)
+	sols := msvc.SelectSolutions(foldersTree)
+	msvc.SortSolutions(sols)
 
-	handlers := []solutioner{
+	acts := []solutioner{
 		newDisplay(c.Prn(), c),
 		newTotaler(),
 	}
 
-	for _, sol := range solutions {
-		for _, h := range handlers {
-			h.solution(sol)
-		}
-	}
+	solutions(sols).foreach(acts)
 
 	return nil
 }

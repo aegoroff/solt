@@ -1,7 +1,15 @@
 package info
 
-import "solt/msvc"
+import (
+	"solt/msvc"
+	"solt/solution"
+)
 
 type solutioner interface {
-	solution(sl *msvc.VisualStudioSolution)
+	solution(*msvc.VisualStudioSolution)
+}
+
+type sectioner interface {
+	allow(*solution.Section) bool
+	run(*solution.Section)
 }
