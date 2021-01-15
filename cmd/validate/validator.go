@@ -10,6 +10,7 @@ import (
 	"solt/cmd/fw"
 	"solt/msvc"
 	"solt/solution"
+	"sort"
 )
 
 type validator struct {
@@ -30,11 +31,14 @@ func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 func (va *validator) validate() {
 	foldersTree := msvc.ReadSolutionDir(va.sourcesPath, va.fs)
 
-	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
 	va.onlySdkProjects(allProjects)
 
-	fw.SolutionSlice(solutions).Foreach(va)
+	solutions := fw.SolutionSlice(sols)
+	sort.Sort(solutions)
+
+	solutions.Foreach(va)
 }
 
 func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
