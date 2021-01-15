@@ -47,6 +47,11 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   --------
   Any CPU
 
+ Totals:
+  Solutions    1
+  Projects     1
+  --------     -
+  C#           1
 `), actual)
 }
 
