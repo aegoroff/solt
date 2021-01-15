@@ -51,9 +51,9 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   Solutions       1
   Projects        1
                   
-  Project type    Count    Percent
-  ------------    -----    -------
-  C#              1        100.00%
+  Project type    Count    %          Solutions    %     
+  ------------    -----    ------     ---------    ------
+  C#              1        100.00%    1            100.00%
 `), actual)
 }
 
