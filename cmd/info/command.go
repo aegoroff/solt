@@ -32,7 +32,11 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	solutions := fw.SolutionSlice(sols)
 	sort.Sort(solutions)
 
-	solutions.Foreach(newDisplay(c.Prn(), c), newTotaler())
+	grp := newProjectGroupper()
+	tot := newTotaler(grp)
+	solutions.Foreach(grp, newDisplay(c.Prn(), c, grp), tot)
+
+	tot.display(c.Prn(), c)
 
 	return nil
 }

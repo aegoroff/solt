@@ -4,7 +4,6 @@ import (
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
-	"solt/solution"
 	"strconv"
 )
 
@@ -12,13 +11,15 @@ type display struct {
 	p      out.Printer
 	margin int
 	w      out.Writable
+	grp    *projectGroupper
 }
 
-func newDisplay(p out.Printer, w out.Writable) *display {
+func newDisplay(p out.Printer, w out.Writable, grp *projectGroupper) *display {
 	return &display{
 		p:      p,
 		margin: 2,
 		w:      w,
+		grp:    grp,
 	}
 }
 
@@ -38,25 +39,23 @@ func (d *display) Solution(sl *msvc.VisualStudioSolution) {
 
 	d.p.Println()
 
-	d.showProjectsInfo(sln.Projects)
+	d.showProjectsInfo()
 	d.showSectionsInfo(sln.GlobalSections)
 }
 
-func (d *display) showProjectsInfo(projects []*solution.Project) {
-	var byType = make(map[string]int)
-
-	for _, p := range projects {
-		byType[p.Type]++
-	}
-
+func (d *display) showProjectsInfo() {
 	tbl := ux.NewTabler(d.w, d.margin)
 	tbl.AddHead("Project type", "Count")
 
-	for k, v := range byType {
+	for k, v := range d.groupped() {
 		tbl.AddLine(k, strconv.Itoa(v))
 	}
 	tbl.Print()
 	d.p.Println()
+}
+
+func (d *display) groupped() map[string]int {
+	return d.grp.ByType()
 }
 
 func (d *display) showSectionsInfo(sections sections) {
