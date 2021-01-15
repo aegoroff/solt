@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
 	"solt/msvc"
+	"sort"
 )
 
 type infoCommand struct {
@@ -27,9 +28,11 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 
 	sols := msvc.SelectSolutions(foldersTree)
-	msvc.SortSolutions(sols)
 
-	fw.SolutionSlice(sols).Foreach(newDisplay(c.Prn(), c), newTotaler())
+	solutions := fw.SolutionSlice(sols)
+	sort.Sort(solutions)
+
+	solutions.Foreach(newDisplay(c.Prn(), c), newTotaler())
 
 	return nil
 }

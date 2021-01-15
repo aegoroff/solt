@@ -101,9 +101,10 @@ func (r *readerSolution) read(path string, ch chan<- *Folder) {
 
 	f := newFolder(path)
 
-	s := VisualStudioSolution{Solution: sln, path: path}
+	vs := NewVisualStudioSolution(path)
+	vs.Solution = sln
 
-	f.Content.Solutions = append(f.Content.Solutions, &s)
+	f.Content.Solutions = append(f.Content.Solutions, vs)
 
 	ch <- f
 }
