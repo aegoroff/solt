@@ -8,7 +8,6 @@ import (
 
 type infoCommand struct {
 	*fw.BaseCommand
-	margin int
 }
 
 // New creates new command that shows information about solutions
@@ -16,7 +15,6 @@ func New(c *fw.Conf) *cobra.Command {
 	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		exe := &infoCommand{
 			BaseCommand: fw.NewBaseCmd(c),
-			margin:      2,
 		}
 		return fw.NewExecutorShowHelp(exe, c)
 	})
