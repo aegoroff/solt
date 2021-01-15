@@ -31,6 +31,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 
 	handlers := []solutioner{
 		newDisplay(c.Prn(), c),
+		newTotaler(),
 	}
 
 	for _, sol := range solutions {
