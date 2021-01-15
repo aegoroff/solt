@@ -22,7 +22,11 @@ func (p *projectGroupper) Solution(vs *msvc.VisualStudioSolution) {
 
 	for _, pr := range vs.Solution.Projects {
 		if pr.TypeID != solution.IDSolutionFolder {
-			p.byType[pr.Type]++
+			if pr.Type != "" {
+				p.byType[pr.Type]++
+			} else {
+				p.byType[pr.TypeID]++
+			}
 		}
 	}
 }
