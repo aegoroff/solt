@@ -13,6 +13,10 @@ func NewIncluder(exister Exister) *Includer {
 	return &Includer{exister: exister}
 }
 
+func (i *Includer) Solution(s *msvc.VisualStudioSolution) {
+	i.From(s)
+}
+
 // From gets includes from msvc.Container and validates their existence
 func (i *Includer) From(p msvc.Container) {
 	includes := p.Items()

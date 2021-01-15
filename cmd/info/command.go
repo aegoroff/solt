@@ -29,12 +29,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	sols := msvc.SelectSolutions(foldersTree)
 	msvc.SortSolutions(sols)
 
-	acts := []solutioner{
-		newDisplay(c.Prn(), c),
-		newTotaler(),
-	}
-
-	solutions(sols).foreach(acts)
+	fw.SolutionSlice(sols).Foreach(newDisplay(c.Prn(), c), newTotaler())
 
 	return nil
 }

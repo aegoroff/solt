@@ -7,6 +7,7 @@ import (
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
+	"solt/cmd/fw"
 	"solt/msvc"
 	"solt/solution"
 )
@@ -15,6 +16,7 @@ type validator struct {
 	fs          afero.Fs
 	sourcesPath string
 	act         actioner
+	sdkProjects rbtree.RbTree
 }
 
 func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
@@ -25,41 +27,42 @@ func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 	}
 }
 
-func (m *validator) validate() {
-	foldersTree := msvc.ReadSolutionDir(m.sourcesPath, m.fs)
+func (va *validator) validate() {
+	foldersTree := msvc.ReadSolutionDir(va.sourcesPath, va.fs)
 
 	solutions, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 
-	sdkProjects := m.onlySdkProjects(allProjects)
+	va.onlySdkProjects(allProjects)
 
-	for _, sol := range solutions {
-		g, allNodes := m.newSolutionGraph(sol, sdkProjects)
-
-		redundants := m.findRedundants(g, allNodes)
-
-		m.act.action(sol.Path(), redundants)
-	}
+	fw.SolutionSlice(solutions).Foreach(va)
 }
 
-func (*validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) rbtree.RbTree {
-	tree := rbtree.New()
+func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
+	va.sdkProjects = rbtree.New()
 
 	for _, project := range allProjects {
 		if !project.Project.IsSdkProject() {
 			continue
 		}
-		tree.Insert(project)
+		va.sdkProjects.Insert(project)
 	}
-	return tree
 }
 
-func (m *validator) newSolutionGraph(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
-	g, nodes := m.createGraphNodes(sln, sdkTree)
-	m.createGraphEdges(g, nodes)
+func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
+	g, allNodes := va.newSolutionGraph(sol)
+
+	redundants := va.findRedundants(g, allNodes)
+
+	va.act.action(sol.Path(), redundants)
+}
+
+func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) (*simple.DirectedGraph, rbtree.RbTree) {
+	g, nodes := va.createGraphNodes(sln)
+	va.createGraphEdges(g, nodes)
 	return g, nodes
 }
 
-func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtree.RbTree) (*simple.DirectedGraph, rbtree.RbTree) {
+func (va *validator) createGraphNodes(sln *msvc.VisualStudioSolution) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path())
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.New()
@@ -71,7 +74,7 @@ func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtre
 
 		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, prj.Path))
 
-		msbuild, ok := sdkTree.Search(p)
+		msbuild, ok := va.sdkProjects.Search(p)
 		if !ok {
 			continue
 		}
@@ -85,12 +88,12 @@ func (*validator) createGraphNodes(sln *msvc.VisualStudioSolution, sdkTree rbtre
 	return g, nodes
 }
 
-func (m *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
+func (va *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
 	gn := g.Nodes()
 
 	for gn.Next() {
 		to := gn.Node().(*node)
-		refs := m.getReferences(to, nodes)
+		refs := va.getReferences(to, nodes)
 		for _, ref := range refs {
 			e := g.NewEdge(ref, to)
 			g.SetEdge(e)
@@ -98,7 +101,7 @@ func (m *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTre
 	}
 }
 
-func (m *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
+func (va *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
@@ -107,7 +110,7 @@ func (m *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTr
 	for gn.Next() {
 		project := gn.Node().(*node)
 
-		refs := m.getReferences(project, allNodes)
+		refs := va.getReferences(project, allNodes)
 
 		rrs := make(c9s.StringHashSet)
 

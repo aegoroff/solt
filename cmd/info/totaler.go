@@ -14,7 +14,7 @@ func newTotaler() *totaler {
 	}
 }
 
-func (t *totaler) solution(sl *msvc.VisualStudioSolution) {
+func (t *totaler) Solution(sl *msvc.VisualStudioSolution) {
 	t.result.solutions++
 	t.result.projects += len(sl.Solution.Projects)
 }

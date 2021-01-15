@@ -22,7 +22,7 @@ func newDisplay(p out.Printer, w out.Writable) *display {
 	}
 }
 
-func (d *display) solution(sl *msvc.VisualStudioSolution) {
+func (d *display) Solution(sl *msvc.VisualStudioSolution) {
 	sln := sl.Solution
 
 	d.p.Cprint(" <gray>%s</>\n", sl.Path())

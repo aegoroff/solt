@@ -38,10 +38,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	exist := fw.NewExister(c.Fs(), c.Writer())
 	solutionProjects := fw.NewIncluder(exist)
 
-	// Each found solution
-	for _, sln := range solutions {
-		solutionProjects.From(sln)
-	}
+	fw.SolutionSlice(solutions).Foreach(solutionProjects)
 
 	find := newFinder()
 
