@@ -48,10 +48,12 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   Any CPU
 
  Totals:
-  Solutions    1
-  Projects     1
-  --------     -
-  C#           1
+  Solutions       1
+  Projects        1
+                  
+  Project type    Count    Percent
+  ------------    -----    -------
+  C#              1        100.00%
 `), actual)
 }
 
