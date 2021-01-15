@@ -8,13 +8,13 @@ import (
 // SolutionSlice provides *msvc.VisualStudioSolution slice
 type SolutionSlice []*msvc.VisualStudioSolution
 
-func (v SolutionSlice) Len() int { return len(v) }
+func (s SolutionSlice) Len() int { return len(s) }
 
-func (v SolutionSlice) Less(i, j int) bool {
-	return sortfold.CompareFold(v[i].Path(), v[j].Path()) < 0
+func (s SolutionSlice) Less(i, j int) bool {
+	return sortfold.CompareFold(s[i].Path(), s[j].Path()) < 0
 }
 
-func (v SolutionSlice) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
+func (s SolutionSlice) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
 // Foreach enumerates all solutions within slice and
 // calls each action on each
