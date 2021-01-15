@@ -44,7 +44,7 @@ func (d *display) Solution(sl *msvc.VisualStudioSolution) {
 }
 
 func (d *display) showProjectsInfo() {
-	tbl := ux.NewTabler(d.w, d.margin)
+	tbl := ux.NewTabler(d.w, d.margin+1)
 	tbl.AddHead("Project type", "Count")
 
 	for k, v := range d.groupped() {
@@ -63,7 +63,7 @@ func (d *display) showSectionsInfo(sections sections) {
 
 	sections.foreach(confPlat)
 
-	prn := newPrinter(d.margin, d.w)
+	prn := newPrinter(d.margin+1, d.w)
 
 	prn.print(confPlat.configurations, "Configuration")
 
