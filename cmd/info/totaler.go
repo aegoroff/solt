@@ -2,11 +2,11 @@ package info
 
 import (
 	"fmt"
-	"github.com/akutz/sortfold"
 	"github.com/dustin/go-humanize"
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
+	"sort"
 )
 
 type totaler struct {
@@ -41,22 +41,26 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 	tbl.AddLine("Projects", humanize.Comma(int64(t.result.projects)))
 	tbl.AddLine("", "")
 
-	types := make([]string, len(t.result.projectTypes))
-	i := 0
-	for k := range t.result.projectTypes {
-		types[i] = k
-		i++
+	type nv struct {
+		name string
+		val  int
 	}
 
-	sortfold.Strings(types)
+	types := make([]nv, 0, len(t.result.projectTypes))
+	for k, v := range t.result.projectTypes {
+		types = append(types, nv{name: k, val: v})
+	}
+
+	sort.Slice(types, func(i, j int) bool {
+		return types[i].val > types[j].val
+	})
 
 	tbl.AddHead("Project type", "Count", "Percent")
-	for _, name := range types {
-		count := t.result.projectTypes[name]
-		countS := humanize.Comma(int64(count))
-		percent := t.percent(count)
+	for _, tt := range types {
+		countS := humanize.Comma(int64(tt.val))
+		percent := t.percent(tt.val)
 		percentS := fmt.Sprintf("%.2f%%", percent)
-		tbl.AddLine(name, countS, percentS)
+		tbl.AddLine(tt.name, countS, percentS)
 	}
 	tbl.Print()
 }
