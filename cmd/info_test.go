@@ -36,10 +36,11 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
   Visual Studio Version            16.0.30104.148
   Minimum Visual Studio Version    10.0.40219.1
 
-   Project type                   Count
-   ------------                   -----
-   WiX (Windows Installer XML)    1
-   C#                             2
+   Project type                             Count
+   ------------                             -----
+   WiX (Windows Installer XML)              1
+   C#                                       2
+   {00000000-000-0000-0000-000000000000}    1
 
    Configuration
    -------------
@@ -70,13 +71,14 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
    Any CPU
 
  Totals:
-  Solutions                      2
-  Projects                       4
-                                 
-  Project type                   Count    %         Solutions    %     
-  ------------                   -----    ------    ---------    ------
-  C#                             3        75.00%    2            100.00%
-  WiX (Windows Installer XML)    1        25.00%    1            50.00%
+  Solutions                                2
+  Projects                                 5
+                                           
+  Project type                             Count    %         Solutions    %     
+  ------------                             -----    ------    ---------    ------
+  C#                                       3        60.00%    2            100.00%
+  WiX (Windows Installer XML)              1        20.00%    1            50.00%
+  {00000000-000-0000-0000-000000000000}    1        20.00%    1            50.00%
 `), actual)
 }
 
@@ -106,6 +108,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "a", "a\a.csproj", "{3F69AE6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "b", "b\b.csproj", "{1C0ED62B-D506-4E72-BBC2-A50D3926466E}"
 EndProject
+Project("{00000000-000-0000-0000-000000000000}") = "test.prop", "b\test.prop", "{97E04FD2-B904-46BE-930A-B270D264E83C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +128,10 @@ Global
 		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97E04FD2-B904-46BE-930A-B270D264E83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97E04FD2-B904-46BE-930A-B270D264E83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97E04FD2-B904-46BE-930A-B270D264E83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97E04FD2-B904-46BE-930A-B270D264E83C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
