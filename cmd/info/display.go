@@ -4,6 +4,7 @@ import (
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
+	"sort"
 	"strconv"
 )
 
@@ -47,8 +48,19 @@ func (d *display) showProjectsInfo() {
 	tbl := ux.NewTabler(d.w, d.margin+1)
 	tbl.AddHead("Project type", "Count")
 
+	type kv struct {
+		k string
+		v int
+	}
+	var kvs []kv
 	for k, v := range d.groupped() {
-		tbl.AddLine(k, strconv.Itoa(v))
+		kvs = append(kvs, kv{k, v})
+	}
+	sort.Slice(kvs, func(i, j int) bool {
+		return kvs[i].k < kvs[j].k
+	})
+	for _, v := range kvs {
+		tbl.AddLine(v.k, strconv.Itoa(v.v))
 	}
 	tbl.Print()
 	d.p.Println()

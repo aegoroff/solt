@@ -38,8 +38,8 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
    Project type                             Count
    ------------                             -----
-   WiX (Windows Installer XML)              1
    C#                                       2
+   WiX (Windows Installer XML)              1
    {00000000-000-0000-0000-000000000000}    1
 
    Configuration
