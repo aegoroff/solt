@@ -30,7 +30,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath(` a/a.sln
+	ass.Equal(sys.ToValidPath(` a\a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148
@@ -51,7 +51,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
    --------
    Any CPU
 
- a/a1.sln
+ a\a1.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148
