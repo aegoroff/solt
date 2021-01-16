@@ -71,6 +71,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
    Any CPU
 
  Totals:
+
   Solutions                                2
   Projects                                 5
                                            

@@ -50,7 +50,7 @@ func (t *totaler) groupped() map[string]int {
 }
 
 func (t *totaler) display(p out.Printer, w out.Writable) {
-	p.Cprint(" <red>Totals:</>\n")
+	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
 	tbl.AddLine("Solutions", humanize.Comma(t.result.solutions))
