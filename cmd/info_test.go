@@ -15,6 +15,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 	memfs := afero.NewMemMapFs()
 	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
 	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(wixSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1.sln", []byte(testSolutionContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(testProjectContent), 0644)
 	_ = afero.WriteFile(memfs, dir+"w/w.wixproj", []byte(wix), 0644)
 	_ = afero.WriteFile(memfs, dir+"a/App.config", []byte(appConfigContent), 0644)
@@ -29,7 +30,7 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath(` a\a.sln
+	ass.Equal(sys.ToValidPath(` a/a.sln
   Header                           Microsoft Visual Studio Solution File, Format Version 12.00
   Product                          # Visual Studio Version 16
   Visual Studio Version            16.0.30104.148
@@ -38,7 +39,26 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
    Project type                   Count
    ------------                   -----
    WiX (Windows Installer XML)    1
-   C#                             1
+   C#                             2
+
+   Configuration
+   -------------
+   Debug
+   Release
+
+   Platform
+   --------
+   Any CPU
+
+ a/a1.sln
+  Header                           Microsoft Visual Studio Solution File, Format Version 12.00
+  Product                          # Visual Studio Version 16
+  Visual Studio Version            16.0.30104.148
+  Minimum Visual Studio Version    10.0.40219.1
+
+   Project type    Count
+   ------------    -----
+   C#              1
 
    Configuration
    -------------
@@ -50,13 +70,13 @@ func Test_InfoCmd_InfoAsSpecified(t *testing.T) {
    Any CPU
 
  Totals:
-  Solutions                      1
-  Projects                       2
+  Solutions                      2
+  Projects                       4
                                  
   Project type                   Count    %         Solutions    %     
   ------------                   -----    ------    ---------    ------
-  C#                             1        50.00%    1            100.00%
-  WiX (Windows Installer XML)    1        50.00%    1            100.00%
+  C#                             3        75.00%    2            100.00%
+  WiX (Windows Installer XML)    1        25.00%    1            50.00%
 `), actual)
 }
 
@@ -84,6 +104,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "w", "w\w.wixproj", "{27060C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "a", "a\a.csproj", "{3F69AE61-CC2E-40DB-B3CE-77ABD9BF327F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "b", "b\b.csproj", "{1C0ED62B-D506-4E72-BBC2-A50D3926466E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +120,10 @@ Global
 		{3F69AE61-CC2E-40DB-B3CE-77ABD9BF327F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F69AE61-CC2E-40DB-B3CE-77ABD9BF327F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F69AE61-CC2E-40DB-B3CE-77ABD9BF327F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C0ED62B-D506-4E72-BBC2-A50D3926466E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
