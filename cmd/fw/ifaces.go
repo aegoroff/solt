@@ -3,6 +3,7 @@ package fw
 import (
 	"github.com/spf13/cobra"
 	"solt/internal/out"
+	"solt/msvc"
 )
 
 // Matcher defines string matcher interface
@@ -30,4 +31,10 @@ type Exister interface {
 	Validate(root string, includes []string)
 	// Print outputs unexist files info
 	Print(p out.Printer, title string, container string)
+}
+
+// Solutioner provides solution action prototype
+type Solutioner interface {
+	// Solution method called on each solution
+	Solution(*msvc.VisualStudioSolution)
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
-	"path/filepath"
 	"solt/cmd/fw"
 	"solt/msvc"
 	"strings"
@@ -64,49 +63,16 @@ func newNugetByProject(c *fw.Conf) *cobra.Command {
 
 func (c *nugetCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	c.execute(foldersTree)
-	return nil
-}
-
-func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	c.execute(foldersTree)
-	return nil
-}
-
-func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
-	result := rbtree.New()
-	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
-		packages, sources := fold.Content.NugetPackages()
-		if len(packages) == 0 {
-			return
-		}
-
-		packs := make([]*pack, len(packages))
-		for i, np := range packages {
-			packs[i] = newPack(np.ID, np.Version)
-		}
-
-		n := newNugetFolder(fold.Path, packs, sources)
-		result.Insert(n)
-	})
-
-	return result
-}
-
-func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 	nugets := newNugetFoldersTree(foldersTree)
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
-	packs := spreadNugetPacks(solutions, nugets)
-
-	if c.mismatch {
-		keepOnlyMismatch(packs)
-	}
+	grp := newGroupper(nugets)
+	fw.SolutionSlice(solutions).Foreach(grp)
+	packs := grp.result(c.mismatch)
 
 	if packs.Len() == 0 {
-		return
+		return nil
 	}
 
 	if c.mismatch {
@@ -131,9 +97,11 @@ func (c *nugetCommand) execute(foldersTree rbtree.RbTree) {
 			})
 		}
 	})
+	return nil
 }
 
-func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
+func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
 	nugets := newNugetFoldersTree(foldersTree)
 
 	prn := newNugetPrinter(c.Prn(), c, "Package", 2)
@@ -142,90 +110,25 @@ func (c *nugetByProjectCommand) execute(foldersTree rbtree.RbTree) {
 		src := strings.Join(nf.sources, ", ")
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
+	return nil
 }
 
-// spreadNugetPacks binds all found nuget packages by solutions
-func spreadNugetPacks(solutions []*msvc.VisualStudioSolution, nugets rbtree.RbTree) rbtree.RbTree {
+func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
 	result := rbtree.New()
-
-	for _, sol := range solutions {
-		npacks, projectFolders := onlySolutionPacks(sol, nugets)
-		reduced := mergeNugetPacks(npacks)
-
-		if len(reduced) > 0 {
-			nf := newNugetFolder(sol.Path(), reduced, projectFolders)
-			result.Insert(nf)
+	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
+		packages, sources := fold.Content.NugetPackages()
+		if len(packages) == 0 {
+			return
 		}
-	}
 
-	return result
-}
-
-func onlySolutionPacks(sol *msvc.VisualStudioSolution, nugets rbtree.RbTree) ([]*pack, []string) {
-	paths := sol.AllProjectPaths(filepath.Dir)
-	npacks := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
-	projectFolders := make([]string, 0, len(paths))
-
-	for _, path := range paths {
-		sv := newNugetFolder(path, nil, nil)
-		val, ok := nugets.Search(sv)
-		if ok {
-			packs := val.(*folder).packs
-			npacks = append(npacks, packs...)
-			projectFolders = append(projectFolders, path)
+		packs := make([]*pack, len(packages))
+		for i, np := range packages {
+			packs[i] = newPack(np.ID, np.Version)
 		}
-	}
-	return npacks, projectFolders
-}
 
-func mergeNugetPacks(packs []*pack) []*pack {
-	unique := make(map[string]*pack)
-	for _, p := range packs {
-		exist, ok := unique[p.pkg]
-		if ok {
-			exist.versions.AddRange(p.versions.Items()...)
-		} else {
-			unique[p.pkg] = p.copy()
-		}
-	}
-
-	reduced := make([]*pack, len(unique))
-	i := 0
-	for _, p := range unique {
-		reduced[i] = p
-		i++
-	}
-	return reduced
-}
-
-// keepOnlyMismatch removes all packs but only those
-// which have more then one version on a nuget package
-func keepOnlyMismatch(in rbtree.RbTree) {
-	empty := make([]*folder, 0)
-
-	rbtree.NewWalkInorder(in).Foreach(func(n rbtree.Comparable) {
-		nf := n.(*folder)
-		mismatchOnly := onlyMismatches(nf.packs)
-		if len(mismatchOnly) == 0 {
-			empty = append(empty, nf)
-		} else {
-			nf.packs = mismatchOnly
-		}
+		n := newNugetFolder(fold.Path, packs, sources)
+		result.Insert(n)
 	})
 
-	for _, n := range empty {
-		in.Delete(n)
-	}
-}
-
-func onlyMismatches(packs []*pack) []*pack {
-	n := 0
-	for _, p := range packs {
-		if p.versions.Count() > 1 {
-			packs[n] = p
-			n++
-		}
-	}
-	packs = packs[:n]
-	return packs
+	return result
 }

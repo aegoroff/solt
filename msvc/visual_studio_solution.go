@@ -1,10 +1,8 @@
 package msvc
 
 import (
-	"github.com/akutz/sortfold"
 	"path/filepath"
 	"solt/solution"
-	"sort"
 )
 
 // VisualStudioSolution defines VS solution that contains *solution.Solution
@@ -15,6 +13,11 @@ type VisualStudioSolution struct {
 
 	// filesystem path
 	path string
+}
+
+// NewVisualStudioSolution creates new *VisualStudioSolution instance and assigns path to it
+func NewVisualStudioSolution(path string) *VisualStudioSolution {
+	return &VisualStudioSolution{path: path}
 }
 
 // Path gets full path to solution
@@ -41,18 +44,3 @@ func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []stri
 	}
 	return paths[0:i]
 }
-
-// SortSolutions sorts solutions by path
-func SortSolutions(solutions []*VisualStudioSolution) {
-	sort.Sort(visualStudioSolutionSlice(solutions))
-}
-
-type visualStudioSolutionSlice []*VisualStudioSolution
-
-func (v visualStudioSolutionSlice) Len() int { return len(v) }
-
-func (v visualStudioSolutionSlice) Less(i, j int) bool {
-	return sortfold.CompareFold(v[i].path, v[j].path) < 0
-}
-
-func (v visualStudioSolutionSlice) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
