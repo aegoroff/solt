@@ -2,11 +2,11 @@ package info
 
 import (
 	"fmt"
+	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
-	"sort"
 )
 
 type totaler struct {
@@ -17,8 +17,7 @@ type totaler struct {
 func newTotaler(grp *projectGroupper) *totaler {
 	return &totaler{
 		result: &totals{
-			projectTypes:            make(map[string]int),
-			projectTypesInSolutions: make(map[string]int),
+			projectTypes: rbtree.New(),
 		},
 		grp: grp,
 	}
@@ -27,9 +26,22 @@ func newTotaler(grp *projectGroupper) *totaler {
 func (t *totaler) Solution(*msvc.VisualStudioSolution) {
 	t.result.solutions++
 	for k, v := range t.groupped() {
-		t.result.projectTypes[k] += v
-		t.result.projectTypesInSolutions[k]++
-		t.result.projects += v
+		t.updateType(k, int64(v))
+	}
+}
+
+func (t *totaler) updateType(k string, v int64) {
+	t.result.projects += v
+	key := newTypeStat(k)
+	n, ok := t.result.projectTypes.Search(newTypeStat(k))
+	if ok {
+		ts := n.(*typeStat)
+		ts.solutions++
+		ts.count += v
+	} else {
+		key.solutions = 1
+		key.count = v
+		t.result.projectTypes.Insert(key)
 	}
 }
 
@@ -45,39 +57,29 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 	tbl.AddLine("Projects", humanize.Comma(int64(t.result.projects)))
 	tbl.AddLine("", "")
 
-	type nv struct {
-		name string
-		val  int
-	}
-
-	types := make([]nv, 0, len(t.result.projectTypes))
-	for k, v := range t.result.projectTypes {
-		types = append(types, nv{name: k, val: v})
-	}
-
-	sort.Slice(types, func(i, j int) bool {
-		return types[i].val > types[j].val
-	})
-
 	const percentH = "%     "
 	tbl.AddHead("Project type", "Count", percentH, "Solutions", percentH)
-	for _, tt := range types {
-		countS := humanize.Comma(int64(tt.val))
-		percent := t.percentProjects(tt.val)
-		percentS := fmt.Sprintf("%.2f%%", percent)
-		solutions := t.result.projectTypesInSolutions[tt.name]
-		solutionsS := humanize.Comma(int64(solutions))
-		solPercent := t.percentSolutions(solutions)
-		solPercentS := fmt.Sprintf("%.2f%%", solPercent)
-		tbl.AddLine(tt.name, countS, percentS, solutionsS, solPercentS)
-	}
+
+	it := rbtree.NewAscend(t.result.projectTypes)
+
+	it.Foreach(func(n rbtree.Comparable) {
+		ts := n.(*typeStat)
+		percentS := fmt.Sprintf("%.2f%%", t.percentProjects(ts.count))
+		solPercentS := fmt.Sprintf("%.2f%%", t.percentSolutions(ts.solutions))
+		tbl.AddLine(ts.name, ts.Count(), percentS, ts.Solutions(), solPercentS)
+	})
+
 	tbl.Print()
 }
 
-func (t *totaler) percentProjects(value int) float64 {
-	return (float64(value) / float64(t.result.projects)) * 100
+func (t *totaler) percentProjects(value int64) float64 {
+	return percent(value, t.result.projects)
 }
 
-func (t *totaler) percentSolutions(value int) float64 {
-	return (float64(value) / float64(t.result.solutions)) * 100
+func (t *totaler) percentSolutions(value int64) float64 {
+	return percent(value, t.result.solutions)
+}
+
+func percent(value int64, total int64) float64 {
+	return (float64(value) / float64(total)) * 100
 }
