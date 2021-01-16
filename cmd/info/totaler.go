@@ -53,8 +53,8 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Solutions", humanize.Comma(int64(t.result.solutions)))
-	tbl.AddLine("Projects", humanize.Comma(int64(t.result.projects)))
+	tbl.AddLine("Solutions", humanize.Comma(t.result.solutions))
+	tbl.AddLine("Projects", humanize.Comma(t.result.projects))
 	tbl.AddLine("", "")
 
 	const percentH = "%     "
