@@ -13,6 +13,7 @@ func NewIncluder(exister Exister) *Includer {
 	return &Includer{exister: exister}
 }
 
+// Solution method that called on each solution while iterating solutions
 func (i *Includer) Solution(s *msvc.VisualStudioSolution) {
 	i.From(s)
 }
