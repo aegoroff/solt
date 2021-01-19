@@ -31,6 +31,8 @@ type Exister interface {
 	Validate(root string, includes []string)
 	// Print outputs unexist files info
 	Print(p out.Printer, title string, container string)
+	// UnexistCount gets the number of non exist items
+	UnexistCount() int64
 }
 
 // Solutioner provides solution action prototype

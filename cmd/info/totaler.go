@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
+	"solt/cmd/fw"
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
@@ -73,13 +74,9 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 }
 
 func (t *totaler) percentProjects(value int64) float64 {
-	return percent(value, t.result.projects)
+	return fw.Percent(value, t.result.projects)
 }
 
 func (t *totaler) percentSolutions(value int64) float64 {
-	return percent(value, t.result.solutions)
-}
-
-func percent(value int64, total int64) float64 {
-	return (float64(value) / float64(total)) * 100
+	return fw.Percent(value, t.result.solutions)
 }

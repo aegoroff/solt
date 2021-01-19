@@ -6,9 +6,10 @@ import (
 )
 
 type remover struct {
-	fs     afero.Fs
-	remove bool
-	p      out.Printer
+	fs           afero.Fs
+	remove       bool
+	p            out.Printer
+	successCount int64
 }
 
 func newRemover(fs afero.Fs, p out.Printer, remove bool) *remover {
@@ -25,6 +26,7 @@ func (r *remover) removeAll(projects []string) error {
 		if err != nil {
 			return err
 		}
+		r.successCount++
 		r.p.Cprint("\n Folder '<red>%s</>' removed", d)
 	}
 	if len(projects) > 0 {

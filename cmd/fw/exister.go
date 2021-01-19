@@ -9,8 +9,9 @@ import (
 )
 
 type exister struct {
-	filer   sys.Filer
-	unexist map[string][]string
+	filer        sys.Filer
+	unexist      map[string][]string
+	unexistCount int64
 }
 
 // NewExister creates new Exister instance
@@ -24,10 +25,17 @@ func NewExister(fs afero.Fs, w io.Writer) Exister {
 // Validate validates whether files from container exist in filesystem
 func (e *exister) Validate(root string, paths []string) {
 	nonexist := e.filer.CheckExistence(paths)
+	l := len(nonexist)
+	e.unexistCount += int64(l)
 
-	if len(nonexist) > 0 {
+	if l > 0 {
 		e.unexist[root] = append(e.unexist[root], nonexist...)
 	}
+}
+
+// UnexistCount gets the number of non exist items
+func (e *exister) UnexistCount() int64 {
+	return e.unexistCount
 }
 
 // Print outputs unexist files info
@@ -46,6 +54,8 @@ func (e *exister) Print(p out.Printer, title string, container string) {
 func NewNullExister() Exister { return &nullExister{} }
 
 type nullExister struct{}
+
+func (*nullExister) UnexistCount() int64 { return 0 }
 
 func (*nullExister) Print(out.Printer, string, string) {}
 

@@ -28,7 +28,20 @@ func Test_FindLostProjectsCmd_NoLostProjectsFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(``, actual)
+	ass.Equal(`
+ Totals:
+
+  Solutions                      1
+  Projects                       1
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        100.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
+`, actual)
 }
 
 func Test_FindLostProjectsCmdPureSdkProjects_LostProjectsFound(t *testing.T) {
@@ -55,6 +68,19 @@ func Test_FindLostProjectsCmdPureSdkProjects_LostProjectsFound(t *testing.T) {
 	// Assert
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`  a\b1\b.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       4
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               3        75.00%
+  Lost projects                  1        25.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -84,6 +110,19 @@ func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testi
  but files from the projects' folders are used in another projects within a solution:
 
   a\a\a1.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    1        50.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -112,6 +151,19 @@ func Test_FindLostProjectsCmdLostProjectsRemove_LostProjectsRemoved(t *testing.T
 	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
 
  Folder 'a\a1\' removed
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  1        50.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         1        50.00%
 `), actual)
 }
 
@@ -138,6 +190,19 @@ func Test_FindLostProjectsCmdLostProjectsRemoveReadOnlyFs_LostProjectsNotRemoved
 	// Assert
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  1        50.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -171,6 +236,19 @@ func Test_FindLostProjectsCmdOtherDirWithFilesIncludedToLinked_LostProjectsFound
  but files from the projects' folders are used in another projects within a solution:
 
   a\a1\a1.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    1        50.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -204,6 +282,19 @@ func Test_FindLostProjectsCmdOtherDirWithFilesDeepIncludedToLinked_LostProjectsF
  but files from the projects' folders are used in another projects within a solution:
 
   a\a1\a1.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    1        50.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -232,6 +323,19 @@ func Test_FindLostProjectsCmdLostProjectsInOtherDir_LostProjectsFound(t *testing
 	// Assert
 	actual := env.String()
 	ass.Equal(sys.ToValidPath(`  a\a1\a1.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       2
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               1        50.00%
+  Lost projects                  1        50.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         0        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
@@ -259,6 +363,19 @@ These projects are included into a solution but not found in the file system:
 
  Solution: a\a.sln
   a\a\a.csproj
+
+ Totals:
+
+  Solutions                      1
+  Projects                       0
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               0        0.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         1        0.00%
+  Removed (if specified)         0        0.00%
 `), actual)
 }
 
