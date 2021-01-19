@@ -34,6 +34,11 @@ func Test_NugetCmd_OutputAsSpecified(t *testing.T) {
    -------            -------
    CmdLine            1.0.7.509
    Newtonsoft.Json    12.0.1
+
+ Totals:
+
+  Projects    1
+  Packages    2
 `), actual)
 }
 
@@ -62,6 +67,11 @@ func Test_NugetCmdOnSdkProjects_OutputAsSpecified(t *testing.T) {
    Package              Version
    -------              -------
    CommandLineParser    2.8.0
+
+ Totals:
+
+  Projects    1
+  Packages    1
 `), actual)
 }
 
@@ -114,6 +124,15 @@ func Test_NugetCmdFindMismatch_OutputAsSpecified(t *testing.T) {
    Package              Version
    -------              -------
    CommandLineParser    2.7.0, 2.8.0
+
+ Totals:
+
+  Solutions     1
+                
+  Packages      Count
+  --------      -----
+  Total         1
+  Mismatched    1
 `), actual)
 }
 
@@ -149,6 +168,15 @@ func Test_NugetCmdFindMismatchVerbose_OutputAsSpecified(t *testing.T) {
       -------    -------
       a\a        2.8.0
       a\b        2.7.0
+
+ Totals:
+
+  Solutions     1
+                
+  Packages      Count
+  --------      -----
+  Total         1
+  Mismatched    1
 `), actual)
 }
 
@@ -178,6 +206,15 @@ func Test_NugetCmdBySolution_OutputAsSpecified(t *testing.T) {
    -------            -------
    CmdLine            1.0.7.509
    Newtonsoft.Json    12.0.1
+
+ Totals:
+
+  Solutions     1
+                
+  Packages      Count
+  --------      -----
+  Total         2
+  Mismatched    0
 `), actual)
 }
 

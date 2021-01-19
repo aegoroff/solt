@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func newNugetPrinter(p out.Printer, w out.Writable, column string, margin int) *nugetprint {
+func newNugetPrint(p out.Printer, w out.Writable, column string, margin int) *nugetprint {
 	np := nugetprint{
 		p:      p,
 		w:      w,
@@ -26,11 +26,11 @@ type nugetprint struct {
 	m      *ux.Marginer
 }
 
-func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *folder) string) {
+func (n *nugetprint) printTree(tree rbtree.RbTree, head func(nf *nugetFolder) string) {
 	it := rbtree.NewAscend(tree)
 
 	it.Foreach(func(c rbtree.Comparable) {
-		f := c.(*folder)
+		f := c.(*nugetFolder)
 		n.print(head(f), f.packs)
 	})
 }

@@ -6,33 +6,33 @@ import (
 	"solt/msvc"
 )
 
-type groupper struct {
-	nugets   rbtree.RbTree
-	groupped rbtree.RbTree
+type grouper struct {
+	nugets  rbtree.RbTree
+	grouped rbtree.RbTree
 }
 
-func newGroupper(nugets rbtree.RbTree) *groupper {
-	return &groupper{nugets: nugets, groupped: rbtree.New()}
+func newGroupper(nugets rbtree.RbTree) *grouper {
+	return &grouper{nugets: nugets, grouped: rbtree.New()}
 }
 
-func (g *groupper) result(onlyMismatch bool) rbtree.RbTree {
+func (g *grouper) result(onlyMismatch bool) rbtree.RbTree {
 	if onlyMismatch {
 		g.keepOnlyMismatch()
 	}
-	return g.groupped
+	return g.grouped
 }
 
-func (g *groupper) Solution(vs *msvc.VisualStudioSolution) {
+func (g *grouper) Solution(vs *msvc.VisualStudioSolution) {
 	npacks, projectFolders := g.onlySolutionPacks(vs)
 	reduced := mergeNugetPacks(npacks)
 
 	if len(reduced) > 0 {
 		nf := newNugetFolder(vs.Path(), reduced, projectFolders)
-		g.groupped.Insert(nf)
+		g.grouped.Insert(nf)
 	}
 }
 
-func (g *groupper) onlySolutionPacks(sol *msvc.VisualStudioSolution) ([]*pack, []string) {
+func (g *grouper) onlySolutionPacks(sol *msvc.VisualStudioSolution) ([]*pack, []string) {
 	paths := sol.AllProjectPaths(filepath.Dir)
 	npacks := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
 	projectFolders := make([]string, 0, len(paths))
@@ -41,7 +41,7 @@ func (g *groupper) onlySolutionPacks(sol *msvc.VisualStudioSolution) ([]*pack, [
 		sv := newNugetFolder(path, nil, nil)
 		val, ok := g.nugets.Search(sv)
 		if ok {
-			packs := val.(*folder).packs
+			packs := val.(*nugetFolder).packs
 			npacks = append(npacks, packs...)
 			projectFolders = append(projectFolders, path)
 		}
@@ -71,11 +71,11 @@ func mergeNugetPacks(packs []*pack) []*pack {
 
 // keepOnlyMismatch removes all packs but only those
 // which have more then one version on a nuget package
-func (g *groupper) keepOnlyMismatch() {
-	empty := make([]*folder, 0)
+func (g *grouper) keepOnlyMismatch() {
+	empty := make([]*nugetFolder, 0)
 
-	rbtree.NewWalkInorder(g.groupped).Foreach(func(n rbtree.Comparable) {
-		nf := n.(*folder)
+	rbtree.NewWalkInorder(g.grouped).Foreach(func(n rbtree.Comparable) {
+		nf := n.(*nugetFolder)
 		mismatchOnly := onlyMismatches(nf.packs)
 		if len(mismatchOnly) == 0 {
 			empty = append(empty, nf)
@@ -85,7 +85,7 @@ func (g *groupper) keepOnlyMismatch() {
 	})
 
 	for _, n := range empty {
-		g.groupped.Delete(n)
+		g.grouped.Delete(n)
 	}
 }
 

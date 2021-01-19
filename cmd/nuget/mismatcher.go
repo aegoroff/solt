@@ -4,6 +4,7 @@ import "github.com/aegoroff/godatastruct/rbtree"
 
 type mismatcher struct {
 	nugets rbtree.RbTree
+	count  int64
 }
 
 func newMismatcher(nugets rbtree.RbTree) *mismatcher {
@@ -18,10 +19,13 @@ func (m *mismatcher) mismatchedPacks(mismatches []*pack, allPaths []string) rbtr
 		for _, path := range allPaths {
 			packs = append(packs, m.filter(path, mismatch)...)
 		}
-		node := newNugetFolder(mismatch.pkg, packs, nil)
-		result.Insert(node)
+		if mismatch.versions.Count() > 1 {
+			node := newNugetFolder(mismatch.pkg, packs, nil)
+			result.Insert(node)
+		}
 	}
 
+	m.count += result.Len()
 	return result
 }
 
@@ -31,7 +35,7 @@ func (m *mismatcher) filter(folderToSearch string, mismatch *pack) []*pack {
 	packs := make([]*pack, 0)
 
 	if ok {
-		nf := found.(*folder)
+		nf := found.(*nugetFolder)
 		for _, p := range nf.packs {
 			if mismatch.match(p) {
 				packs = append(packs, newPack(folderToSearch, p.versions.Items()...))

@@ -6,22 +6,22 @@ import (
 	"strings"
 )
 
-type folder struct {
+type nugetFolder struct {
 	path    string
 	sources []string
 	packs   []*pack
 }
 
-func (n *folder) Less(y rbtree.Comparable) bool {
-	return sortfold.CompareFold(n.path, y.(*folder).path) < 0
+func (n *nugetFolder) Less(y rbtree.Comparable) bool {
+	return sortfold.CompareFold(n.path, y.(*nugetFolder).path) < 0
 }
 
-func (n *folder) Equal(y rbtree.Comparable) bool {
-	return strings.EqualFold(n.path, y.(*folder).path)
+func (n *nugetFolder) Equal(y rbtree.Comparable) bool {
+	return strings.EqualFold(n.path, y.(*nugetFolder).path)
 }
 
 func newNugetFolder(p string, packs []*pack, src []string) rbtree.Comparable {
-	nf := folder{
+	nf := nugetFolder{
 		path:    p,
 		packs:   packs,
 		sources: src,

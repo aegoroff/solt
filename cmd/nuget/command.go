@@ -2,6 +2,7 @@ package nuget
 
 import (
 	"fmt"
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
 	"solt/cmd/fw"
@@ -63,7 +64,7 @@ func newNugetByProject(c *fw.Conf) *cobra.Command {
 
 func (c *nugetCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	nugets := newNugetFoldersTree(foldersTree)
+	nugets, ncount := newNugetFoldersTree(foldersTree)
 
 	solutions := msvc.SelectSolutions(foldersTree)
 
@@ -79,42 +80,60 @@ func (c *nugetCommand) Execute(*cobra.Command) error {
 		c.Prn().Cprint(" <red>Different nuget package's versions in the same solution found:</>\n")
 	}
 
-	pSolution := newNugetPrinter(c.Prn(), c, "Package", 2)
+	pSolution := newNugetPrint(c.Prn(), c, "Package", 2)
 
 	it := rbtree.NewAscend(packs)
 	m := newMismatcher(nugets)
 
 	it.Foreach(func(n rbtree.Comparable) {
-		f := n.(*folder)
+		f := n.(*nugetFolder)
 
 		pSolution.print(f.path, f.packs)
 
+		mtree := m.mismatchedPacks(f.packs, f.sources)
+
 		if c.verbose {
-			pPack := newNugetPrinter(c.Prn(), c, "Project", 5)
-			mtree := m.mismatchedPacks(f.packs, f.sources)
-			pPack.printTree(mtree, func(nf *folder) string {
+			pPack := newNugetPrint(c.Prn(), c, "Project", 5)
+			pPack.printTree(mtree, func(nf *nugetFolder) string {
 				return fmt.Sprintf("Package: %s", nf.path)
 			})
 		}
 	})
+
+	tt := totalsBySolution{
+		solutions:  int64(len(solutions)),
+		nugets:     ncount,
+		mismatched: m.count,
+	}
+
+	tt.display(c.Prn(), c)
+
 	return nil
 }
 
 func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs())
-	nugets := newNugetFoldersTree(foldersTree)
+	nugets, ncount := newNugetFoldersTree(foldersTree)
 
-	prn := newNugetPrinter(c.Prn(), c, "Package", 2)
+	prn := newNugetPrint(c.Prn(), c, "Package", 2)
 
-	prn.printTree(nugets, func(nf *folder) string {
+	prn.printTree(nugets, func(nf *nugetFolder) string {
 		src := strings.Join(nf.sources, ", ")
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
+
+	tt := totalsByProjects{
+		projects: nugets.Len(),
+		nugets:   ncount,
+	}
+
+	tt.display(c.Prn(), c)
 	return nil
 }
 
-func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
+func newNugetFoldersTree(foldersTree rbtree.RbTree) (rbtree.RbTree, int64) {
 	result := rbtree.New()
+	counter := make(c9s.StringHashSet)
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
 		if len(packages) == 0 {
@@ -124,11 +143,12 @@ func newNugetFoldersTree(foldersTree rbtree.RbTree) rbtree.RbTree {
 		packs := make([]*pack, len(packages))
 		for i, np := range packages {
 			packs[i] = newPack(np.ID, np.Version)
+			counter.Add(np.ID)
 		}
 
 		n := newNugetFolder(fold.Path, packs, sources)
 		result.Insert(n)
 	})
 
-	return result
+	return result, int64(counter.Count())
 }
