@@ -40,3 +40,23 @@ type Solutioner interface {
 	// Solution method called on each solution
 	Solution(*msvc.VisualStudioSolution)
 }
+
+// Filer defines module that works with files
+type Filer interface {
+	Remover
+	// CheckExistence validates files passed to be present in file system
+	// The list of non exist files returned
+	CheckExistence(files []string) []string
+
+	// Write writes new file content
+	Write(path string, content []byte)
+
+	// Read reads file content
+	Read(path string) ([]byte, error)
+}
+
+// Remover defines removing files interface
+type Remover interface {
+	// Remove removes files from file system
+	Remove(files []string)
+}

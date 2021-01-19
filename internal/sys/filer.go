@@ -12,38 +12,22 @@ import (
 	"sync"
 )
 
-// Filer defines module that works with files
-type Filer interface {
-	// CheckExistence validates files passed to be present in file system
-	// The list of non exist files returned
-	CheckExistence(files []string) []string
-
-	// Remove removes files from file system
-	Remove(files []string)
-
-	// Write writes new file content
-	Write(path string, content []byte)
-
-	// Read reads file content
-	Read(path string) ([]byte, error)
-}
-
 // NewFiler creates new Filer instance
-func NewFiler(fs afero.Fs, w io.Writer) Filer {
-	return &filer{
+func NewFiler(fs afero.Fs, w io.Writer) *Filer {
+	return &Filer{
 		fs: fs,
 		w:  w,
 	}
 }
 
-type filer struct {
+type Filer struct {
 	fs afero.Fs
 	w  io.Writer
 }
 
 // CheckExistence validates files passed to be present in file system
 // The list of non exist files returned
-func (f *filer) CheckExistence(files []string) []string {
+func (f *Filer) CheckExistence(files []string) []string {
 	var mu sync.RWMutex
 	result := make([]string, 0)
 	var restrict = make(chan struct{}, 32)
@@ -69,13 +53,13 @@ func (f *filer) CheckExistence(files []string) []string {
 	return result
 }
 
-func (f *filer) fileNotExists(path string) bool {
+func (f *Filer) fileNotExists(path string) bool {
 	_, err := f.fs.Stat(path)
 	return os.IsNotExist(err)
 }
 
 // Remove removes files from file system
-func (f *filer) Remove(files []string) {
+func (f *Filer) Remove(files []string) {
 	for _, file := range files {
 		err := f.fs.Remove(file)
 		if err != nil {
@@ -86,7 +70,7 @@ func (f *filer) Remove(files []string) {
 	}
 }
 
-func (f *filer) Write(path string, content []byte) {
+func (f *Filer) Write(path string, content []byte) {
 	if content == nil {
 		return
 	}
@@ -103,7 +87,7 @@ func (f *filer) Write(path string, content []byte) {
 	}
 }
 
-func (f *filer) Read(path string) ([]byte, error) {
+func (f *Filer) Read(path string) ([]byte, error) {
 	file, err := f.fs.Open(filepath.Clean(path))
 	if err != nil {
 		return nil, err

@@ -12,9 +12,9 @@ import (
 
 type lostFilesCommand struct {
 	*fw.BaseCommand
-	removeLost bool
-	searchAll  bool
-	filter     string
+	remover fw.Remover
+	exister fw.Exister
+	filter  string
 }
 
 // New creates new command that does lost files search
@@ -26,8 +26,8 @@ func New(c *fw.Conf) *cobra.Command {
 	cc := fw.NewCobraCreator(c, func() fw.Executor {
 		exe := &lostFilesCommand{
 			BaseCommand: fw.NewBaseCmd(c),
-			removeLost:  removeLost,
-			searchAll:   searchAll,
+			remover:     newRemover(c.Fs(), c.W(), removeLost),
+			exister:     newExister(c.Fs(), c.W(), searchAll),
 			filter:      filter,
 		}
 		return fw.NewExecutorShowHelp(exe, c)
@@ -42,59 +42,58 @@ func New(c *fw.Conf) *cobra.Command {
 	return cmd
 }
 
+func newExister(fs afero.Fs, w io.Writer, real bool) fw.Exister {
+	if real {
+		return fw.NewExister(fs, w)
+	}
+	return &nullExister{}
+}
+
+func newRemover(fs afero.Fs, w io.Writer, real bool) fw.Remover {
+	if real {
+		return sys.NewFiler(fs, w)
+	}
+	return &nullRemover{}
+}
+
 func (c *lostFilesCommand) Execute(*cobra.Command) error {
-	collect := newCollector(c.filter)
+	collected := newCollector(c.filter)
 	skip := newSkipper()
 
-	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), collect, skip)
+	foldersTree := msvc.ReadSolutionDir(c.SourcesPath(), c.Fs(), collected, skip)
 	projects := msvc.SelectProjects(foldersTree)
 
-	exist := c.newExister(c.Fs(), c.Writer())
-	incl := fw.NewIncluder(exist)
+	incl := fw.NewIncluder(c.exister)
 
 	for _, p := range projects {
 		skip.fromProject(p)
 		incl.From(p)
 	}
 
-	ifiles := incl.Includes()
-	lf := newFinder(ifiles, skip.folders())
-	lost := lf.find(collect.files)
+	filesIn := incl.Includes()
+	lf := newFinder(filesIn, skip.folders())
+	lost := lf.find(collected.files)
 
 	c.print(lost)
 
-	title := "<red>These files included into projects but not exist in the file system.</>"
-	exist.Print(c.Prn(), title, "Project")
-
-	c.removeIfRequested(lost)
+	c.remover.Remove(lost)
 
 	tt := totals{
 		projects: int64(len(projects)),
-		unexist:  exist.UnexistCount(),
-		included: int64(len(ifiles)),
+		unexist:  c.exister.UnexistCount(),
+		included: int64(len(filesIn)),
 		lost:     int64(len(lost)),
-		found:    int64(len(collect.files)),
+		found:    int64(len(collected.files)),
 	}
 
 	tt.display(c.Prn(), c)
 	return nil
 }
 
-func (c *lostFilesCommand) newExister(fs afero.Fs, w io.Writer) fw.Exister {
-	if c.searchAll {
-		return fw.NewExister(fs, w)
-	}
-	return fw.NewNullExister()
-}
-
 func (c *lostFilesCommand) print(lost []string) {
 	s := ux.NewScreener(c.Prn())
 	s.WriteSlice(lost)
-}
 
-func (c *lostFilesCommand) removeIfRequested(lost []string) {
-	if c.removeLost {
-		filer := sys.NewFiler(c.Fs(), c.Writer())
-		filer.Remove(lost)
-	}
+	title := "<red>These files included into projects but not exist in the file system.</>"
+	c.exister.Print(c.Prn(), title, "Project")
 }

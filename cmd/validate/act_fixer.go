@@ -4,6 +4,7 @@ import (
 	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
+	"solt/cmd/fw"
 	"solt/internal/out"
 	"solt/internal/sys"
 	"unicode/utf8"
@@ -12,7 +13,7 @@ import (
 type fixer struct {
 	prn   out.Printer
 	fs    afero.Fs
-	filer sys.Filer
+	filer fw.Filer
 	w     out.Writable
 }
 

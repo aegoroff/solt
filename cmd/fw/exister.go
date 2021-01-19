@@ -9,7 +9,7 @@ import (
 )
 
 type exister struct {
-	filer        sys.Filer
+	filer        Filer
 	unexist      map[string][]string
 	unexistCount int64
 }
@@ -49,14 +49,3 @@ func (e *exister) Print(p out.Printer, title string, container string) {
 	s := ux.NewScreener(p)
 	s.WriteMap(e.unexist, container)
 }
-
-// NewNullExister creates new Exister that do nothing
-func NewNullExister() Exister { return &nullExister{} }
-
-type nullExister struct{}
-
-func (*nullExister) UnexistCount() int64 { return 0 }
-
-func (*nullExister) Print(out.Printer, string, string) {}
-
-func (*nullExister) Validate(string, []string) {}
