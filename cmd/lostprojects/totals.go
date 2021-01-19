@@ -29,12 +29,12 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	within := t.allProjects - t.lost - t.lostWithIncludes
 	tbl.AddHead("", "Count", "%     ")
 
-	type kv struct {
+	type hv struct {
 		h string
 		v int64
 	}
 
-	lines := []kv{
+	lines := []hv{
 		{"Within solutions", within},
 		{"Lost projects", t.lost},
 		{"Lost projects with includes", t.lostWithIncludes},
