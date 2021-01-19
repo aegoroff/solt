@@ -18,7 +18,7 @@ func newConfigurationPlatform() *configurationPlatform {
 	}
 }
 
-func (c *configurationPlatform) allow(section *solution.Section) bool {
+func (*configurationPlatform) allow(section *solution.Section) bool {
 	return section.Name == "SolutionConfigurationPlatforms"
 }
 
