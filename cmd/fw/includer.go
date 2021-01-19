@@ -2,7 +2,7 @@ package fw
 
 import "solt/msvc"
 
-// Includer provides includes extractor from msvc.Container
+// Includer provides includes extractor from msvc.container
 type Includer struct {
 	includes []string
 	exister  Exister
@@ -18,15 +18,15 @@ func (i *Includer) Solution(s *msvc.VisualStudioSolution) {
 	i.From(s)
 }
 
-// From gets includes from msvc.Container and validates their existence
-func (i *Includer) From(p msvc.Container) {
-	includes := p.Items()
+// From gets includes from container and validates their existence
+func (i *Includer) From(c container) {
+	includes := c.Items()
 	i.includes = append(i.includes, includes...)
 
-	i.exister.Validate(p.Path(), includes)
+	i.exister.Validate(c.Path(), includes)
 }
 
-// Includes gets includes extracted from msvc.Container
+// Includes gets includes extracted from container
 func (i *Includer) Includes() []string {
 	return i.includes
 }

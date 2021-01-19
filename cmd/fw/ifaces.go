@@ -19,6 +19,12 @@ type Searcher interface {
 	Search(s string) []string
 }
 
+// Solutioner provides solution action prototype
+type Solutioner interface {
+	// Solution method called on each solution
+	Solution(*msvc.VisualStudioSolution)
+}
+
 // Executor represent executable command interface
 type Executor interface {
 	// Execute starts execute command's code
@@ -33,12 +39,6 @@ type Exister interface {
 	Print(p out.Printer, title string, container string)
 	// UnexistCount gets the number of non exist items
 	UnexistCount() int64
-}
-
-// Solutioner provides solution action prototype
-type Solutioner interface {
-	// Solution method called on each solution
-	Solution(*msvc.VisualStudioSolution)
 }
 
 // Filer defines module that works with files
@@ -59,4 +59,12 @@ type Filer interface {
 type Remover interface {
 	// Remove removes files from file system
 	Remove(files []string)
+}
+
+// container provides paths container interface
+type container interface {
+	// Path provides container's path itself
+	Path() string
+	// Items provides all paths included into container
+	Items() []string
 }
