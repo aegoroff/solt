@@ -57,7 +57,8 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 		incl.From(p)
 	}
 
-	lf := newFinder(incl.Includes(), skip.folders())
+	ifiles := incl.Includes()
+	lf := newFinder(ifiles, skip.folders())
 	lost := lf.find(collect.files)
 
 	c.print(lost)
@@ -67,6 +68,15 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	c.removeIfRequested(lost)
 
+	tt := totals{
+		projects: int64(len(projects)),
+		unexist:  exist.UnexistCount(),
+		included: int64(len(ifiles)),
+		lost:     int64(len(lost)),
+		found:    int64(len(collect.files)),
+	}
+
+	tt.display(c.Prn(), c)
 	return nil
 }
 

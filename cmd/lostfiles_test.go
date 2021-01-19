@@ -28,7 +28,18 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(``, actual)
+	ass.Equal(`
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     2
+  Included                  4
+  Lost                      0
+  Included but not exist    0
+`, actual)
 }
 
 func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
@@ -62,7 +73,18 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
 
 		// Assert
 		actual := env.String()
-		ass.Equal(``, actual)
+		ass.Equal(`
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  4
+  Lost                      0
+  Included but not exist    0
+`, actual)
 	}
 }
 
@@ -87,7 +109,19 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
+	ass.Equal(sys.ToValidPath(`  a\a\Properties\AssemblyInfo1.cs
+
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  4
+  Lost                      1
+  Included but not exist    0
+`), actual)
 }
 
 func Test_FindLostFilesCmdNoProjects_AllFilesLost(t *testing.T) {
@@ -106,7 +140,20 @@ func Test_FindLostFilesCmdNoProjects_AllFilesLost(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  a\\a\\Program.cs\n  a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
+	ass.Equal(sys.ToValidPath(`  a\a\Program.cs
+  a\a\Properties\AssemblyInfo.cs
+
+ Totals:
+
+  Projects                  0
+                            
+  Files                     Count
+  -----                     -----
+  Found                     2
+  Included                  0
+  Lost                      2
+  Included but not exist    0
+`), actual)
 }
 
 func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
@@ -142,7 +189,20 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  root\\a\\a\\Properties\\AssemblyInfo1.cs\n  root\\b\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
+	ass.Equal(sys.ToValidPath(`  root\a\a\Properties\AssemblyInfo1.cs
+  root\b\a\Properties\AssemblyInfo1.cs
+
+ Totals:
+
+  Projects                  2
+                            
+  Files                     Count
+  -----                     -----
+  Found                     6
+  Included                  8
+  Lost                      2
+  Included but not exist    0
+`), actual)
 }
 
 func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
@@ -165,7 +225,18 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Equal(`
+ Totals:
+
+  Projects                  3
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  0
+  Lost                      0
+  Included but not exist    0
+`, actual)
 }
 
 func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
@@ -197,7 +268,19 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
 
 		// Assert
 		actual := env.String()
-		ass.Equal(sys.ToValidPath("  a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
+		ass.Equal(sys.ToValidPath(`  a\a\Properties\AssemblyInfo1.cs
+
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  4
+  Lost                      1
+  Included but not exist    0
+`), actual)
 	}
 }
 
@@ -222,7 +305,20 @@ func Test_FindLostFilesCmdRemove_LostFilesRemoved(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  a\\a\\Properties\\AssemblyInfo1.cs\nFile: a\\a\\Properties\\AssemblyInfo1.cs removed successfully.\n"), actual)
+	ass.Equal(sys.ToValidPath(`  a\a\Properties\AssemblyInfo1.cs
+File: a\a\Properties\AssemblyInfo1.cs removed successfully.
+
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  4
+  Lost                      1
+  Included but not exist    0
+`), actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.Error(err)
 }
@@ -249,7 +345,19 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("  a\\a\\Properties\\AssemblyInfo1.cs\n"), actual)
+	ass.Equal(sys.ToValidPath(`  a\a\Properties\AssemblyInfo1.cs
+
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     3
+  Included                  4
+  Lost                      1
+  Included but not exist    0
+`), actual)
 	_, err := fs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
 }
@@ -273,7 +381,23 @@ func Test_FindLostFilesCmdUnexistOptionEnabled_UnesistFilesFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal(sys.ToValidPath("\nThese files included into projects but not exist in the file system.\n\n Project: a\\a\\a.csproj\n  a\\a\\Properties\\AssemblyInfo.cs\n"), actual)
+	ass.Equal(sys.ToValidPath(`
+These files included into projects but not exist in the file system.
+
+ Project: a\a\a.csproj
+  a\a\Properties\AssemblyInfo.cs
+
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     1
+  Included                  4
+  Lost                      0
+  Included but not exist    1
+`), actual)
 }
 
 func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T) {
@@ -295,7 +419,18 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Equal(`
+ Totals:
+
+  Projects                  1
+                            
+  Files                     Count
+  -----                     -----
+  Found                     1
+  Included                  4
+  Lost                      0
+  Included but not exist    0
+`, actual)
 }
 
 func Test_FindLostFilesNoPath_OutputHelp(t *testing.T) {
@@ -323,5 +458,16 @@ func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Equal(`
+ Totals:
+
+  Projects                  0
+                            
+  Files                     Count
+  -----                     -----
+  Found                     0
+  Included                  0
+  Lost                      0
+  Included but not exist    0
+`, actual)
 }
