@@ -20,6 +20,8 @@ func NewFiler(fs afero.Fs, w io.Writer) *Filer {
 	}
 }
 
+// Filer provides methods to work with files i.e. reading, writing
+// checking existence and remove
 type Filer struct {
 	fs afero.Fs
 	w  io.Writer
