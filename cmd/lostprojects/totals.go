@@ -29,14 +29,20 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	within := t.allProjects - t.lost - t.lostWithIncludes
 	tbl.AddHead("", "Count", "%     ")
 
-	lines := []*totalLine{
-		newTotalLine("Within solutions", within, t.allProjects),
-		newTotalLine("Lost projects", t.lost, t.allProjects),
-		newTotalLine("Lost projects with includes", t.lostWithIncludes, t.allProjects),
-		newTotalLine("Included but not exist", t.unexist, t.allProjects),
-		newTotalLine("Removed (if specified)", t.removed, t.allProjects),
+	type kv struct {
+		h string
+		v int64
 	}
-	for _, line := range lines {
+
+	lines := []kv{
+		{"Within solutions", within},
+		{"Lost projects", t.lost},
+		{"Lost projects with includes", t.lostWithIncludes},
+		{"Included but not exist", t.unexist},
+		{"Removed (if specified)", t.removed},
+	}
+	for _, l := range lines {
+		line := newTotalLine(l.h, l.v, t.allProjects)
 		tbl.AddLine(line.h(), line.v(), line.p())
 	}
 
