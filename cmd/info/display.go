@@ -71,17 +71,17 @@ func (d *display) groupped() map[string]int {
 }
 
 func (d *display) showSectionsInfo(sections sections) {
-	confPlat := newConfigurationPlatform()
+	s := newSectioner()
 
-	sections.foreach(confPlat)
+	sections.foreach(s)
 
 	prn := newPrinter(d.margin+1, d.w)
 
-	prn.print(confPlat.configurations, "Configuration")
+	prn.print(s.configurations, "Configuration")
 
 	d.p.Println()
 
-	prn.print(confPlat.platforms, "Platform")
+	prn.print(s.platforms, "Platform")
 
 	d.p.Println()
 }

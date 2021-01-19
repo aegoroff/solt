@@ -6,23 +6,23 @@ import (
 	"strings"
 )
 
-type configurationPlatform struct {
+type sectioner struct {
 	configurations c9s.StringHashSet
 	platforms      c9s.StringHashSet
 }
 
-func newConfigurationPlatform() *configurationPlatform {
-	return &configurationPlatform{
+func newSectioner() *sectioner {
+	return &sectioner{
 		configurations: make(c9s.StringHashSet),
 		platforms:      make(c9s.StringHashSet),
 	}
 }
 
-func (*configurationPlatform) allow(section *solution.Section) bool {
+func (*sectioner) allow(section *solution.Section) bool {
 	return section.Name == "SolutionConfigurationPlatforms"
 }
 
-func (c *configurationPlatform) run(section *solution.Section) {
+func (c *sectioner) run(section *solution.Section) {
 	for _, item := range section.Items {
 		parts := strings.Split(item.Key, "|")
 		c.configurations.Add(parts[0])

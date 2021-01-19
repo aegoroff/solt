@@ -9,7 +9,7 @@ import (
 func Test_sections_foreach(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	act := newConfigurationPlatform()
+	act := newSectioner()
 	sect := &solution.Section{
 		Name: "SolutionConfigurationPlatforms",
 		Items: []*solution.SectionItem{

@@ -18,7 +18,7 @@ func Test_configurationPlatform_allow(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
 			ass := assert.New(t)
-			s := newConfigurationPlatform()
+			s := newSectioner()
 			sect := &solution.Section{
 				Name: tt.name,
 			}
@@ -35,7 +35,7 @@ func Test_configurationPlatform_allow(t *testing.T) {
 func Test_configurationPlatform_handle(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	s := newConfigurationPlatform()
+	s := newSectioner()
 	sect := &solution.Section{
 		Items: []*solution.SectionItem{
 			{Key: "Debug|Any CPU"},
