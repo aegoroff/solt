@@ -36,6 +36,16 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
    project a\a\a.csproj has redundant references:
      a\b\b.csproj
 
+
+ Totals:
+
+  Parameter               Count    %     
+  ---------               -----    ------
+  Solutions               1        
+  Problem solutions       1        100.00%
+  Projects                3        
+  Problem projects        1        33.33%
+  Redundant references    1
 `), actual)
 }
 
@@ -105,7 +115,17 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
 
 	// Assert
 	actual := env.String()
-	ass.Equal("", actual)
+	ass.Equal(`
+ Totals:
+
+  Parameter               Count    %     
+  ---------               -----    ------
+  Solutions               1        
+  Problem solutions       0        0.00%
+  Projects                1        
+  Problem projects        0        0.00%
+  Redundant references    0
+`, actual)
 }
 
 func Test_FixSdkSolutionCmd_RedundantReferencesNotFound(t *testing.T) {

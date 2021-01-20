@@ -25,14 +25,14 @@ func (s *Lines) Add(name string, val int64) {
 }
 
 // Name gets a parameter name
-func (t *Line) Name() string { return t.name }
+func (l *Line) Name() string { return l.name }
 
 // Value gets parameter value
-func (t *Line) Value() string { return humanize.Comma(t.val) }
+func (l *Line) Value() string { return humanize.Comma(l.val) }
 
 // Percent calculates value percent
-func (t *Line) Percent(total int64) string {
-	pv := Percent(t.val, total)
+func (l *Line) Percent(total int64) string {
+	pv := Percent(l.val, total)
 	return fmt.Sprintf("%.2f%%", pv)
 }
 

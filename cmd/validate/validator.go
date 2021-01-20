@@ -18,6 +18,7 @@ type validator struct {
 	sourcesPath string
 	act         actioner
 	sdkProjects rbtree.RbTree
+	tt          *totals
 }
 
 func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
@@ -25,6 +26,7 @@ func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 		fs:          fs,
 		sourcesPath: sourcesPath,
 		act:         act,
+		tt:          &totals{},
 	}
 }
 
@@ -32,6 +34,8 @@ func (va *validator) validate() {
 	foldersTree := msvc.ReadSolutionDir(va.sourcesPath, va.fs)
 
 	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+	va.tt.solutions = int64(len(sols))
+	va.tt.projects = int64(len(allProjects))
 
 	va.onlySdkProjects(allProjects)
 
@@ -56,6 +60,13 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	g, allNodes := va.newSolutionGraph(sol)
 
 	redundants := va.findRedundants(g, allNodes)
+	if len(redundants) > 0 {
+		va.tt.problemSolutions++
+		va.tt.problemProjects += int64(len(redundants))
+		for _, set := range redundants {
+			va.tt.redundantRefs += int64(set.Count())
+		}
+	}
 
 	va.act.action(sol.Path(), redundants)
 }

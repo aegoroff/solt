@@ -38,6 +38,8 @@ func (c *validateCommand) Execute(*cobra.Command) error {
 	valid := newValidator(c.Fs(), c.SourcesPath(), prn)
 
 	valid.validate()
+
+	valid.tt.display(c.Prn(), c)
 	return nil
 }
 
