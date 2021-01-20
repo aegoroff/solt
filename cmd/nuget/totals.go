@@ -26,11 +26,12 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 	tbl.AddLine("", "")
 	tbl.AddHead("Packages", "Count")
 
-	nl := newTotalLine("Total", t.nugets)
-	tbl.AddLine(nl.h(), nl.v())
+	nl := ux.NewLine("Total", t.nugets)
 
-	ml := newTotalLine("Mismatched", t.mismatched)
-	tbl.AddLine(ml.h(), ml.v())
+	tbl.AddLine(nl.Name(), nl.Value())
+
+	ml := ux.NewLine("Mismatched", t.mismatched)
+	tbl.AddLine(ml.Name(), ml.Value())
 
 	tbl.Print()
 }
@@ -44,19 +45,4 @@ func (t *totalsByProjects) display(p out.Printer, w out.Writable) {
 	tbl.AddLine("Packages", humanize.Comma(t.nugets))
 
 	tbl.Print()
-}
-
-type totalLine struct {
-	head string
-	val  int64
-}
-
-func (t *totalLine) h() string { return t.head }
-func (t *totalLine) v() string { return humanize.Comma(t.val) }
-
-func newTotalLine(head string, val int64) *totalLine {
-	return &totalLine{
-		head: head,
-		val:  val,
-	}
 }

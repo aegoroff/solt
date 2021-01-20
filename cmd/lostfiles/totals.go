@@ -1,7 +1,6 @@
 package lostfiles
 
 import (
-	"github.com/dustin/go-humanize"
 	"solt/internal/out"
 	"solt/internal/ux"
 )
@@ -19,41 +18,21 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Projects", humanize.Comma(t.projects))
+	pl := ux.NewLine("Projects", t.projects)
+	tbl.AddLine(pl.Name(), pl.Value())
 	tbl.AddLine("", "")
 
 	tbl.AddHead("Files", "Count")
 
-	type hv struct {
-		h string
-		v int64
-	}
+	lines := ux.NewLines()
+	lines.Add("Found", t.found)
+	lines.Add("Included", t.included)
+	lines.Add("Lost", t.lost)
+	lines.Add("Included but not exist", t.unexist)
 
-	lines := []hv{
-		{"Found", t.found},
-		{"Included", t.included},
-		{"Lost", t.lost},
-		{"Included but not exist", t.unexist},
-	}
 	for _, l := range lines {
-		line := newTotalLine(l.h, l.v)
-		tbl.AddLine(line.h(), line.v())
+		tbl.AddLine(l.Name(), l.Value())
 	}
 
 	tbl.Print()
-}
-
-type totalLine struct {
-	head string
-	val  int64
-}
-
-func (t *totalLine) h() string { return t.head }
-func (t *totalLine) v() string { return humanize.Comma(t.val) }
-
-func newTotalLine(head string, val int64) *totalLine {
-	return &totalLine{
-		head: head,
-		val:  val,
-	}
 }

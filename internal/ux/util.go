@@ -1,4 +1,4 @@
-package fw
+package ux
 
 // Percent calculates percent value
 func Percent(value int64, total int64) float64 {

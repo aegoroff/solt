@@ -3,8 +3,6 @@ package info
 import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/dustin/go-humanize"
-	"solt/cmd/fw"
 	"solt/internal/out"
 	"solt/internal/ux"
 	"solt/msvc"
@@ -54,8 +52,10 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Solutions", humanize.Comma(t.result.solutions))
-	tbl.AddLine("Projects", humanize.Comma(t.result.projects))
+	sl := ux.NewLine("Solutions", t.result.solutions)
+	pl := ux.NewLine("Projects", t.result.projects)
+	tbl.AddLine(sl.Name(), sl.Value())
+	tbl.AddLine(pl.Name(), pl.Value())
 	tbl.AddLine("", "")
 
 	const percentH = "%     "
@@ -74,9 +74,9 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 }
 
 func (t *totaler) percentProjects(value int64) float64 {
-	return fw.Percent(value, t.result.projects)
+	return ux.Percent(value, t.result.projects)
 }
 
 func (t *totaler) percentSolutions(value int64) float64 {
-	return fw.Percent(value, t.result.solutions)
+	return ux.Percent(value, t.result.solutions)
 }
