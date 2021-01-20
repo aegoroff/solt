@@ -27,7 +27,6 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 	tbl.AddHead("Packages", "Count")
 
 	nl := ux.NewLine("Total", t.nugets)
-
 	tbl.AddLine(nl.Name(), nl.Value())
 
 	ml := ux.NewLine("Mismatched", t.mismatched)
