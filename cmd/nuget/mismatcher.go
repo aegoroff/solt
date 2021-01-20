@@ -1,14 +1,21 @@
 package nuget
 
-import "github.com/aegoroff/godatastruct/rbtree"
+import (
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/aegoroff/godatastruct/rbtree"
+)
 
 type mismatcher struct {
-	nugets rbtree.RbTree
-	count  int64
+	nugets  rbtree.RbTree
+	counter c9s.StringHashSet
 }
 
 func newMismatcher(nugets rbtree.RbTree) *mismatcher {
-	return &mismatcher{nugets: nugets}
+	return &mismatcher{nugets: nugets, counter: make(c9s.StringHashSet)}
+}
+
+func (m *mismatcher) count() int64 {
+	return int64(m.counter.Count())
 }
 
 func (m *mismatcher) mismatchedPacks(mismatches []*pack, allPaths []string) rbtree.RbTree {
@@ -20,12 +27,12 @@ func (m *mismatcher) mismatchedPacks(mismatches []*pack, allPaths []string) rbtr
 			packs = append(packs, m.filter(path, mismatch)...)
 		}
 		if mismatch.versions.Count() > 1 {
+			m.counter.Add(mismatch.pkg)
 			node := newNugetFolder(mismatch.pkg, packs, nil)
 			result.Insert(node)
 		}
 	}
 
-	m.count += result.Len()
 	return result
 }
 

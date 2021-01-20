@@ -103,7 +103,7 @@ func (c *nugetCommand) Execute(*cobra.Command) error {
 	tt := totalsBySolution{
 		solutions:  int64(len(solutions)),
 		nugets:     ncount,
-		mismatched: m.count,
+		mismatched: m.count(),
 	}
 
 	tt.display(c.Prn(), c)
