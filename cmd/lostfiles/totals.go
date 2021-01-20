@@ -19,8 +19,8 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 
 	tbl := ux.NewTabler(w, 2)
 	pl := ux.NewLine("Projects", t.projects)
-	tbl.AddLine(pl.Name(), pl.Value())
-	tbl.AddLine("", "")
+	tbl.AddLine(pl)
+	tbl.AddStringLine("", "")
 
 	tbl.AddHead("Files", "Count")
 
@@ -30,9 +30,7 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	lines.Add("Lost", t.lost)
 	lines.Add("Included but not exist", t.unexist)
 
-	for _, l := range lines {
-		tbl.AddLine(l.Name(), l.Value())
-	}
+	tbl.AddLines(lines...)
 
 	tbl.Print()
 }

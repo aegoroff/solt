@@ -21,9 +21,8 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	tbl := ux.NewTabler(w, 2)
 	sl := ux.NewLine("Solutions", t.solutions)
 	pl := ux.NewLine("Projects", t.allProjects)
-	tbl.AddLine(sl.Name(), sl.Value())
-	tbl.AddLine(pl.Name(), pl.Value())
-	tbl.AddLine("", "")
+	tbl.AddLines(sl, pl)
+	tbl.AddStringLine("", "")
 
 	within := t.allProjects - t.lost - t.lostWithIncludes
 	tbl.AddHead("", "Count", "%     ")
@@ -36,7 +35,7 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	lines.Add("Removed (if specified)", t.removed)
 
 	for _, l := range lines {
-		tbl.AddLine(l.Name(), l.Value(), l.Percent(t.allProjects))
+		tbl.AddStringLine(l.Name(), l.Value(), l.Percent(t.allProjects))
 	}
 
 	tbl.Print()

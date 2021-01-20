@@ -30,10 +30,10 @@ func (d *display) Solution(sl *msvc.VisualStudioSolution) {
 
 	tbl := ux.NewTabler(d.w, d.margin)
 
-	tbl.AddLine("Header", sln.Header)
-	tbl.AddLine("Product", sln.Comment)
-	tbl.AddLine("Visual Studio Version", sln.VisualStudioVersion)
-	tbl.AddLine("Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
+	tbl.AddStringLine("Header", sln.Header)
+	tbl.AddStringLine("Product", sln.Comment)
+	tbl.AddStringLine("Visual Studio Version", sln.VisualStudioVersion)
+	tbl.AddStringLine("Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
 
 	tbl.Print()
 
@@ -55,9 +55,8 @@ func (d *display) showProjectsInfo() {
 	sort.Slice(lines, func(i, j int) bool {
 		return lines[i].Name() < lines[j].Name()
 	})
-	for _, l := range lines {
-		tbl.AddLine(l.Name(), l.Value())
-	}
+
+	tbl.AddLines(lines...)
 	tbl.Print()
 	d.p.Println()
 }

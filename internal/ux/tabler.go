@@ -26,9 +26,21 @@ func (t *Tabler) AddHead(line ...string) {
 	t.addLine(line, originalString, underline)
 }
 
-// AddLine adds data line to the table
-func (t Tabler) AddLine(line ...string) {
+// AddStringLine adds data line to the table
+func (t Tabler) AddStringLine(line ...string) {
 	t.addLine(line, originalString)
+}
+
+// AddLine adds new *Line into table
+func (t Tabler) AddLine(line *Line) {
+	t.AddStringLine(line.Name(), line.Value())
+}
+
+// AddLines adds many lines
+func (t Tabler) AddLines(lines ...*Line) {
+	for _, line := range lines {
+		t.AddLine(line)
+	}
 }
 
 func (t Tabler) addLine(line []string, decors ...func(s string) string) {

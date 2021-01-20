@@ -22,15 +22,14 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Solutions", humanize.Comma(t.solutions))
-	tbl.AddLine("", "")
+	tbl.AddStringLine("Solutions", humanize.Comma(t.solutions))
+	tbl.AddStringLine("", "")
 	tbl.AddHead("Packages", "Count")
 
 	nl := ux.NewLine("Total", t.nugets)
-	tbl.AddLine(nl.Name(), nl.Value())
-
 	ml := ux.NewLine("Mismatched", t.mismatched)
-	tbl.AddLine(ml.Name(), ml.Value())
+
+	tbl.AddLines(nl, ml)
 
 	tbl.Print()
 }
@@ -40,8 +39,8 @@ func (t *totalsByProjects) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Projects", humanize.Comma(t.projects))
-	tbl.AddLine("Packages", humanize.Comma(t.nugets))
+	tbl.AddStringLine("Projects", humanize.Comma(t.projects))
+	tbl.AddStringLine("Packages", humanize.Comma(t.nugets))
 
 	tbl.Print()
 }
