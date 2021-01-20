@@ -5,7 +5,6 @@ import (
 	"solt/internal/ux"
 	"solt/msvc"
 	"sort"
-	"strconv"
 )
 
 type display struct {
@@ -48,19 +47,16 @@ func (d *display) showProjectsInfo() {
 	tbl := ux.NewTabler(d.w, d.margin+1)
 	tbl.AddHead("Project type", "Count")
 
-	type kv struct {
-		k string
-		v int
-	}
-	var kvs []kv
+	lines := ux.NewLines()
 	for k, v := range d.groupped() {
-		kvs = append(kvs, kv{k, v})
+		lines.Add(k, int64(v))
 	}
-	sort.Slice(kvs, func(i, j int) bool {
-		return kvs[i].k < kvs[j].k
+
+	sort.Slice(lines, func(i, j int) bool {
+		return lines[i].Name() < lines[j].Name()
 	})
-	for _, v := range kvs {
-		tbl.AddLine(v.k, strconv.Itoa(v.v))
+	for _, l := range lines {
+		tbl.AddLine(l.Name(), l.Value())
 	}
 	tbl.Print()
 	d.p.Println()
