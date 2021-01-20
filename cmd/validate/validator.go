@@ -35,9 +35,9 @@ func (va *validator) validate() {
 
 	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 	va.tt.solutions = int64(len(sols))
-	va.tt.projects = int64(len(allProjects))
 
 	va.onlySdkProjects(allProjects)
+	va.tt.projects = va.sdkProjects.Len()
 
 	solutions := fw.SolutionSlice(sols)
 	sort.Sort(solutions)

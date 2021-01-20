@@ -27,7 +27,7 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	psl := ux.NewLine("Problem solutions", t.problemSolutions)
 	tbl.AddLine(psl.Name(), psl.Value(), psl.Percent(t.solutions))
 
-	pl := ux.NewLine("Projects", t.projects)
+	pl := ux.NewLine("SDK Projects", t.projects)
 	tbl.AddLine(pl.Name(), pl.Value(), "")
 
 	ppl := ux.NewLine("Problem projects", t.problemProjects)

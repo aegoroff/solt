@@ -43,7 +43,7 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
   ---------               -----    ------
   Solutions               1        
   Problem solutions       1        100.00%
-  Projects                3        
+  SDK Projects            3        
   Problem projects        1        33.33%
   Redundant references    1
 `), actual)
@@ -122,7 +122,7 @@ func Test_ValidateOldSolutionCmd_RedundantReferencesNotFound(t *testing.T) {
   ---------               -----    ------
   Solutions               1        
   Problem solutions       0        0.00%
-  Projects                1        
+  SDK Projects            0        
   Problem projects        0        0.00%
   Redundant references    0
 `, actual)
