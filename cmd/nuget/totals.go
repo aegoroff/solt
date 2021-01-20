@@ -22,8 +22,8 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddStringLine("Solutions", humanize.Comma(t.solutions))
-	tbl.AddStringLine("", "")
+	tbl.AddLine("Solutions", humanize.Comma(t.solutions))
+	tbl.AddLine("", "")
 	tbl.AddHead("Packages", "Count")
 
 	nl := ux.NewLine("Total", t.nugets)
@@ -39,8 +39,8 @@ func (t *totalsByProjects) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddStringLine("Projects", humanize.Comma(t.projects))
-	tbl.AddStringLine("Packages", humanize.Comma(t.nugets))
+	tbl.AddLine("Projects", humanize.Comma(t.projects))
+	tbl.AddLine("Packages", humanize.Comma(t.nugets))
 
 	tbl.Print()
 }

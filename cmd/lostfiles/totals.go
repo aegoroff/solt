@@ -19,8 +19,8 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 
 	tbl := ux.NewTabler(w, 2)
 	pl := ux.NewLine("Projects", t.projects)
-	tbl.AddLine(pl)
-	tbl.AddStringLine("", "")
+	tbl.AddLines(pl)
+	tbl.AddLine("", "")
 
 	tbl.AddHead("Files", "Count")
 

@@ -49,7 +49,7 @@ func (n *nugetprint) print(parent string, packs []*pack) {
 	for _, item := range packs {
 		versions := item.versions.SortedItems(sortfold.Strings)
 
-		tbl.AddStringLine(item.pkg, strings.Join(versions, ", "))
+		tbl.AddLine(item.pkg, strings.Join(versions, ", "))
 	}
 	tbl.Print()
 }

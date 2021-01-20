@@ -23,7 +23,7 @@ func (p *printer) print(set c9s.StringHashSet, name string) {
 	items := set.SortedItems(sortfold.Strings)
 
 	for _, k := range items {
-		tbl.AddStringLine(k)
+		tbl.AddLine(k)
 	}
 	tbl.Print()
 }

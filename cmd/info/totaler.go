@@ -55,7 +55,7 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 	sl := ux.NewLine("Solutions", t.result.solutions)
 	pl := ux.NewLine("Projects", t.result.projects)
 	tbl.AddLines(sl, pl)
-	tbl.AddStringLine("", "")
+	tbl.AddLine("", "")
 
 	const percentH = "%     "
 	tbl.AddHead("Project type", "Count", percentH, "Solutions", percentH)
@@ -66,7 +66,7 @@ func (t *totaler) display(p out.Printer, w out.Writable) {
 		ts := n.(*typeStat)
 		percentS := fmt.Sprintf("%.2f%%", t.percentProjects(ts.count))
 		solPercentS := fmt.Sprintf("%.2f%%", t.percentSolutions(ts.solutions))
-		tbl.AddStringLine(ts.name, ts.Count(), percentS, ts.Solutions(), solPercentS)
+		tbl.AddLine(ts.name, ts.Count(), percentS, ts.Solutions(), solPercentS)
 	})
 
 	tbl.Print()

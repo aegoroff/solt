@@ -30,10 +30,10 @@ func (d *display) Solution(sl *msvc.VisualStudioSolution) {
 
 	tbl := ux.NewTabler(d.w, d.margin)
 
-	tbl.AddStringLine("Header", sln.Header)
-	tbl.AddStringLine("Product", sln.Comment)
-	tbl.AddStringLine("Visual Studio Version", sln.VisualStudioVersion)
-	tbl.AddStringLine("Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
+	tbl.AddLine("Header", sln.Header)
+	tbl.AddLine("Product", sln.Comment)
+	tbl.AddLine("Visual Studio Version", sln.VisualStudioVersion)
+	tbl.AddLine("Minimum Visual Studio Version", sln.MinimumVisualStudioVersion)
 
 	tbl.Print()
 
