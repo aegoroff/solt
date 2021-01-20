@@ -19,9 +19,11 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	sl := ux.NewLine("Solutions", t.solutions)
-	pl := ux.NewLine("Projects", t.allProjects)
-	tbl.AddLines(sl, pl)
+
+	tbl.AddLines(
+		ux.NewLine("Solutions", t.solutions),
+		ux.NewLine("Projects", t.allProjects),
+	)
 	tbl.AddLine("", "")
 
 	within := t.allProjects - t.lost - t.lostWithIncludes

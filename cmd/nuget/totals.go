@@ -1,7 +1,6 @@
 package nuget
 
 import (
-	"github.com/dustin/go-humanize"
 	"solt/internal/out"
 	"solt/internal/ux"
 )
@@ -22,14 +21,14 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Solutions", humanize.Comma(t.solutions))
+	tbl.AddLines(ux.NewLine("Solutions", t.solutions))
 	tbl.AddLine("", "")
 	tbl.AddHead("Packages", "Count")
 
-	nl := ux.NewLine("Total", t.nugets)
-	ml := ux.NewLine("Mismatched", t.mismatched)
-
-	tbl.AddLines(nl, ml)
+	tbl.AddLines(
+		ux.NewLine("Total", t.nugets),
+		ux.NewLine("Mismatched", t.mismatched),
+	)
 
 	tbl.Print()
 }
@@ -39,8 +38,11 @@ func (t *totalsByProjects) display(p out.Printer, w out.Writable) {
 	p.Cprint(" <red>Totals:</>\n\n")
 
 	tbl := ux.NewTabler(w, 2)
-	tbl.AddLine("Projects", humanize.Comma(t.projects))
-	tbl.AddLine("Packages", humanize.Comma(t.nugets))
+
+	tbl.AddLines(
+		ux.NewLine("Projects", t.projects),
+		ux.NewLine("Packages", t.nugets),
+	)
 
 	tbl.Print()
 }
