@@ -1,4 +1,3 @@
-// Package lf finds lost files in the folder specified
 package lf
 
 import (

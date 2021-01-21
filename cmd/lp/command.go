@@ -1,4 +1,3 @@
-// Package lp finds projects that not included into any solution
 package lp
 
 import (

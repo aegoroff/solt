@@ -1,4 +1,3 @@
-// Package nu gets nuget packages information within solutions
 package nu
 
 import (

@@ -1,4 +1,3 @@
-// Package in gets information about found solutions
 package in
 
 import (

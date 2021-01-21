@@ -1,4 +1,3 @@
-// Package va validates SDK projects within solution(s)
 package va
 
 import (
