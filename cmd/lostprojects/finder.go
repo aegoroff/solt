@@ -15,7 +15,7 @@ type finder struct {
 
 func newFinder() *finder {
 	return &finder{
-		allFilesPaths: make(c9s.StringHashSet),
+		allFilesPaths: c9s.NewStringHashSet(),
 	}
 }
 

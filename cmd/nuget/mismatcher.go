@@ -11,7 +11,7 @@ type mismatcher struct {
 }
 
 func newMismatcher(nugets rbtree.RbTree) *mismatcher {
-	return &mismatcher{nugets: nugets, counter: make(c9s.StringHashSet)}
+	return &mismatcher{nugets: nugets, counter: c9s.NewStringHashSet()}
 }
 
 func (m *mismatcher) count() int64 {

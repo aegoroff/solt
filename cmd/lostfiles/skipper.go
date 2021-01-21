@@ -16,7 +16,7 @@ type skipper struct {
 
 func newSkipper() *skipper {
 	return &skipper{
-		items: make(c9s.StringHashSet),
+		items: c9s.NewStringHashSet(),
 	}
 }
 

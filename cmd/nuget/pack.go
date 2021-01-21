@@ -12,7 +12,7 @@ type pack struct {
 }
 
 func newPack(id string, versions ...string) *pack {
-	vs := make(c9s.StringHashSet)
+	vs := c9s.NewStringHashSet()
 	vs.AddRange(versions...)
 	return &pack{
 		pkg:      id,

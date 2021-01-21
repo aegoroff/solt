@@ -13,8 +13,8 @@ type sectioner struct {
 
 func newSectioner() *sectioner {
 	return &sectioner{
-		configurations: make(c9s.StringHashSet),
-		platforms:      make(c9s.StringHashSet),
+		configurations: c9s.NewStringHashSet(),
+		platforms:      c9s.NewStringHashSet(),
 	}
 }
 

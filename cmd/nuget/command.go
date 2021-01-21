@@ -136,7 +136,7 @@ func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 
 func newNugetFoldersTree(foldersTree rbtree.RbTree) (rbtree.RbTree, int64) {
 	result := rbtree.New()
-	counter := make(c9s.StringHashSet)
+	counter := c9s.NewStringHashSet()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
 		if len(packages) == 0 {

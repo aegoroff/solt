@@ -127,7 +127,7 @@ func (va *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbT
 
 		refs := va.getReferences(project, allNodes)
 
-		rrs := make(c9s.StringHashSet)
+		rrs := c9s.NewStringHashSet()
 
 		allPairs(refs, func(from *node, to *node) {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
