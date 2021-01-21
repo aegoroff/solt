@@ -5,7 +5,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/cobra"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"solt/msvc"
 	"strings"
 )

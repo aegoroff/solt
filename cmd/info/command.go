@@ -2,7 +2,7 @@ package info
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"solt/msvc"
 	"sort"
 )

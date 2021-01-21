@@ -3,12 +3,12 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"solt/cmd/fw"
 	"solt/cmd/info"
 	"solt/cmd/lostfiles"
 	"solt/cmd/lostprojects"
 	"solt/cmd/nuget"
 	"solt/cmd/validate"
+	"solt/internal/fw"
 	"solt/internal/out"
 )
 

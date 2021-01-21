@@ -1,7 +1,7 @@
 package lostfiles
 
 import (
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"strings"
 )
 

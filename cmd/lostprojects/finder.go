@@ -4,7 +4,7 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"os"
 	"path/filepath"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"solt/msvc"
 	"strings"
 )

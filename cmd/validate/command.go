@@ -2,7 +2,7 @@ package validate
 
 import (
 	"github.com/spf13/cobra"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 )
 
 type validateCommand struct{ *fw.BaseCommand }

@@ -7,7 +7,7 @@ import (
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"solt/msvc"
 	"solt/solution"
 	"sort"

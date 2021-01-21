@@ -4,7 +4,7 @@ import (
 	"bytes"
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
-	"solt/cmd/fw"
+	"solt/internal/fw"
 	"solt/internal/out"
 	"solt/internal/sys"
 	"unicode/utf8"
