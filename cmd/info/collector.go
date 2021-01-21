@@ -26,10 +26,10 @@ func (c *collector) Solution(*msvc.VisualStudioSolution) {
 	}
 }
 
-func (t *collector) updateType(k string, v int64) {
-	t.result.projects += v
+func (c *collector) updateType(k string, v int64) {
+	c.result.projects += v
 	key := newTypeStat(k)
-	n, ok := t.result.projectTypes.Search(newTypeStat(k))
+	n, ok := c.result.projectTypes.Search(newTypeStat(k))
 	if ok {
 		ts := n.(*typeStat)
 		ts.solutions++
@@ -37,10 +37,10 @@ func (t *collector) updateType(k string, v int64) {
 	} else {
 		key.solutions = 1
 		key.count = v
-		t.result.projectTypes.Insert(key)
+		c.result.projectTypes.Insert(key)
 	}
 }
 
-func (t *collector) groupped() map[string]int {
-	return t.grp.ByType()
+func (c *collector) groupped() map[string]int {
+	return c.grp.ByType()
 }
