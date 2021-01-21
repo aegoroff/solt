@@ -83,7 +83,7 @@ func (e *executorMemUsage) Execute(cc *cobra.Command) error {
 
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	// For in on each, see: https://golang.org/pkg/runtime/#MemStats
 	e.c.Prn().Cprint("\n<gray>Alloc =</> <green>%s</>", humanize.IBytes(m.Alloc))
 	e.c.Prn().Cprint("\t<gray>TotalAlloc =</> <green>%s</>", humanize.IBytes(m.TotalAlloc))
 	e.c.Prn().Cprint("\t<gray>Sys =</> <green>%s</>", humanize.IBytes(m.Sys))

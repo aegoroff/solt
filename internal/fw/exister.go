@@ -38,7 +38,7 @@ func (e *exister) UnexistCount() int64 {
 	return e.unexistCount
 }
 
-// Print outputs unexist files info
+// Print outputs unexist files in
 func (e *exister) Print(p out.Printer, title string, container string) {
 	if len(e.unexist) > 0 {
 		p.Println()

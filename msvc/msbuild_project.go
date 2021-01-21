@@ -61,7 +61,7 @@ func (p *msbuildProject) nugetPackages() []*NugetPackage {
 
 	result := make([]*NugetPackage, len(p.PackageReferences))
 
-	// If SDK project nuget packages included into project file
+	// If SDK project nu packages included into project file
 	for i, pkg := range p.PackageReferences {
 		result[i] = &NugetPackage{ID: pkg.ID, Version: pkg.Version}
 	}

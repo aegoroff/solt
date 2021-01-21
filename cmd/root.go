@@ -3,11 +3,11 @@ package cmd
 import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"solt/cmd/info"
-	"solt/cmd/lostfiles"
-	"solt/cmd/lostprojects"
-	"solt/cmd/nuget"
-	"solt/cmd/validate"
+	"solt/cmd/in"
+	"solt/cmd/lf"
+	"solt/cmd/lp"
+	"solt/cmd/nu"
+	"solt/cmd/va"
 	"solt/internal/fw"
 	"solt/internal/out"
 )
@@ -48,12 +48,12 @@ func Execute(fs afero.Fs, pe out.PrintEnvironment, args ...string) error {
 
 	c := fw.NewConf(fs, env, &d)
 
-	rootCmd.AddCommand(info.New(c))
-	rootCmd.AddCommand(lostfiles.New(c))
-	rootCmd.AddCommand(lostprojects.New(c))
-	rootCmd.AddCommand(nuget.New(c))
+	rootCmd.AddCommand(in.New(c))
+	rootCmd.AddCommand(lf.New(c))
+	rootCmd.AddCommand(lp.New(c))
+	rootCmd.AddCommand(nu.New(c))
 	rootCmd.AddCommand(newVersion(c))
-	rootCmd.AddCommand(validate.New(c))
+	rootCmd.AddCommand(va.New(c))
 
 	if args != nil && len(args) > 0 {
 		rootCmd.SetArgs(args)

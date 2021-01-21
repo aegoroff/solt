@@ -39,7 +39,7 @@ func (b *BaseCommand) Writer() io.WriteCloser {
 	return b.conf.W()
 }
 
-// Total does total info displaying
+// Total does total in displaying
 func (b *BaseCommand) Total(d ux.Displayer) {
 	t := ux.NewTotaler(b.Prn(), b)
 	t.Display(d)

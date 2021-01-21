@@ -35,7 +35,7 @@ type Executor interface {
 type Exister interface {
 	// Validate validates whether files from container exist in filesystem
 	Validate(root string, includes []string)
-	// Print outputs unexist files info
+	// Print outputs unexist files in
 	Print(p out.Printer, title string, container string)
 	// UnexistCount gets the number of non exist items
 	UnexistCount() int64

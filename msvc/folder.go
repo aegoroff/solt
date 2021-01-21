@@ -14,7 +14,7 @@ type Folder struct {
 	Path    string
 }
 
-// NugetPackage defines nuget package descriptor
+// NugetPackage defines nu package descriptor
 type NugetPackage struct {
 	ID      string
 	Version string
@@ -28,13 +28,13 @@ type FolderContent struct {
 	Solutions []*VisualStudioSolution
 }
 
-// NugetPackages gets all nuget packages found in a folder
+// NugetPackages gets all nu packages found in a folder
 func (c *FolderContent) NugetPackages() ([]*NugetPackage, []string) {
 	result := make([]*NugetPackage, 0)
 	var sources []string
 
 	if c.Packages != nil {
-		// old style projects (nuget packages references in separate files)
+		// old style projects (nu packages references in separate files)
 		result = append(result, c.Packages.nugetPackages()...)
 		sources = append(sources, packagesConfigFile)
 	}

@@ -2,7 +2,7 @@ package ux
 
 import "solt/internal/out"
 
-// Totaler does total info output
+// Totaler does total in output
 type Totaler struct {
 	p out.Printer
 	w out.Writable
@@ -13,7 +13,7 @@ func NewTotaler(p out.Printer, w out.Writable) *Totaler {
 	return &Totaler{p: p, w: w}
 }
 
-// Display outputs total info
+// Display outputs total in
 func (t *Totaler) Display(d Displayer) {
 	t.p.Cprint(" <red>Totals:</>")
 	t.p.Println()
