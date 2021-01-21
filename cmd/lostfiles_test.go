@@ -37,8 +37,8 @@ func Test_FindLostFilesCmd_NoLostFilesFound(t *testing.T) {
   -----                     -----
   Found                     2
   Included                  4
-  Lost                      0
   Included but not exist    0
+  Lost                      0
 `, actual)
 }
 
@@ -82,8 +82,8 @@ func Test_FindLostFilesCmdFilesInExcludedFolder_NoLostFilesFound(t *testing.T) {
   -----                     -----
   Found                     3
   Included                  4
-  Lost                      0
   Included but not exist    0
+  Lost                      0
 `, actual)
 	}
 }
@@ -119,8 +119,8 @@ func Test_FindLostFilesCmd_LostFilesFound(t *testing.T) {
   -----                     -----
   Found                     3
   Included                  4
-  Lost                      1
   Included but not exist    0
+  Lost                      1
 `), actual)
 }
 
@@ -151,8 +151,8 @@ func Test_FindLostFilesCmdNoProjects_AllFilesLost(t *testing.T) {
   -----                     -----
   Found                     2
   Included                  0
-  Lost                      2
   Included but not exist    0
+  Lost                      2
 `), actual)
 }
 
@@ -200,8 +200,8 @@ func Test_FindLostFilesCmdSeveralSolutions_LostFilesFound(t *testing.T) {
   -----                     -----
   Found                     6
   Included                  8
-  Lost                      2
   Included but not exist    0
+  Lost                      2
 `), actual)
 }
 
@@ -234,8 +234,8 @@ func Test_FindLostFilesCmdSdkProjects_NoLostFilesFound(t *testing.T) {
   -----                     -----
   Found                     3
   Included                  0
-  Lost                      0
   Included but not exist    0
+  Lost                      0
 `, actual)
 }
 
@@ -278,8 +278,8 @@ func Test_FindLostFilesCmdExplicitFilterSet_LostFilesFound(t *testing.T) {
   -----                     -----
   Found                     3
   Included                  4
-  Lost                      1
   Included but not exist    0
+  Lost                      1
 `), actual)
 	}
 }
@@ -316,8 +316,8 @@ File: a\a\Properties\AssemblyInfo1.cs removed successfully.
   -----                     -----
   Found                     3
   Included                  4
-  Lost                      1
   Included but not exist    0
+  Lost                      1
 `), actual)
 	_, err := memfs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.Error(err)
@@ -355,8 +355,8 @@ func Test_FindLostFilesCmdRemoveReadOnly_LostFilesNotRemoved(t *testing.T) {
   -----                     -----
   Found                     3
   Included                  4
-  Lost                      1
   Included but not exist    0
+  Lost                      1
 `), actual)
 	_, err := fs.Stat(dir + "a/Properties/AssemblyInfo1.cs")
 	ass.NoError(err)
@@ -395,8 +395,8 @@ These files included into projects but not exist in the file system.
   -----                     -----
   Found                     1
   Included                  4
-  Lost                      0
   Included but not exist    1
+  Lost                      0
 `), actual)
 }
 
@@ -428,8 +428,8 @@ func Test_FindLostFilesCmdUnexistOptionNotSet_UnesistFilesNotShown(t *testing.T)
   -----                     -----
   Found                     1
   Included                  4
-  Lost                      0
   Included but not exist    0
+  Lost                      0
 `, actual)
 }
 
@@ -467,7 +467,7 @@ func Test_FindLostFilesEmptyPath_NoOutput(t *testing.T) {
   -----                     -----
   Found                     0
   Included                  0
-  Lost                      0
   Included but not exist    0
+  Lost                      0
 `, actual)
 }

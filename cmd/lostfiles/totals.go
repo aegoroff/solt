@@ -22,8 +22,8 @@ func (t *totals) Display(tbl *ux.Tabler) {
 	lines := ux.NewLines()
 	lines.Add("Found", t.found)
 	lines.Add("Included", t.included)
-	lines.Add("Lost", t.lost)
 	lines.Add("Included but not exist", t.unexist)
+	lines.Add("Lost", t.lost)
 
 	tbl.AddLines(lines...)
 }
