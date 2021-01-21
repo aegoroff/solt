@@ -33,10 +33,10 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	sort.Sort(solutions)
 
 	grp := newProjectGroupper()
-	tot := newTotaler(grp)
-	solutions.Foreach(grp, newDisplay(c.Prn(), c, grp), tot)
+	collect := newCollector(grp)
+	solutions.Foreach(grp, newDisplay(c.Prn(), c, grp), collect)
 
-	c.Total(tot.result)
+	c.Total(collect.result)
 
 	return nil
 }

@@ -5,13 +5,13 @@ import (
 	"solt/msvc"
 )
 
-type totaler struct {
+type collector struct {
 	result *totals
 	grp    *projectGroupper
 }
 
-func newTotaler(grp *projectGroupper) *totaler {
-	return &totaler{
+func newCollector(grp *projectGroupper) *collector {
+	return &collector{
 		result: &totals{
 			projectTypes: rbtree.New(),
 		},
@@ -19,14 +19,14 @@ func newTotaler(grp *projectGroupper) *totaler {
 	}
 }
 
-func (t *totaler) Solution(*msvc.VisualStudioSolution) {
-	t.result.solutions++
-	for k, v := range t.groupped() {
-		t.updateType(k, int64(v))
+func (c *collector) Solution(*msvc.VisualStudioSolution) {
+	c.result.solutions++
+	for k, v := range c.groupped() {
+		c.updateType(k, int64(v))
 	}
 }
 
-func (t *totaler) updateType(k string, v int64) {
+func (t *collector) updateType(k string, v int64) {
 	t.result.projects += v
 	key := newTypeStat(k)
 	n, ok := t.result.projectTypes.Search(newTypeStat(k))
@@ -41,6 +41,6 @@ func (t *totaler) updateType(k string, v int64) {
 	}
 }
 
-func (t *totaler) groupped() map[string]int {
+func (t *collector) groupped() map[string]int {
 	return t.grp.ByType()
 }
