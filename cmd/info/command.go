@@ -36,7 +36,7 @@ func (c *infoCommand) Execute(*cobra.Command) error {
 	tot := newTotaler(grp)
 	solutions.Foreach(grp, newDisplay(c.Prn(), c, grp), tot)
 
-	tot.display(c.Prn(), c)
+	tot.result.display(c.Prn(), c)
 
 	return nil
 }

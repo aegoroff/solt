@@ -1,10 +1,7 @@
 package info
 
 import (
-	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
-	"solt/internal/out"
-	"solt/internal/ux"
 	"solt/msvc"
 )
 
@@ -46,36 +43,4 @@ func (t *totaler) updateType(k string, v int64) {
 
 func (t *totaler) groupped() map[string]int {
 	return t.grp.ByType()
-}
-
-func (t *totaler) display(p out.Printer, w out.Writable) {
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
-	sl := ux.NewLine("Solutions", t.result.solutions)
-	pl := ux.NewLine("Projects", t.result.projects)
-	tbl.AddLines(sl, pl)
-	tbl.AddLine("", "")
-
-	const percentH = "%     "
-	tbl.AddHead("Project type", "Count", percentH, "Solutions", percentH)
-
-	it := rbtree.NewAscend(t.result.projectTypes)
-
-	it.Foreach(func(n rbtree.Comparable) {
-		ts := n.(*typeStat)
-		percentS := fmt.Sprintf("%.2f%%", t.percentProjects(ts.count))
-		solPercentS := fmt.Sprintf("%.2f%%", t.percentSolutions(ts.solutions))
-		tbl.AddLine(ts.name, ts.Count(), percentS, ts.Solutions(), solPercentS)
-	})
-
-	tbl.Print()
-}
-
-func (t *totaler) percentProjects(value int64) float64 {
-	return ux.Percent(value, t.result.projects)
-}
-
-func (t *totaler) percentSolutions(value int64) float64 {
-	return ux.Percent(value, t.result.solutions)
 }
