@@ -1,7 +1,6 @@
 package validate
 
 import (
-	"solt/internal/out"
 	"solt/internal/ux"
 )
 
@@ -13,12 +12,7 @@ type totals struct {
 	redundantRefs    int64
 }
 
-func (t *totals) display(p out.Printer, w out.Writable) {
-	p.Println()
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
-
+func (t *totals) Display(tbl *ux.Tabler) {
 	tbl.AddHead("Parameter", "Count", "%     ")
 
 	sl := ux.NewLine("Solutions", t.solutions)
@@ -34,5 +28,4 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	tbl.AddLine(ppl.Name(), ppl.Value(), ppl.Percent(t.projects))
 
 	tbl.AddLines(ux.NewLine("Redundant references", t.redundantRefs))
-	tbl.Print()
 }

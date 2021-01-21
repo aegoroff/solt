@@ -1,7 +1,6 @@
 package lostprojects
 
 import (
-	"solt/internal/out"
 	"solt/internal/ux"
 )
 
@@ -14,12 +13,7 @@ type totals struct {
 	removed          int64
 }
 
-func (t *totals) display(p out.Printer, w out.Writable) {
-	p.Println()
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
-
+func (t *totals) Display(tbl *ux.Tabler) {
 	tbl.AddLines(
 		ux.NewLine("Solutions", t.solutions),
 		ux.NewLine("Projects", t.allProjects),
@@ -39,6 +33,4 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	for _, l := range lines {
 		tbl.AddLine(l.Name(), l.Value(), l.Percent(t.allProjects))
 	}
-
-	tbl.Print()
 }

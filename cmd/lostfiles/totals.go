@@ -1,7 +1,6 @@
 package lostfiles
 
 import (
-	"solt/internal/out"
 	"solt/internal/ux"
 )
 
@@ -13,11 +12,7 @@ type totals struct {
 	found    int64
 }
 
-func (t *totals) display(p out.Printer, w out.Writable) {
-	p.Println()
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
+func (t *totals) Display(tbl *ux.Tabler) {
 	pl := ux.NewLine("Projects", t.projects)
 	tbl.AddLines(pl)
 	tbl.AddLine("", "")
@@ -31,6 +26,4 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 	lines.Add("Included but not exist", t.unexist)
 
 	tbl.AddLines(lines...)
-
-	tbl.Print()
 }

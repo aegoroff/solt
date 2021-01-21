@@ -78,15 +78,15 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	c.remover.Remove(lost)
 
-	tt := totals{
+	tt := &totals{
 		projects: int64(len(projects)),
 		unexist:  c.exister.UnexistCount(),
 		included: int64(len(filesIn)),
 		lost:     int64(len(lost)),
 		found:    int64(len(collected.files)),
 	}
-
-	tt.display(c.Prn(), c)
+	c.Prn().Println()
+	c.Total(tt)
 	return nil
 }
 

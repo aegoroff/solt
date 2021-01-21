@@ -69,7 +69,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 	r := newRemover(c.Fs(), c.Prn(), c.removeLost)
 	err := r.removeAll(lost)
 
-	tt := totals{
+	tt := &totals{
 		solutions:        int64(len(solutions)),
 		allProjects:      int64(len(allProjects)),
 		lost:             int64(len(lost)),
@@ -77,6 +77,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 		unexist:          exist.UnexistCount(),
 		removed:          r.successCount,
 	}
-	tt.display(c.Prn(), c)
+	c.Prn().Println()
+	c.Total(tt)
 	return err
 }

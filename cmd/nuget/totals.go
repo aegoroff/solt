@@ -1,7 +1,6 @@
 package nuget
 
 import (
-	"solt/internal/out"
 	"solt/internal/ux"
 )
 
@@ -16,11 +15,7 @@ type totalsByProjects struct {
 	nugets   int64
 }
 
-func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
-	p.Println()
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
+func (t *totalsBySolution) Display(tbl *ux.Tabler) {
 	tbl.AddLines(ux.NewLine("Solutions", t.solutions))
 	tbl.AddLine("", "")
 	tbl.AddHead("Packages", "Count")
@@ -29,20 +24,11 @@ func (t *totalsBySolution) display(p out.Printer, w out.Writable) {
 		ux.NewLine("Total", t.nugets),
 		ux.NewLine("Mismatched", t.mismatched),
 	)
-
-	tbl.Print()
 }
 
-func (t *totalsByProjects) display(p out.Printer, w out.Writable) {
-	p.Println()
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
-
+func (t *totalsByProjects) Display(tbl *ux.Tabler) {
 	tbl.AddLines(
 		ux.NewLine("Projects", t.projects),
 		ux.NewLine("Packages", t.nugets),
 	)
-
-	tbl.Print()
 }

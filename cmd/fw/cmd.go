@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"solt/internal/out"
+	"solt/internal/ux"
 )
 
 type cobraRunSignature func(cmd *cobra.Command, args []string) error
@@ -36,6 +37,12 @@ func (b *BaseCommand) Prn() out.Printer {
 // Writer gets underlying io.WriteCloser
 func (b *BaseCommand) Writer() io.WriteCloser {
 	return b.conf.W()
+}
+
+// Total does total info displaying
+func (b *BaseCommand) Total(d ux.Displayer) {
+	t := ux.NewTotaler(b.Prn(), b)
+	t.Display(d)
 }
 
 // NewBaseCmd creates new BaseCommand instance

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/dustin/go-humanize"
-	"solt/internal/out"
 	"solt/internal/ux"
 	"strings"
 )
@@ -21,10 +20,7 @@ type typeStat struct {
 	solutions int64
 }
 
-func (t *totals) display(p out.Printer, w out.Writable) {
-	p.Cprint(" <red>Totals:</>\n\n")
-
-	tbl := ux.NewTabler(w, 2)
+func (t *totals) Display(tbl *ux.Tabler) {
 	tbl.AddLines(
 		ux.NewLine("Solutions", t.solutions),
 		ux.NewLine("Projects", t.projects),
@@ -46,8 +42,6 @@ func (t *totals) display(p out.Printer, w out.Writable) {
 			ts.SolutionsPercent(t.solutions),
 		)
 	})
-
-	tbl.Print()
 }
 
 func (t *totals) percentProjects(value int64) float64 {

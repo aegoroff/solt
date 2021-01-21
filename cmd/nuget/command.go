@@ -100,13 +100,14 @@ func (c *nugetCommand) Execute(*cobra.Command) error {
 		}
 	})
 
-	tt := totalsBySolution{
+	tt := &totalsBySolution{
 		solutions:  int64(len(solutions)),
 		nugets:     ncount,
 		mismatched: m.count(),
 	}
 
-	tt.display(c.Prn(), c)
+	c.Prn().Println()
+	c.Total(tt)
 
 	return nil
 }
@@ -122,12 +123,14 @@ func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 		return fmt.Sprintf("%s (%s)", nf.path, src)
 	})
 
-	tt := totalsByProjects{
+	tt := &totalsByProjects{
 		projects: nugets.Len(),
 		nugets:   ncount,
 	}
 
-	tt.display(c.Prn(), c)
+	c.Prn().Println()
+	c.Total(tt)
+
 	return nil
 }
 
