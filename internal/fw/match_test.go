@@ -168,5 +168,4 @@ func Test_Filter_Nil(t *testing.T) {
 
 	// Assert
 	ass.Equal([]string{}, result)
-
 }
