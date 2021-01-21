@@ -45,11 +45,15 @@ func (h *skipper) fromProject(prj *msvc.MsbuildProject) {
 		return
 	}
 
-	subfolders := []string{"obj"}
-
+	var subfolders []string
+	const objPath = "obj"
 	// Exclude output paths too something like bin\Debug, bin\Release etc.
 	if prj.Project.OutputPaths != nil {
-		subfolders = append(subfolders, prj.Project.OutputPaths...)
+		subfolders = make([]string, len(prj.Project.OutputPaths)+1)
+		i := copy(subfolders, prj.Project.OutputPaths)
+		subfolders[i] = objPath
+	} else {
+		subfolders = []string{objPath}
 	}
 
 	// Add project base + exclude subfolder into exclude folders list
