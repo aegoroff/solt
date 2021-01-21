@@ -44,14 +44,6 @@ func (t *totals) Display(tbl *ux.Tabler) {
 	})
 }
 
-func (t *totals) percentProjects(value int64) float64 {
-	return ux.Percent(value, t.projects)
-}
-
-func (t *totals) percentSolutions(value int64) float64 {
-	return ux.Percent(value, t.solutions)
-}
-
 func newTypeStat(name string) *typeStat {
 	return &typeStat{name: name}
 }
