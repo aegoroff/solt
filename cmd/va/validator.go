@@ -163,14 +163,16 @@ func getReferences(to *node, allNodes rbtree.RbTree) []*node {
 
 	dir := filepath.Dir(to.project.Path())
 
-	result := make([]*node, 0, len(to.project.Project.ProjectReferences))
+	result := make([]*node, len(to.project.Project.ProjectReferences))
+	i := 0
 	for _, ref := range to.project.Project.ProjectReferences {
 		p := filepath.Join(dir, ref.Path())
 		n := &node{fullPath: &p}
 		from, ok := allNodes.Search(n)
 		if ok {
-			result = append(result, from.(*node))
+			result[i] = from.(*node)
+			i++
 		}
 	}
-	return result
+	return result[:i]
 }
