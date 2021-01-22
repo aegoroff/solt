@@ -125,11 +125,14 @@ func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 
 		// If there are any paths between project refs
 		// they path start point considered redundant link
-		allPairs(project.refs, func(from *node, to *node) {
+		allPairs(project.refs, func(from *node, to *node) bool {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
-			if len(paths) > 0 {
+			ok := len(paths) > 0
+			if ok {
 				rrs.Add(from.String())
 			}
+			// if not found iteration will continue
+			return !ok
 		})
 
 		if rrs.Count() > 0 {
@@ -140,13 +143,15 @@ func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 	return result
 }
 
-func allPairs(nodes []*node, action func(*node, *node)) {
+func allPairs(nodes []*node, action func(*node, *node) bool) {
 	for _, from := range nodes {
 		for _, to := range nodes {
 			if from.ID() == to.ID() {
 				continue
 			}
-			action(from, to)
+			if !action(from, to) {
+				break
+			}
 		}
 	}
 }
