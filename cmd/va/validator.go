@@ -131,8 +131,8 @@ func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 			if ok {
 				rrs.Add(from.String())
 			}
-			// if not found iteration will continue
-			return !ok
+			// if found iteration will stop
+			return ok
 		})
 
 		if rrs.Count() > 0 {
@@ -143,13 +143,13 @@ func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 	return result
 }
 
-func allPairs(nodes []*node, action func(*node, *node) bool) {
+func allPairs(nodes []*node, hasPath func(*node, *node) bool) {
 	for _, from := range nodes {
 		for _, to := range nodes {
 			if from.ID() == to.ID() {
 				continue
 			}
-			if !action(from, to) {
+			if hasPath(from, to) {
 				break
 			}
 		}
