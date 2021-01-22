@@ -59,7 +59,7 @@ func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	g := va.newSolutionGraph(sol)
 
-	redundants := va.findRedundants(g)
+	redundants := findRedundants(g)
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
 		va.tt.problemProjects += int64(len(redundants))
@@ -116,7 +116,7 @@ func (va *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTr
 	}
 }
 
-func (va *validator) findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
+func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
