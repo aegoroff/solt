@@ -57,9 +57,9 @@ func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
 }
 
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
-	g, allNodes := va.newSolutionGraph(sol)
+	g := va.newSolutionGraph(sol)
 
-	redundants := va.findRedundants(g, allNodes)
+	redundants := va.findRedundants(g)
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
 		va.tt.problemProjects += int64(len(redundants))
@@ -71,10 +71,10 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	va.act.action(sol.Path(), redundants)
 }
 
-func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) (*simple.DirectedGraph, rbtree.RbTree) {
+func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) *simple.DirectedGraph {
 	g, nodes := va.createGraphNodes(sln)
 	va.createGraphEdges(g, nodes)
-	return g, nodes
+	return g
 }
 
 func (va *validator) createGraphNodes(sln *msvc.VisualStudioSolution) (*simple.DirectedGraph, rbtree.RbTree) {
@@ -108,15 +108,15 @@ func (va *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTr
 
 	for gn.Next() {
 		to := gn.Node().(*node)
-		refs := va.getReferences(to, nodes)
-		for _, ref := range refs {
+		to.refs = getReferences(to, nodes)
+		for _, ref := range to.refs {
 			e := g.NewEdge(ref, to)
 			g.SetEdge(e)
 		}
 	}
 }
 
-func (va *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbTree) map[string]c9s.StringHashSet {
+func (va *validator) findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
@@ -125,11 +125,11 @@ func (va *validator) findRedundants(g *simple.DirectedGraph, allNodes rbtree.RbT
 	for gn.Next() {
 		project := gn.Node().(*node)
 
-		refs := va.getReferences(project, allNodes)
-
 		rrs := c9s.NewStringHashSet()
 
-		allPairs(refs, func(from *node, to *node) {
+		// If there are any paths between project refs
+		// they path start point considered redundant link
+		allPairs(project.refs, func(from *node, to *node) {
 			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
 			if len(paths) > 0 {
 				rrs.Add(from.String())
@@ -155,14 +155,14 @@ func allPairs(nodes []*node, action func(*node, *node)) {
 	}
 }
 
-func (*validator) getReferences(to *node, allNodes rbtree.RbTree) []*node {
+func getReferences(to *node, allNodes rbtree.RbTree) []*node {
 	if to.project.Project.ProjectReferences == nil {
 		return []*node{}
 	}
 
 	dir := filepath.Dir(to.project.Path())
 
-	var result []*node
+	result := make([]*node, 0, len(to.project.Project.ProjectReferences))
 	for _, ref := range to.project.Project.ProjectReferences {
 		p := filepath.Join(dir, ref.Path())
 		n := &node{fullPath: &p}
