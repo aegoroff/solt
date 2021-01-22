@@ -72,12 +72,6 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 }
 
 func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) *simple.DirectedGraph {
-	g, nodes := va.createGraphNodes(sln)
-	va.createGraphEdges(g, nodes)
-	return g
-}
-
-func (va *validator) createGraphNodes(sln *msvc.VisualStudioSolution) (*simple.DirectedGraph, rbtree.RbTree) {
 	solutionPath := filepath.Dir(sln.Path())
 	g := simple.NewDirectedGraph()
 	nodes := rbtree.New()
@@ -100,10 +94,12 @@ func (va *validator) createGraphNodes(sln *msvc.VisualStudioSolution) (*simple.D
 		g.AddNode(n)
 	}
 
-	return g, nodes
+	createGraphEdges(g, nodes)
+
+	return g
 }
 
-func (va *validator) createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
+func createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
 	gn := g.Nodes()
 
 	for gn.Next() {
