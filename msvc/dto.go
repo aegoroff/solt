@@ -66,8 +66,7 @@ func (i *include) path() string {
 	return sys.ToValidPath(i.Include)
 }
 
-// IsSdkProject gets whether a project is a the new VS 2017 or later project
-func (p *msbuildProject) IsSdkProject() bool {
+func (p *msbuildProject) isSdkProject() bool {
 	if len(p.Sdk) > 0 {
 		return true
 	}

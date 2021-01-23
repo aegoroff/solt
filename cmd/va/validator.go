@@ -44,11 +44,10 @@ func (va *validator) validate() {
 func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
 	va.sdkProjects = rbtree.New()
 
-	for _, project := range allProjects {
-		if !project.Project.IsSdkProject() {
-			continue
+	for _, p := range allProjects {
+		if p.IsSdkProject() {
+			va.sdkProjects.Insert(p)
 		}
-		va.sdkProjects.Insert(project)
 	}
 }
 

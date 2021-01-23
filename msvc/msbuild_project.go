@@ -23,6 +23,11 @@ func (prj *MsbuildProject) Path() string {
 	return prj.path
 }
 
+// IsSdkProject gets whether a project is a the new VS 2017 or later project
+func (prj *MsbuildProject) IsSdkProject() bool {
+	return prj.Project.isSdkProject()
+}
+
 // Less implements rbtree.Comparable interface
 func (prj *MsbuildProject) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(prj.path, y.(*MsbuildProject).path) < 0

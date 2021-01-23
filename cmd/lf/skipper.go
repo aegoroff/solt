@@ -40,7 +40,7 @@ func (h *skipper) fromProject(prj *msvc.MsbuildProject) {
 	pdir := filepath.Dir(prj.Path())
 
 	// In case of SDK projects all files inside project folder are considered included
-	if prj.Project.IsSdkProject() {
+	if prj.IsSdkProject() {
 		h.items.Add(pdir)
 		return
 	}
