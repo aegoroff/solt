@@ -33,13 +33,11 @@ func (gr *graph) allPaths() *path.AllShortest {
 	return &paths
 }
 
-func (gr *graph) foreach(f func(n *node)) {
-	gn := gr.g.Nodes()
-
-	for gn.Next() {
-		n := gn.Node().(*node)
-		f(n)
-	}
+func (gr *graph) foreach(callFn func(n *node)) {
+	it := rbtree.NewWalkInorder(gr.allNodes)
+	it.Foreach(func(cmp rbtree.Comparable) {
+		callFn(cmp.(*node))
+	})
 }
 
 func (gr *graph) newNode(msbuild *msvc.MsbuildProject) {
