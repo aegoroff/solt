@@ -27,18 +27,13 @@ func newSdkIterator(allProjects []*msvc.MsbuildProject) *sdkIterator {
 
 func (s *sdkIterator) foreach(sln *msvc.VisualStudioSolution, callFn func(*msvc.MsbuildProject)) {
 	solutionPath := filepath.Dir(sln.Path())
-	for _, prj := range sln.Solution.Projects {
-		if prj.TypeID == solution.IDSolutionFolder {
-			continue
-		}
 
-		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, prj.Path))
+	sln.Projects(func(project *solution.Project) {
+		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, project.Path))
 
 		found, ok := s.sdkProjects.Search(p)
-		if !ok {
-			continue
+		if ok {
+			callFn(found.(*msvc.MsbuildProject))
 		}
-
-		callFn(found.(*msvc.MsbuildProject))
-	}
+	})
 }

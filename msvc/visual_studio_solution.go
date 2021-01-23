@@ -35,12 +35,20 @@ func (s *VisualStudioSolution) AllProjectPaths(decorator StringDecorator) []stri
 	solutionPath := filepath.Dir(s.path)
 	var paths = make([]string, len(s.Solution.Projects))
 	i := 0
+	s.Projects(func(project *solution.Project) {
+		fullProjectPath := filepath.Join(solutionPath, project.Path)
+		paths[i] = decorator(fullProjectPath)
+		i++
+	})
+	return paths[:i]
+}
+
+// Projects enumerates all solutions projects that
+// has type different from {2150E333-8FDC-42A3-9474-1A3956D46DE8} (solution folder)
+func (s *VisualStudioSolution) Projects(callFn func(*solution.Project)) {
 	for _, sp := range s.Solution.Projects {
 		if sp.TypeID != solution.IDSolutionFolder {
-			fullProjectPath := filepath.Join(solutionPath, sp.Path)
-			paths[i] = decorator(fullProjectPath)
-			i++
+			callFn(sp)
 		}
 	}
-	return paths[0:i]
 }

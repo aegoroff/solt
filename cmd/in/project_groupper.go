@@ -20,13 +20,11 @@ func (p *projectGroupper) ByType() map[string]int {
 func (p *projectGroupper) Solution(vs *msvc.VisualStudioSolution) {
 	p.byType = make(map[string]int)
 
-	for _, pr := range vs.Solution.Projects {
-		if pr.TypeID != solution.IDSolutionFolder {
-			if pr.Type != "" {
-				p.byType[pr.Type]++
-			} else {
-				p.byType[pr.TypeID]++
-			}
+	vs.Projects(func(pr *solution.Project) {
+		if pr.Type != "" {
+			p.byType[pr.Type]++
+		} else {
+			p.byType[pr.TypeID]++
 		}
-	}
+	})
 }
