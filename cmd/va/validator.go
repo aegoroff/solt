@@ -104,8 +104,8 @@ func createGraphEdges(g *simple.DirectedGraph, allNodes rbtree.RbTree) {
 	for gn.Next() {
 		to := gn.Node().(*node)
 		to.refs = getReferences(to, allNodes)
-		for _, ref := range to.refs {
-			e := g.NewEdge(ref, to)
+		for _, from := range to.refs {
+			e := g.NewEdge(from, to)
 			g.SetEdge(e)
 		}
 	}
