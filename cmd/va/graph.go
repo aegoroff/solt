@@ -6,22 +6,24 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
 	"solt/msvc"
-	"solt/solution"
 )
 
 type graph struct {
 	allNodes rbtree.RbTree
 	g        *simple.DirectedGraph
+	nextID   int64
 }
 
-func newGraph(sln *msvc.VisualStudioSolution, projects rbtree.RbTree) *graph {
+func newGraph(sln *msvc.VisualStudioSolution, it *sdkIterator) *graph {
 	gr := &graph{
 		g:        simple.NewDirectedGraph(),
 		allNodes: rbtree.New(),
+		nextID:   1,
 	}
 
-	gr.newNodes(sln, projects)
-	gr.newEdges()
+	it.foreach(sln, gr.newNode)
+	ait := rbtree.NewWalkInorder(gr.allNodes)
+	ait.Foreach(gr.newEdge)
 
 	return gr
 }
@@ -40,38 +42,20 @@ func (gr *graph) foreach(f func(n *node)) {
 	}
 }
 
-func (gr *graph) newNodes(sln *msvc.VisualStudioSolution, projects rbtree.RbTree) {
-	solutionPath := filepath.Dir(sln.Path())
-	ix := int64(1)
-	for _, prj := range sln.Solution.Projects {
-		if prj.TypeID == solution.IDSolutionFolder {
-			continue
-		}
-
-		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, prj.Path))
-
-		msbuild, ok := projects.Search(p)
-		if !ok {
-			continue
-		}
-
-		n := newNode(ix, msbuild.(*msvc.MsbuildProject))
-		gr.allNodes.Insert(n)
-		ix++
-		gr.g.AddNode(n)
-	}
+func (gr *graph) newNode(msbuild *msvc.MsbuildProject) {
+	n := newNode(gr.nextID, msbuild)
+	gr.allNodes.Insert(n)
+	gr.nextID++
+	gr.g.AddNode(n)
 }
 
-func (gr *graph) newEdges() {
-	it := rbtree.NewWalkInorder(gr.allNodes)
-	it.Foreach(func(cmp rbtree.Comparable) {
-		to := cmp.(*node)
-		to.refs = gr.references(to)
-		for _, from := range to.refs {
-			e := gr.g.NewEdge(from, to)
-			gr.g.SetEdge(e)
-		}
-	})
+func (gr *graph) newEdge(cmp rbtree.Comparable) {
+	to := cmp.(*node)
+	to.refs = gr.references(to)
+	for _, from := range to.refs {
+		e := gr.g.NewEdge(from, to)
+		gr.g.SetEdge(e)
+	}
 }
 
 func (gr *graph) references(to *node) []*node {

@@ -1,7 +1,6 @@
 package va
 
 import (
-	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"solt/internal/fw"
 	"solt/msvc"
@@ -12,7 +11,7 @@ type validator struct {
 	fs          afero.Fs
 	sourcesPath string
 	act         actioner
-	sdkProjects rbtree.RbTree
+	iter        *sdkIterator
 	tt          *totals
 }
 
@@ -29,10 +28,9 @@ func (va *validator) validate() {
 	foldersTree := msvc.ReadSolutionDir(va.sourcesPath, va.fs)
 
 	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
+	va.iter = newSdkIterator(allProjects)
 	va.tt.solutions = int64(len(sols))
-
-	va.onlySdkProjects(allProjects)
-	va.tt.projects = va.sdkProjects.Len()
+	va.tt.projects = va.iter.sdkProjects.Len()
 
 	solutions := fw.SolutionSlice(sols)
 	sort.Sort(solutions)
@@ -40,18 +38,8 @@ func (va *validator) validate() {
 	solutions.Foreach(va)
 }
 
-func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
-	va.sdkProjects = rbtree.New()
-
-	for _, p := range allProjects {
-		if p.IsSdkProject() {
-			va.sdkProjects.Insert(p)
-		}
-	}
-}
-
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
-	gr := newGraph(sol, va.sdkProjects)
+	gr := newGraph(sol, va.iter)
 	find := newFinder(gr)
 	redundants := find.findAll()
 
