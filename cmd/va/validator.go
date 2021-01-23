@@ -120,10 +120,10 @@ func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
 	for gn.Next() {
 		project := gn.Node().(*node)
 
-		rrs, ok := find.find(project.refs)
+		found, ok := find.find(project.refs)
 
 		if ok {
-			result[project.String()] = rrs
+			result[project.String()] = found
 		}
 	}
 
