@@ -30,7 +30,6 @@ func (va *validator) validate() {
 	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
 	va.iter = newSdkIterator(allProjects)
 	va.tt.solutions = int64(len(sols))
-	va.tt.projects = va.iter.sdkProjects.Len()
 
 	solutions := fw.SolutionSlice(sols)
 	sort.Sort(solutions)
@@ -43,6 +42,7 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	find := newFinder(gr)
 	redundants := find.findAll()
 
+	va.tt.projects = gr.nextID - 1
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
 		va.tt.problemProjects += int64(len(redundants))
