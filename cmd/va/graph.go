@@ -14,6 +14,18 @@ type graph struct {
 	g        *simple.DirectedGraph
 }
 
+func newGraph(sln *msvc.VisualStudioSolution, projects rbtree.RbTree) *graph {
+	gr := &graph{
+		g:        simple.NewDirectedGraph(),
+		allNodes: rbtree.New(),
+	}
+
+	gr.newNodes(sln, projects)
+	gr.newEdges()
+
+	return gr
+}
+
 func (gr *graph) allPaths() *path.AllShortest {
 	paths := path.DijkstraAllPaths(gr.g)
 	return &paths
@@ -26,22 +38,6 @@ func (gr *graph) foreach(f func(n *node)) {
 		n := gn.Node().(*node)
 		f(n)
 	}
-}
-
-func newGraph(sln *msvc.VisualStudioSolution, projects rbtree.RbTree) *graph {
-	g := simple.NewDirectedGraph()
-	allNodes := rbtree.New()
-
-	gr := &graph{
-		g:        g,
-		allNodes: allNodes,
-	}
-
-	gr.newNodes(sln, projects)
-
-	gr.newEdges()
-
-	return gr
 }
 
 func (gr *graph) newNodes(sln *msvc.VisualStudioSolution, projects rbtree.RbTree) {
