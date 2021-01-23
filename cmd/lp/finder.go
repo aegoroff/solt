@@ -45,11 +45,12 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 
 	i := 0
 	for _, lp := range allLost {
-		d := dir(lp.Path())
+		pp := lp.Path()
+		d := dir(pp)
 		if filesFoldersM.Match(d) {
-			lostWithIncludes = append(lostWithIncludes, lp.Path())
+			lostWithIncludes = append(lostWithIncludes, pp)
 		} else {
-			lost[i] = lp.Path()
+			lost[i] = pp
 			i++
 		}
 	}
