@@ -6,11 +6,13 @@ import (
 )
 
 type finder struct {
+	g        *graph
 	allPaths *path.AllShortest
 }
 
-func newFinder(allPaths *path.AllShortest) *finder {
-	return &finder{allPaths: allPaths}
+func newFinder(g *graph) *finder {
+	allPaths := g.allPaths()
+	return &finder{allPaths: allPaths, g: g}
 }
 
 func (fi *finder) hasPath(from *node, to *node) bool {
@@ -32,4 +34,17 @@ func (fi *finder) find(nodes []*node) (c9s.StringHashSet, bool) {
 		}
 	}
 	return found, found.Count() > 0
+}
+
+func (fi *finder) findAll() map[string]c9s.StringHashSet {
+	result := make(map[string]c9s.StringHashSet)
+	fi.g.foreach(func(n *node) {
+		found, ok := fi.find(n.refs)
+
+		if ok {
+			result[n.String()] = found
+		}
+	})
+
+	return result
 }

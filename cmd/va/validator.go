@@ -1,7 +1,6 @@
 package va
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
 	"solt/internal/fw"
@@ -53,7 +52,8 @@ func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
 
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	gr := newGraph(sol, va.sdkProjects)
-	redundants := findRedundants(gr)
+	find := newFinder(gr)
+	redundants := find.findAll()
 
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
@@ -64,19 +64,4 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	}
 
 	va.act.action(sol.Path(), redundants)
-}
-
-func findRedundants(g *graph) map[string]c9s.StringHashSet {
-	result := make(map[string]c9s.StringHashSet)
-	find := newFinder(g.allPaths())
-
-	g.foreach(func(n *node) {
-		found, ok := find.find(n.refs)
-
-		if ok {
-			result[n.String()] = found
-		}
-	})
-
-	return result
 }
