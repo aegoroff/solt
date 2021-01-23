@@ -42,7 +42,7 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	find := newFinder(gr)
 	redundants := find.findAll()
 
-	va.tt.projects = gr.nextID - 1
+	va.tt.projects += gr.nextID - 1
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
 		va.tt.problemProjects += int64(len(redundants))
