@@ -63,16 +63,15 @@ func (gr *graph) newNodes(sln *msvc.VisualStudioSolution, projects rbtree.RbTree
 }
 
 func (gr *graph) newEdges() {
-	gn := gr.g.Nodes()
-
-	for gn.Next() {
-		to := gn.Node().(*node)
+	it := rbtree.NewWalkInorder(gr.allNodes)
+	it.Foreach(func(cmp rbtree.Comparable) {
+		to := cmp.(*node)
 		to.refs = gr.references(to)
 		for _, from := range to.refs {
 			e := gr.g.NewEdge(from, to)
 			gr.g.SetEdge(e)
 		}
-	}
+	})
 }
 
 func (gr *graph) references(to *node) []*node {
