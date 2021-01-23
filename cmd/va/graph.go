@@ -23,7 +23,7 @@ func newGraph(sln *msvc.VisualStudioSolution, it *sdkIterator) *graph {
 
 	it.foreach(sln, gr.newNode)
 	ait := rbtree.NewWalkInorder(gr.allNodes)
-	ait.Foreach(gr.newEdge)
+	ait.Foreach(gr.newEdges)
 
 	return gr
 }
@@ -47,7 +47,7 @@ func (gr *graph) newNode(msbuild *msvc.MsbuildProject) {
 	gr.g.AddNode(n)
 }
 
-func (gr *graph) newEdge(cmp rbtree.Comparable) {
+func (gr *graph) newEdges(cmp rbtree.Comparable) {
 	to := cmp.(*node)
 	to.refs = gr.references(to)
 	for _, from := range to.refs {
