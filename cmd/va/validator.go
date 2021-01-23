@@ -4,7 +4,6 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
-	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 	"path/filepath"
 	"solt/internal/fw"
@@ -74,7 +73,7 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) *simple.DirectedGraph {
 	solutionPath := filepath.Dir(sln.Path())
 	g := simple.NewDirectedGraph()
-	nodes := rbtree.New()
+	allNodes := rbtree.New()
 	ix := int64(1)
 	for _, prj := range sln.Solution.Projects {
 		if prj.TypeID == solution.IDSolutionFolder {
@@ -89,22 +88,22 @@ func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) *simple.Di
 		}
 
 		n := newNode(ix, msbuild.(*msvc.MsbuildProject))
-		nodes.Insert(n)
+		allNodes.Insert(n)
 		ix++
 		g.AddNode(n)
 	}
 
-	createGraphEdges(g, nodes)
+	createGraphEdges(g, allNodes)
 
 	return g
 }
 
-func createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
+func createGraphEdges(g *simple.DirectedGraph, allNodes rbtree.RbTree) {
 	gn := g.Nodes()
 
 	for gn.Next() {
 		to := gn.Node().(*node)
-		to.refs = getReferences(to, nodes)
+		to.refs = getReferences(to, allNodes)
 		for _, ref := range to.refs {
 			e := g.NewEdge(ref, to)
 			g.SetEdge(e)
@@ -113,47 +112,22 @@ func createGraphEdges(g *simple.DirectedGraph, nodes rbtree.RbTree) {
 }
 
 func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
-	allPaths := path.DijkstraAllPaths(g)
 	result := make(map[string]c9s.StringHashSet)
 
 	gn := g.Nodes()
 
+	find := newFinder(g)
 	for gn.Next() {
 		project := gn.Node().(*node)
 
-		rrs := c9s.NewStringHashSet()
+		rrs, ok := find.find(project.refs)
 
-		// If there are any paths between project refs
-		// they path start point considered redundant link
-		allPairs(project.refs, func(from *node, to *node) bool {
-			paths, _ := allPaths.AllBetween(from.ID(), to.ID())
-			ok := len(paths) > 0
-			if ok {
-				rrs.Add(from.String())
-			}
-			// if found iteration will stop
-			return ok
-		})
-
-		if rrs.Count() > 0 {
+		if ok {
 			result[project.String()] = rrs
 		}
 	}
 
 	return result
-}
-
-func allPairs(nodes []*node, hasPath func(*node, *node) bool) {
-	for _, from := range nodes {
-		for _, to := range nodes {
-			if from.ID() == to.ID() {
-				continue
-			}
-			if hasPath(from, to) {
-				break
-			}
-		}
-	}
 }
 
 func getReferences(to *node, allNodes rbtree.RbTree) []*node {
