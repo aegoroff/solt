@@ -4,11 +4,8 @@ import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/spf13/afero"
-	"gonum.org/v1/gonum/graph/simple"
-	"path/filepath"
 	"solt/internal/fw"
 	"solt/msvc"
-	"solt/solution"
 	"sort"
 )
 
@@ -56,9 +53,9 @@ func (va *validator) onlySdkProjects(allProjects []*msvc.MsbuildProject) {
 }
 
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
-	g := va.newSolutionGraph(sol)
+	gr := newGraph(sol, va.sdkProjects)
+	redundants := findRedundants(gr)
 
-	redundants := findRedundants(g)
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
 		va.tt.problemProjects += int64(len(redundants))
@@ -70,83 +67,17 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 	va.act.action(sol.Path(), redundants)
 }
 
-func (va *validator) newSolutionGraph(sln *msvc.VisualStudioSolution) *simple.DirectedGraph {
-	solutionPath := filepath.Dir(sln.Path())
-	g := simple.NewDirectedGraph()
-	allNodes := rbtree.New()
-	ix := int64(1)
-	for _, prj := range sln.Solution.Projects {
-		if prj.TypeID == solution.IDSolutionFolder {
-			continue
-		}
-
-		p := msvc.NewMsbuildProject(filepath.Join(solutionPath, prj.Path))
-
-		msbuild, ok := va.sdkProjects.Search(p)
-		if !ok {
-			continue
-		}
-
-		n := newNode(ix, msbuild.(*msvc.MsbuildProject))
-		allNodes.Insert(n)
-		ix++
-		g.AddNode(n)
-	}
-
-	createGraphEdges(g, allNodes)
-
-	return g
-}
-
-func createGraphEdges(g *simple.DirectedGraph, allNodes rbtree.RbTree) {
-	gn := g.Nodes()
-
-	for gn.Next() {
-		to := gn.Node().(*node)
-		to.refs = getReferences(to, allNodes)
-		for _, from := range to.refs {
-			e := g.NewEdge(from, to)
-			g.SetEdge(e)
-		}
-	}
-}
-
-func findRedundants(g *simple.DirectedGraph) map[string]c9s.StringHashSet {
+func findRedundants(g *graph) map[string]c9s.StringHashSet {
 	result := make(map[string]c9s.StringHashSet)
+	find := newFinder(g.allPaths())
 
-	gn := g.Nodes()
-
-	find := newFinder(g)
-	for gn.Next() {
-		project := gn.Node().(*node)
-
-		found, ok := find.find(project.refs)
+	g.foreach(func(n *node) {
+		found, ok := find.find(n.refs)
 
 		if ok {
-			result[project.String()] = found
+			result[n.String()] = found
 		}
-	}
+	})
 
 	return result
-}
-
-func getReferences(to *node, allNodes rbtree.RbTree) []*node {
-	if to.project.Project.ProjectReferences == nil {
-		return []*node{}
-	}
-
-	dir := filepath.Dir(to.project.Path())
-
-	result := make([]*node, len(to.project.Project.ProjectReferences))
-	i := 0
-	for _, ref := range to.project.Project.ProjectReferences {
-		p := filepath.Join(dir, ref.Path())
-		n := &node{fullPath: &p}
-		from, ok := allNodes.Search(n)
-		if ok {
-			result[i] = from.(*node)
-			i++
-		}
-	}
-	return result[:i]
 }

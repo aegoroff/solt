@@ -3,16 +3,14 @@ package va
 import (
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"gonum.org/v1/gonum/graph/path"
-	"gonum.org/v1/gonum/graph/simple"
 )
 
 type finder struct {
 	allPaths *path.AllShortest
 }
 
-func newFinder(g *simple.DirectedGraph) *finder {
-	allPaths := path.DijkstraAllPaths(g)
-	return &finder{allPaths: &allPaths}
+func newFinder(allPaths *path.AllShortest) *finder {
+	return &finder{allPaths: allPaths}
 }
 
 func (fi *finder) hasPath(from *node, to *node) bool {
