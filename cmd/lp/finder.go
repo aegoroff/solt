@@ -53,7 +53,7 @@ func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
 			i++
 		}
 	}
-	return lost[:0], lostWithIncludes
+	return lost[:i], lostWithIncludes
 }
 
 func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
