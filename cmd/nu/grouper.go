@@ -35,18 +35,20 @@ func (g *grouper) Solution(vs *msvc.VisualStudioSolution) {
 func (g *grouper) onlySolutionPacks(sol *msvc.VisualStudioSolution) ([]*pack, []string) {
 	paths := sol.AllProjectPaths(filepath.Dir)
 	npacks := make([]*pack, 0, len(paths)*empiricNugetPacksForEachProject)
-	projectFolders := make([]string, 0, len(paths))
+	projectFolders := make([]string, len(paths))
 
+	i := 0
 	for _, path := range paths {
 		sv := newNugetFolder(path, nil, nil)
 		val, ok := g.nugets.Search(sv)
 		if ok {
 			packs := val.(*nugetFolder).packs
 			npacks = append(npacks, packs...)
-			projectFolders = append(projectFolders, path)
+			projectFolders[i] = path
+			i++
 		}
 	}
-	return npacks, projectFolders
+	return npacks, projectFolders[:i]
 }
 
 func mergeNugetPacks(packs []*pack) []*pack {
