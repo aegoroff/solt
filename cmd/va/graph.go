@@ -14,14 +14,14 @@ type graph struct {
 	nextID   int64
 }
 
-func newGraph(sln *msvc.VisualStudioSolution, it *sdkIterator) *graph {
+func newGraph(it *msvc.ProjectIterator) *graph {
 	gr := &graph{
 		g:        simple.NewDirectedGraph(),
 		allNodes: rbtree.New(),
 		nextID:   1,
 	}
 
-	it.foreach(sln, gr.newNode)
+	it.Foreach(gr.newNode)
 	ait := rbtree.NewWalkInorder(gr.allNodes)
 	ait.Foreach(gr.newEdges)
 

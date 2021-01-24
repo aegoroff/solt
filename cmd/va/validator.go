@@ -11,7 +11,7 @@ type validator struct {
 	fs          afero.Fs
 	sourcesPath string
 	act         actioner
-	iter        *sdkIterator
+	sdk         *sdkProjects
 	tt          *totals
 }
 
@@ -28,7 +28,7 @@ func (va *validator) validate() {
 	foldersTree := msvc.ReadSolutionDir(va.sourcesPath, va.fs)
 
 	sols, allProjects := msvc.SelectSolutionsAndProjects(foldersTree)
-	va.iter = newSdkIterator(allProjects)
+	va.sdk = newSdkProjects(allProjects)
 	va.tt.solutions = int64(len(sols))
 
 	solutions := fw.SolutionSlice(sols)
@@ -38,7 +38,9 @@ func (va *validator) validate() {
 }
 
 func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
-	gr := newGraph(sol, va.iter)
+	search := newSdkSearcher(va.sdk, sol)
+	it := msvc.NewProjectIterator(sol, search)
+	gr := newGraph(it)
 	find := newFinder(gr)
 	redundants := find.findAll()
 
