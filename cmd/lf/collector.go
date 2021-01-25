@@ -14,7 +14,7 @@ type collector struct {
 // filter - file extension to collect files that match it
 func newCollector(filter string) *collector {
 	return &collector{
-		files:  make([]string, 0),
+		files:  make([]string, 0, 4096),
 		filter: filter,
 	}
 }
