@@ -30,3 +30,7 @@ func (s *sdkProjects) search(p *msvc.MsbuildProject) (*msvc.MsbuildProject, bool
 	}
 	return nil, false
 }
+
+func (s *sdkProjects) count() int64 {
+	return s.tree.Len()
+}
