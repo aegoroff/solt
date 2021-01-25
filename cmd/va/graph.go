@@ -33,10 +33,22 @@ func (gr *graph) allPaths() *path.AllShortest {
 	return &paths
 }
 
-func (gr *graph) foreach(callFn func(n *node)) {
+// to returns all nodes in g that can reach directly to n.
+func (gr *graph) to(n *node) []*node {
+	refs := gr.g.To(n.ID())
+	nodes := make([]*node, refs.Len())
+	i := 0
+	for refs.Next() {
+		nodes[i] = refs.Node().(*node)
+		i++
+	}
+	return nodes
+}
+
+func (gr *graph) foreach(nodeFn func(n *node)) {
 	it := rbtree.NewWalkInorder(gr.allNodes)
 	it.Foreach(func(cmp rbtree.Comparable) {
-		callFn(cmp.(*node))
+		nodeFn(cmp.(*node))
 	})
 }
 
@@ -49,30 +61,19 @@ func (gr *graph) newNode(msbuild *msvc.MsbuildProject) {
 
 func (gr *graph) newEdges(cmp rbtree.Comparable) {
 	to := cmp.(*node)
-	to.refs = gr.references(to)
-	for _, from := range to.refs {
-		e := gr.g.NewEdge(from, to)
-		gr.g.SetEdge(e)
-	}
-}
-
-func (gr *graph) references(to *node) []*node {
 	if to.project.Project.ProjectReferences == nil {
-		return []*node{}
+		return
 	}
 
 	dir := filepath.Dir(to.project.Path())
 
-	result := make([]*node, len(to.project.Project.ProjectReferences))
-	i := 0
 	for _, ref := range to.project.Project.ProjectReferences {
 		p := filepath.Join(dir, ref.Path())
 		n := &node{fullPath: &p}
 		from, ok := gr.allNodes.Search(n)
 		if ok {
-			result[i] = from.(*node)
-			i++
+			e := gr.g.NewEdge(from.(*node), to)
+			gr.g.SetEdge(e)
 		}
 	}
-	return result[:i]
 }

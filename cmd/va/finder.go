@@ -23,7 +23,8 @@ func (fi *finder) hasPath(from *node, to *node) bool {
 	return len(paths) > 0
 }
 
-func (fi *finder) find(nodes []*node) (c9s.StringHashSet, bool) {
+func (fi *finder) find(n *node) (c9s.StringHashSet, bool) {
+	nodes := fi.g.to(n)
 	found := c9s.NewStringHashSet()
 	for _, from := range nodes {
 		for _, to := range nodes {
@@ -39,7 +40,7 @@ func (fi *finder) find(nodes []*node) (c9s.StringHashSet, bool) {
 func (fi *finder) findAll() map[string]c9s.StringHashSet {
 	result := make(map[string]c9s.StringHashSet)
 	fi.g.foreach(func(n *node) {
-		found, ok := fi.find(n.refs)
+		found, ok := fi.find(n)
 
 		if ok {
 			result[n.String()] = found

@@ -11,7 +11,6 @@ type node struct {
 	id       int64
 	project  *msvc.MsbuildProject
 	fullPath *string
-	refs     []*node
 }
 
 func newNode(id int64, prj *msvc.MsbuildProject) *node {
