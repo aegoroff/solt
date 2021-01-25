@@ -22,49 +22,48 @@ func newFinder() *finder {
 func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]string, []string) {
 	// Create projects matching machine
 	within := fw.NewExactMatch(withinSolution)
+	lost := make([]string, len(all))
 
 	n := 0
 	for _, p := range all {
-		if within.Match(p.Path()) {
+		pp := p.Path()
+		if within.Match(pp) {
 			f.selectFilePaths(p)
 		} else {
-			all[n] = p
+			lost[n] = pp
 			n++
 		}
 	}
 
-	all = all[:n]
-	return f.separate(all)
+	return f.separate(lost[:n])
 }
 
-func (f *finder) separate(allLost []*msvc.MsbuildProject) ([]string, []string) {
-	lost := make([]string, len(allLost))
-	lostWithIncludes := make([]string, len(allLost))
+func (f *finder) separate(lost []string) ([]string, []string) {
+	lostWithIncludes := make([]string, len(lost))
 
-	filesFoldersM := f.newMatcher(allLost)
+	filesFoldersM, lostDirs := f.newMatcher(lost)
 
 	i := 0
 	j := 0
-	for _, lp := range allLost {
-		pp := lp.Path()
-		d := dir(pp)
+	for ix, lp := range lost {
+		d := lostDirs[ix]
 		if filesFoldersM.Match(d) {
-			lostWithIncludes[j] = pp
+			lostWithIncludes[j] = lp
 			j++
 		} else {
-			lost[i] = pp
+			lost[i] = lp
 			i++
 		}
 	}
 	return lost[:i], lostWithIncludes[:j]
 }
 
-func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
-	filePaths := make(c9s.StringHashSet, len(f.allFilesPaths))
+func (f *finder) newMatcher(allLost []string) (fw.Matcher, []string) {
+	filePaths := make(c9s.StringHashSet, f.allFilesPaths.Count())
 	lostDirs := make([]string, len(allLost))
 
 	for i, lp := range allLost {
-		lostDirs[i] = dir(lp.Path())
+		lostDirs[i] = dir(lp)
 	}
 
 	ldMatch, err := fw.NewPartialMatcher(lostDirs, strings.ToUpper)
@@ -78,9 +77,9 @@ func (f *finder) newMatcher(allLost []*msvc.MsbuildProject) fw.Matcher {
 
 	m, err := fw.NewPartialMatcher(filePaths.Items(), strings.ToUpper)
 	if err != nil {
-		return fw.NewMatchNothing()
+		return fw.NewMatchNothing(), lostDirs
 	}
-	return m
+	return m, lostDirs
 }
 
 func (f *finder) selectFilePaths(p *msvc.MsbuildProject) {
