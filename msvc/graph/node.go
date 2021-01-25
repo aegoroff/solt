@@ -34,10 +34,12 @@ func (n *Node) String() string {
 	return *n.fullPath
 }
 
+// Less gets whether value specified less then current value
 func (n *Node) Less(y rbtree.Comparable) bool {
 	return sortfold.CompareFold(n.String(), y.(*Node).String()) < 0
 }
 
+// Equal gets whether value specified equal current value
 func (n *Node) Equal(y rbtree.Comparable) bool {
 	return strings.EqualFold(n.String(), y.(*Node).String())
 }
