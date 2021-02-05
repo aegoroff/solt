@@ -10,14 +10,11 @@ require (
 	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/cheynewallace/tabby v1.1.1
 	github.com/dustin/go-humanize v1.0.0
-	github.com/gookit/color v1.3.6
-	github.com/mattn/go-runewidth v0.0.10 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/gookit/color v1.3.7
 	github.com/spf13/afero v1.5.1
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/exp v0.0.0-20201229011636-eab1b5eb1a03 // indirect
-	golang.org/x/sys v0.0.0-20210122093101-04d7465088b8 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gonum.org/v1/gonum v0.8.2
 )
