@@ -11,9 +11,12 @@ require (
 	github.com/cheynewallace/tabby v1.1.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gookit/color v1.3.7
+	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.5.1
 	github.com/spf13/cobra v1.1.1
 	github.com/stretchr/testify v1.7.0
+	github.com/willf/bitset v1.1.11 // indirect
+	github.com/willf/bloom v2.0.3+incompatible
 	golang.org/x/exp v0.0.0-20201229011636-eab1b5eb1a03 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gonum.org/v1/gonum v0.8.2
