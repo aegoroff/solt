@@ -6,22 +6,42 @@ import (
 )
 
 const size = 100000
-const search = "s934ns4s0"
+const nomatch = "sgfdgdsfg-s934ns4s0"
 
-func BenchmarkNewExactMatch_NoBloom(b *testing.B) {
+func BenchmarkNewExactMatch_NoMatch_NoBloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
 	m := NewExactMatch(data, NewNoneFilter())
 	for i := 0; i < b.N; i++ {
-		m.Match(search)
+		m.Match(nomatch)
 	}
 	b.ReportAllocs()
 }
 
-func BenchmarkNewExactMatch_Bloom(b *testing.B) {
+func BenchmarkNewExactMatch_NoMatch_Bloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
 	m := NewExactMatch(data, NewBloomFilter(uint(len(data))))
 	for i := 0; i < b.N; i++ {
-		m.Match(search)
+		m.Match(nomatch)
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkNewExactMatch_Match_NoBloom(b *testing.B) {
+	data := generateRandomStringSlice(size, 50)
+	m := NewExactMatch(data, NewNoneFilter())
+	s := data[size/2]
+	for i := 0; i < b.N; i++ {
+		m.Match(s)
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkNewExactMatch_Match_Bloom(b *testing.B) {
+	data := generateRandomStringSlice(size, 50)
+	m := NewExactMatch(data, NewBloomFilter(uint(len(data))))
+	s := data[size/2]
+	for i := 0; i < b.N; i++ {
+		m.Match(s)
 	}
 	b.ReportAllocs()
 }
