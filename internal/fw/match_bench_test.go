@@ -10,7 +10,7 @@ const search = "s934ns4s0"
 
 func BenchmarkNewExactMatch_NoBloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, false)
+	m := NewExactMatch(data, NewNoneFilter())
 	for i := 0; i < b.N; i++ {
 		m.Match(search)
 	}
@@ -19,7 +19,7 @@ func BenchmarkNewExactMatch_NoBloom(b *testing.B) {
 
 func BenchmarkNewExactMatch_Bloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, true)
+	m := NewExactMatch(data, NewBloomFilter(uint(len(data))))
 	for i := 0; i < b.N; i++ {
 		m.Match(search)
 	}

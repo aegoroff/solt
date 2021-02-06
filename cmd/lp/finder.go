@@ -21,7 +21,8 @@ func newFinder() *finder {
 
 func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]string, []string) {
 	// Create projects matching machine
-	within := fw.NewExactMatch(withinSolution, true)
+	bloom := fw.NewBloomFilter(uint(len(all)))
+	within := fw.NewExactMatch(withinSolution, bloom)
 	lost := make([]string, len(all))
 
 	n := 0

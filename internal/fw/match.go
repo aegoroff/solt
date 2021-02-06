@@ -5,7 +5,6 @@ import (
 	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
-	"github.com/willf/bloom"
 	"strings"
 )
 
@@ -18,7 +17,7 @@ type matchP struct {
 // matchE defines exact matching using rbtree.RbTree
 type matchE struct {
 	tree   rbtree.RbTree
-	filter *bloom.BloomFilter
+	filter MatchFilter
 }
 
 type matchL struct {
@@ -76,24 +75,18 @@ func NewPartialMatcher(matches []string, decorator func(s string) string) (Searc
 }
 
 // NewExactMatch creates exact matcher from strings slice
-func NewExactMatch(matches []string, useBloom bool) Matcher {
+func NewExactMatch(matches []string, mf MatchFilter) Matcher {
 	tree := rbtree.New()
-	var filter *bloom.BloomFilter
-	if useBloom {
-		filter = bloom.New(16*uint(len(matches)), 8)
-	}
 
 	for _, s := range matches {
 		cs := caseless(s)
 		tree.Insert(&cs)
-		if useBloom {
-			filter.AddString(strings.ToUpper(s))
-		}
+		mf.Append(s)
 	}
 
 	m := &matchE{
 		tree:   tree,
-		filter: filter,
+		filter: mf,
 	}
 	return m
 }
@@ -120,7 +113,7 @@ func (m *matchL) Match(s string) bool {
 }
 
 func (m *matchE) Match(s string) bool {
-	if m.filter != nil && !m.filter.TestString(strings.ToUpper(s)) {
+	if !m.filter.Match(s) {
 		return false
 	}
 	cs := caseless(s)

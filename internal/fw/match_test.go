@@ -94,7 +94,7 @@ func Test_MatchOneOfPatterns_Exact(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
 			// Act
-			m := NewExactMatch(test.patterns, false)
+			m := NewExactMatch(test.patterns, NewNoneFilter())
 			result := m.Match(test.input)
 
 			// Assert
@@ -121,7 +121,7 @@ func Test_MatchOneOfPatternsWithBloomEnabled_Exact(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
 			// Act
-			m := NewExactMatch(test.patterns, true)
+			m := NewExactMatch(test.patterns, NewBloomFilter(uint(len(test.patterns))))
 			result := m.Match(test.input)
 
 			// Assert
@@ -149,7 +149,7 @@ func Test_MatchAnyOneOfPatterns_Exact(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Act
-			m := NewExactMatch(test.patterns, false)
+			m := NewExactMatch(test.patterns, NewNoneFilter())
 			result := MatchAny(test.input, m)
 
 			// Assert
@@ -161,7 +161,7 @@ func Test_MatchAnyOneOfPatterns_Exact(t *testing.T) {
 func Test_Filter(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
-	m := NewExactMatch([]string{"xxx", "yyy", "zzz"}, false)
+	m := NewExactMatch([]string{"xxx", "yyy", "zzz"}, NewNoneFilter())
 
 	var tests = []struct {
 		name     string

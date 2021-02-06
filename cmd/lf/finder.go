@@ -11,7 +11,7 @@ type finder struct {
 
 func newFinder(includedFiles, excludedFolders []string) *finder {
 	excludes := exclude(excludedFolders)
-	includes := fw.NewExactMatch(includedFiles, false)
+	includes := fw.NewExactMatch(includedFiles, fw.NewNoneFilter())
 
 	m := fw.NewLostItemMatcher(includes, excludes)
 	return &finder{m: m}
