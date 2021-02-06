@@ -1,6 +1,7 @@
 package fw
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -195,4 +196,16 @@ func Test_Filter_Nil(t *testing.T) {
 
 	// Assert
 	ass.Equal([]string{}, result)
+}
+
+func Test_BloomFilter_estimate(t *testing.T) {
+	// Arrange
+	n := uint(100000)
+	b := NewBloomFilter(n).(*bloomFilter)
+
+	// Act
+	r := b.estimate(n)
+
+	// Assert
+	fmt.Printf("%f\n", r)
 }

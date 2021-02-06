@@ -19,7 +19,9 @@ func BenchmarkNewExactMatch_NoMatch_NoBloom(b *testing.B) {
 
 func BenchmarkNewExactMatch_NoMatch_Bloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, NewBloomFilter(uint(len(data))))
+	n := uint(len(data))
+	bloom := NewBloomFilter(n)
+	m := NewExactMatch(data, bloom)
 	for i := 0; i < b.N; i++ {
 		m.Match(nomatch)
 	}

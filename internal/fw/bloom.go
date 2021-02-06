@@ -23,7 +23,7 @@ type bloomFilter struct {
 
 // NewBloomFilter creates new Bloom filter instance
 func NewBloomFilter(sz uint) MatchFilter {
-	filter := bloom.New(16*sz, 8)
+	filter := bloom.New(16*sz*2, 6)
 
 	return &bloomFilter{
 		filter:    filter,
@@ -33,6 +33,10 @@ func NewBloomFilter(sz uint) MatchFilter {
 
 func (b *bloomFilter) Append(s string) {
 	b.filter.AddString(b.decorator(s))
+}
+
+func (b *bloomFilter) estimate(n uint) float64 {
+	return b.filter.EstimateFalsePositiveRate(n)
 }
 
 func (b *bloomFilter) Match(s string) bool {
