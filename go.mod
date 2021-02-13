@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/willf/bitset v1.1.11 // indirect
 	github.com/willf/bloom v2.0.3+incompatible
-	golang.org/x/exp v0.0.0-20201229011636-eab1b5eb1a03 // indirect
+	golang.org/x/exp v0.0.0-20210212053707-62dc52270d37 // indirect
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gonum.org/v1/gonum v0.8.2
