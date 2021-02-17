@@ -30,15 +30,23 @@ builds:
       - linux
     goarch:
       - arm
-      - arm64
     goarm:
       - 7
+
+  - id: "arm64"
+    binary: dirstat
+    ldflags: -s -w -X solt/cmd.Version={{ .Version }}
+    goos:
+      - darwin
+    goarch:
+      - arm64
 
 archives:
   - id: default
     builds:
       - x64
       - arm
+      - arm64
       - 386
 
 brews:
