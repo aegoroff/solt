@@ -44,6 +44,7 @@ func (prj *MsbuildProject) Items() []string {
 
 	msp := prj.Project
 
+	// Sometimes ugly but rather fast
 	l := len(msp.Contents) + len(msp.Nones) + len(msp.CLCompiles) + len(msp.CLInclude) + len(msp.Compiles)
 	incl := make(includes, l)
 	start := 0
