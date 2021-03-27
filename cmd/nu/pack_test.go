@@ -6,8 +6,6 @@ import (
 )
 
 func Test_match(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
 	var tests = []struct {
 		name   string
 		p1     *pack
@@ -25,6 +23,9 @@ func Test_match(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+
 			// Act
 			result := test.p1.match(test.p2)
 

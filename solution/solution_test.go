@@ -7,8 +7,6 @@ import (
 )
 
 func Test_ParseSolution_ParsedSolution(t *testing.T) {
-	// Arrange
-	ass := assert.New(t)
 	var tests = []struct {
 		input                string
 		expectedComment      string
@@ -32,6 +30,8 @@ func Test_ParseSolution_ParsedSolution(t *testing.T) {
 	// Act
 	for _, test := range tests {
 		t.Run(test.expectedComment, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
 			sol := parse(test.input, false)
 
 			// Assert
