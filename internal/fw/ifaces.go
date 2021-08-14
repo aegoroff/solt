@@ -6,23 +6,10 @@ import (
 	"solt/msvc"
 )
 
-// MatchFilter defines pre matching filter
-// that could speedup matching
-type MatchFilter interface {
-	Matcher
-	Appender
-}
-
 // Matcher defines string matcher interface
 type Matcher interface {
 	// Match does string matching to several patterns
 	Match(s string) bool
-}
-
-// Appender defines append string interface
-type Appender interface {
-	// Append appends a string to instance
-	Append(s string)
 }
 
 // Searcher defines string searching interface

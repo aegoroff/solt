@@ -16,8 +16,7 @@ type matchP struct {
 
 // matchE defines exact matching using rbtree.RbTree
 type matchE struct {
-	tree   rbtree.RbTree
-	filter MatchFilter
+	tree rbtree.RbTree
 }
 
 type matchL struct {
@@ -43,6 +42,26 @@ func NewMatchNothing() Matcher {
 }
 
 func (*matchNothing) Match(string) bool { return false }
+
+type matchComposer struct {
+	matchers []Matcher
+}
+
+// NewMatchComposer creates new Matcher that matches when all matchers match
+func NewMatchComposer(matchers ...Matcher) Matcher {
+	return &matchComposer{
+		matchers: matchers,
+	}
+}
+
+func (mc *matchComposer) Match(s string) bool {
+	for _, matcher := range mc.matchers {
+		if !matcher.Match(s) {
+			return false
+		}
+	}
+	return true
+}
 
 // NewLostItemMatcher creates new Matcher instance that detects lost item
 func NewLostItemMatcher(incl Matcher, excl Matcher) Matcher {
@@ -75,18 +94,16 @@ func NewPartialMatcher(matches []string, decorator func(s string) string) (Searc
 }
 
 // NewExactMatch creates exact matcher from strings slice
-func NewExactMatch(matches []string, mf MatchFilter) Matcher {
+func NewExactMatch(matches []string) Matcher {
 	tree := rbtree.New()
 
 	for _, s := range matches {
 		cs := caseless(s)
 		tree.Insert(&cs)
-		mf.Append(s)
 	}
 
 	m := &matchE{
-		tree:   tree,
-		filter: mf,
+		tree: tree,
 	}
 	return m
 }
@@ -113,9 +130,6 @@ func (m *matchL) Match(s string) bool {
 }
 
 func (m *matchE) Match(s string) bool {
-	if !m.filter.Match(s) {
-		return false
-	}
 	cs := caseless(s)
 	_, ok := m.tree.SearchNode(&cs)
 	return ok

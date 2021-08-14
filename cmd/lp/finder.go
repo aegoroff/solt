@@ -21,14 +21,15 @@ func newFinder() *finder {
 
 func (f *finder) filter(all []*msvc.MsbuildProject, withinSolution []string) ([]string, []string) {
 	// Create projects matching machine
-	bloom := fw.NewBloomFilter(uint(len(all)))
-	within := fw.NewExactMatch(withinSolution, bloom)
+	bloom := fw.NewBloomFilter(withinSolution)
+	within := fw.NewExactMatch(withinSolution)
+	compose := fw.NewMatchComposer(bloom, within)
 	lost := make([]string, len(all))
 
 	n := 0
 	for _, p := range all {
 		pp := p.Path()
-		if within.Match(pp) {
+		if compose.Match(pp) {
 			f.selectFilePaths(p)
 		} else {
 			lost[n] = pp

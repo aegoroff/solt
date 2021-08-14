@@ -10,7 +10,7 @@ const nomatch = "sgfdgdsfg-s934ns4s0"
 
 func BenchmarkNewExactMatch_NoMatch_NoBloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, NewNoneFilter())
+	m := NewExactMatch(data)
 	for i := 0; i < b.N; i++ {
 		m.Match(nomatch)
 	}
@@ -19,18 +19,18 @@ func BenchmarkNewExactMatch_NoMatch_NoBloom(b *testing.B) {
 
 func BenchmarkNewExactMatch_NoMatch_Bloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	n := uint(len(data))
-	bloom := NewBloomFilter(n)
-	m := NewExactMatch(data, bloom)
+	bloom := NewBloomFilter(data)
+	m := NewExactMatch(data)
+	compose := NewMatchComposer(bloom, m)
 	for i := 0; i < b.N; i++ {
-		m.Match(nomatch)
+		compose.Match(nomatch)
 	}
 	b.ReportAllocs()
 }
 
 func BenchmarkNewExactMatch_Match_NoBloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, NewNoneFilter())
+	m := NewExactMatch(data)
 	s := data[size/2]
 	for i := 0; i < b.N; i++ {
 		m.Match(s)
@@ -40,10 +40,12 @@ func BenchmarkNewExactMatch_Match_NoBloom(b *testing.B) {
 
 func BenchmarkNewExactMatch_Match_Bloom(b *testing.B) {
 	data := generateRandomStringSlice(size, 50)
-	m := NewExactMatch(data, NewBloomFilter(uint(len(data))))
+	bloom := NewBloomFilter(data)
+	m := NewExactMatch(data)
+	compose := NewMatchComposer(bloom, m)
 	s := data[size/2]
 	for i := 0; i < b.N; i++ {
-		m.Match(s)
+		compose.Match(s)
 	}
 	b.ReportAllocs()
 }

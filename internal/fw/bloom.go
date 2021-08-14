@@ -5,34 +5,23 @@ import (
 	"strings"
 )
 
-type noneFilter struct {
-}
-
-// NewNoneFilter creates filter that do nothing
-func NewNoneFilter() MatchFilter {
-	return &noneFilter{}
-}
-
-func (*noneFilter) Match(string) bool { return true }
-func (*noneFilter) Append(string)     {}
-
 type bloomFilter struct {
 	filter    *bloom.BloomFilter
 	decorator func(s string) string
 }
 
 // NewBloomFilter creates new Bloom filter instance
-func NewBloomFilter(sz uint) MatchFilter {
-	filter := bloom.New(16*sz*2, 6)
+func NewBloomFilter(matches []string) Matcher {
+	filter := bloom.New(16*uint(len(matches))*2, 6)
 
+	d := strings.ToUpper
+	for _, match := range matches {
+		filter.AddString(d(match))
+	}
 	return &bloomFilter{
 		filter:    filter,
-		decorator: strings.ToUpper,
+		decorator: d,
 	}
-}
-
-func (b *bloomFilter) Append(s string) {
-	b.filter.AddString(b.decorator(s))
 }
 
 func (b *bloomFilter) estimate(n uint) float64 {
