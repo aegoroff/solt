@@ -43,19 +43,19 @@ func NewMatchNothing() Matcher {
 
 func (*matchNothing) Match(string) bool { return false }
 
-type matchComposer struct {
+type matchAll struct {
 	matchers []Matcher
 }
 
-// NewMatchComposer creates new Matcher that matches when all matchers match
-func NewMatchComposer(matchers ...Matcher) Matcher {
-	return &matchComposer{
+// NewMatchAll creates new Matcher that matches when all matchers match
+func NewMatchAll(matchers ...Matcher) Matcher {
+	return &matchAll{
 		matchers: matchers,
 	}
 }
 
-func (mc *matchComposer) Match(s string) bool {
-	for _, matcher := range mc.matchers {
+func (ma *matchAll) Match(s string) bool {
+	for _, matcher := range ma.matchers {
 		if !matcher.Match(s) {
 			return false
 		}

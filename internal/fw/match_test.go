@@ -124,7 +124,7 @@ func Test_MatchOneOfPatternsWithBloomEnabled_Exact(t *testing.T) {
 			// Act
 			b := NewBloomFilter(test.patterns)
 			m := NewExactMatch(test.patterns)
-			c := NewMatchComposer(b, m)
+			c := NewMatchAll(b, m)
 			result := c.Match(test.input)
 
 			// Assert
