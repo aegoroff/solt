@@ -56,7 +56,7 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 				continue
 			}
 			va.problemProjects.Add(prj)
-			va.tt.problemProjects += 1
+			va.tt.problemProjects++
 			va.tt.redundantRefs += int64(set.Count())
 		}
 	}
