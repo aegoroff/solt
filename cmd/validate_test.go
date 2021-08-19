@@ -49,6 +49,51 @@ func Test_ValidateSdkSolutionCmd_RedundantReferencesFound(t *testing.T) {
 `), actual)
 }
 
+func Test_ValidateSdkSolutionCmdSeveralSolutionsWithSameProjects_RedundantReferencesFound(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	top := "t/"
+	dir := top + "a/"
+	memfs := afero.NewMemMapFs()
+	_ = afero.WriteFile(memfs, top+"t.sln", []byte(coreTopSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+
+	env := out.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "va", top)
+
+	// Assert
+	actual := env.String()
+	ass.Equal(sys.ToValidPath(`
+ Solution: t\a\a.sln
+   project t\a\a\a.csproj has redundant references:
+     t\a\b\b.csproj
+
+
+ Solution: t\t.sln
+   project t\a\a\a.csproj has redundant references:
+     t\a\b\b.csproj
+
+
+ Totals:
+
+  Parameter               Count    %     
+  ---------               -----    ------
+  Solutions               2        
+  Problem solutions       2        100.00%
+  SDK Projects            3        
+  Problem projects        1        33.33%
+  Redundant references    1
+`), actual)
+}
+
 func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 	var tests = []struct {
 		name      string

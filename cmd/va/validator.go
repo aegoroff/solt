@@ -1,6 +1,7 @@
 package va
 
 import (
+	c9s "github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"solt/internal/fw"
 	"solt/msvc"
@@ -9,19 +10,21 @@ import (
 )
 
 type validator struct {
-	fs          afero.Fs
-	sourcesPath string
-	act         actioner
-	sdk         *sdkProjects
-	tt          *totals
+	fs              afero.Fs
+	sourcesPath     string
+	act             actioner
+	sdk             *sdkProjects
+	tt              *totals
+	problemProjects c9s.StringHashSet
 }
 
 func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 	return &validator{
-		fs:          fs,
-		sourcesPath: sourcesPath,
-		act:         act,
-		tt:          &totals{},
+		fs:              fs,
+		sourcesPath:     sourcesPath,
+		act:             act,
+		tt:              &totals{},
+		problemProjects: c9s.NewStringHashSet(),
 	}
 }
 
@@ -48,8 +51,12 @@ func (va *validator) Solution(sol *msvc.VisualStudioSolution) {
 
 	if len(redundants) > 0 {
 		va.tt.problemSolutions++
-		va.tt.problemProjects += int64(len(redundants))
-		for _, set := range redundants {
+		for prj, set := range redundants {
+			if va.problemProjects.Contains(prj) {
+				continue
+			}
+			va.problemProjects.Add(prj)
+			va.tt.problemProjects += 1
 			va.tt.redundantRefs += int64(set.Count())
 		}
 	}
