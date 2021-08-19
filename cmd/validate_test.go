@@ -136,6 +136,49 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 	}
 }
 
+func Test_FixSdkSolutionCmdSeveralSolutionsCase_RedundantReferencesRemoved(t *testing.T) {
+	var tests = []struct {
+		name      string
+		redundant string
+		expect    string
+	}{
+		{"unix", aSdkProjectContent, aSdkProjectContentWithoutRedundantRefs},
+		{"unix full tags", aSdkProjectContentFullTags, aSdkProjectContentFullTagsNoRedundant},
+		{"windows", unix2Win(aSdkProjectContent), unix2Win(aSdkProjectContentWithoutRedundantRefs)},
+		{"windows full tags", unix2Win(aSdkProjectContentFullTags), unix2Win(aSdkProjectContentFullTagsNoRedundant)},
+	}
+	for _, tst := range tests {
+		t.Run(tst.name, func(t *testing.T) {
+			// Arrange
+			ass := assert.New(t)
+			top := "t/"
+			dir := top + "a/"
+			memfs := afero.NewMemMapFs()
+			_ = afero.WriteFile(memfs, top+"t.sln", []byte(coreTopSolutionContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(tst.redundant), 0644)
+			_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"c/c.csproj", []byte(cSdkProjectContent), 0644)
+			_ = afero.WriteFile(memfs, dir+"c/Class1.cs", []byte(codeFileContent), 0644)
+
+			env := out.NewMemoryEnvironment()
+
+			// Act
+			_ = Execute(memfs, env, "va", "fix", top)
+
+			// Assert
+			actual := env.String()
+			ass.Equal(sys.ToValidPath("Fixed 1 redundant project references in 1 projects within solution t\\a\\a.sln\nFixed 1 redundant project references in 1 projects within solution t\\t.sln\n"), actual)
+			fa, _ := memfs.Open(dir + "a/a.csproj")
+			buf := bytes.NewBuffer(nil)
+			_, _ = io.Copy(buf, fa)
+			ass.Equal(tst.expect, string(buf.Bytes()))
+		})
+	}
+}
+
 func unix2Win(s string) string {
 	return strings.ReplaceAll(s, "\n", "\r\n")
 }
