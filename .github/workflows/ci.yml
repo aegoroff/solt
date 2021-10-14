@@ -29,7 +29,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build
-      run: gox -osarch="linux/amd64 windows/amd64 darwin/amd64 darwin/arm64" -ldflags "-s -w -X solt/cmd.Version=${GITHUB_RUN_NUMBER}" solt
+      run: gox -osarch="linux/amd64 windows/amd64 darwin/amd64 darwin/arm64" -ldflags "-s -w -X solt/cmd.Version=${{ github.run_number }}" solt
 
     - name: Test
       run: go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/internal/fw,solt/internal/ux,solt/internal/out,solt/cmd/in,solt/cmd/nu,solt/cmd/lf,solt/cmd/lp,solt/cmd/va,solt/solution -covermode=atomic solt/...
