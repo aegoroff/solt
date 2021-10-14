@@ -42,8 +42,13 @@ jobs:
     - name: Build
       run: gox -osarch="${{ matrix.build }}/amd64 ${{ matrix.build }}/arm64" -ldflags "-s -w -X solt/cmd.Version=${{ github.run_number }}" solt
 
-    - name: Test
+    - name: Test with coverage
+      if: matrix.build == 'linux'
       run: go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/internal/fw,solt/internal/ux,solt/internal/out,solt/cmd/in,solt/cmd/nu,solt/cmd/lf,solt/cmd/lp,solt/cmd/va,solt/solution -covermode=atomic solt/...
+
+    - name: Test
+      if: matrix.build != 'linux'
+      run: go test solt/...
 
     - name: Send coverage
       if: matrix.build == 'linux'
