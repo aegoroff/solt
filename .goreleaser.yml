@@ -34,7 +34,7 @@ builds:
       - 7
 
   - id: "arm64"
-    binary: dirstat
+    binary: solt
     ldflags: -s -w -X solt/cmd.Version={{ .Version }}
     goos:
       - darwin
