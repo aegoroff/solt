@@ -2,10 +2,9 @@ package fw
 
 import (
 	"bytes"
-	"github.com/aegoroff/godatastruct/rbtree"
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
-	"strings"
+	"github.com/google/btree"
 )
 
 // matchP defines partial matching
@@ -14,9 +13,9 @@ type matchP struct {
 	decorator func(s string) string
 }
 
-// matchE defines exact matching using rbtree.RbTree
+// matchE defines exact matching using btree.BTree
 type matchE struct {
-	tree rbtree.RbTree
+	tree *btree.BTree
 }
 
 type matchL struct {
@@ -26,12 +25,8 @@ type matchL struct {
 
 type caseless string
 
-func (c *caseless) Less(y rbtree.Comparable) bool {
-	return sortfold.CompareFold(string(*c), string(*y.(*caseless))) < 0
-}
-
-func (c *caseless) Equal(y rbtree.Comparable) bool {
-	return strings.EqualFold(string(*c), string(*y.(*caseless)))
+func (c *caseless) Less(than btree.Item) bool {
+	return sortfold.CompareFold(string(*c), string(*than.(*caseless))) < 0
 }
 
 type matchNothing struct{}
@@ -95,11 +90,11 @@ func NewPartialMatcher(matches []string, decorator func(s string) string) (Searc
 
 // NewExactMatch creates exact matcher from strings slice
 func NewExactMatch(matches []string) Matcher {
-	tree := rbtree.New()
+	tree := btree.New(1024)
 
 	for _, s := range matches {
 		cs := caseless(s)
-		tree.Insert(&cs)
+		tree.ReplaceOrInsert(&cs)
 	}
 
 	m := &matchE{
@@ -131,8 +126,7 @@ func (m *matchL) Match(s string) bool {
 
 func (m *matchE) Match(s string) bool {
 	cs := caseless(s)
-	_, ok := m.tree.SearchNode(&cs)
-	return ok
+	return m.tree.Has(&cs)
 }
 
 // MatchAny does any string matching to several patterns

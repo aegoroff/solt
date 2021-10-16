@@ -10,6 +10,7 @@ require (
 	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
 	github.com/cheynewallace/tabby v1.1.1
 	github.com/dustin/go-humanize v1.0.0
+	github.com/google/btree v1.0.1
 	github.com/gookit/color v1.4.2
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.6.0
