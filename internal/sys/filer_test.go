@@ -15,6 +15,7 @@ func TestCheckExistence(t *testing.T) {
 		expect []string
 	}{
 		{"has unexist files", []string{"a.txt", "b.txt"}, []string{"b.txt"}},
+		{"has unexist files in same dir", []string{"a.txt", "/b/b.txt", "/b/c.txt"}, []string{"/b/b.txt", "/b/c.txt"}},
 		{"all files exist", []string{"a.txt"}, []string{}},
 	}
 	for _, tst := range tests {
@@ -120,5 +121,21 @@ func TestClose(t *testing.T) {
 	scan.Close(f)
 
 	// Assert
+	ass.Error(err)
+}
+
+func TestFiler_Remove(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
+	_ = afero.WriteFile(memfs, "a.txt", []byte("a"), 0644)
+	f := NewFiler(memfs, bytes.NewBufferString(""))
+	path := "a.txt"
+
+	// Act
+	f.Remove([]string{path})
+
+	// Assert
+	_, err := afero.ReadFile(memfs, path)
 	ass.Error(err)
 }

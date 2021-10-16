@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/aegoroff/dirstat/scan"
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"io"
 	"log"
@@ -34,6 +35,7 @@ func (f *Filer) CheckExistence(files []string) []string {
 	result := make([]string, 0)
 	var restrict = make(chan struct{}, 32)
 	defer close(restrict)
+	notExitsDirs := collections.NewStringHashSet()
 
 	var wg sync.WaitGroup
 	wg.Add(len(files))
@@ -42,8 +44,20 @@ func (f *Filer) CheckExistence(files []string) []string {
 		go func(file string, restrict chan struct{}) {
 			defer wg.Done()
 			defer func() { <-restrict }()
+			dir := filepath.Dir(file)
+			if notExitsDirs.Contains(dir) {
+				mu.Lock()
+				result = append(result, file)
+				mu.Unlock()
+				return
+			}
 
 			if f.fileNotExists(file) {
+				if f.fileNotExists(dir) {
+					mu.Lock()
+					notExitsDirs.Add(dir)
+					mu.Unlock()
+				}
 				mu.Lock()
 				result = append(result, file)
 				mu.Unlock()
