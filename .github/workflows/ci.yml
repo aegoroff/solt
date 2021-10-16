@@ -51,6 +51,7 @@ jobs:
       run: go test solt/...
 
     - name: Benchmarks
+      shell: bash
       run: go test -bench=. solt/internal/fw
 
     - name: Send coverage
