@@ -3,6 +3,7 @@ solt
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b8b9bdf73cfb4e97888b6ff7b48bfc84)](https://app.codacy.com/manual/egoroff/solt?utm_source=github.com&utm_medium=referral&utm_content=aegoroff/solt&utm_campaign=Badge_Grade_Dashboard)
 [![CI](https://github.com/aegoroff/solt/actions/workflows/ci.yml/badge.svg)](https://github.com/aegoroff/solt/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/aegoroff/solt/branch/master/graph/badge.svg?token=owoFBLMia8)](https://codecov.io/gh/aegoroff/solt)
 
 **SOL**ution **T**ool is the small console app written in Go that allows you to easily analyze
 sources and Microsoft Visual Studio solutions and projects.
