@@ -124,11 +124,26 @@ func TestClose(t *testing.T) {
 	ass.Error(err)
 }
 
-func TestFiler_Remove(t *testing.T) {
+func TestFiler_Remove_Exist(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
 	memfs := afero.NewMemMapFs()
 	_ = afero.WriteFile(memfs, "a.txt", []byte("a"), 0644)
+	f := NewFiler(memfs, bytes.NewBufferString(""))
+	path := "a.txt"
+
+	// Act
+	f.Remove([]string{path})
+
+	// Assert
+	_, err := afero.ReadFile(memfs, path)
+	ass.Error(err)
+}
+
+func TestFiler_Remove_NotExist(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	memfs := afero.NewMemMapFs()
 	f := NewFiler(memfs, bytes.NewBufferString(""))
 	path := "a.txt"
 
