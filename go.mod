@@ -3,7 +3,7 @@ module solt
 go 1.17
 
 require (
-	github.com/aegoroff/dirstat v1.0.6
+	github.com/aegoroff/dirstat v1.0.7
 	github.com/aegoroff/godatastruct v1.2.0
 	github.com/akutz/sortfold v0.2.1
 	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0
