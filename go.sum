@@ -45,8 +45,8 @@ github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
-github.com/aegoroff/dirstat v1.0.7 h1:rGaw4gIeAj/mzfLgoKxWlAkKD7bApQVCYoPZCMfeXSQ=
-github.com/aegoroff/dirstat v1.0.7/go.mod h1:HG3oePxWh5tkxbkS1Uv35y0TH30mpl2WDo2qThE9GNM=
+github.com/aegoroff/dirstat v1.0.8 h1:aWHLbqYAOO9+hTpkAiFLKk5wDyFpgJUNi7QCk0G6Tzg=
+github.com/aegoroff/dirstat v1.0.8/go.mod h1:UVvXxwIxXt/Zu1aNkd72ZwX/gClqVzHQTcDL/8278ug=
 github.com/aegoroff/godatastruct v1.2.0 h1:abCFPiyzdsIPc8zBvrtt361ox0zaGJH+RWs4omxhsY8=
 github.com/aegoroff/godatastruct v1.2.0/go.mod h1:WT8eEbkOIhN5LahFJESs7EL5aNk2CVkgJ1jUyNM4LtQ=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
@@ -220,7 +220,6 @@ github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
-github.com/gookit/color v1.4.2/go.mod h1:fqRyamkC1W8uxl+lxCQxOT09l/vYfZ+QeiX3rKQHCoQ=
 github.com/gookit/color v1.5.0 h1:1Opow3+BWDwqor78DcJkJCIwnkviFi+rrOANki9BUFw=
 github.com/gookit/color v1.5.0/go.mod h1:43aQb+Zerm/BWh2GnrgOQm7ffz7tvQXEKV6BFMl7wAo=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
