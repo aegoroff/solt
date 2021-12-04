@@ -37,7 +37,7 @@ func (x *XMLDecoder) Decode(rdr io.Reader, decoders ...DecodeFn) {
 	}
 }
 
-// UnmarshalFrom unmarshal whole xml file using path specified
+// UnmarshalFrom deserializes whole xml file using path specified
 func (x *XMLDecoder) UnmarshalFrom(path string, fs afero.Fs, result interface{}) error {
 	filer := NewFiler(fs, x.w)
 	b, err := filer.Read(path)
@@ -49,7 +49,7 @@ func (x *XMLDecoder) UnmarshalFrom(path string, fs afero.Fs, result interface{})
 	return x.Unmarshal(r, result)
 }
 
-// Unmarshal unmarshal whole xml file using reader specified
+// Unmarshal deserializes whole xml file using reader specified
 func (*XMLDecoder) Unmarshal(r io.Reader, result interface{}) error {
 	return xml.NewDecoder(r).Decode(result)
 }
