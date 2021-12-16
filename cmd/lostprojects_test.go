@@ -115,7 +115,7 @@ These projects are included into a solution but not found in the file system:
  Solution: a\a.sln
   a\c\c.csproj
 
- Solution: a/a1.sln
+ Solution: a\a1.sln
   a\c\c.csproj
 
  Totals:
