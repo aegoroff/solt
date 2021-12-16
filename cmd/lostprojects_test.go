@@ -84,6 +84,55 @@ func Test_FindLostProjectsCmdPureSdkProjects_LostProjectsFound(t *testing.T) {
 `), actual)
 }
 
+func Test_FindLostProjectsCmdMissingProjectInSeveralSolutions_LostProjectsFound(t *testing.T) {
+	// Arrange
+	ass := assert.New(t)
+	dir := "a/"
+	memfs := afero.NewMemMapFs()
+
+	_ = memfs.MkdirAll(dir+"a/Properties", 0755)
+	_ = afero.WriteFile(memfs, dir+"a.sln", []byte(coreSolutionContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1.sln", []byte(coreSolutionContent2), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/a.csproj", []byte(aSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"a1/Program.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/b.csproj", []byte(bSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b/Class1.cs", []byte(codeFileContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b1/b.csproj", []byte(bSdkProjectContent), 0644)
+	_ = afero.WriteFile(memfs, dir+"b1/Class1.cs", []byte(codeFileContent), 0644)
+
+	env := out.NewMemoryEnvironment()
+
+	// Act
+	_ = Execute(memfs, env, "lp", dir)
+
+	// Assert
+	actual := env.String()
+	ass.Equal(sys.ToValidPath(`
+These projects are included into a solution but not found in the file system:
+
+ Solution: a/a.sln
+  a/c/c.csproj
+
+ Solution: a/a1.sln
+  a/c/c.csproj
+
+ Totals:
+
+  Solutions                      2
+  Projects                       4
+                                 
+                                 Count    %     
+                                 -----    ------
+  Within solutions               4        100.00%
+  Lost projects                  0        0.00%
+  Lost projects with includes    0        0.00%
+  Included but not exist         1        25.00%
+  Removed (if specified)         0        0.00%
+`), actual)
+}
+
 func Test_FindLostProjectsCmdLostProjectsInTheSameDir_LostProjectsFound(t *testing.T) {
 	// Arrange
 	ass := assert.New(t)
