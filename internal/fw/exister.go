@@ -1,6 +1,7 @@
 package fw
 
 import (
+	"github.com/aegoroff/godatastruct/collections"
 	"github.com/spf13/afero"
 	"io"
 	"solt/internal/out"
@@ -11,31 +12,31 @@ import (
 type exister struct {
 	filer        Filer
 	unexist      map[string][]string
-	unexistCount int64
+	unexistPaths collections.StringHashSet
 }
 
 // NewExister creates new Exister instance
 func NewExister(fs afero.Fs, w io.Writer) Exister {
 	return &exister{
-		unexist: make(map[string][]string),
-		filer:   sys.NewFiler(fs, w),
+		unexist:      make(map[string][]string),
+		unexistPaths: make(collections.StringHashSet),
+		filer:        sys.NewFiler(fs, w),
 	}
 }
 
 // Validate validates whether files from container exist in filesystem
 func (e *exister) Validate(root string, paths []string) {
 	nonexist := e.filer.CheckExistence(paths)
-	l := len(nonexist)
-	e.unexistCount += int64(l)
+	e.unexistPaths.AddRange(nonexist...)
 
-	if l > 0 {
+	if len(nonexist) > 0 {
 		e.unexist[root] = append(e.unexist[root], nonexist...)
 	}
 }
 
 // UnexistCount gets the number of non exist items
 func (e *exister) UnexistCount() int64 {
-	return e.unexistCount
+	return int64(e.unexistPaths.Count())
 }
 
 // Print outputs unexist files in
