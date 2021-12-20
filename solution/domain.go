@@ -102,4 +102,8 @@ var ProjectsGuids = map[string]string{
 	"{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}": "Sandcastle Documentation",
 	"{A33008B1-5DAC-44D5-9060-242E3B6E38F2}": "#SharpDevelop",
 	"{CFEE4113-1246-4D54-95CB-156813CB8593}": "WiX (Windows Installer XML)",
+	"{C1CDDADD-2546-481F-9697-4EA41081F2FC}": "Office/SharePoint App",
+	"{581633EB-B896-402F-8E60-36F3DA191C85}": "LightSwitch Project",
+	"{8BB0C5E8-0616-4F60-8E55-A43933E57E9C}": "LightSwitch",
+	"{82B43B9B-A64C-4715-B499-D71E9CA2BD60}": "Extensibility",
 }
