@@ -106,4 +106,7 @@ var ProjectsGuids = map[string]string{
 	"{581633EB-B896-402F-8E60-36F3DA191C85}": "LightSwitch Project",
 	"{8BB0C5E8-0616-4F60-8E55-A43933E57E9C}": "LightSwitch",
 	"{82B43B9B-A64C-4715-B499-D71E9CA2BD60}": "Extensibility",
+	"{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}": "Node.js",
+	"{E53339B2-1760-4266-BCC7-CA923CBCF16C}": "Docker Application",
+	"{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}": "SQL Server Database",
 }
