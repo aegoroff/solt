@@ -18,6 +18,7 @@ type matchE struct {
 	tree *btree.BTree
 }
 
+// matchL defines lost item matching
 type matchL struct {
 	include Matcher
 	exclude Matcher
