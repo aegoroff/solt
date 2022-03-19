@@ -80,7 +80,7 @@ func (c *lostFilesCommand) Execute(*cobra.Command) error {
 
 	tt := &totals{
 		projects: int64(len(projects)),
-		unexist:  c.exister.UnexistCount(),
+		missing:  c.exister.MissingCount(),
 		included: int64(len(filesIn)),
 		lost:     int64(len(lost)),
 		found:    int64(len(collected.files)),

@@ -37,8 +37,8 @@ type Exister interface {
 	Validate(root string, includes []string)
 	// Print outputs unexist files in
 	Print(p out.Printer, title string, container string)
-	// UnexistCount gets the number of non exist items
-	UnexistCount() int64
+	// MissingCount gets the number of non exist items
+	MissingCount() int64
 }
 
 // Filer defines module that works with files

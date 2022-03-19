@@ -9,7 +9,7 @@ type totals struct {
 	allProjects      int64
 	lost             int64
 	lostWithIncludes int64
-	unexist          int64
+	missing          int64
 	removed          int64
 }
 
@@ -27,7 +27,7 @@ func (t *totals) Display(tbl *ux.Tabler) {
 	lines.Add("Within solutions", within)
 	lines.Add("Lost projects", t.lost)
 	lines.Add("Lost projects with includes", t.lostWithIncludes)
-	lines.Add("Included but not exist", t.unexist)
+	lines.Add("Included but not exist", t.missing)
 	lines.Add("Removed (if specified)", t.removed)
 
 	for _, l := range lines {

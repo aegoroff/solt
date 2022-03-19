@@ -74,7 +74,7 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 		allProjects:      int64(len(allProjects)),
 		lost:             int64(len(lost)),
 		lostWithIncludes: int64(len(lostWithIncludes)),
-		unexist:          exist.UnexistCount(),
+		missing:          exist.MissingCount(),
 		removed:          r.successCount,
 	}
 	c.Prn().Println()
