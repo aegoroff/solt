@@ -107,7 +107,7 @@ func (lx *lexer) emitTrim(typ tokenType) {
 
 func (lx *lexer) next() (r rune) {
 	if lx.atEOF {
-		panic("next called after EOF")
+		return eof
 	}
 	if lx.pos >= len(lx.input) {
 		lx.atEOF = true
