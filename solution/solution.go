@@ -156,7 +156,9 @@ func onSection(sectionType, name, stage string) {
 	s := Section{Name: name, Stage: stage}
 	currentSectionType = sectionType
 	if sectionType == projectSection {
-		projects[len(projects)-1].Sections = append(projects[len(projects)-1].Sections, &s)
+		if len(projects) > 0 {
+			projects[len(projects)-1].Sections = append(projects[len(projects)-1].Sections, &s)
+		}
 	} else {
 		globalSections = append(globalSections, &s)
 	}

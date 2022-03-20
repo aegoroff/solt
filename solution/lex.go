@@ -106,10 +106,7 @@ func (lx *lexer) emitTrim(typ tokenType) {
 }
 
 func (lx *lexer) next() (r rune) {
-	if lx.atEOF {
-		return eof
-	}
-	if lx.pos >= len(lx.input) {
+	if lx.atEOF || lx.pos >= len(lx.input) {
 		lx.atEOF = true
 		return eof
 	}
