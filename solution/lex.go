@@ -57,6 +57,14 @@ type lexer struct {
 
 func (lx *lexer) nextItem() yySymType {
 	for {
+		if lx.atEOF {
+			return yySymType{
+				yys:  0,
+				tok:  itemEOF,
+				str:  "",
+				line: 0,
+			}
+		}
 		select {
 		case item := <-lx.items:
 			return item

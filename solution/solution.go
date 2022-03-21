@@ -172,7 +172,7 @@ func onSectionItem(key, value string) {
 		sectionIx := len(sections) - 1
 
 		prj.Sections[sectionIx].Items = append(prj.Sections[sectionIx].Items, &si)
-	} else {
+	} else if len(globalSections) > 0 {
 		globalSections[len(globalSections)-1].Items = append(globalSections[len(globalSections)-1].Items, &si)
 	}
 }
