@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-// ReadSolutionDir reads filesystem directory and all its childs to get information
+// ReadSolutionDir reads filesystem directory and all its children to get information
 // about all solutions and projects in this tree.
 // It returns tree
 func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rbtree.RbTree {
@@ -15,7 +15,7 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 
 	rdr := newReader(modules)
 
-	fh := newFileEventHanlder(rdr)
+	fh := newFileEventHandler(rdr)
 	fh.addHandlers(fileHandlers...)
 
 	go rdr.aggregate()
@@ -25,21 +25,21 @@ func ReadSolutionDir(path string, fs afero.Fs, fileHandlers ...ReaderHandler) rb
 	return rdr.getResult()
 }
 
-type fileEventHanlder struct {
+type fileEventHandler struct {
 	handlers []ReaderHandler
 }
 
-func newFileEventHanlder(rdr ReaderHandler) *fileEventHanlder {
-	return &fileEventHanlder{
+func newFileEventHandler(rdr ReaderHandler) *fileEventHandler {
+	return &fileEventHandler{
 		handlers: []ReaderHandler{rdr},
 	}
 }
 
-func (f *fileEventHanlder) addHandlers(handlers ...ReaderHandler) {
+func (f *fileEventHandler) addHandlers(handlers ...ReaderHandler) {
 	f.handlers = append(f.handlers, handlers...)
 }
 
-func (f *fileEventHanlder) Handle(evt *scan.Event) {
+func (f *fileEventHandler) Handle(evt *scan.Event) {
 	if evt.File != nil {
 		for _, h := range f.handlers {
 			h.Handler(evt.File.Path)
