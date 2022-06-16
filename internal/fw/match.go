@@ -127,7 +127,7 @@ func (m *matchL) Match(s string) bool {
 
 func (m *matchE) Match(s string) bool {
 	cs := caseless(s)
-	return m.tree.Get(&cs) != nil
+	return m.tree.Has(&cs)
 }
 
 // MatchAny does any string matching to several patterns
