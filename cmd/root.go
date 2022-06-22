@@ -55,7 +55,7 @@ func Execute(fs afero.Fs, pe out.PrintEnvironment, args ...string) error {
 	rootCmd.AddCommand(newVersion(c))
 	rootCmd.AddCommand(va.New(c))
 
-	if args != nil && len(args) > 0 {
+	if len(args) > 0 {
 		rootCmd.SetArgs(args)
 	}
 

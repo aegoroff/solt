@@ -98,7 +98,6 @@ func stopFallback(data []byte, current int) (int, bool) {
 		// Keep > so as not to break xml syntax
 		ix = current + 1
 		ok = true
-		break
 	case '\n':
 		ix = current
 		ok = true
@@ -106,7 +105,6 @@ func stopFallback(data []byte, current int) (int, bool) {
 			// windows case (\r\n as line ending) - remove \r to keep correctness
 			ix = current - 1
 		}
-		break
 	}
 
 	return ix, ok

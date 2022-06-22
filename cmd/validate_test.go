@@ -131,7 +131,7 @@ func Test_FixSdkSolutionCmd_RedundantReferencesRemoved(t *testing.T) {
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)
-			ass.Equal(tst.expect, string(buf.Bytes()))
+			ass.Equal(tst.expect, buf.String())
 		})
 	}
 }
@@ -174,7 +174,7 @@ func Test_FixSdkSolutionCmdSeveralSolutionsCase_RedundantReferencesRemoved(t *te
 			fa, _ := memfs.Open(dir + "a/a.csproj")
 			buf := bytes.NewBuffer(nil)
 			_, _ = io.Copy(buf, fa)
-			ass.Equal(tst.expect, string(buf.Bytes()))
+			ass.Equal(tst.expect, buf.String())
 		})
 	}
 }
