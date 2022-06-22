@@ -50,6 +50,12 @@ jobs:
       if: matrix.build == 'windows'
       run: go test solt/...
 
+    - name: Static analysis
+      uses: dominikh/staticcheck-action@v1.2.0
+      with:
+        version: "2022.1.1"
+        install-go: false
+
     - name: Benchmarks
       shell: bash
       run: go test -bench=. solt/internal/fw
