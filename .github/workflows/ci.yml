@@ -62,7 +62,7 @@ jobs:
 
     - name: Fuzzing
       shell: bash
-      working-directory: solt/solution
+      working-directory: solution
       run: go test -fuzz=Fuzz* -fuzztime 120s
 
     - name: Send coverage
