@@ -166,7 +166,7 @@ func onSection(sectionType, name, stage string) {
 
 func onSectionItem(key, value string) {
 	si := SectionItem{Key: key, Value: value}
-	if currentSectionType == projectSection {
+	if currentSectionType == projectSection && len(projects) > 0 {
 		prj := projects[len(projects)-1]
 		sections := prj.Sections
 		sectionIx := len(sections) - 1

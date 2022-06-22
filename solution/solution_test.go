@@ -65,6 +65,7 @@ func Test_ParseInvalidSolution(t *testing.T) {
 		{"1", "\nMicrosoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio 2013\nVisualStudioVersion = 12.0.31101.0\nMinimumVisualStudioVersion = 10.0.40219.1\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Grok\", \"Grok\\Grok.csproj\", \"{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}\"\nEndProject\nGlobal\n\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n\t\tDebug|Any CPU = Debug|Any CPU\n\t\tRelease|Any CPU = Release|Any CPU\n\tEnnGlobalSectionease|Any CPU = Release|Any CPU\\n\\tEnnGlobalSection\\n\\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\\n\\t\\t{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Debug|Any CPU.ActiveCfg = Debug|Ady CPU\\n\\t\\t{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}.Debug|Any CPU."},
 		{"2", "\nMicrosoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio 2013\nVisualStudioVersion = 12.0.31101.0\nMinimumVisualStudioVersion = 10.0.40219.1\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Grok\", \"Grok\\Grok.csproj\", \"{EC6D1E9B-2DA0-4225-9109-E9CF1C924116}\"\nEndProject\nGlobal\n\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n\t\tDebug|Any CPU = Deb"},
 		{"3", "A\n\t = \n0"},
+		{"4", "A00000000000000000000000000000000\nA00000000\n\t = \n"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
