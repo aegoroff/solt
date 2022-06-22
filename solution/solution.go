@@ -170,8 +170,9 @@ func onSectionItem(key, value string) {
 		prj := projects[len(projects)-1]
 		sections := prj.Sections
 		sectionIx := len(sections) - 1
-
-		prj.Sections[sectionIx].Items = append(prj.Sections[sectionIx].Items, &si)
+		if sectionIx >= 0 {
+			prj.Sections[sectionIx].Items = append(prj.Sections[sectionIx].Items, &si)
+		}
 	} else if len(globalSections) > 0 {
 		globalSections[len(globalSections)-1].Items = append(globalSections[len(globalSections)-1].Items, &si)
 	}
