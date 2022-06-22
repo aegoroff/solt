@@ -60,6 +60,11 @@ jobs:
       shell: bash
       run: go test -bench=. solt/internal/fw
 
+    - name: Fuzzing
+      shell: bash
+      working-directory: solt/solution
+      run: go test -fuzz=Fuzz* -fuzztime 120s
+
     - name: Send coverage
       if: matrix.build == 'linux'
       run: |
