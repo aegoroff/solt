@@ -38,8 +38,8 @@ cloud.google.com/go/storage v1.14.0/go.mod h1:GrKmX003DSIwi9o29oFT7YDnHYwZoctc3f
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/aegoroff/dirstat v1.1.0 h1:ht5MYQi77s74kR5vyhJIYALLXvMdOj37MQWVE+7WArM=
-github.com/aegoroff/dirstat v1.1.0/go.mod h1:dwCbea5nqwpI5VzqHMaECQIwTcxLznfSzKJzAT15d/8=
+github.com/aegoroff/dirstat v1.1.1 h1:hm6HrhMLmS3ppquIv8Hz+eS1KaDFxv+p0Iop2SsjD9k=
+github.com/aegoroff/dirstat v1.1.1/go.mod h1:AAqd/8KH67QgMGhrKnb8R/02jmOshcBRUxiDb+A71+c=
 github.com/aegoroff/godatastruct v1.3.0 h1:kpA995d7drmCrAstyeSLhSJ8rq8h/ro5gms9itWXiG8=
 github.com/aegoroff/godatastruct v1.3.0/go.mod h1:meoxIy52cm9vY3baM9iMtUjge2iMKW/5hpgkOSWP4fQ=
 github.com/akutz/sortfold v0.2.1 h1:u9x3FC6oM+6gZKEVNRnmVafJgappwrv9YqpELQCYViI=
