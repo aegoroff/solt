@@ -72,6 +72,18 @@ scoop:
   description: Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects
   license: MIT
 
+nfpms:
+  -
+    package_name: solt
+    homepage: https://github.com/aegoroff/solt
+    maintainer: Alexander Egorov <egoroff@gmail.com>
+    description: Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects
+    license: MIT
+    bindir: /usr/bin
+    formats:
+      - deb
+      - rpm
+
 signs:
   - artifacts: checksum
     args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
