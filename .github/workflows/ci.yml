@@ -28,16 +28,16 @@ jobs:
     steps:
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: "1.20"
       id: go
 
     - name: Install gox
       run: go install github.com/mitchellh/gox@latest
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Build
       run: gox -osarch="${{ matrix.build }}/amd64 ${{ matrix.build }}/arm64" -ldflags "-s -w -X solt/cmd.Version=${{ github.run_number }}" solt
@@ -51,10 +51,10 @@ jobs:
       run: go test solt/...
 
     - name: Static analysis
-      uses: dominikh/staticcheck-action@v1.2.0
+      uses: dominikh/staticcheck-action@v1.3.0
       with:
-        version: "2022.1.1"
-        install-go: false
+        version: "2022.1.3"
+        install-go: true
 
     - name: Benchmarks
       shell: bash
