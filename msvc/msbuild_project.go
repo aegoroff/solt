@@ -23,7 +23,7 @@ func (prj *MsbuildProject) Path() string {
 	return prj.path
 }
 
-// IsSdkProject gets whether a project is a the new VS 2017 or later project
+// IsSdkProject gets whether a project is the new VS 2017 or later project
 func (prj *MsbuildProject) IsSdkProject() bool {
 	return prj.Project.isSdkProject()
 }
