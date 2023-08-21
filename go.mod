@@ -19,7 +19,7 @@ require (
 	github.com/willf/bitset v1.1.11 // indirect
 	github.com/willf/bloom v2.0.3+incompatible
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
-	gonum.org/v1/gonum v0.13.0
+	gonum.org/v1/gonum v0.14.0
 )
 
 require (
