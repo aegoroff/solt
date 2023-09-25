@@ -13,7 +13,7 @@ require (
 	github.com/google/btree v1.1.2
 	github.com/gookit/color v1.5.4
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/spf13/afero v1.9.5
+	github.com/spf13/afero v1.10.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/willf/bitset v1.1.11 // indirect
