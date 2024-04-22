@@ -2,12 +2,13 @@ package nu
 
 import (
 	"fmt"
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/aegoroff/godatastruct/rbtree"
-	"github.com/spf13/cobra"
 	"solt/internal/fw"
 	"solt/msvc"
 	"strings"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/aegoroff/godatastruct/rbtree"
+	"github.com/spf13/cobra"
 )
 
 const empiricNugetPacksForEachProject = 16
@@ -136,7 +137,7 @@ func (c *nugetByProjectCommand) Execute(*cobra.Command) error {
 
 func newNugetFoldersTree(foldersTree rbtree.RbTree) (rbtree.RbTree, int64) {
 	result := rbtree.New()
-	counter := c9s.NewStringHashSet()
+	counter := c9s.NewHashSet[string]()
 	msvc.WalkProjectFolders(foldersTree, func(prj *msvc.MsbuildProject, fold *msvc.Folder) {
 		packages, sources := fold.Content.NugetPackages()
 		if len(packages) == 0 {

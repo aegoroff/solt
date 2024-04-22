@@ -1,21 +1,22 @@
 package lp
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"os"
 	"path/filepath"
 	"solt/internal/fw"
 	"solt/msvc"
 	"strings"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
 )
 
 type finder struct {
-	allFilesPaths c9s.StringHashSet
+	allFilesPaths c9s.HashSet[string]
 }
 
 func newFinder() *finder {
 	return &finder{
-		allFilesPaths: c9s.NewStringHashSet(),
+		allFilesPaths: c9s.NewHashSet[string](),
 	}
 }
 
@@ -59,7 +60,7 @@ func (f *finder) separate(lost []string) ([]string, []string) {
 }
 
 func (f *finder) newMatcher(allLost []string) (fw.Matcher, []string) {
-	filePaths := make(c9s.StringHashSet, f.allFilesPaths.Count())
+	filePaths := make(c9s.HashSet[string], f.allFilesPaths.Count())
 	lostDirs := make([]string, len(allLost))
 
 	for i, lp := range allLost {

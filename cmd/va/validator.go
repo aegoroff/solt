@@ -1,12 +1,13 @@
 package va
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"solt/internal/fw"
 	"solt/msvc"
 	"solt/msvc/graph"
 	"sort"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
 )
 
 type validator struct {
@@ -15,7 +16,7 @@ type validator struct {
 	act             actioner
 	sdk             *sdkProjects
 	tt              *totals
-	problemProjects c9s.StringHashSet
+	problemProjects c9s.HashSet[string]
 }
 
 func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
@@ -24,7 +25,7 @@ func newValidator(fs afero.Fs, sourcesPath string, act actioner) *validator {
 		sourcesPath:     sourcesPath,
 		act:             act,
 		tt:              &totals{},
-		problemProjects: c9s.NewStringHashSet(),
+		problemProjects: c9s.NewHashSet[string](),
 	}
 }
 

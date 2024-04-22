@@ -1,22 +1,23 @@
 package lf
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
 	"solt/internal/sys"
 	"solt/msvc"
 	"strings"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
 )
 
 // skipper is just collector that collects folders
 // which files have to be skipped
 type skipper struct {
-	items c9s.StringHashSet
+	items c9s.HashSet[string]
 }
 
 func newSkipper() *skipper {
 	return &skipper{
-		items: c9s.NewStringHashSet(),
+		items: c9s.NewHashSet[string](),
 	}
 }
 

@@ -1,10 +1,11 @@
 package in
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/akutz/sortfold"
 	"solt/internal/out"
 	"solt/internal/ux"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/akutz/sortfold"
 )
 
 type printer struct {
@@ -16,7 +17,7 @@ func newPrinter(margin int, w out.Writable) *printer {
 	return &printer{margin: margin, w: w}
 }
 
-func (p *printer) print(set c9s.StringHashSet, name string) {
+func (p *printer) print(set c9s.HashSet[string], name string) {
 	tbl := ux.NewTabler(p.w, p.margin)
 	tbl.AddHead(name)
 

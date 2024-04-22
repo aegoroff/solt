@@ -1,10 +1,11 @@
 package va
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/akutz/sortfold"
 	"solt/internal/out"
 	"solt/internal/ux"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/akutz/sortfold"
 )
 
 type printer struct {
@@ -17,7 +18,7 @@ func newPrinter(p out.Printer) actioner {
 	}
 }
 
-func (v *printer) action(path string, refs map[string]c9s.StringHashSet) {
+func (v *printer) action(path string, refs map[string]c9s.HashSet[string]) {
 	if len(refs) == 0 {
 		return
 	}

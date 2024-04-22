@@ -7,11 +7,11 @@ import (
 
 type mismatcher struct {
 	nugets  rbtree.RbTree
-	counter c9s.StringHashSet
+	counter c9s.HashSet[string]
 }
 
 func newMismatcher(nugets rbtree.RbTree) *mismatcher {
-	return &mismatcher{nugets: nugets, counter: c9s.NewStringHashSet()}
+	return &mismatcher{nugets: nugets, counter: c9s.NewHashSet[string]()}
 }
 
 func (m *mismatcher) count() int64 {

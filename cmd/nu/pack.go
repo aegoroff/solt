@@ -1,18 +1,19 @@
 package nu
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"strings"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
 )
 
 // pack defines nu package descriptor
 type pack struct {
 	pkg      string
-	versions c9s.StringHashSet
+	versions c9s.HashSet[string]
 }
 
 func newPack(id string, versions ...string) *pack {
-	vs := c9s.NewStringHashSet()
+	vs := c9s.NewHashSet[string]()
 	vs.AddRange(versions...)
 	return &pack{
 		pkg:      id,

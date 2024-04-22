@@ -1,9 +1,10 @@
 package va
 
 import (
+	"solt/msvc/graph"
+
 	c9s "github.com/aegoroff/godatastruct/collections"
 	"gonum.org/v1/gonum/graph/path"
-	"solt/msvc/graph"
 )
 
 type finder struct {
@@ -24,9 +25,9 @@ func (fi *finder) hasPath(from *graph.Node, to *graph.Node) bool {
 	return len(paths) > 0
 }
 
-func (fi *finder) find(n *graph.Node) (c9s.StringHashSet, bool) {
+func (fi *finder) find(n *graph.Node) (c9s.HashSet[string], bool) {
 	nodes := fi.g.To(n)
-	found := c9s.NewStringHashSet()
+	found := c9s.NewHashSet[string]()
 	for _, from := range nodes {
 		for _, to := range nodes {
 			if fi.hasPath(from, to) {
@@ -38,8 +39,8 @@ func (fi *finder) find(n *graph.Node) (c9s.StringHashSet, bool) {
 	return found, found.Count() > 0
 }
 
-func (fi *finder) findAll() map[string]c9s.StringHashSet {
-	result := make(map[string]c9s.StringHashSet)
+func (fi *finder) findAll() map[string]c9s.HashSet[string] {
+	result := make(map[string]c9s.HashSet[string])
 	fi.g.Foreach(func(n *graph.Node) {
 		found, ok := fi.find(n)
 

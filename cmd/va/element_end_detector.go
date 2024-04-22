@@ -2,9 +2,10 @@ package va
 
 import (
 	"encoding/xml"
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"path/filepath"
 	"solt/internal/sys"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
 )
 
 type projectReference struct {
@@ -16,12 +17,12 @@ func (r *projectReference) path() string {
 }
 
 type elementEndDetector struct {
-	filter c9s.StringHashSet
+	filter c9s.HashSet[string]
 	ends   []int64
 	dir    string
 }
 
-func newElementEndDetector(project string, filter c9s.StringHashSet) *elementEndDetector {
+func newElementEndDetector(project string, filter c9s.HashSet[string]) *elementEndDetector {
 	return &elementEndDetector{
 		filter: filter,
 		ends:   make([]int64, 0),

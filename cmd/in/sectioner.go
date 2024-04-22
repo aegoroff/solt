@@ -1,20 +1,21 @@
 package in
 
 import (
-	c9s "github.com/aegoroff/godatastruct/collections"
 	"solt/solution"
 	"strings"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
 )
 
 type sectioner struct {
-	configurations c9s.StringHashSet
-	platforms      c9s.StringHashSet
+	configurations c9s.HashSet[string]
+	platforms      c9s.HashSet[string]
 }
 
 func newSectioner() *sectioner {
 	return &sectioner{
-		configurations: c9s.NewStringHashSet(),
-		platforms:      c9s.NewStringHashSet(),
+		configurations: c9s.NewHashSet[string](),
+		platforms:      c9s.NewHashSet[string](),
 	}
 }
 

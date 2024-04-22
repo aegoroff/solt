@@ -1,25 +1,26 @@
 package fw
 
 import (
-	"github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"io"
 	"solt/internal/out"
 	"solt/internal/sys"
 	"solt/internal/ux"
+
+	"github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
 )
 
 type exister struct {
 	filer        Filer
 	missingFiles map[string][]string
-	missingPaths collections.StringHashSet
+	missingPaths collections.HashSet[string]
 }
 
 // NewExister creates new Exister instance
 func NewExister(fs afero.Fs, w io.Writer) Exister {
 	return &exister{
 		missingFiles: make(map[string][]string),
-		missingPaths: make(collections.StringHashSet),
+		missingPaths: make(collections.HashSet[string]),
 		filer:        sys.NewFiler(fs, w),
 	}
 }

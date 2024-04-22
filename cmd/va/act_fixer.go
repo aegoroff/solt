@@ -2,12 +2,13 @@ package va
 
 import (
 	"bytes"
-	c9s "github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"solt/internal/fw"
 	"solt/internal/out"
 	"solt/internal/sys"
 	"unicode/utf8"
+
+	c9s "github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
 )
 
 type fixer struct {
@@ -26,7 +27,7 @@ func newFixer(p out.Printer, w out.Writable, fs afero.Fs) actioner {
 	}
 }
 
-func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
+func (f *fixer) action(path string, refs map[string]c9s.HashSet[string]) {
 	if len(refs) == 0 {
 		return
 	}
@@ -47,7 +48,7 @@ func (f *fixer) action(path string, refs map[string]c9s.StringHashSet) {
 	f.prn.Cprint(mf, invalidRefsCount, len(refs), path)
 }
 
-func (f *fixer) getElementsEnds(data []byte, project string, toRemove c9s.StringHashSet) []int64 {
+func (f *fixer) getElementsEnds(data []byte, project string, toRemove c9s.HashSet[string]) []int64 {
 	ed := newElementEndDetector(project, toRemove)
 
 	decoder := sys.NewXMLDecoder(f.w.Writer())

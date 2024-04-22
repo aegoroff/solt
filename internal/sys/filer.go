@@ -3,14 +3,15 @@ package sys
 import (
 	"bytes"
 	"fmt"
-	"github.com/aegoroff/dirstat/scan"
-	"github.com/aegoroff/godatastruct/collections"
-	"github.com/spf13/afero"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/aegoroff/dirstat/scan"
+	"github.com/aegoroff/godatastruct/collections"
+	"github.com/spf13/afero"
 )
 
 // NewFiler creates new Filer instance
@@ -35,7 +36,7 @@ func (f *Filer) CheckExistence(files []string) []string {
 	result := make([]string, 0)
 	var restrict = make(chan struct{}, 32)
 	defer close(restrict)
-	notExitsDirs := collections.NewStringHashSet()
+	notExitsDirs := collections.NewHashSet[string]()
 
 	var wg sync.WaitGroup
 	wg.Add(len(files))
