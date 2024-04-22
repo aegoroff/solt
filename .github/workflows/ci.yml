@@ -24,13 +24,15 @@ jobs:
             os: macos-latest
           - build: windows
             os: windows-latest
+    env:
+      GOCOVERDIR: "_icoverdir_"
 
     steps:
 
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: "1.20"
+        go-version: "1.22"
       id: go
 
     - name: Install gox
@@ -43,12 +45,14 @@ jobs:
       run: gox -osarch="${{ matrix.build }}/amd64 ${{ matrix.build }}/arm64" -ldflags "-s -w -X solt/cmd.Version=${{ github.run_number }}" solt
 
     - name: Test with coverage
-      if: matrix.build != 'windows'
-      run: go test -coverprofile=coverage.txt -coverpkg solt/internal/sys,solt/msvc,solt/cmd,solt/internal/fw,solt/internal/ux,solt/internal/out,solt/cmd/in,solt/cmd/nu,solt/cmd/lf,solt/cmd/lp,solt/cmd/va,solt/solution -covermode=atomic solt/...
+      if: matrix.build == 'linux'
+      run: |
+        mkdir _icoverdir_
+        go test -coverprofile=coverage.txt -coverpkg ./... -covermode=atomic ./...
 
     - name: Test
-      if: matrix.build == 'windows'
-      run: go test solt/...
+      if: matrix.build != 'linux'
+      run: go test ./...
 
     - name: Static analysis
       uses: dominikh/staticcheck-action@v1.3.1
