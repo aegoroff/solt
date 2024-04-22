@@ -52,7 +52,7 @@ archives:
 brews:
 -
     goarm: 7
-    tap:
+    repository:
       owner: aegoroff
       name: homebrew-tap
     commit_author:
@@ -64,13 +64,14 @@ brews:
     description: "Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects"
     license: "MIT"
 
-scoop:
-  bucket:
-    owner: aegoroff
-    name: scoop-bucket
-  homepage:  https://github.com/aegoroff/solt
-  description: Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects
-  license: MIT
+scoops:
+  -
+    repository:
+      owner: aegoroff
+      name: scoop-bucket
+    homepage:  https://github.com/aegoroff/solt
+    description: Small console app written in Go that allows you to easily analyze sources and Microsoft Visual Studio solutions and projects
+    license: MIT
 
 nfpms:
   -
