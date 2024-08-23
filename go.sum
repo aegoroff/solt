@@ -1,5 +1,5 @@
-github.com/aegoroff/dirstat v1.3.1 h1:JRpZyq2e5gQY5IdJHk6YMyJ+wROcstYsdMX0Ecc7ATY=
-github.com/aegoroff/dirstat v1.3.1/go.mod h1:KRQbsKWrpVf85YdQD2wqHd28H8Dqz6fua5HvcYAU3lA=
+github.com/aegoroff/dirstat v1.3.2 h1:H9trVT5rxsbnav5TMuE8YeqthXd5eOYHmpHOLJUOsG8=
+github.com/aegoroff/dirstat v1.3.2/go.mod h1:eQ0abMgj6tAYeNErxW/mz5QYu8SpgFpBONY3t5igmv4=
 github.com/aegoroff/godatastruct v1.4.1 h1:VLPPR9EdZq5CxaLAq+X6CwRk+GQ7DmU0pu4EG95m40c=
 github.com/aegoroff/godatastruct v1.4.1/go.mod h1:FiBlQRFBfNr9/8pTg2JDme9wPnXjSHrLfipyQrbDfes=
 github.com/akutz/sortfold v0.2.1 h1:u9x3FC6oM+6gZKEVNRnmVafJgappwrv9YqpELQCYViI=
