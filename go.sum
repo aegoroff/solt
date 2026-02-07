@@ -1,7 +1,7 @@
-github.com/aegoroff/dirstat v1.3.4 h1:zYBTTIaHn50gerJtAhGh2snQUz4d4CjTA3l53T1txk8=
-github.com/aegoroff/dirstat v1.3.4/go.mod h1:eYAc6dIXiWadLXf5dHPJQzvk6mcCuuKtSsYJ/+WA22U=
-github.com/aegoroff/godatastruct v1.4.1 h1:VLPPR9EdZq5CxaLAq+X6CwRk+GQ7DmU0pu4EG95m40c=
-github.com/aegoroff/godatastruct v1.4.1/go.mod h1:FiBlQRFBfNr9/8pTg2JDme9wPnXjSHrLfipyQrbDfes=
+github.com/aegoroff/dirstat v1.4.0 h1:fn42N+er7NUWkrlSoTGBzkflDbS4i02elj9kEA3R98A=
+github.com/aegoroff/dirstat v1.4.0/go.mod h1:nU2lOEG1cRmvsMmUrzQIhJ9dFKTh2dzXR1tOIoKOPw4=
+github.com/aegoroff/godatastruct v1.5.0 h1:4xG7RwVw6NDil+8Dqkv4+itrl5pHUEsn/QX39nj2GIY=
+github.com/aegoroff/godatastruct v1.5.0/go.mod h1:1623936jaDQtxmJ2P2L/JfX7GjC3+tGz6jp2YYPvjW4=
 github.com/akutz/sortfold v0.2.1 h1:u9x3FC6oM+6gZKEVNRnmVafJgappwrv9YqpELQCYViI=
 github.com/akutz/sortfold v0.2.1/go.mod h1:m1NArmessx+/3z2N8MiiTjq79A3WwZwDDiZ7eeD4jHA=
 github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0 h1:onfun1RA+KcxaMk1lfrRnwCd1UUuOjJM/lri5eM1qMs=
