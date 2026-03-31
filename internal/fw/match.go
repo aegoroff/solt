@@ -5,6 +5,7 @@ import (
 	"github.com/akutz/sortfold"
 	"github.com/anknown/ahocorasick"
 	"github.com/google/btree"
+	"slices"
 )
 
 // matchP defines partial matching
@@ -132,13 +133,7 @@ func (m *matchE) Match(s string) bool {
 
 // MatchAny does any string matching to several patterns
 func MatchAny(ss []string, m Matcher) bool {
-	for _, s := range ss {
-		if m.Match(s) {
-			return true
-		}
-	}
-
-	return false
+	return slices.ContainsFunc(ss, m.Match)
 }
 
 // Filter filters slice using Matcher. Only matched strings will be in result

@@ -167,7 +167,7 @@ func (lx *lexer) peek() rune {
 // errorf stops all lexing by emitting an error and returning `nil`.
 // Note that any value that is a character is escaped if it's a special
 // character (newlines, tabs, etc.).
-func (lx *lexer) errorf(format string, values ...interface{}) stateFn {
+func (lx *lexer) errorf(format string, values ...any) stateFn {
 	lx.items <- yySymType{
 		tok:  itemError,
 		str:  fmt.Sprintf(format, values...),

@@ -9,7 +9,7 @@ func NewPrinter(pe PrintEnvironment) Printer {
 	return &prn{env: pe}
 }
 
-func (r *prn) Cprint(format string, a ...interface{}) {
+func (r *prn) Cprint(format string, a ...any) {
 	r.env.PrintFunc(r.env.Writer(), format, a...)
 }
 

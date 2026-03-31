@@ -37,7 +37,7 @@ func (e *fileEnvironment) NewPrinter() (Printer, error) {
 	return NewPrinter(e), nil
 }
 
-func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (e *fileEnvironment) PrintFunc(w io.Writer, format string, a ...any) {
 	e.base.PrintFunc(w, format, a...)
 }
 

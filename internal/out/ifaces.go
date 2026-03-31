@@ -10,7 +10,7 @@ type PrintEnvironment interface {
 	Writable
 
 	// PrintFunc represents printing function implementation
-	PrintFunc(w io.Writer, format string, a ...interface{})
+	PrintFunc(w io.Writer, format string, a ...any)
 
 	// NewPrinter creates new printer
 	NewPrinter() (Printer, error)
@@ -25,7 +25,7 @@ type StringEnvironment interface {
 // Printer represents printing abstraction with colorizing support
 type Printer interface {
 	// Cprint prints data with colorizing support
-	Cprint(format string, a ...interface{})
+	Cprint(format string, a ...any)
 
 	// Println prints new line
 	Println()

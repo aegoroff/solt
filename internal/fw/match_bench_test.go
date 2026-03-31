@@ -52,7 +52,7 @@ func BenchmarkNewExactMatch_Match_Bloom(b *testing.B) {
 
 func generateRandomStringSlice(num int, length int) []string {
 	result := make([]string, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		l := 1 + rand.Intn(length)
 		s := randomString(l)
 		result[i] = s

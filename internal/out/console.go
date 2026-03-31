@@ -31,7 +31,7 @@ func (e *consoleEnvironment) NewPrinter() (Printer, error) {
 	return NewPrinter(e), nil
 }
 
-func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...interface{}) {
+func (*consoleEnvironment) PrintFunc(w io.Writer, format string, a ...any) {
 	color.Fprintf(w, format, a...)
 }
 

@@ -44,8 +44,8 @@ func (t Tabler) addLine(line []string, decors ...func(s string) string) {
 	}
 }
 
-func (t Tabler) newLine(line []string, d func(s string) string) []interface{} {
-	result := make([]interface{}, len(line))
+func (t Tabler) newLine(line []string, d func(s string) string) []any {
+	result := make([]any, len(line))
 	for i, column := range line {
 		decorated := d(column)
 		if i == 0 {
