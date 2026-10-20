@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/aegoroff/dirstat v1.4.0
-	github.com/aegoroff/godatastruct v1.5.0
+	github.com/aegoroff/godatastruct v1.6.0
 	github.com/akutz/sortfold v0.2.1
 	github.com/anknown/ahocorasick v0.0.0-20190904063843-d75dbd5169c0
 	github.com/anknown/darts v0.0.0-20151216065714-83ff685239e6 // indirect
