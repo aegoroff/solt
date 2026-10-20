@@ -54,9 +54,9 @@ func (c *lostProjectsCommand) Execute(*cobra.Command) error {
 		l1 := "<red>These projects are not included into any solution</>"
 		l2 := "<red>but files from the projects' folders are used in another projects within a solution:</>"
 		c.Prn().Println()
-		c.Prn().Cprint(m1.Margin(l1))
+		c.Prn().Cprint("%s", m1.Margin(l1))
 		c.Prn().Println()
-		c.Prn().Cprint(m1.Margin(l2))
+		c.Prn().Cprint("%s", m1.Margin(l2))
 		c.Prn().Println()
 		c.Prn().Println()
 

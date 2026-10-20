@@ -44,7 +44,7 @@ func (e *exister) MissingCount() int64 {
 func (e *exister) Print(p out.Printer, title string, container string) {
 	if len(e.missingFiles) > 0 {
 		p.Println()
-		p.Cprint(title)
+		p.Cprint("%s", title)
 		p.Println()
 	}
 
